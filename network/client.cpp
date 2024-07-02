@@ -20,8 +20,7 @@ int main(int argc, char* argv[]) {
 
     const char* ip = argv[1];
     int port = std::stoi(argv[2]);
-
-    sockaddr_in serverAddress;
+    sockaddr_in serverAddress{};
 
     if ((clientSocket = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         std::cerr << "Socket creation failed!" << std::endl;
@@ -35,7 +34,6 @@ int main(int argc, char* argv[]) {
         std::cerr << "Invalid address or address not supported!" << std::endl;
         return 1;
     }
-
     if (connect(clientSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) {
         std::cerr << "Connection failed!" << std::endl;
         return 1;

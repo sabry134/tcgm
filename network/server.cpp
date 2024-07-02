@@ -11,9 +11,9 @@ constexpr int DEFAULT_PORT = 5000;
 
 void open_window(std::vector<int>& clientSockets);
 
-void server(std::vector<int>& clientSockets, int port) {
+[[noreturn]] void server(std::vector<int>& clientSockets, int port) {
     int serverSocket, newSocket;
-    sockaddr_in address;
+    sockaddr_in address{};
     int addrlen = sizeof(address);
     int max_clients = SOMAXCONN;
     std::map<int, int> clientIDs;
@@ -43,12 +43,10 @@ void server(std::vector<int>& clientSockets, int port) {
         fd_set readfds;
 
         FD_ZERO(&readfds);
-
         FD_SET(serverSocket, &readfds);
         int max_sd = serverSocket;
 
-        for (size_t i = 0; i < clientSockets.size(); i++) {
-            int sd = clientSockets[i];
+        for (int sd : clientSockets) {
             FD_SET(sd, &readfds);
             if (sd > max_sd)
                 max_sd = sd;

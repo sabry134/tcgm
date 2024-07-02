@@ -1,12 +1,11 @@
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <iostream>
-#include <algorithm>
 
 const int SHAPE_SPACING = 150;
 
 void open_window(std::vector<int>& clientSockets) {
-    sf::RenderWindow window(sf::VideoMode(1920, 1080), "My advanced runner");
+    sf::RenderWindow window(sf::VideoMode(1920, 1080), "TCGM Client");
 
     sf::Texture backgroundTexture;
     if (!backgroundTexture.loadFromFile("img/runner_background.jpg")) {
@@ -29,8 +28,8 @@ void open_window(std::vector<int>& clientSockets) {
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
-                std::cout << "Server has been closed!" << std::endl;
-                exit(84);
+                std::cout << "Window has been closed!" << std::endl;
+                exit(0);
             } else if (event.type == sf::Event::Resized) {
                 sf::FloatRect visibleArea(0.f, 0.f, static_cast<float>(event.size.width), static_cast<float>(event.size.height));
                 window.setView(sf::View(visibleArea));
@@ -46,12 +45,8 @@ void open_window(std::vector<int>& clientSockets) {
             clientSprites.push_back(clientSprite);
         }
 
-        for (auto it = clientSprites.begin(); it != clientSprites.end();) {
-            if (static_cast<std::size_t>(std::distance(clientSprites.begin(), it)) >= clientSockets.size()) {
-                it = clientSprites.erase(it);
-            } else {
-                ++it;
-            }
+        while (clientSprites.size() > clientSockets.size()) {
+            clientSprites.pop_back();
         }
 
         for (std::size_t i = 0; i < clientSprites.size(); ++i) {

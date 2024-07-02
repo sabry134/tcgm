@@ -3,13 +3,10 @@
 #include <cstring>
 #include <unistd.h>
 #include <arpa/inet.h>
-#include <SFML/Graphics.hpp>
 #include <thread>
 #include <map>
 
 constexpr int DEFAULT_PORT = 5000;
-
-void open_window(std::vector<int>& clientSockets);
 
 void server(std::vector<int>& clientSockets, int port) {
     int serverSocket, newSocket;
@@ -85,16 +82,20 @@ void server(std::vector<int>& clientSockets, int port) {
                     i--;
                 } else {
                     buffer[bytesRead] = '\0';
-                    std::cout << "Received message from client ID " << clientIDs[sd] << ": " << buffer << std::endl;
-                    if (std::strcmp(buffer, "exit") == 0) {
-                        std::cout << "Client ID " << clientIDs[sd] << " requested to exit. Disconnecting client." << std::endl;
-                        close(sd);
-                        clientIDs.erase(sd);
-                        clientSockets.erase(clientSockets.begin() + i);
-                        i--;
+                    if (std::strcmp(buffer, "count") == 0) {
+                        std::string count = std::to_string(clientSockets.size());
+                        send(sd, count.c_str(), count.size(), 0);
                     } else {
-                        // Echo back the message
-                        send(sd, buffer, bytesRead, 0);
+                        std::cout << "Received message from client ID " << clientIDs[sd] << ": " << buffer << std::endl;
+                        if (std::strcmp(buffer, "exit") == 0) {
+                            std::cout << "Client ID " << clientIDs[sd] << " requested to exit. Disconnecting client." << std::endl;
+                            close(sd);
+                            clientIDs.erase(sd);
+                            clientSockets.erase(clientSockets.begin() + i);
+                            i--;
+                        } else {
+                            send(sd, buffer, bytesRead, 0);
+                        }
                     }
                 }
             }
@@ -112,9 +113,6 @@ int main(int argc, char** argv) {
     std::vector<int> clientSockets;
 
     std::thread serverThread(server, std::ref(clientSockets), port);
-
-    open_window(clientSockets);
-
     serverThread.join();
 
     return 0;

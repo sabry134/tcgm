@@ -113,6 +113,7 @@ int main(int argc, char** argv) {
     std::vector<int> clientSockets;
 
     std::thread serverThread(server, std::ref(clientSockets), port);
+
     serverThread.join();
 
     return 0;

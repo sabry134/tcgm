@@ -20,6 +20,15 @@ jobs:
         echo "Running tests..."
         echo "::set-output name=success::true"
       
+    - name: Set job color
+      id: set_color
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "::set-output name=color::3066993"
+        else
+          echo "::set-output name=color::15158332"
+        fi
+
     - name: Send Discord notification
       if: always()
       env:
@@ -28,6 +37,7 @@ jobs:
         JOB_STATUS: ${{ job.status }}
         JOB_NAME: ${{ github.job }}
         REPO_NAME: ${{ github.repository }}
+        COLOR: ${{ steps.set_color.outputs.color }}
       run: |
         curl -H "Content-Type: application/json" \
         -d '{
@@ -35,7 +45,7 @@ jobs:
               "embeds": [{
                 "title": "GitHub Actions - '${REPO_NAME}'",
                 "description": "Workflow **'${{ github.workflow }}'** run for commit **'${GITHUB_SHA}'**.",
-                "color": '${{ job.status == 'success' && "3066993" || "15158332" }}',
+                "color": '${COLOR}',
                 "fields": [
                   {
                     "name": "Job",

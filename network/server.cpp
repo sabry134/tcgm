@@ -3,19 +3,16 @@
 #include <cstring>
 #include <unistd.h>
 #include <arpa/inet.h>
-#include <SFML/Graphics.hpp>
 #include <thread>
 #include <map>
 
 constexpr int DEFAULT_PORT = 5000;
 
-void OpenWindow(std::vector<int>& clientSockets);
-
-[[noreturn]] void Server(std::vector<int>& clientSockets, int port) {
+void server(std::vector<int>& clientSockets, int port) {
     int serverSocket, newSocket;
-    sockaddr_in address{};
+    sockaddr_in address;
     int addrlen = sizeof(address);
-    int maxClients = SOMAXCONN;
+    int max_clients = SOMAXCONN;
     std::map<int, int> clientIDs;
     int clientIDCounter = 0;
 
@@ -33,32 +30,34 @@ void OpenWindow(std::vector<int>& clientSockets);
         exit(84);
     }
 
-    if (listen(serverSocket, maxClients) < 0) {
+    if (listen(serverSocket, max_clients) < 0) {
         std::cerr << "Listen failed!" << std::endl;
         exit(84);
     }
 
     std::cout << "Server started. Listening on port " << port << std::endl;
     while (true) {
-        fd_set readFds;
+        fd_set readfds;
 
-        FD_ZERO(&readFds);
-        FD_SET(serverSocket, &readFds);
-        int maxSd = serverSocket;
+        FD_ZERO(&readfds);
 
-        for (int sd : clientSockets) {
-            FD_SET(sd, &readFds);
-            if (sd > maxSd)
-                maxSd = sd;
+        FD_SET(serverSocket, &readfds);
+        int max_sd = serverSocket;
+
+        for (size_t i = 0; i < clientSockets.size(); i++) {
+            int sd = clientSockets[i];
+            FD_SET(sd, &readfds);
+            if (sd > max_sd)
+                max_sd = sd;
         }
 
-        int activity = select(maxSd + 1, &readFds, nullptr, nullptr, nullptr);
+        int activity = select(max_sd + 1, &readfds, nullptr, nullptr, nullptr);
 
         if ((activity < 0) && (errno != EINTR)) {
             std::cerr << "Select error!" << std::endl;
         }
 
-        if (FD_ISSET(serverSocket, &readFds)) {
+        if (FD_ISSET(serverSocket, &readfds)) {
             if ((newSocket = accept(serverSocket, (struct sockaddr*)&address, (socklen_t*)&addrlen)) < 0) {
                 std::cerr << "Accept failed!" << std::endl;
                 continue;
@@ -71,7 +70,7 @@ void OpenWindow(std::vector<int>& clientSockets);
 
         for (size_t i = 0; i < clientSockets.size(); i++) {
             int sd = clientSockets[i];
-            if (FD_ISSET(sd, &readFds)) {
+            if (FD_ISSET(sd, &readfds)) {
                 char buffer[1024];
                 int bytesRead = recv(sd, buffer, sizeof(buffer), 0);
 
@@ -83,16 +82,20 @@ void OpenWindow(std::vector<int>& clientSockets);
                     i--;
                 } else {
                     buffer[bytesRead] = '\0';
-                    std::cout << "Received message from client ID " << clientIDs[sd] << ": " << buffer << std::endl;
-                    if (std::strcmp(buffer, "exit") == 0) {
-                        std::cout << "Client ID " << clientIDs[sd] << " requested to exit. Disconnecting client." << std::endl;
-                        close(sd);
-                        clientIDs.erase(sd);
-                        clientSockets.erase(clientSockets.begin() + i);
-                        i--;
+                    if (std::strcmp(buffer, "count") == 0) {
+                        std::string count = std::to_string(clientSockets.size());
+                        send(sd, count.c_str(), count.size(), 0);
                     } else {
-                        // Echo back the message
-                        send(sd, buffer, bytesRead, 0);
+                        std::cout << "Received message from client ID " << clientIDs[sd] << ": " << buffer << std::endl;
+                        if (std::strcmp(buffer, "exit") == 0) {
+                            std::cout << "Client ID " << clientIDs[sd] << " requested to exit. Disconnecting client." << std::endl;
+                            close(sd);
+                            clientIDs.erase(sd);
+                            clientSockets.erase(clientSockets.begin() + i);
+                            i--;
+                        } else {
+                            send(sd, buffer, bytesRead, 0);
+                        }
                     }
                 }
             }
@@ -108,9 +111,10 @@ int main(int argc, char** argv) {
     }
 
     std::vector<int> clientSockets;
-    std::thread serverThread(Server, std::ref(clientSockets), port);
 
-    OpenWindow(clientSockets);
+    std::thread serverThread(server, std::ref(clientSockets), port);
+
     serverThread.join();
+
     return 0;
 }

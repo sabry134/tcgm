@@ -7,6 +7,7 @@ on:
 
 jobs:
   build:
+    name: Build and Test
     runs-on: ubuntu-latest
 
     steps:
@@ -27,10 +28,33 @@ jobs:
         DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         GITHUB_SHA: ${{ github.sha }}
         JOB_STATUS: ${{ job.status }}
+        JOB_NAME: ${{ github.job }}
+        REPO_NAME: ${{ github.repository }}
       run: |
         curl -H "Content-Type: application/json" \
         -d '{
               "username": "GitHub Actions",
-              "content": "**Repository:** '${{ github.repository }}'\n**Commit SHA:** '${GITHUB_SHA}'\n**Job Status:** '${JOB_STATUS}'"
+              "embeds": [{
+                "title": "GitHub Actions - '${REPO_NAME}'",
+                "description": "Workflow **'${{ github.workflow }}'** run for commit **'${GITHUB_SHA}'**.",
+                "color": '${{ job.status == 'success' && "3066993" || "15158332" }}',
+                "fields": [
+                  {
+                    "name": "Job",
+                    "value": "'${JOB_NAME}'",
+                    "inline": true
+                  },
+                  {
+                    "name": "Status",
+                    "value": "'${JOB_STATUS}'",
+                    "inline": true
+                  }
+                ],
+                "footer": {
+                  "text": "GitHub Actions",
+                  "icon_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                },
+                "timestamp": "'$(date --utc +%FT%TZ)'"
+              }]
             }' \
         $DISCORD_WEBHOOK_URL

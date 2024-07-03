@@ -3,13 +3,31 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <csignal>
+#include <vector>
+#include <thread>
 
+void open_window(std::vector<int>& clientSockets);
 int clientSocket;
+bool running = true;
 
 void signalHandler(int signum) {
     std::cout << "\nInterrupt signal (" << signum << ") received.\n";
     close(clientSocket);
     exit(signum);
+}
+
+void checkServerConnections(std::vector<int>& clientSockets) {
+    while (running) {
+        send(clientSocket, "count", strlen("count"), 0);
+
+        char buffer[1024] = {0};
+        recv(clientSocket, buffer, sizeof(buffer), 0);
+
+        int connectedClients = std::stoi(buffer);
+        clientSockets.resize(connectedClients);
+
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
 }
 
 int main(int argc, char* argv[]) {
@@ -20,7 +38,8 @@ int main(int argc, char* argv[]) {
 
     const char* ip = argv[1];
     int port = std::stoi(argv[2]);
-    sockaddr_in serverAddress{};
+
+    sockaddr_in serverAddress;
 
     if ((clientSocket = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         std::cerr << "Socket creation failed!" << std::endl;
@@ -34,6 +53,7 @@ int main(int argc, char* argv[]) {
         std::cerr << "Invalid address or address not supported!" << std::endl;
         return 1;
     }
+
     if (connect(clientSocket, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) {
         std::cerr << "Connection failed!" << std::endl;
         return 1;
@@ -41,29 +61,14 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Connected to the server!" << std::endl;
 
-    // Register signal handler for SIGINT
     signal(SIGINT, signalHandler);
 
-    while (true) {
-        char message[1024];
-        std::cout << "Enter a message to send to the server (type 'exit' to quit): ";
-        if (!std::cin.getline(message, sizeof(message))) {
-            std::cout << "\nEOF received, closing connection.\n";
-            break;
-        }
-        printf("Message: %s\n", message);
+    std::vector<int> clientSockets;
+    std::thread serverCheckThread(checkServerConnections, std::ref(clientSockets));
 
-        send(clientSocket, message, strlen(message), 0);
+    open_window(clientSockets);
 
-        char buffer[1024] = {0};
-        recv(clientSocket, buffer, sizeof(buffer), 0);
-
-        std::cout << "Server response: " << buffer << std::endl;
-
-        if (std::string(message) == "exit") {
-            break;
-        }
-    }
+    serverCheckThread.join();
 
     close(clientSocket);
     return 0;

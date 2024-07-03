@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "3M00JoxaIlE=",
+  "success": true,
+  "projectFilePath": "/home/ulysse/Epitech/Eip/EIP_TCGM/card-logic-handler/card-logic-handler.csproj",
+  "expectedPackageFiles": [
+    "/home/ulysse/.nuget/packages/keralua/1.4.1/keralua.1.4.1.nupkg.sha512",
+    "/home/ulysse/.nuget/packages/nlua/1.7.3/nlua.1.7.3.nupkg.sha512"
+  ],
+  "logs": []
+}

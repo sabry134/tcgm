@@ -6,7 +6,7 @@
 
 int clientSocket;
 
-void signalHandler(int signum) {
+void SignalHandler(int signum) {
     std::cout << "\nInterrupt signal (" << signum << ") received.\n";
     close(clientSocket);
     exit(signum);
@@ -42,7 +42,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Connected to the server!" << std::endl;
 
     // Register signal handler for SIGINT
-    signal(SIGINT, signalHandler);
+    signal(SIGINT, SignalHandler);
 
     while (true) {
         char message[1024];

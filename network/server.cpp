@@ -9,13 +9,13 @@
 
 constexpr int DEFAULT_PORT = 5000;
 
-void open_window(std::vector<int>& clientSockets);
+void OpenWindow(std::vector<int>& clientSockets);
 
-[[noreturn]] void server(std::vector<int>& clientSockets, int port) {
+[[noreturn]] void Server(std::vector<int>& clientSockets, int port) {
     int serverSocket, newSocket;
     sockaddr_in address{};
     int addrlen = sizeof(address);
-    int max_clients = SOMAXCONN;
+    int maxClients = SOMAXCONN;
     std::map<int, int> clientIDs;
     int clientIDCounter = 0;
 
@@ -33,32 +33,32 @@ void open_window(std::vector<int>& clientSockets);
         exit(84);
     }
 
-    if (listen(serverSocket, max_clients) < 0) {
+    if (listen(serverSocket, maxClients) < 0) {
         std::cerr << "Listen failed!" << std::endl;
         exit(84);
     }
 
     std::cout << "Server started. Listening on port " << port << std::endl;
     while (true) {
-        fd_set readfds;
+        fd_set readFds;
 
-        FD_ZERO(&readfds);
-        FD_SET(serverSocket, &readfds);
-        int max_sd = serverSocket;
+        FD_ZERO(&readFds);
+        FD_SET(serverSocket, &readFds);
+        int maxSd = serverSocket;
 
         for (int sd : clientSockets) {
-            FD_SET(sd, &readfds);
-            if (sd > max_sd)
-                max_sd = sd;
+            FD_SET(sd, &readFds);
+            if (sd > maxSd)
+                maxSd = sd;
         }
 
-        int activity = select(max_sd + 1, &readfds, nullptr, nullptr, nullptr);
+        int activity = select(maxSd + 1, &readFds, nullptr, nullptr, nullptr);
 
         if ((activity < 0) && (errno != EINTR)) {
             std::cerr << "Select error!" << std::endl;
         }
 
-        if (FD_ISSET(serverSocket, &readfds)) {
+        if (FD_ISSET(serverSocket, &readFds)) {
             if ((newSocket = accept(serverSocket, (struct sockaddr*)&address, (socklen_t*)&addrlen)) < 0) {
                 std::cerr << "Accept failed!" << std::endl;
                 continue;
@@ -71,7 +71,7 @@ void open_window(std::vector<int>& clientSockets);
 
         for (size_t i = 0; i < clientSockets.size(); i++) {
             int sd = clientSockets[i];
-            if (FD_ISSET(sd, &readfds)) {
+            if (FD_ISSET(sd, &readFds)) {
                 char buffer[1024];
                 int bytesRead = recv(sd, buffer, sizeof(buffer), 0);
 
@@ -108,12 +108,9 @@ int main(int argc, char** argv) {
     }
 
     std::vector<int> clientSockets;
+    std::thread serverThread(Server, std::ref(clientSockets), port);
 
-    std::thread serverThread(server, std::ref(clientSockets), port);
-
-    open_window(clientSockets);
-
+    OpenWindow(clientSockets);
     serverThread.join();
-
     return 0;
 }

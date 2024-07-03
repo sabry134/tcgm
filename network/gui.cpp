@@ -5,27 +5,27 @@
 
 const int SHAPE_SPACING = 150;
 
-void open_window(std::vector<int>& clientSockets) {
+void OpenWindow(std::vector<int>& clientSockets) {
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "My advanced runner");
-
     sf::Texture backgroundTexture;
+
     if (!backgroundTexture.loadFromFile("img/runner_background.jpg")) {
         std::cerr << "Error loading background texture." << std::endl;
         exit(1);
     }
 
     sf::Texture persoTexture;
+
     if (!persoTexture.loadFromFile("img/character.png")) {
         std::cerr << "Error loading perso texture." << std::endl;
         exit(1);
     }
 
     sf::Sprite backgroundSprite(backgroundTexture);
-
     std::vector<sf::Sprite> clientSprites;
 
     while (window.isOpen()) {
-        sf::Event event;
+        sf::Event event{};
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
@@ -33,12 +33,12 @@ void open_window(std::vector<int>& clientSockets) {
                 exit(84);
             } else if (event.type == sf::Event::Resized) {
                 sf::FloatRect visibleArea(0.f, 0.f, static_cast<float>(event.size.width), static_cast<float>(event.size.height));
+
                 window.setView(sf::View(visibleArea));
             }
         }
 
         window.clear();
-
         window.draw(backgroundSprite);
 
         while (clientSprites.size() < clientSockets.size()) {

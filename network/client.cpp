@@ -16,8 +16,10 @@ void SignalHandler(int signum) {
     exit(signum);
 }
 
-[[noreturn]] void CheckServerConnections(std::vector<int>& clientSockets) {
+void CheckServerConnections(std::vector<int>& clientSockets) {
     while (RUNNING) {
+        std::string message;
+
         send(clientSocket, "count", strlen("count"), 0);
 
         char buffer[1024] = {0};
@@ -25,6 +27,20 @@ void SignalHandler(int signum) {
 
         int connectedClients = std::stoi(buffer);
         clientSockets.resize(connectedClients);
+
+        std::cout << "Enter a message: (type 'exit' to close the connection)" << std::endl;
+        std::getline(std::cin, message);
+        std::cout << message << std::endl << "Sending message to the server..." << std::endl;
+
+        send(clientSocket, message.c_str(), message.size(), 0);
+        recv(clientSocket, buffer, sizeof(buffer), 0);
+
+        std::cout << "Server response: " << buffer << std::endl;
+
+        if (message == "exit") {
+            close(clientSocket);
+            exit(0);
+        }
 
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }

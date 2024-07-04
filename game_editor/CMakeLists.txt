@@ -3,7 +3,7 @@ project(TCGM)
 
 include_directories(/usr/local/include)
 
-add_executable(tcgm src/main.cpp src/addCard.cpp src/card.cpp src/shaders.cpp)
+add_executable(tcgm src/main.cpp src/addCard.cpp src/card.cpp src/shaders.cpp src/background.cpp src/loadFile.cpp)
 
 link_directories(/usr/local/lib)
 

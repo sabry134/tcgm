@@ -70,12 +70,9 @@ int main( void )
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
-	std::vector<cardGraphique> rectangles = {
-		cardGraphique( -0.5f, -0.5f, 0.2f, 0.3f ),
-		cardGraphique( 0.0f, 0.0f, 0.2f, 0.3f )
-    };
-	rectangles[1].setTextures("/home/besnainou/Downloads/unoCard.png");
-	rectangles[0].setTextures("/home/besnainou/Downloads/yugiohCard.png");
+	std::vector<cardGraphique> cards = generateCardGraphique("/home/besnainou/epitech/EIP/EIP_TCGM/game_editor/src/config_card.txt");
+	cards[1].setTextures("/home/besnainou/Downloads/unoCard.png");
+	cards[0].setTextures("/home/besnainou/Downloads/yugiohCard.png");
     GLuint vertexbuffer, uvbuffer;
 
     glGenBuffers(1, &vertexbuffer);
@@ -100,11 +97,14 @@ int main( void )
     std::vector<GLfloat> uvData;
 	GLint useTextureLocation = glGetUniformLocation(programID, "useTexture");
     GLint rectColorLocation = glGetUniformLocation(programID, "rectColor");
+	GLuint backgroundTextureID = loadTexture("/home/besnainou/Downloads/fond_start.png");
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	while (!glfwWindowShouldClose(window)) {
 		glClear(GL_COLOR_BUFFER_BIT);
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
-		addCard(rectangles, vertexbuffer, uvbuffer, useTextureLocation, rectColorLocation, vertexData, uvData);
+		//drawBackground(backgroundTextureID);
+		addCard(cards, vertexbuffer, uvbuffer, useTextureLocation, rectColorLocation, vertexData, uvData);
 		// Swap buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();

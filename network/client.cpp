@@ -6,18 +6,18 @@
 #include <vector>
 #include <thread>
 
-void open_window(std::vector<int>& clientSockets);
+void OpenWindow(std::vector<int>& clientSockets);
 int clientSocket;
-bool running = true;
+const bool RUNNING = true;
 
-void signalHandler(int signum) {
+void SignalHandler(int signum) {
     std::cout << "\nInterrupt signal (" << signum << ") received.\n";
     close(clientSocket);
     exit(signum);
 }
 
-void checkServerConnections(std::vector<int>& clientSockets) {
-    while (running) {
+[[noreturn]] void CheckServerConnections(std::vector<int>& clientSockets) {
+    while (RUNNING) {
         send(clientSocket, "count", strlen("count"), 0);
 
         char buffer[1024] = {0};
@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
     const char* ip = argv[1];
     int port = std::stoi(argv[2]);
 
-    sockaddr_in serverAddress;
+    sockaddr_in serverAddress{};
 
     if ((clientSocket = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
         std::cerr << "Socket creation failed!" << std::endl;
@@ -61,12 +61,12 @@ int main(int argc, char* argv[]) {
 
     std::cout << "Connected to the server!" << std::endl;
 
-    signal(SIGINT, signalHandler);
+    signal(SIGINT, SignalHandler);
 
     std::vector<int> clientSockets;
-    std::thread serverCheckThread(checkServerConnections, std::ref(clientSockets));
+    std::thread serverCheckThread(CheckServerConnections, std::ref(clientSockets));
 
-    open_window(clientSockets);
+    OpenWindow(clientSockets);
 
     serverCheckThread.join();
 

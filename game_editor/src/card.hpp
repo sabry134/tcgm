@@ -28,5 +28,8 @@ public:
 
 void addCard(std::vector<cardGraphique>& cards, GLuint vertexbuffer, GLuint uvbuffer, GLint useTextureLocation, GLint rectColorLocation, std::vector<GLfloat> vertexData, std::vector<GLfloat> uvData);
 GLuint LoadShaders(const char * vertex_file_path, const char * fragment_file_path);
+GLuint loadTexture(const char* path);
+void drawBackground(GLuint textureID);
+std::vector<cardGraphique> generateCardGraphique(char *path);
 
 #endif

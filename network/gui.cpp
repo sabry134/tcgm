@@ -4,27 +4,27 @@
 
 const int SHAPE_SPACING = 150;
 
-void OpenWindow(std::vector<int>& clientSockets) {
+void open_window(std::vector<int>& clientSockets) {
     sf::RenderWindow window(sf::VideoMode(1920, 1080), "TCGM Client");
-    sf::Texture backgroundTexture;
 
+    sf::Texture backgroundTexture;
     if (!backgroundTexture.loadFromFile("img/runner_background.jpg")) {
         std::cerr << "Error loading background texture." << std::endl;
         exit(1);
     }
 
     sf::Texture persoTexture;
-
     if (!persoTexture.loadFromFile("img/character.png")) {
         std::cerr << "Error loading perso texture." << std::endl;
         exit(1);
     }
 
     sf::Sprite backgroundSprite(backgroundTexture);
+
     std::vector<sf::Sprite> clientSprites;
 
     while (window.isOpen()) {
-        sf::Event event{};
+        sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
@@ -37,6 +37,7 @@ void OpenWindow(std::vector<int>& clientSockets) {
         }
 
         window.clear();
+
         window.draw(backgroundSprite);
 
         while (clientSprites.size() < clientSockets.size()) {

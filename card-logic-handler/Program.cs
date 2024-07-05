@@ -11,7 +11,7 @@ class Program
     {
         var engine = new GameEngine();
         
-        var cards = CardLoader.LoadCards("cards/cards.json");
+        var cards = CardLoader.LoadCards("../card-logic-creator/cards.json");
 
         int hp = (int)engine.Player.GetAttribute("Health");
         Console.WriteLine($"Player starting health is : {hp}");

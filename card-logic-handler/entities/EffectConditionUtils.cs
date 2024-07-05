@@ -68,7 +68,7 @@ namespace Entities.Utils {
 
         public static bool DiscardCost(Entity entity, params object[] args) {
             if (entity is Player player) {
-                int amount = args.Length;
+                int amount = (int)args[0];
                 if (player.Hand.CountCards() >= amount) {
                     for (int i = 0; i < amount; i++) {
                         player.Hand.DiscardRandom(player.Discard);
@@ -76,6 +76,22 @@ namespace Entities.Utils {
                     return true;
                 } else {
                     Console.WriteLine("Not enough cards in hand !");
+                    return false;
+                }
+            } else {
+                Console.WriteLine("Invalid target !");
+                return false;
+            }
+        }
+
+        public static bool PlayerLifeCost(Entity entity, params object[] args) {
+            if (entity is Player player) {
+                int amount = (int)args[0];
+                if ((int)player.GetAttribute("Health") > amount) {
+                    player.ModifyNumberAttribute("Health", amount);
+                    return true;
+                } else {
+                    Console.WriteLine("Not enough health to pay !");
                     return false;
                 }
             } else {
@@ -106,6 +122,7 @@ namespace Entities.Utils {
             return name switch {
                 "NoCost" => NoCost,
                 "DiscardCost" => DiscardCost,
+                "LifeCost" => PlayerLifeCost,
                 _ => throw new ArgumentException($"Cost '{name}' not found")
             };
         }

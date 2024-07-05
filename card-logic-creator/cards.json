@@ -1,0 +1,61 @@
+[
+  {
+    "Name": "Fireball",
+    "EffectsWithConditions": [
+      {
+        "EffectName": "DealDamage",
+        "ConditionName": "TrueCondition",
+        "CostName": "NoCost",
+        "EffectArgs": [
+          5
+        ],
+        "ConditionArgs": [],
+        "CostArgs": []
+      }
+    ],
+    "Attributes": {
+      "Cost": 2,
+      "Text": "Test"
+    }
+  },
+  {
+    "Name": "Heal",
+    "EffectsWithConditions": [
+      {
+        "EffectName": "Heal",
+        "ConditionName": "PlayerHealthBelowThreshold",
+        "CostName": "NoCost",
+        "EffectArgs": [
+          10
+        ],
+        "ConditionArgs": [
+          6
+        ],
+        "CostArgs": []
+      }
+    ],
+    "Attributes": {
+      "Cost": 3
+    }
+  },
+  {
+    "Name": "One for one",
+    "EffectsWithConditions": [
+      {
+        "EffectName": "DrawCards",
+        "ConditionName": "TrueCondition",
+        "CostName": "DiscardCost",
+        "EffectArgs": [
+          1
+        ],
+        "ConditionArgs": [],
+        "CostArgs": [
+          1
+        ]
+      }
+    ],
+    "Attributes": {
+      "Cost": 0
+    }
+  }
+]

@@ -12,3 +12,5 @@ _deps
 CMakeUserPresets.json
 tutoriel_ogl
 tcgm
+.vscode
+.cmake

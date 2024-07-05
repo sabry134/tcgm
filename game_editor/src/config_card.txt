@@ -1,0 +1,12 @@
+card:
+    pos: x = 0.5f, y = 0.5f;
+    size: width = 0.2f, height = 0.3f;
+card:
+    pos: x = 0f, y = 0f;
+    size: width = 0.2f, height = 0.3f;
+card:
+    pos: x = 0f, y = 0f;
+    size: width = 0.2f, height = 0.3f;
+card:
+    pos: x = 0f, y = 0f;
+    size: width = 0.2f, height = 0.3f;

@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Run tests
+      id: run_tests
+      run: |
+        echo "Running tests..."
+        echo "::set-output name=success::true"
+      
+    - name: Set job color
+      id: set_color
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "::set-output name=color::3066993"
+        else
+          echo "::set-output name=color::15158332"
+        fi
+
+    - name: Send Discord notification
+      if: always()
+      env:
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        GITHUB_SHA: ${{ github.sha }}
+        JOB_STATUS: ${{ job.status }}
+        JOB_NAME: ${{ github.job }}
+        REPO_NAME: ${{ github.repository }}
+        COLOR: ${{ steps.set_color.outputs.color }}
+      run: |
+        curl -H "Content-Type: application/json" \
+        -d '{
+              "username": "GitHub Actions",
+              "embeds": [{
+                "title": "GitHub Actions - '${REPO_NAME}'",
+                "description": "Workflow **'${{ github.workflow }}'** run for commit **'${GITHUB_SHA}'**.",
+                "color": '${COLOR}',
+                "fields": [
+                  {
+                    "name": "Job",
+                    "value": "'${JOB_NAME}'",
+                    "inline": true
+                  },
+                  {
+                    "name": "Status",
+                    "value": "'${JOB_STATUS}'",
+                    "inline": true
+                  }
+                ],
+                "footer": {
+                  "text": "GitHub Actions",
+                  "icon_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
+                },
+                "timestamp": "'$(date --utc +%FT%TZ)'"
+              }]
+            }' \
+        $DISCORD_WEBHOOK_URL

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("card-logic-handler")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e80e6f2aeb19ad6df35802759152d4d8f89d1b65")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+424aac0d9d8d7287ccd0888bff3c1f1f6b54112c")]
 [assembly: System.Reflection.AssemblyProductAttribute("card-logic-handler")]
 [assembly: System.Reflection.AssemblyTitleAttribute("card-logic-handler")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

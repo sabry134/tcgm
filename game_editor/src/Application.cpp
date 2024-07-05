@@ -10,7 +10,6 @@ std::vector<cardGraphique> cardsList;
 int selectedCard = -1;
 namespace TCGM
 {
-
     Application::Application()
     {
     }
@@ -55,6 +54,8 @@ namespace TCGM
         glGenVertexArrays(1, &VertexArrayID);
         glBindVertexArray(VertexArrayID);
         cardsList = generateCardGraphique("./src/config_card.txt");
+        cardsList[3].setTextures("./assets/unoCard.png");
+        cardsList[2].setTextures("./assets/unoCard.png");
         cardsList[1].setTextures("./assets/unoCard.png");
         cardsList[0].setTextures("./assets/yugiohCard.png");
         GLuint vertexbuffer, uvbuffer;
@@ -67,7 +68,7 @@ namespace TCGM
         std::vector<GLfloat> uvData;
         GLint useTextureLocation = glGetUniformLocation(programID, "useTexture");
         GLint rectColorLocation = glGetUniformLocation(programID, "rectColor");
-        GLuint backgroundTextureID = loadTexture("./assets/fond_start.png");
+        GLuint backgroundTextureID = loadTexture("./assets/background.png");
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glfwSetMouseButtonCallback(window, mouse_button_callback);
 

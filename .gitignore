@@ -1,3 +1,4 @@
+# CMake
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
@@ -10,7 +11,12 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 CMakeUserPresets.json
+
+# JCCE related
 tutoriel_ogl
 tcgm
+
+# Hidden files
 .vscode
 .cmake
+.idea

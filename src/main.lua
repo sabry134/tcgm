@@ -55,7 +55,7 @@ end
 function love.mousepressed(x, y, buttonPressed, istouch)
     if buttonPressed == 1 then  -- Left mouse button
         if button.isHovered then
-            packaging.packageGame(gameName, gameMessage)  -- Package the user-created game
+            packaging.PackageGame(gameName, gameMessage)  -- Package the user-created game
         end
     end
 end

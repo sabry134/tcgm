@@ -1,0 +1,51 @@
+{
+    "templates": {
+        "familiar": {
+            "properties": {
+                "name": "string",
+                "description": "string",
+                "innate": "string",
+                "cost": "number",
+                "mana": "number",
+                "growth": "number",
+                "health": "number",
+                "text": "string",
+                "effects": [
+                    {
+                        "effect": "string",
+                        "conditions": [
+                            {
+                                "condition": "string"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        "spell": {
+            "properties": {
+                "name": "string",
+                "cost": "string",
+                "text": "string",
+                "effects": [
+                    {
+                        "effect": "string",
+                        "conditions": [
+                            {
+                                "condition": "string"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "subtypes" : [
+                {
+                    "type": "curse",
+                    "properties": {
+                        "linger": "number"
+                    }
+                }
+            ]
+        }
+    }
+}

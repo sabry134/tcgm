@@ -42,13 +42,22 @@ end
 local function processTemplates(templates, parentTemplate, processed, currentName)
     for templateName, template in pairs(templates) do
         local fullName = currentName and (currentName .. "." .. templateName) or templateName
+
         local merged = mergeTemplate(template, parentTemplate)
         processed[fullName] = merged
+
         if template.subtypes then
-            processTemplates(template.subtypes, merged, processed, fullName)
+            for _, subtype in ipairs(template.subtypes) do
+                local subtypeName = subtype.type
+                local fullSubtypeName = fullName .. "." .. subtypeName
+                local mergedSubtype = mergeTemplate(subtype, merged)
+                processed[fullSubtypeName] = mergedSubtype
+            end
         end
     end
 end
+
+
 
 local typesTemplatesPath = "cards/templates.json"
 local typesConfig = loadconfig(typesTemplatesPath)

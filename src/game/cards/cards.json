@@ -16,7 +16,7 @@
         },
         {
             "id": "card_002",
-            "template": "spell.1",
+            "template": "spell.curse",
             "properties": {
                 "name": "Drain",
                 "cost": 3,

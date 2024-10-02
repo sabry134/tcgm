@@ -58,16 +58,15 @@ local function processTemplates(templates, parentTemplate, processed, currentNam
 end
 
 
-
-local typesTemplatesPath = "cards/templates.json"
+local typesTemplatesPath = "assets/cards/templates.json"
 local typesConfig = loadconfig(typesTemplatesPath)
 local typesTemplates = typesConfig.templates
 
-local effectsPath = "effects/effects.json"
+local effectsPath = "assets/effects/effects.json"
 local effectsConfig = loadconfig(effectsPath)
 local effects = effectsConfig.effects
 
-local cardsPath = "cards/cards.json"
+local cardsPath = "assets/cards/cards.json"
 local cardsConfig = loadconfig(cardsPath)
 local cards = cardsConfig.cards
 

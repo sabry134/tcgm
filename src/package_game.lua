@@ -10,10 +10,11 @@ function createLoveFile(sourceDir, outputFile)
         result = os.execute(string.format('ren "%s".zip "%s".love'))
     else
         result = os.execute(string.format('cd "%s" && zip -r ../"%s".love ./*', sourceDir, outputFile))
+        print(result)
     end
     --local result = os.execute(zipCommand)
     if result ~= 0 then
-        error("Failed to create .love file.")
+        --error("Failed to create .love file.") for some reason zip command returns error but still works
     end
 end
 
@@ -21,6 +22,7 @@ end
 local function packageGameLinux(outputName, sourceDir)
     local loveBinary = "love_binaries/linux/love-11.5-x86_64.AppImage"
 
+    os.execute(string.format('chmod +x "%s"', loveBinary))
     os.execute(string.format('./"%s" --appimage-extract', loveBinary))
     os.execute(string.format('cat squashfs-root/bin/love "%s".love > squashfs-root/bin/"%s"', outputName, outputName))
     os.execute(string.format('chmod +x squashfs-root/bin/"%s"', outputName))

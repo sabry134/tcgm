@@ -1,3 +1,5 @@
+local assets = require("assets")
+
 function createLoveFile(sourceDir, outputFile)
     local result
     if love.system.getOS() == "Windows" then
@@ -24,14 +26,15 @@ local function packageGameLinux(outputName, sourceDir)
     os.execute(string.format('chmod +x squashfs-root/bin/"%s"', outputName))
     os.execute("rm squashfs-root/bin/love")
 
+    assets.MoveAssets(sourceDir)
     -- Create asset folder in binary location
-    os.execute("mkdir squashfs-root/bin/assets")
-    os.execute("mkdir squashfs-root/bin/assets/cards")
-    os.execute("mkdir squashfs-root/bin/assets/effects")
+    -- os.execute("mkdir squashfs-root/bin/assets")
+    -- os.execute("mkdir squashfs-root/bin/assets/cards")
+    -- os.execute("mkdir squashfs-root/bin/assets/effects")
 
     -- Will automate this later for clarity
-    os.execute(string.format('find "%s"/cards -name "*.json" -exec cp {} squashfs-root/bin/assets/cards \\;', sourceDir))
-    os.execute(string.format('find "%s"/effects -name "*.json" -exec cp {} squashfs-root/bin/assets/effects \\;', sourceDir))
+    -- os.execute(string.format('find "%s"/cards -name "*.json" -exec cp {} squashfs-root/bin/assets/cards \\;', sourceDir))
+    -- os.execute(string.format('find "%s"/effects -name "*.json" -exec cp {} squashfs-root/bin/assets/effects \\;', sourceDir))
 
     os.execute(string.format('mv squashfs-root "%s"', outputName))
 

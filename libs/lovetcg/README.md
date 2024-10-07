@@ -1,4 +1,4 @@
-This is a GUI library made for love2d in lua
+This is a Graphic library made for love2d in lua
 
 ## How to contribute
 

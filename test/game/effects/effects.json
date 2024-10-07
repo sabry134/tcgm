@@ -1,0 +1,18 @@
+{
+    "effects": {
+        "effect_001": {
+            "action": "deal_damage",
+            "parameters": {
+                "amount": 1,
+                "target": "any"
+            }
+        },
+        "effect_002": {
+            "action": "reduce_mana",
+            "parameters": {
+                "amount": 1,
+                "target": "familiar"
+            }
+        }
+    }
+}

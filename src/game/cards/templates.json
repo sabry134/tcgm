@@ -1,16 +1,16 @@
 {
     "templates": {
-        "familiar": {
+        "familiar #(type)#": {
             "properties": {
-                "name": "string",
+                "name": "string", # user defined
                 "description": "string",
                 "innate": "string",
                 "cost": "number",
                 "mana": "number",
                 "growth": "number",
                 "health": "number",
-                "text": "string",
-                "effects": [
+                "text": "string", # end usr defined
+                "effects": [ # do not change
                     {
                         "effect": "string",
                         "conditions": [
@@ -19,7 +19,7 @@
                             }
                         ]
                     }
-                ]
+                ] # end do not change
             }
         },
         "spell": {
@@ -38,13 +38,13 @@
                     }
                 ]
             },
-            "subtypes" : [
+            "subtypes" : [ 
                 {
                     "type": "curse",
-                    "properties": {
+                    "properties": {  #usr defined
                         "linger": "number"
                     }
-                }
+                } # end usr defined
             ]
         }
     }

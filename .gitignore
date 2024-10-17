@@ -15,6 +15,7 @@ CMakeUserPresets.json
 # JCCE related
 tutoriel_ogl
 tcgm
+*.zip
 
 # Hidden files
 .vscode

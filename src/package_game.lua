@@ -7,7 +7,7 @@ function createLoveFile(sourceDir, outputFile)
         if result ~= 0 then
             error("Failed to create .zip file")
         end
-        result = os.execute(string.format('ren "%s".zip "%s".love'))
+        result = os.execute(string.format('ren "%s".zip "%s".love', outputFile, outputFile))
     else
         result = os.execute(string.format('cd "%s" && zip -r ../"%s".love ./*', sourceDir, outputFile))
         print(result)

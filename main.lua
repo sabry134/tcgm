@@ -6,7 +6,7 @@ function love.load()
 end
 
 function love.update(dt)
- 
+    lovetcg.update()
 end
 
 -- Draw a coloured rectangle.

@@ -1,5 +1,6 @@
 local BASE = (...) .. "."
 local lovetcg = require(BASE .. "core")
+local button = require(BASE .. "button")
 
 local instance = lovetcg.new()
 -- This the class index you need to add each function/widget to it
@@ -13,9 +14,8 @@ return setmetatable({
 	draw = function(...) return instance:draw(...) end,
 	update = function(...) return instance:update(...) end,
 	
-
 	-- widgets
-	Button = function(...) return instance:Button(...) end,
+	Button = function(...) return  instance:Button(...) end,
 
 	-- layout
 	-- layout = instance.layout

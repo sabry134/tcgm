@@ -6,13 +6,20 @@ local BASE = (...):match('(.-)[^%.]+$')
 -- This is the constructor of our lib.
 -- You need to add all new widget to it
 function lovetcg.new()
-	return setmetatable({
-		Button = require(BASE.."button"),
+  local button = require(BASE.."button")
 
+	return setmetatable({
     -- the draw queue that we will call when drawing our ui
-    draw_queue = {n = 0},
-    -- the update queue that we will call when updating our ui
+
     update_queue = {n = 0},
+
+    -- the update queue that we will call when updating our ui
+
+    draw_queue = {n = 0},
+
+
+		Button =  require(BASE.."button"),
+
 
 		-- layout = require(BASE.."layout").new(),
 	}, lovetcg)
@@ -25,6 +32,9 @@ end
 
 
 -- mouse handling
+function lovetcg:isHover(mouseX, mouseY, x, y, w, h)
+    return mouseX >= x and mouseX <= w + x and mouseY >= y and mouseY <= h + y
+end
 
 -- keyboard handling
 
@@ -33,11 +43,13 @@ function lovetcg:addQueueUpdate(f, ...)
 	table.unpack = table.unpack or unpack -- I know there is a warning but i cant seem to make it work with just table.unpack
   local args = {...}
   local nbargs = select('#', ...)
-	self.update_queue.n = self.update_queue.n + 1;
+  if (self.draw_queue ~= nil) then
+	  self.update_queue.n = self.update_queue.n + 1;
 
-  self.update_queue[self.update_queue.n] = function ()
-    f(table.unpack(args, 1 , nbargs));
-  end;
+    self.update_queue[self.update_queue.n] = function ()
+      f(table.unpack(args, 0, nbargs));
+    end;
+  end
 end
 
 -- draw
@@ -46,11 +58,14 @@ function lovetcg:addQueueDraw(f, ...)
   table.unpack = table.unpack or unpack -- I know there is a warning but i cant seem to make it work with just table.unpack
   local args = {...}
   local nbargs = select('#', ...)
-	self.draw_queue.n = self.draw_queue.n + 1;
+  if (self.draw_queue ~= nil) then
+	  self.draw_queue.n = self.draw_queue.n + 1;
 
-  self.draw_queue[self.draw_queue.n] = function ()
-    f(table.unpack(args, 1 , nbargs));
-  end;
+    self.draw_queue[self.draw_queue.n] = function ()
+      f(table.unpack(args, 0, nbargs));
+    end;
+  end
+
 end
 
 

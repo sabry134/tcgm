@@ -1,0 +1,24 @@
+{
+  "name": "eip_tcgm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sabry134/EIP_TCGM.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sabry134/EIP_TCGM/issues"
+  },
+  "homepage": "https://github.com/sabry134/EIP_TCGM#readme",
+  "devDependencies": {
+    "electron": "^33.0.2"
+  }
+}

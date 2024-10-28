@@ -16,6 +16,7 @@ CMakeUserPresets.json
 tutoriel_ogl
 tcgm
 *.zip
+*.love
 
 # Hidden files
 .vscode

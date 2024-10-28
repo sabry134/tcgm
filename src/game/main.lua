@@ -1,31 +1,16 @@
-local debugPrints = require("debug.debugPrints")
-local cardsModule = require("cards.cards")
-local loading = require("load")
-local processTemplates = require("processTemplates")
+local ConfigLoader = require("config.load_config_data")
 
 function love.load()
     love.graphics.setBackgroundColor(1, 1, 1)  -- White background
 
-    local processedTemplates = loading.LoadTemplates()
-    local cards = loading.LoadCards()
-    local effects = loading.LoadEffects()
+    -- Main game setup
+    local configLoader = ConfigLoader:new()
+    configLoader:loadCards("assets/data/cards.json")
 
-    debugPrints.PrintProcessedTemplates(processedTemplates)
-    print("== Processed Cards ==")
-    debugPrints.PrintAllCardProperties(cards, processedTemplates)
-    print("== Processed Effects ==")
-    debugPrints.PrintEffects(effects)
+    local testCard = configLoader:getCardByName("Red Dragon")
+    testCard:printCard()
 end
 
 function love.draw()
     love.graphics.setColor(0, 0, 0)  -- Black text
-
-    local cards = loading.LoadCards()
-    local processedTemplates = loading.LoadTemplates()
-
-    for i, card in ipairs(cards) do
-        local props = cardsModule.GetCardProperties(card, processedTemplates)
-        local yPos = 100 + (i - 1) * 50
-        love.graphics.print(props.name .. ": " .. props.text, 100, yPos)
-    end
 end

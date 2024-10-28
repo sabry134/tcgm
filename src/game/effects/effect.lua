@@ -2,7 +2,7 @@
 local Effect = {}
 Effect.__index = Effect
 
-local ActionManager = require("game.actions.action_manager")
+local ActionManager = require("actions.action_manager")
 
 function Effect:new(name, requirements, actions, action_resolution_order, speed, description, turn_usage_limit, game_usage_limit, turn_activation_limit, game_activation_limit)
     local effect = setmetatable({}, Effect)

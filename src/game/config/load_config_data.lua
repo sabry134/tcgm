@@ -26,12 +26,28 @@ end
 
 ConfigLoader.__index = ConfigLoader
 
+function ConfigLoader:new()
+    local loader = setmetatable({}, ConfigLoader)
+
+    loader.cards = {}
+    loader.actions = {}
+    loader.battleRules = nil
+    loader.boards = {}
+    loader.cardTypes = {}
+    loader.deckTypes = {}
+    loader.phases = {}
+    loader.player = nil
+    loader.generalRules = nil
+    loader.winConditions = {}
+
+    return loader
+end
+
 function ConfigLoader:loadCards(filename)
     local cardConfigs = loadJsonFile(filename)
-    self.cards = {}
     for _, cardData in ipairs(cardConfigs.cards) do
         local effects = {}
-        for _, effectData in ipairs(cardData.effect) do
+        for _, effectData in ipairs(cardData.effects) do
             local effect = Effect:new(
                 effectData.name,
                 effectData.requirements,
@@ -99,7 +115,6 @@ end
 
 function ConfigLoader:loadActions(filename)
     local actionConfig = loadJsonFile(filename)
-    self.actions = {}
 
     for _, actionData in ipairs(actionConfig.actions) do
         local action = Action:new(
@@ -113,7 +128,6 @@ end
 
 function ConfigLoader:loadBattleRules(filename)
     local battleRulesData = loadJsonFile(filename)
-    self.battleRules = nil
 
     local battleRules = BattleRules:new(
         battleRulesData.attackers,
@@ -127,7 +141,6 @@ end
 
 function ConfigLoader:loadBoards(filename)
     local boardsConfig = loadJsonFile(filename)
-    self.Boards = {}
 
     for _, boardData in ipairs(boardsConfig.boards) do
         local board = Board:new(
@@ -142,7 +155,6 @@ end
 
 function ConfigLoader:loadCardTypes(filename)
     local cardTypesConfig = loadJsonFile(filename)
-    self.CardTypes = {}
 
     for _, cardTypeData in ipairs(cardTypesConfig.card_types) do
         local cardType = CardType:new(
@@ -162,7 +174,6 @@ end
 
 function ConfigLoader:loadDeckTypes(filename)
     local deckTypesConfig = loadJsonFile(filename)
-    self.dekcTypes = {}
 
     for _, deckTypeData in ipairs(deckTypesConfig.deck_types) do
         local deckType = DeckType:new(
@@ -173,13 +184,12 @@ function ConfigLoader:loadDeckTypes(filename)
             deckTypeData.copies_limit,
             deckTypeData.shared_limit_with
         )
-        table.insert(self.dekcTypes, deckType)
+        table.insert(self.deckTypes, deckType)
     end
 end
 
 function ConfigLoader:loadPhases(filename)
     local phasesConfig = loadJsonFile(filename)
-    self.phases = {}
 
     for _, phaseData in ipairs(phasesConfig.phases) do
         local phase = Phase:new(
@@ -195,7 +205,6 @@ end
 
 function ConfigLoader:loadPlayer(filename)
     local playerData = loadJsonFile(filename)
-    self.player = nil
 
     local player = Player:new(
         playerData.name,
@@ -206,7 +215,6 @@ end
 
 function ConfigLoader:loadGeneralRules(filename)
     local generalRulesData = loadJsonFile(filename)
-    self.generalRules = nil
 
     local generalRules = GeneralRules:new(
         generalRulesData.player_count,
@@ -222,7 +230,6 @@ end
 
 function ConfigLoader:loadWinConditions(filename)
     local winConditionsConfig = loadJsonFile(filename)
-    self.winConditions = {}
 
     for _, winConditionData in ipairs(winConditionsConfig.win_conditions) do
         local winCondition = WinCondition:new(

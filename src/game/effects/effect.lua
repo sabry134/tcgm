@@ -9,7 +9,7 @@ function Effect:new(name, requirements, actions, action_resolution_order, speed,
 
     effect.name = name
     effect.requirements = requirements or {}
-    effect.action = actions or {}
+    effect.actions = actions or {}
     effect.action_resolution_order = action_resolution_order or "simultaneous"
     effect.speed = speed
     effect.description = description
@@ -22,6 +22,33 @@ function Effect:new(name, requirements, actions, action_resolution_order, speed,
     effect.turn_activation_count = 0
     effect.game_activation_count = 0
     return effect
+end
+
+function Effect:printEffect()
+    print("    Effect Name: " .. self.name)
+
+    print("    Requirement:")
+    for _, requirement in ipairs(self.requirements) do
+        print("      * Requirement Name: " .. requirement.name)
+        print("      * Requirement parameters:")
+        for key, value in pairs(requirement.parameters) do
+            print("        * " .. key .. ": " .. tostring(value))
+        end
+    end
+
+    print("    Actions:")
+    for _, action in ipairs(self.actions) do
+        print("      * Action Name: " .. action.name)
+        print("      * Action parameters:")
+        for key, value in pairs(action.parameters) do
+            print("        * " .. key .. ": " .. tostring(value))
+        end
+    end
+
+    print("    Speed: " .. self.speed)
+    print("    Description: " .. (self.description or "N/A"))
+    print("    Turn usage Limit: " .. (self.turn_usage_limit or "N/A"))
+    print("    Game usage Limit: " .. (self.game_usage_limit or "N/A"))
 end
 
 function Effect:requirementsMet(game_state)

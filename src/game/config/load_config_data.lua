@@ -64,10 +64,10 @@ function ConfigLoader:loadCards(filename)
         end
         local card = Card:new(
             cardData.name,
-            cardData.effects,
+            effects,
             cardData.types,
             cardData.limit_per_deck,
-            cardData.limit_per_field,
+            cardData.limit_per_board,
             cardData.play_requirements,
             cardData.custom_values,
             cardData.keywords

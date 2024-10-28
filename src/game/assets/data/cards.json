@@ -25,10 +25,8 @@
             "action_resolution_order": "",
             "speed": "quick",
             "description": "Use 3 mana to deal 10 damage to target creature.",
-            "usage_limit": {
-              "type": "per_turn",
-              "value": 1
-            }
+            "turn_usage_limit": 1,
+            "game_usage_limit": -1
           }
         ],
         "types": ["Dragon"],

@@ -150,52 +150,6 @@ local function processCommandLoggedOut(command)
     end
 end
 
-local function oldProcessCommandLoggedIn(command)
-    if network.mode == "responding" then
-        if command == "return" then
-            sendTextInput()
-        elseif command == "backspace" then
-            -- Handle backspace
-            globals.inputText = globals.inputText:sub(1, -2)
-        else
-            -- Add character to input text
-            globals.inputText = globals.inputText .. command
-        end
-    elseif command == "c" then
-        createRoomCommand()
-    elseif command == "l" then
-        listRoomsCommand()
-    elseif command == "j" then
-        joinRoomCommand()
-    elseif command == "e" then
-        leaveRoomCommand()
-    elseif command == "q" then
-        exitServerCommand()
-    elseif command == "u" then
-        listUsersCommand()
-    elseif command == "m" then
-        sendMessageCommand()
-    elseif command == "p" then
-        sendPrivateMessageCommand()
-    elseif command == "k" then
-        kickUserCommand()
-    elseif command == "o" then
-        promoteUserCommand()
-    elseif command == "x" then
-        closeRoomCommand()
-    elseif command == "s" then
-        setPasswordCommand()
-    elseif command == "v" then
-        viewPasswordCommand()
-    end
-end
-
-local function oldProcessCommandLoggedOut(command)
-    if command == "space" then
-        loginCommand()
-    end
-end
-
 function networkCommands:processCommand(command)
     if network.client == nil then
         processCommandLoggedOut(command)

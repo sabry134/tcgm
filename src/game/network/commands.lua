@@ -3,8 +3,6 @@ local network = require("network.network")
 local helpers = require("helpers.helpers")
 local globals = require("network.globals")
 
-networkCommands.inputModes = {"create_room", "sending_message", "join_room", "log_in", "select_user", "kicking_user", "promoting_user", "setting_password"}
-
 local function createRoomCommand()
     print("Preparing to create a room")
     network.mode = "create_room"
@@ -99,16 +97,10 @@ end
 
 local function sendTextInput()
     network:send(globals.inputText)
-    if network.mode == "select_user" or network.mode == "create_room" then
-        network.mode = "sending_message"
-        globals.inputText = "" -- Clear previous input
-    else
-        network.mode = "wait_for_server_message"
-    end
 end
 
 local function processCommandLoggedIn(command)
-    if helpers:contains(networkCommands.inputModes, network.mode) then
+    if network.mode == "responding" then
         if command == "return" then
             sendTextInput()
         elseif command == "backspace" then

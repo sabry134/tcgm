@@ -1,4 +1,4 @@
-package main
+package test
 
 import (
 	"bufio"
@@ -9,13 +9,13 @@ import (
 	"sync"
 )
 
-type Client struct {
+type Client struct { // moved
 	conn net.Conn
 	name string
 	room *Room
 }
 
-type Room struct {
+type Room struct { // moved
 	name     string
 	clients  map[*Client]bool
 	owner    *Client
@@ -23,13 +23,14 @@ type Room struct {
 	mu       sync.Mutex
 }
 
-type Server struct {
+type Server struct { // moved
 	rooms   map[string]*Room
 	clients map[*Client]bool
+	port    int
 	mu      sync.Mutex
 }
 
-const (
+const ( // moved
 	CodeSuccess         = "200"
 	CodePrompt          = "300"
 	CodeError           = "400"
@@ -50,19 +51,19 @@ func (r *Room) checkAndCloseEmpty(s *Server) {
 	}
 }
 
-func (s *Server) sendPrompt(client *Client, prompt string) {
+func (s *Server) sendPrompt(client *Client, prompt string) { // moved
 	client.conn.Write([]byte(CodePrompt + " " + prompt + "\n"))
 }
 
-func (s *Server) sendInfo(client *Client, info string) {
+func (s *Server) sendInfo(client *Client, info string) { // moved
 	client.conn.Write([]byte(CodeInfo + " " + info + "\n"))
 }
 
-func (s *Server) sendMessage(client *Client, message string) {
+func (s *Server) sendMessage(client *Client, message string) { // moved
 	client.conn.Write([]byte(CodeMessage + " " + message + "\n"))
 }
 
-func (s *Server) createRoom(client *Client) string {
+func (s *Server) createRoom(client *Client) string { // moved
 	if client.room != nil {
 		return "You are already in a room. Leave it first to create a new one."
 	}
@@ -89,7 +90,7 @@ func (s *Server) createRoom(client *Client) string {
 	return fmt.Sprintf("%s Room '%s' created and joined.", CodeSuccess, roomName)
 }
 
-func (s *Server) viewRoomPassword(client *Client) string {
+func (s *Server) viewRoomPassword(client *Client) string { // moved
 	if client.room == nil {
 		return fmt.Sprintf("%s You are not in a room.", CodeNotFound)
 	}
@@ -101,7 +102,7 @@ func (s *Server) viewRoomPassword(client *Client) string {
 	return fmt.Sprintf("%s Room password is : '%s'.", CodeSuccess, client.room.password)
 }
 
-func (s *Server) setRoomPassword(client *Client) string {
+func (s *Server) setRoomPassword(client *Client) string { // moved
 	if client.room == nil {
 		return fmt.Sprintf("%s You are not in a room.", CodeNotFound)
 	}
@@ -120,7 +121,7 @@ func (s *Server) setRoomPassword(client *Client) string {
 	return fmt.Sprintf("%s Changed room password.", CodeSuccess)
 }
 
-func (r *Room) closeRoom(s *Server) {
+func (r *Room) closeRoom(s *Server) { // moved
 	for client := range r.clients {
 		client.room = nil
 		client.conn.Write([]byte("Room has been closed by owner\n"))
@@ -129,7 +130,7 @@ func (r *Room) closeRoom(s *Server) {
 	delete(s.rooms, r.name)
 }
 
-func (s *Server) joinRoom(client *Client) string {
+func (s *Server) joinRoom(client *Client) string { // moved
 	if client.room != nil {
 		return fmt.Sprintf("%s You are already in a room. Leave it first to join another.", CodeError)
 	}
@@ -158,7 +159,7 @@ func (s *Server) joinRoom(client *Client) string {
 	return fmt.Sprintf("%s Joined room '%s'.", CodeSuccess, roomName)
 }
 
-func (s *Server) leaveRoom(client *Client) string {
+func (s *Server) leaveRoom(client *Client) string { // moved
 	if client.room == nil {
 		return fmt.Sprintf("%s You are not in any room.", CodeNotFound)
 	}
@@ -168,7 +169,7 @@ func (s *Server) leaveRoom(client *Client) string {
 	return fmt.Sprintf("%s You have left the room '%s'.", CodeSuccess, leftRoom)
 }
 
-func (r *Room) kickUser(s *Server, clientToKick *Client) {
+func (r *Room) kickUser(s *Server, clientToKick *Client) { // moved
 	if _, exists := r.clients[clientToKick]; exists {
 		clientToKick.room = nil
 		s.sendInfo(clientToKick, "You have been kicked from the room.")
@@ -176,7 +177,7 @@ func (r *Room) kickUser(s *Server, clientToKick *Client) {
 	}
 }
 
-func (s *Server) listRooms() string {
+func (s *Server) listRooms() string { // moved
 	if len(s.rooms) == 0 {
 		return fmt.Sprintf("%s No rooms available.", CodeNotFound)
 	}
@@ -192,7 +193,7 @@ func (s *Server) listRooms() string {
 	return fmt.Sprintf("%s %s", CodeSuccess, roomsList)
 }
 
-func (s *Server) listUsers(client *Client) string {
+func (s *Server) listUsers(client *Client) string { // moved
 	if client.room == nil {
 		return fmt.Sprintf("%s You are not in a room.", CodeNotFound)
 	}
@@ -208,7 +209,7 @@ func (s *Server) listUsers(client *Client) string {
 	return fmt.Sprintf("%s %s", CodeSuccess, usersList)
 }
 
-func (s *Server) broadcastMessage(client *Client) string {
+func (s *Server) broadcastMessage(client *Client) string { // moved
 	if client.room == nil {
 		return fmt.Sprintf("%s You are not in a room.", CodeNotFound)
 	}
@@ -227,7 +228,7 @@ func (s *Server) broadcastMessage(client *Client) string {
 	return fmt.Sprintf("%s Message sent to room.", CodeSuccess)
 }
 
-func (s *Server) sendPrivateMessage(client *Client) string {
+func (s *Server) sendPrivateMessage(client *Client) string { // moved
 	if client.room == nil {
 		return fmt.Sprintf("%s You are not in a room.", CodeNotFound)
 	}
@@ -252,7 +253,7 @@ func (s *Server) sendPrivateMessage(client *Client) string {
 	return fmt.Sprintf("%s No such user in this room.", CodeNotFound)
 }
 
-func (s *Server) kickUserFromRoom(client *Client) string {
+func (s *Server) kickUserFromRoom(client *Client) string { // moved
 	if client.room == nil {
 		return fmt.Sprintf("%s You are not in a room.", CodeNotFound)
 	}
@@ -275,7 +276,7 @@ func (s *Server) kickUserFromRoom(client *Client) string {
 	return fmt.Sprintf("%s User not found in the room.", CodeNotFound)
 }
 
-func (s *Server) appointNewOwner(client *Client) string {
+func (s *Server) appointNewOwner(client *Client) string { // moved
 	if client.room == nil {
 		return fmt.Sprintf("%s You are not in a room.", CodeNotFound)
 	}
@@ -298,7 +299,7 @@ func (s *Server) appointNewOwner(client *Client) string {
 	return fmt.Sprintf("%s User not found in the room.", CodeNotFound)
 }
 
-func (s *Server) closeRoomCommand(client *Client) string {
+func (s *Server) closeRoomCommand(client *Client) string { // moved
 	if client.room == nil {
 		return fmt.Sprintf("%s You are not in a room.", CodeNotFound)
 	}
@@ -310,7 +311,7 @@ func (s *Server) closeRoomCommand(client *Client) string {
 	return fmt.Sprintf("%s Room '%s' has been closed.", CodeSuccess, roomName)
 }
 
-func (s *Server) handleClient(client *Client) {
+func (s *Server) handleClient(client *Client) { // moved
 	defer client.conn.Close()
 	reader := bufio.NewReader(client.conn)
 
@@ -359,7 +360,7 @@ func (s *Server) handleClient(client *Client) {
 	}
 }
 
-func (s *Server) disconnectClient(client *Client) {
+func (s *Server) disconnectClient(client *Client) { // moved
 	if client.room != nil {
 		s.leaveRoom(client)
 	}
@@ -367,8 +368,8 @@ func (s *Server) disconnectClient(client *Client) {
 	client.conn.Close()
 }
 
-func (s *Server) start() {
-	listener, err := net.Listen("tcp", ":12345")
+func (s *Server) start() { // moved
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", s.port))
 	if err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
@@ -406,10 +407,11 @@ func (s *Server) start() {
 	}
 }
 
-func main() {
+func main() { // done
 	server := &Server{
 		rooms:   make(map[string]*Room),
 		clients: make(map[*Client]bool),
+		port:    12345,
 	}
 	server.start()
 }

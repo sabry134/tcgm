@@ -12,7 +12,7 @@ import (
 
 func DisconnectClient(s *models.Server, client *models.Client) {
 	if client.Room != nil {
-		room.LeaveRoom(client.Room, client)
+		room.LeaveRoom(client.Room, client, s)
 	}
 	delete(s.Clients, client)
 	client.Conn.Close()

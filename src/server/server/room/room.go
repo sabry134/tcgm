@@ -17,7 +17,7 @@ func CreateRoom(s *models.Server, client *models.Client, roomName string, roomPa
 func CloseRoom(r *models.Room, s *models.Server) {
 	for client := range r.Clients {
 		client.Room = nil
-		client.Conn.Write([]byte("Room has been closed by owner\n"))
+		response.SendInfo(client, "Room has been closed by owner")
 		delete(r.Clients, client)
 	}
 	delete(s.Rooms, r.Name)
@@ -28,14 +28,18 @@ func JoinRoom(r *models.Room, client *models.Client) {
 	r.Clients[client] = true
 }
 
-func LeaveRoom(r *models.Room, client *models.Client) {
+func LeaveRoom(r *models.Room, client *models.Client, s *models.Server) {
 	delete(client.Room.Clients, client)
+	room := client.Room
 	client.Room = nil
+	if room.Owner == client || len(room.Clients) == 0 {
+		CloseRoom(room, s)
+	}
 }
 
 func KickUser(r *models.Room, s *models.Server, name string) bool {
 	for c := range r.Clients {
-		if c.Name == name+"\n" {
+		if c.Name == name {
 			c.Room = nil
 			response.SendInfo(c, "You have been kicked from the room.")
 			delete(r.Clients, c)
@@ -69,7 +73,7 @@ func BroadcastMessage(r *models.Room, client *models.Client, message string) {
 
 func SendPrivateMessage(r *models.Room, client *models.Client, name string) bool {
 	for c := range r.Clients {
-		if c != client && c.Name == name+"\n" {
+		if c != client && c.Name == name {
 			response.SendPrompt(client, "Enter message to send to user: ")
 
 			message := response.ReceiveClientInput(client)
@@ -84,7 +88,7 @@ func SendPrivateMessage(r *models.Room, client *models.Client, name string) bool
 
 func AppointNewOwner(r *models.Room, name string) bool {
 	for c := range r.Clients {
-		if c.Name == name+"\n" {
+		if c.Name == name {
 			r.Owner = c
 			return true
 		}

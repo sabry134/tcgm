@@ -40,7 +40,7 @@ func LeaveRoomCommand(s *models.Server, client *models.Client) string {
 		return fmt.Sprintf("%s You are not in any room.", response.CodeNotFound)
 	}
 	leftRoom := client.Room.Name
-	room.LeaveRoom(client.Room, client)
+	room.LeaveRoom(client.Room, client, s)
 	return fmt.Sprintf("%s You have left the room '%s'.", response.CodeSuccess, leftRoom)
 }
 

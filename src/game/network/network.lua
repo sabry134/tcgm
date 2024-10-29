@@ -55,8 +55,6 @@ function network:handleServerResponse(response)
 
     if code and message then
         code = tonumber(code)
-        print("Code is " .. code)
-        print("Message is " .. message)
         if code == 200 then
             print("Success :", message)
             self.mode = "none"

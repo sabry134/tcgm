@@ -1,6 +1,5 @@
 local networkCommands = {}
 local network = require("network.network")
-local helpers = require("helpers.helpers")
 local globals = require("network.globals")
 
 local function createRoomCommand()
@@ -99,7 +98,59 @@ local function sendTextInput()
     network:send(globals.inputText)
 end
 
+local loggedInCommandHandlers = {
+    c = createRoomCommand,
+    l = listRoomsCommand,
+    j = joinRoomCommand,
+    e = leaveRoomCommand,
+    q = exitServerCommand,
+    u = listUsersCommand,
+    m = sendMessageCommand,
+    p = sendPrivateMessageCommand,
+    k = kickUserCommand,
+    o = promoteUserCommand,
+    x = closeRoomCommand,
+    s = setPasswordCommand,
+    v = viewPasswordCommand,
+    -- More commands can be added here
+}
+
+local loggedOutCommandHandlers = {
+    space = loginCommand,
+    -- More commands can be added here
+}
+
 local function processCommandLoggedIn(command)
+    if network.mode == "responding" then
+        if command == "return" then
+            sendTextInput()
+        elseif command == "backspace" then
+            -- Handle backspace
+            globals.inputText = globals.inputText:sub(1, -2)
+        else
+            -- Add character to input text
+            globals.inputText = globals.inputText .. command
+        end
+    else
+        local handler = loggedInCommandHandlers[command]
+        if handler then
+            handler()
+        else
+            print("Unknown command")
+        end
+    end
+end
+
+local function processCommandLoggedOut(command)
+    local handler = loggedOutCommandHandlers[command]
+    if handler then
+        handler()
+    else
+        print("Unknown command")
+    end
+end
+
+local function oldProcessCommandLoggedIn(command)
     if network.mode == "responding" then
         if command == "return" then
             sendTextInput()
@@ -139,7 +190,7 @@ local function processCommandLoggedIn(command)
     end
 end
 
-local function processCommandLoggedOut(command)
+local function oldProcessCommandLoggedOut(command)
     if command == "space" then
         loginCommand()
     end

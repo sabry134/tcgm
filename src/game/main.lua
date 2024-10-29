@@ -1,7 +1,6 @@
 local network = require("network.network")
 local commands = require("network.commands")
 local globals = require("network.globals")
-local helpers = require("helpers.helpers")
 
 local state = "waiting"
 local roomName = ""

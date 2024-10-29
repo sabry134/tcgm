@@ -3,10 +3,47 @@ package handler
 import (
 	"server/server/commands"
 	"server/server/models"
+	"server/server/response"
 	"strings"
 )
 
+type CommandHandler func(*models.Server, *models.Client) string
+
+var commandHandlers = map[string]CommandHandler{
+	"C": commands.CreateRoomCommand,
+	"J": commands.JoinRoomCommand,
+	"E": commands.LeaveRoomCommand,
+	"L": commands.ListRoomsCommand,
+	"U": commands.ListUsersCommand,
+	"M": commands.BroadcastMessageCommand,
+	"P": commands.SendPrivateMessageCommand,
+	"K": commands.KickUserFromRoomCommand,
+	"O": commands.AppointNewOwnerCommand,
+	"X": commands.CloseRoomCommand,
+	"S": commands.SetRoomPasswordCommand,
+	"V": commands.ViewRoomPasswordCommand,
+	// Other commands can be added as needed
+}
+
 func HandleCommand(s *models.Server, client *models.Client, command string) {
+	command = strings.TrimSpace(command)
+
+	if command == "Q" {
+		//response = commands.DisconnectClientCommand(s, client)
+		return
+	}
+
+	if handler, exists := commandHandlers[command]; exists {
+		response := handler(s, client)
+		if response != "" {
+			client.Conn.Write([]byte(response + "\n"))
+		}
+	} else {
+		client.Conn.Write([]byte(response.CodeError + " Unknown command\n"))
+	}
+}
+
+func oldHandleCommand(s *models.Server, client *models.Client, command string) {
 	command = strings.TrimSpace(command)
 	var response string
 

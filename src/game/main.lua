@@ -1,31 +1,36 @@
-local debugPrints = require("debug.debugPrints")
-local cardsModule = require("cards.cards")
-local loading = require("load")
-local processTemplates = require("processTemplates")
+local network = require("network.network")
+local commands = require("network.commands")
+local globals = require("network.globals")
+local helpers = require("helpers.helpers")
+
+local state = "waiting"
+local roomName = ""
 
 function love.load()
-    love.graphics.setBackgroundColor(1, 1, 1)  -- White background
+end
 
-    local processedTemplates = loading.LoadTemplates()
-    local cards = loading.LoadCards()
-    local effects = loading.LoadEffects()
+function love.update()
+    network:update()
+end
 
-    debugPrints.PrintProcessedTemplates(processedTemplates)
-    print("== Processed Cards ==")
-    debugPrints.PrintAllCardProperties(cards, processedTemplates)
-    print("== Processed Effects ==")
-    debugPrints.PrintEffects(effects)
+function love.keypressed(key)
+    commands:processCommand(key)
 end
 
 function love.draw()
-    love.graphics.setColor(0, 0, 0)  -- Black text
-
-    local cards = loading.LoadCards()
-    local processedTemplates = loading.LoadTemplates()
-
-    for i, card in ipairs(cards) do
-        local props = cardsModule.GetCardProperties(card, processedTemplates)
-        local yPos = 100 + (i - 1) * 50
-        love.graphics.print(props.name .. ": " .. props.text, 100, yPos)
+    -- Draw server messages (if you want to display them in a separate area)
+    love.graphics.print("Input: " .. globals.inputText, 10, 10)
+    
+    -- Optionally, display the current mode or prompt
+    if network.mode == "create_room" then
+        love.graphics.print("Creating Room: Type room name and press Enter.", 10, 30)
+    elseif network.mode == "join_room" then
+        love.graphics.print("Joining Room: Type room name and press Enter.", 10, 30)
+    elseif network.mode == "none" then
+        love.graphics.print("Press 'C' to create, 'J' to join, 'E' to leave, 'U' to list users, 'M' to send a message.", 10, 30)
     end
+end
+
+function love.quit()
+    network:close()
 end

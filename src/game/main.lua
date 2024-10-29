@@ -3,8 +3,14 @@ local p2pCommands = require("network.p2p.p2p_commands")
 local server_commands = require("network.server.server_commands")
 local globals = require("network.globals")
 local networkConfig = require("network.loadNetworkConfig")
+local ConfigLoader = require("config.load_config_data")
 
 function love.load()
+    local configLoader = ConfigLoader:new()
+    configLoader:loadCards("assets/data/cards.json")
+
+    local testCard = configLoader:getCardByName("Red Dragon")
+    testCard:printCard()
     networkConfig:LoadNetworkConfig("network/networkConfig.json")
     print("mode is : " .. globals.mode)
 end
@@ -41,4 +47,8 @@ function love.quit()
     if globals.mode == "server" then
         server:close()
     end
+end
+
+function love.draw()
+    love.graphics.setColor(0, 0, 0)  -- Black text
 end

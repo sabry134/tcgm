@@ -1,101 +1,101 @@
 local networkCommands = {}
-local network = require("network.network")
+local server = require("network.server.server")
 local globals = require("network.globals")
 
 local function createRoomCommand()
     print("Preparing to create a room")
-    network.mode = "create_room"
+    server.mode = "create_room"
     globals.inputText = ""  -- Clear previous input
-    network:send("C")
+    server:send("C")
 end
 
 local function listRoomsCommand()
     print("Preparing to list rooms")
-    network.mode = "wait_for_server_message"
-    network:send("L")
+    server.mode = "wait_for_server_message"
+    server:send("L")
 end
 
 local function joinRoomCommand()
     print("Preparing to join a room")
-    network.mode = "join_room"
+    server.mode = "join_room"
     globals.inputText = ""  -- Clear previous input
-    network:send("J")
+    server:send("J")
 end
 
 local function leaveRoomCommand()
     print("Preparing to leave room")
-    network.mode = "wait_for_server_message"
-    network:send("E")
+    server.mode = "wait_for_server_message"
+    server:send("E")
 end
 
 local function exitServerCommand()
     print("Disconnecting from server")
-    network.mode = "wait_for_server_message"
-    network:send("Q")
+    server.mode = "wait_for_server_message"
+    server:send("Q")
 end
 
 local function listUsersCommand()
     print("Listing users in room")
-    network.mode = "wait_for_server_message"
-    network:send("U")
+    server.mode = "wait_for_server_message"
+    server:send("U")
 end
 
 local function sendMessageCommand()
     print("Sending message to room")
-    network.mode = "sending_message"
+    server.mode = "sending_message"
     globals.inputText = "" -- Clear previous input
-    network:send("M")
+    server:send("M")
 end
 
 local function loginCommand()
     print("Logging in to server")
-    network.mode = "log_in"
+    server.mode = "log_in"
     globals.inputText = "" -- Clear previous input
-    network:init()
+    server:init()
 end
 
 local function sendPrivateMessageCommand()
     print("Seding private message")
-    network.mode = "select_user"
+    server.mode = "select_user"
     globals.inputText = "" -- Clear previous input
-    network:send("P")
+    server:send("P")
 end
 
 local function kickUserCommand()
     print("Kicking user from room")
-    network.mode = "kicking_user"
+    server.mode = "kicking_user"
     globals.inputText = "" -- Clear previous input
-    network:send("K")
+    server:send("K")
 end
 
 local function promoteUserCommand()
     print("Promoting user to room owner")
-    network.mode = "promoting_user"
+    server.mode = "promoting_user"
     globals.inputText = "" -- Clear previous input
-    network:send("O")
+    server:send("O")
 end
 
 local function closeRoomCommand()
     print("Closing room")
-    network.mode = "closing_room"
-    network:send("X")
+    server.mode = "closing_room"
+    server:send("X")
 end
 
 local function setPasswordCommand()
     print("Setting room password")
-    network.mode = "setting_password"
+    server.mode = "setting_password"
     globals.inputText = "" -- Clear previous input
-    network:send("S")
+    server:send("S")
 end
 
 local function viewPasswordCommand()
     print("Viewing password")
-    network.mode = "viewing_password"
-    network:send("V")
+    server.mode = "viewing_password"
+    server:send("V")
 end
 
 local function sendTextInput()
-    network:send(globals.inputText)
+    server:send(globals.inputText)
 end
 
 local loggedInCommandHandlers = {
@@ -121,7 +121,7 @@ local loggedOutCommandHandlers = {
 }
 
 local function processCommandLoggedIn(command)
-    if network.mode == "responding" then
+    if server.mode == "responding" then
         if command == "return" then
             sendTextInput()
         elseif command == "backspace" then
@@ -151,7 +151,7 @@ local function processCommandLoggedOut(command)
 end
 
 function networkCommands:processCommand(command)
-    if network.client == nil then
+    if server.client == nil then
         processCommandLoggedOut(command)
     else
         processCommandLoggedIn(command)

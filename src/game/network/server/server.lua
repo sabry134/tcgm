@@ -1,15 +1,16 @@
 local socket = require("socket")
 local globals = require("network.globals")
 
-local network = {}
+local server = {}
 
-network.host = "127.0.0.1" -- Should load from config file later
-network.port = 12345
-network.client = nil
-network.mode = "none"
+server.host = "" -- Should load from config file later
+server.port = 12345
+server.client = nil
+server.mode = "none"
 
 
-function network:init()
+function server:init()
+    self.host = globals.server_address
     self.client = socket.tcp()
     self.client:settimeout(5)
     local success, err = self.client:connect(self.host, self.port)
@@ -22,7 +23,7 @@ function network:init()
     end
 end
 
-function network:send(message)
+function server:send(message)
     if self.client then
         self.client:send(message .. "\n")
     else
@@ -30,7 +31,7 @@ function network:send(message)
     end
 end
 
-function network:update()
+function server:update()
     if self.client then
         local response
         repeat
@@ -50,7 +51,7 @@ function network:update()
     end
 end
 
-function network:handleServerResponse(response)
+function server:handleServerResponse(response)
     local code, message = response:match("^(%d+)%s(.+)$")
 
     if code and message then
@@ -84,11 +85,11 @@ function network:handleServerResponse(response)
     end
 end
 
-function network:close()
+function server:close()
     if self.client then
         self.client:close()
         self.client = nil
     end
 end
 
-return network
+return server

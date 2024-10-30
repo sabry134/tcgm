@@ -2,6 +2,9 @@ package response
 
 import (
 	"bufio"
+	"encoding/json"
+	"log"
+	"net"
 	"server/server/models"
 	"strings"
 )
@@ -17,8 +20,30 @@ const (
 	CodeInfo            = "501"
 )
 
-func SendResponse(client *models.Client, response string) {
-	client.Conn.Write([]byte(response + "\n"))
+type ServerMessage struct {
+	Command string      `json:"command"`
+	Data    interface{} `json:"data"`
+}
+
+func GetErrorResponse(code string, reason string) (string, interface{}) {
+	message := map[string]interface{}{
+		"data": reason, // Should rename to reason when better handled client side
+	}
+
+	return code, message
+}
+
+func SendResponse(conn net.Conn, command string, data interface{}) {
+	response := ServerMessage{
+		Command: command,
+		Data:    data,
+	}
+	jsonMessage, err := json.Marshal(response)
+	if err != nil {
+		log.Println("Error encoding JSON:", err)
+		return
+	}
+	conn.Write(append(jsonMessage, '\n'))
 }
 
 func SendPrompt(client *models.Client, prompt string) {

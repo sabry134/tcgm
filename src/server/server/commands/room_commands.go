@@ -7,74 +7,89 @@ import (
 	"server/server/room"
 )
 
-func ViewRoomPasswordCommand(s *models.Server, client *models.Client, params []string) string {
+func ViewRoomPasswordCommand(s *models.Server, client *models.Client, params []string) (string, interface{}) {
 	if client.Room == nil {
-		return fmt.Sprintf("%s You are not in a room.", response.CodeNotFound)
+		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
 	}
 
 	if client.Room.Owner != client {
-		return fmt.Sprintf("%s You must be the room owner to view it's password.", response.CodeForbidden)
+		return response.GetErrorResponse(response.CodeForbidden, "You must be room owner for this action.")
 	}
 
-	return fmt.Sprintf("%s Room password is : '%s'.", response.CodeSuccess, client.Room.Password)
+	data := map[string]interface{}{
+		"data": fmt.Sprintf("Room password is : '%s'.", client.Room.Password),
+	}
+	return response.CodeSuccess, data
 }
 
-func SetRoomPasswordCommand(s *models.Server, client *models.Client, params []string) string {
+func SetRoomPasswordCommand(s *models.Server, client *models.Client, params []string) (string, interface{}) {
 	if client.Room == nil {
-		return fmt.Sprintf("%s You are not in a room.", response.CodeNotFound)
+		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
 	}
 
 	if client.Room.Owner != client {
-		return fmt.Sprintf("%s You must be the room owner to set it's password.", response.CodeForbidden)
+		return response.GetErrorResponse(response.CodeForbidden, "You must be room owner for this action.")
 	}
 
 	newPassword := ""
 	if len(params) >= 1 {
 		newPassword = params[0]
 	} else {
-		return fmt.Sprintf("%s Must have password to change to as a parameter.", response.CodeError)
+		return response.GetErrorResponse(response.CodeError, "Wrong parameters to command.")
 	}
 
-	client.Room.Password = newPassword
-	return fmt.Sprintf("%s Changed room password.", response.CodeSuccess)
+	room.SetPassword(client.Room, newPassword)
+	data := map[string]interface{}{
+		"data": "Changed room password",
+	}
+	return response.CodeSuccess, data
 }
 
-func LeaveRoomCommand(s *models.Server, client *models.Client, params []string) string {
+func LeaveRoomCommand(s *models.Server, client *models.Client, params []string) (string, interface{}) {
 	if client.Room == nil {
-		return fmt.Sprintf("%s You are not in any room.", response.CodeNotFound)
+		response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
 	}
 	leftRoom := client.Room.Name
 	room.LeaveRoom(client.Room, client, s)
-	return fmt.Sprintf("%s You have left the room '%s'.", response.CodeSuccess, leftRoom)
+	data := map[string]interface{}{
+		"data": fmt.Sprintf("You have left room '%s'.", leftRoom),
+	}
+	return response.CodeSuccess, data
 }
 
-func ListUsersCommand(s *models.Server, client *models.Client, params []string) string {
+func ListUsersCommand(s *models.Server, client *models.Client, params []string) (string, interface{}) {
 	if client.Room == nil {
-		return fmt.Sprintf("%s You are not in a room.", response.CodeNotFound)
+		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
 	}
 	usersList := room.ListUsersAsString(client.Room)
-	return fmt.Sprintf("%s %s", response.CodeSuccess, usersList)
+	data := map[string]interface{}{
+		"data": usersList,
+	}
+	return response.CodeSuccess, data
 }
 
-func BroadcastMessageCommand(s *models.Server, client *models.Client, params []string) string {
+func BroadcastMessageCommand(s *models.Server, client *models.Client, params []string) (string, interface{}) {
 	if client.Room == nil {
-		return fmt.Sprintf("%s You are not in a room.", response.CodeNotFound)
+		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
 	}
 
 	message := ""
 	if len(params) >= 1 {
 		message = params[0]
 	} else {
-		return fmt.Sprintf("%s Must have message to send to as a parameter.", response.CodeError)
+		return response.GetErrorResponse(response.CodeError, "Wrong parameters to command.")
 	}
 
 	room.BroadcastMessage(client.Room, client, message)
-	return fmt.Sprintf("%s Message sent to room.", response.CodeSuccess)
+	data := map[string]interface{}{
+		"data": "Message sent to room.",
+	}
+	return response.CodeSuccess, data
 }
 
-func SendPrivateMessageCommand(s *models.Server, client *models.Client, params []string) string {
+func SendPrivateMessageCommand(s *models.Server, client *models.Client, params []string) (string, interface{}) {
 	if client.Room == nil {
-		return fmt.Sprintf("%s You are not in a room.", response.CodeNotFound)
+		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
 	}
 
 	name := ""
@@ -83,68 +98,80 @@ func SendPrivateMessageCommand(s *models.Server, client *models.Client, params [
 		name = params[0]
 		message = params[1]
 	} else {
-		return fmt.Sprintf("%s Must have username and message to send as parameters.", response.CodeError)
+		return response.GetErrorResponse(response.CodeError, "Wrong parameters to command.")
 	}
 
 	if room.SendPrivateMessage(client.Room, client, name, message) {
-		return fmt.Sprintf("%s Message successfully sent.", response.CodeSuccess)
+		data := map[string]interface{}{
+			"data": "Message successfully sent.",
+		}
+		return response.CodeSuccess, data
 	} else {
-		return fmt.Sprintf("%s No such user in this room.", response.CodeNotFound)
+		return response.GetErrorResponse(response.CodeNotFound, "No such user in the room.")
 	}
 }
 
-func KickUserFromRoomCommand(s *models.Server, client *models.Client, params []string) string {
+func KickUserFromRoomCommand(s *models.Server, client *models.Client, params []string) (string, interface{}) {
 	if client.Room == nil {
-		return fmt.Sprintf("%s You are not in a room.", response.CodeNotFound)
+		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
 	}
 	if client != client.Room.Owner {
-		return fmt.Sprintf("%s Only the owner can kick users from the room.", response.CodeForbidden)
+		return response.GetErrorResponse(response.CodeForbidden, "You must be room owner for this action.")
 	}
 
 	name := ""
 	if len(params) >= 1 {
 		name = params[0]
 	} else {
-		return fmt.Sprintf("%s Must have user to kick as parameter.", response.CodeError)
+		return response.GetErrorResponse(response.CodeError, "Wrong parameters to command.")
 	}
 
 	if room.KickUser(client.Room, s, name) {
-		return fmt.Sprintf("%s %s has been kicked from the room.", response.CodeSuccess, name)
+		data := map[string]interface{}{
+			"data": fmt.Sprintf("%s has been kicked from the room.", name),
+		}
+		return response.CodeSuccess, data
 	} else {
-		return fmt.Sprintf("%s User not found in the room.", response.CodeNotFound)
+		return response.GetErrorResponse(response.CodeNotFound, "No such user in the room.")
 	}
 }
 
-func AppointNewOwnerCommand(s *models.Server, client *models.Client, params []string) string {
+func AppointNewOwnerCommand(s *models.Server, client *models.Client, params []string) (string, interface{}) {
 	if client.Room == nil {
-		return fmt.Sprintf("%s You are not in a room.", response.CodeNotFound)
+		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
 	}
 	if client != client.Room.Owner {
-		return fmt.Sprintf("%s Only the owner can kick appoint a new owner.", response.CodeForbidden)
+		return response.GetErrorResponse(response.CodeForbidden, "You must be room owner for this action.")
 	}
 
 	name := ""
 	if len(params) >= 1 {
 		name = params[0]
 	} else {
-		return fmt.Sprintf("%s Must have user to appoint as parameters.", response.CodeError)
+		return response.GetErrorResponse(response.CodeError, "Wrong parameters to command.")
 	}
 
 	if room.AppointNewOwner(client.Room, name) {
-		return fmt.Sprintf("%s %s is now the owner of the room.", response.CodeSuccess, name)
+		data := map[string]interface{}{
+			"data": fmt.Sprintf("%s is now the owner of the room.", name),
+		}
+		return response.CodeSuccess, data
 	} else {
-		return fmt.Sprintf("%s User not found in the room.", response.CodeNotFound)
+		return response.GetErrorResponse(response.CodeNotFound, "No such user in the room.")
 	}
 }
 
-func CloseRoomCommand(s *models.Server, client *models.Client, params []string) string {
+func CloseRoomCommand(s *models.Server, client *models.Client, params []string) (string, interface{}) {
 	if client.Room == nil {
-		return fmt.Sprintf("%s You are not in a room.", response.CodeNotFound)
+		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
 	}
 	if client != client.Room.Owner {
-		return fmt.Sprintf("%s Only the owner can close the room.", response.CodeForbidden)
+		return response.GetErrorResponse(response.CodeForbidden, "You must be room owner for this action.")
 	}
 	roomName := client.Room.Name
 	room.CloseRoom(client.Room, s)
-	return fmt.Sprintf("%s Room '%s' has been closed.", response.CodeSuccess, roomName)
+	data := map[string]interface{}{
+		"data": fmt.Sprintf("Room '%s' has been closed.", roomName),
+	}
+	return response.CodeSuccess, data
 }

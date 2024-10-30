@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-type CommandHandler func(*models.Server, *models.Client, []string) string
+type CommandHandler func(*models.Server, *models.Client, []string) (string, interface{})
 
 var commandHandlers = map[string]CommandHandler{
 	"Login":                   commands.LogInCommand,
@@ -52,12 +52,13 @@ func HandleCommand(s *models.Server, c *models.Client, command string, params []
 	}
 
 	if handler, exists := commandHandlers[command]; exists {
-		response := handler(s, c, params)
-		if response != "" {
-			c.Conn.Write([]byte(response + "\n"))
+		responseCode, responseData := handler(s, c, params)
+		if responseData != "" {
+			response.SendResponse(c.Conn, responseCode, responseData)
 		}
 	} else {
-		c.Conn.Write([]byte(response.CodeError + " Unknown command\n"))
+		responseCode, responseData := response.GetErrorResponse(response.CodeError, "Unknown command")
+		response.SendResponse(c.Conn, responseCode, responseData)
 	}
 }
 

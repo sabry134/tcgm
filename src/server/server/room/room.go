@@ -21,6 +21,12 @@ func CreateRoom(s *models.Server, client *models.Client, roomName string, roomPa
 	})
 }
 
+func SetPassword(r *models.Room, password string) {
+	r.WithLock(func(r *models.Room) {
+		r.Password = password
+	})
+}
+
 func CloseRoom(r *models.Room, s *models.Server) {
 	for client := range r.Clients {
 		client.Room = nil

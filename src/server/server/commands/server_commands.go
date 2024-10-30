@@ -8,24 +8,27 @@ import (
 	"server/server/room"
 )
 
-func LogInCommand(s *models.Server, c *models.Client, params []string) string {
+func LogInCommand(s *models.Server, c *models.Client, params []string) (string, interface{}) {
 	if c.Name != "" {
-		return fmt.Sprintf("%s Already logged in.", response.CodeError)
+		return response.GetErrorResponse(response.CodeError, "Already logged in!.")
 	}
 	username := ""
 
 	if len(params) >= 1 {
 		username = params[0]
 	} else {
-		return fmt.Sprintf("%s Must have rusername as parameter.", response.CodeError)
+		return response.GetErrorResponse(response.CodeError, "Must have username as parameter")
 	}
 	client.LoginClient(s, c, username)
-	return fmt.Sprintf("%s Welcome %s!", response.CodeSuccess, username)
+	data := map[string]interface{}{
+		"data": fmt.Sprintf("Welcome %s!", username),
+	}
+	return response.CodeSuccess, data
 }
 
-func ListRoomsCommand(s *models.Server, client *models.Client, params []string) string {
+func ListRoomsCommand(s *models.Server, client *models.Client, params []string) (string, interface{}) {
 	if len(s.Rooms) == 0 {
-		return fmt.Sprintf("%s No rooms available.", response.CodeNotFound)
+		return response.GetErrorResponse(response.CodeNotFound, "No rooms available.")
 	}
 	roomsList := "Available rooms: "
 	for name := range s.Rooms {
@@ -36,12 +39,15 @@ func ListRoomsCommand(s *models.Server, client *models.Client, params []string) 
 		roomsList += name + requires_password + ", "
 	}
 	roomsList = roomsList[:len(roomsList)-2]
-	return fmt.Sprintf("%s %s", response.CodeSuccess, roomsList)
+	data := map[string]interface{}{
+		"data": roomsList,
+	}
+	return response.CodeSuccess, data
 }
 
-func CreateRoomCommand(s *models.Server, client *models.Client, params []string) string {
+func CreateRoomCommand(s *models.Server, client *models.Client, params []string) (string, interface{}) {
 	if client.Room != nil {
-		return "You are already in a room. Leave it first to create a new one."
+		return response.GetErrorResponse(response.CodeError, "You are already in a room. Leave it first to create a new one.")
 	}
 
 	roomName := ""
@@ -51,21 +57,24 @@ func CreateRoomCommand(s *models.Server, client *models.Client, params []string)
 		roomName = params[0]
 		roomPassword = params[1]
 	} else {
-		return fmt.Sprintf("%s Must have room name and password as parameters.", response.CodeError)
+		return response.GetErrorResponse(response.CodeError, "Wrong parameters to command.")
 	}
 
 	if _, exists := s.Rooms[roomName]; exists {
-		return "Room name already exists."
+		return response.GetErrorResponse(response.CodeError, "Room name already exists.")
 	}
 
 	room.CreateRoom(s, client, roomName, roomPassword)
 
-	return fmt.Sprintf("%s Room '%s' created and joined.", response.CodeSuccess, roomName)
+	data := map[string]interface{}{
+		"data": fmt.Sprintf("Room '%s' created and joined.", roomName),
+	}
+	return response.CodeSuccess, data
 }
 
-func JoinRoomCommand(s *models.Server, client *models.Client, params []string) string {
+func JoinRoomCommand(s *models.Server, client *models.Client, params []string) (string, interface{}) {
 	if client.Room != nil {
-		return fmt.Sprintf("%s You are already in a room. Leave it first to join another.", response.CodeError)
+		return response.GetErrorResponse(response.CodeError, "You are already in a room.")
 	}
 
 	roomName := ""
@@ -75,20 +84,23 @@ func JoinRoomCommand(s *models.Server, client *models.Client, params []string) s
 		roomName = params[0]
 		password = params[1]
 	} else {
-		return fmt.Sprintf("%s Must have room name and password as parameters.", response.CodeError)
+		return response.GetErrorResponse(response.CodeError, "Wrong parameters to command.")
 	}
 
 	r, exists := s.Rooms[roomName]
 	if !exists {
-		return fmt.Sprintf("%s Room does not exist.", response.CodeNotFound)
+		return response.GetErrorResponse(response.CodeNotFound, "Room does not exist.")
 	}
 
 	if r.Password != "" {
 		if password != r.Password {
-			return fmt.Sprintf("%s Incorrect password.", response.CodeInvalidPassword)
+			return response.GetErrorResponse(response.CodeInvalidPassword, "Incorrect password.")
 		}
 	}
 
 	room.JoinRoom(r, client)
-	return fmt.Sprintf("%s Joined room '%s'.", response.CodeSuccess, roomName)
+	data := map[string]interface{}{
+		"data": fmt.Sprintf("Joined room '%s'.", roomName),
+	}
+	return response.CodeSuccess, data
 }

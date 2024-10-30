@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"server/server/client"
+	"server/server/handler"
 	"server/server/models"
 )
 
@@ -13,18 +14,39 @@ func Start(s *models.Server) {
 	if err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
-	defer listener.Close()
+	s.Listener = listener
 
-	fmt.Println("Server started on port 12345")
+	fmt.Printf("Server started on port %d\n", s.Port)
+
+	go func() {
+		<-s.Quit
+		fmt.Println("Shutting down server...")
+		s.Listener.Close()        // Close the listener
+		client.CloseAllClients(s) // Close all active client connections
+	}()
 
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
+			if opErr, ok := err.(*net.OpError); ok && opErr.Op == "accept" {
+				break
+			}
 			log.Printf("Failed to accept connection: %v", err)
 			continue
 		}
 
-		c := client.CreateClient(s, conn)
-		client.LoginClient(s, c)
+		go func() {
+			c := client.CreateClient(s, conn)
+			handler.HandleClient(s, c)
+		}()
 	}
+}
+
+func Close(s *models.Server) error {
+	close(s.Quit)          // Signal the server to stop
+	if s.Listener != nil { // Close the listener
+		s.Listener.Close()
+	}
+	client.CloseAllClients(s) // Disconnect all clients
+	return nil
 }

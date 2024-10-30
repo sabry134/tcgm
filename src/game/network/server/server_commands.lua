@@ -1,5 +1,5 @@
 local networkCommands = {}
-local server = require("network.server.server")
+local server = require("network.server")
 local globals = require("network.globals")
 
 local function createRoomCommand()

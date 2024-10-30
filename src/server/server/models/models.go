@@ -20,8 +20,22 @@ type Room struct {
 }
 
 type Server struct {
-	Rooms   map[string]*Room
-	Clients map[*Client]bool
-	Port    int
-	Mu      sync.Mutex
+	Rooms    map[string]*Room
+	Clients  map[*Client]bool
+	Listener net.Listener
+	Port     int
+	Mu       sync.Mutex
+	Quit     chan struct{}
+}
+
+func (r *Room) WithLock(fn func(*Room)) {
+	r.Mu.Lock()
+	defer r.Mu.Unlock()
+	fn(r)
+}
+
+func (s *Server) WithLock(fn func(*Server)) {
+	s.Mu.Lock()
+	defer s.Mu.Unlock()
+	fn(s)
 }

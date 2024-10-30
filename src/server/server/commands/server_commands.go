@@ -2,12 +2,28 @@ package commands
 
 import (
 	"fmt"
+	"server/server/client"
 	"server/server/models"
 	"server/server/response"
 	"server/server/room"
 )
 
-func ListRoomsCommand(s *models.Server, client *models.Client) string {
+func LogInCommand(s *models.Server, c *models.Client, params []string) string {
+	if c.Name != "" {
+		return fmt.Sprintf("%s Already logged in.", response.CodeError)
+	}
+	username := ""
+
+	if len(params) >= 1 {
+		username = params[0]
+	} else {
+		return fmt.Sprintf("%s Must have rusername as parameter.", response.CodeError)
+	}
+	client.LoginClient(s, c, username)
+	return fmt.Sprintf("%s Welcome %s!", response.CodeSuccess, username)
+}
+
+func ListRoomsCommand(s *models.Server, client *models.Client, params []string) string {
 	if len(s.Rooms) == 0 {
 		return fmt.Sprintf("%s No rooms available.", response.CodeNotFound)
 	}
@@ -23,33 +39,44 @@ func ListRoomsCommand(s *models.Server, client *models.Client) string {
 	return fmt.Sprintf("%s %s", response.CodeSuccess, roomsList)
 }
 
-func CreateRoomCommand(s *models.Server, client *models.Client) string {
+func CreateRoomCommand(s *models.Server, client *models.Client, params []string) string {
 	if client.Room != nil {
 		return "You are already in a room. Leave it first to create a new one."
 	}
 
-	response.SendPrompt(client, "Enter room name to create: ")
-	roomName := response.ReceiveClientInput(client)
+	roomName := ""
+	roomPassword := ""
+
+	if len(params) >= 2 {
+		roomName = params[0]
+		roomPassword = params[1]
+	} else {
+		return fmt.Sprintf("%s Must have room name and password as parameters.", response.CodeError)
+	}
 
 	if _, exists := s.Rooms[roomName]; exists {
 		return "Room name already exists."
 	}
-
-	response.SendPrompt(client, "Enter room password to create: ")
-	roomPassword := response.ReceiveClientInput(client)
 
 	room.CreateRoom(s, client, roomName, roomPassword)
 
 	return fmt.Sprintf("%s Room '%s' created and joined.", response.CodeSuccess, roomName)
 }
 
-func JoinRoomCommand(s *models.Server, client *models.Client) string {
+func JoinRoomCommand(s *models.Server, client *models.Client, params []string) string {
 	if client.Room != nil {
 		return fmt.Sprintf("%s You are already in a room. Leave it first to join another.", response.CodeError)
 	}
 
-	response.SendPrompt(client, "Enter room name to join: ")
-	roomName := response.ReceiveClientInput(client)
+	roomName := ""
+	password := ""
+
+	if len(params) >= 2 {
+		roomName = params[0]
+		password = params[1]
+	} else {
+		return fmt.Sprintf("%s Must have room name and password as parameters.", response.CodeError)
+	}
 
 	r, exists := s.Rooms[roomName]
 	if !exists {
@@ -57,8 +84,6 @@ func JoinRoomCommand(s *models.Server, client *models.Client) string {
 	}
 
 	if r.Password != "" {
-		response.SendPrompt(client, "Enter room password: ")
-		password := response.ReceiveClientInput(client)
 		if password != r.Password {
 			return fmt.Sprintf("%s Incorrect password.", response.CodeInvalidPassword)
 		}

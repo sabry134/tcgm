@@ -1,85 +1,78 @@
 package handler
 
 import (
+	"bufio"
+	"server/server/client"
 	"server/server/commands"
 	"server/server/models"
 	"server/server/response"
 	"strings"
 )
 
-type CommandHandler func(*models.Server, *models.Client) string
+type CommandHandler func(*models.Server, *models.Client, []string) string
 
 var commandHandlers = map[string]CommandHandler{
-	"C": commands.CreateRoomCommand,
-	"J": commands.JoinRoomCommand,
-	"E": commands.LeaveRoomCommand,
-	"L": commands.ListRoomsCommand,
-	"U": commands.ListUsersCommand,
-	"M": commands.BroadcastMessageCommand,
-	"P": commands.SendPrivateMessageCommand,
-	"K": commands.KickUserFromRoomCommand,
-	"O": commands.AppointNewOwnerCommand,
-	"X": commands.CloseRoomCommand,
-	"S": commands.SetRoomPasswordCommand,
-	"V": commands.ViewRoomPasswordCommand,
+	"Login":                   commands.LogInCommand,
+	"Create_room":             commands.CreateRoomCommand,
+	"Join_room":               commands.JoinRoomCommand,
+	"Leave_room":              commands.LeaveRoomCommand,
+	"List_rooms":              commands.ListRoomsCommand,
+	"List_users_in_room":      commands.ListUsersCommand,
+	"Message_to_room":         commands.BroadcastMessageCommand,
+	"Private_message_to_user": commands.SendPrivateMessageCommand,
+	"Kick_user_from_room":     commands.KickUserFromRoomCommand,
+	"Appoint_new_room_owner":  commands.AppointNewOwnerCommand,
+	"Close_room":              commands.CloseRoomCommand,
+	"Set_room_password":       commands.SetRoomPasswordCommand,
+	"View_room_password":      commands.ViewRoomPasswordCommand,
 	// Other commands can be added as needed
 }
 
-func HandleCommand(s *models.Server, client *models.Client, command string) {
+func parseCommand(input string) (string, []string) {
+	parts := strings.Fields(input)
+	if len(parts) == 0 {
+		return "", nil
+	}
+	command := parts[0]
+	params := parts[1:]
+
+	return command, params
+}
+
+func HandleCommand(s *models.Server, c *models.Client, command string, params []string) {
 	command = strings.TrimSpace(command)
 
-	if command == "Q" {
-		//response = commands.DisconnectClientCommand(s, client)
+	if command != "Login" && c.Name == "" {
+		c.Conn.Write([]byte(response.CodeForbidden + " Must be logged in to send commands\n"))
 		return
+	}
+
+	if command == "Disconnect" {
+		client.DisconnectClient(s, c)
 	}
 
 	if handler, exists := commandHandlers[command]; exists {
-		response := handler(s, client)
+		response := handler(s, c, params)
 		if response != "" {
-			client.Conn.Write([]byte(response + "\n"))
+			c.Conn.Write([]byte(response + "\n"))
 		}
 	} else {
-		client.Conn.Write([]byte(response.CodeError + " Unknown command\n"))
+		c.Conn.Write([]byte(response.CodeError + " Unknown command\n"))
 	}
 }
 
-func oldHandleCommand(s *models.Server, client *models.Client, command string) {
-	command = strings.TrimSpace(command)
-	var response string
+func HandleClient(s *models.Server, client *models.Client) {
+	defer client.Conn.Close()
+	reader := bufio.NewReader(client.Conn)
 
-	switch command {
-	case "C":
-		response = commands.CreateRoomCommand(s, client)
-	case "J":
-		response = commands.JoinRoomCommand(s, client)
-	case "E":
-		response = commands.LeaveRoomCommand(s, client)
-	case "Q":
-		//response = commands.DisconnectClientCommand(s, client)
-		return
-	case "L":
-		response = commands.ListRoomsCommand(s, client)
-	case "U":
-		response = commands.ListUsersCommand(s, client)
-	case "M":
-		response = commands.BroadcastMessageCommand(s, client)
-	case "P":
-		response = commands.SendPrivateMessageCommand(s, client)
-	case "K":
-		response = commands.KickUserFromRoomCommand(s, client)
-	case "O":
-		response = commands.AppointNewOwnerCommand(s, client)
-	case "X":
-		response = commands.CloseRoomCommand(s, client)
-	case "S":
-		response = commands.SetRoomPasswordCommand(s, client)
-	case "V":
-		response = commands.ViewRoomPasswordCommand(s, client)
-	default:
-		response = "Unknown command"
-	}
+	for {
+		fullCommand, err := reader.ReadString('\n')
+		if err != nil {
+			break
+		}
 
-	if response != "" {
-		client.Conn.Write([]byte(response + "\n"))
+		command, params := parseCommand(fullCommand)
+
+		HandleCommand(s, client, command, params)
 	}
 }

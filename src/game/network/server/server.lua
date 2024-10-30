@@ -31,6 +31,14 @@ function server:send(message)
     end
 end
 
+function server:receiveResponse()
+    local line, err = self.client.receive()
+    if not err then
+        local response = json.decode(line)
+        self:handleServerResponse(response)
+    end
+end
+
 function server:update()
     if self.client then
         local response
@@ -52,7 +60,9 @@ function server:update()
 end
 
 function server:handleServerResponse(response)
-    local code, message = response:match("^(%d+)%s(.+)$")
+    local code = response.code
+    local data = response.data
+    local message = data.data
 
     if code and message then
         code = tonumber(code)

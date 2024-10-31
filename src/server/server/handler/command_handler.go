@@ -2,6 +2,8 @@ package handler
 
 import (
 	"bufio"
+	"encoding/json"
+	"log"
 	"server/server/client"
 	"server/server/commands"
 	"server/server/models"
@@ -9,7 +11,7 @@ import (
 	"strings"
 )
 
-type CommandHandler func(*models.Server, *models.Client, []string) (string, interface{})
+type CommandHandler func(*models.Server, *models.Client, interface{}) (string, interface{})
 
 var commandHandlers = map[string]CommandHandler{
 	"Login":                   commands.LogInCommand,
@@ -28,6 +30,16 @@ var commandHandlers = map[string]CommandHandler{
 	// Other commands can be added as needed
 }
 
+func HandleMessage(s *models.Server, c *models.Client, message []byte) {
+	var msg response.ClientMessage
+	err := json.Unmarshal(message, &msg)
+	if err != nil {
+		log.Println("Error decoding JSON", err)
+		return
+	}
+	HandleCommand(s, c, msg)
+}
+
 func parseCommand(input string) (string, []string) {
 	parts := strings.Fields(input)
 	if len(parts) == 0 {
@@ -39,8 +51,8 @@ func parseCommand(input string) (string, []string) {
 	return command, params
 }
 
-func HandleCommand(s *models.Server, c *models.Client, command string, params []string) {
-	command = strings.TrimSpace(command)
+func HandleCommand(s *models.Server, c *models.Client, message response.ClientMessage) {
+	command := strings.TrimSpace(message.Command)
 
 	if command != "Login" && c.Name == "" {
 		c.Conn.Write([]byte(response.CodeForbidden + " Must be logged in to send commands\n"))
@@ -52,7 +64,7 @@ func HandleCommand(s *models.Server, c *models.Client, command string, params []
 	}
 
 	if handler, exists := commandHandlers[command]; exists {
-		responseCode, responseData := handler(s, c, params)
+		responseCode, responseData := handler(s, c, message.Data)
 		if responseData != "" {
 			response.SendResponse(c.Conn, responseCode, responseData)
 		}
@@ -67,13 +79,11 @@ func HandleClient(s *models.Server, client *models.Client) {
 	reader := bufio.NewReader(client.Conn)
 
 	for {
-		fullCommand, err := reader.ReadString('\n')
+		message, err := reader.ReadBytes('\n')
 		if err != nil {
 			break
 		}
 
-		command, params := parseCommand(fullCommand)
-
-		HandleCommand(s, client, command, params)
+		HandleMessage(s, client, message)
 	}
 }

@@ -13,10 +13,13 @@ func TestClientLogin(t *testing.T) {
 
 	client, cleanupCreator := createMockClient(t, "127.0.0.1", "12345")
 	defer cleanupCreator()
-	sendCommand(client, "Login username")
+
+	clientLogin(client, "username")
 
 	response := readResponse(client, 1)
-	if !strings.Contains(response, "200 Welcome username!") {
+	command := response.Command
+	msgData := response.Data.(map[string]interface{})
+	if !strings.Contains(command, "200") || !strings.Contains(msgData["message"].(string), "Welcome username!") {
 		t.Errorf("Expected welcome, got: %s", response)
 	}
 }

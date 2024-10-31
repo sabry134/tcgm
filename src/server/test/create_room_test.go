@@ -13,12 +13,14 @@ func TestCreateRoom(t *testing.T) {
 
 	client, cleanup := createMockClient(t, "127.0.0.1", "12345")
 	defer cleanup()
-	sendCommand(client, "Login username")
 
-	sendCommand(client, "Create_room MyRoom SecretPassword")
+	clientLogin(client, "username")
+	clientCreateRoom(client, "MyRoom", "SecretPassword")
+
 	response := readResponse(client, 2)
-
-	if !strings.Contains(response, "200 Room 'MyRoom' created and joined.") {
+	command := response.Command
+	msgData := response.Data.(map[string]interface{})
+	if !strings.Contains(command, "200") || !strings.Contains(msgData["message"].(string), "Room 'MyRoom' created and joined.") {
 		t.Errorf("Expected room creation success, got: %s", response)
 	}
 

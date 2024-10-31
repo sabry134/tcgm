@@ -14,19 +14,19 @@ import (
 type CommandHandler func(*models.Server, *models.Client, interface{}) (string, interface{})
 
 var commandHandlers = map[string]CommandHandler{
-	"Login":                   commands.LogInCommand,
-	"Create_room":             commands.CreateRoomCommand,
-	"Join_room":               commands.JoinRoomCommand,
-	"Leave_room":              commands.LeaveRoomCommand,
-	"List_rooms":              commands.ListRoomsCommand,
-	"List_users_in_room":      commands.ListUsersCommand,
-	"Message_to_room":         commands.BroadcastMessageCommand,
-	"Private_message_to_user": commands.SendPrivateMessageCommand,
-	"Kick_user_from_room":     commands.KickUserFromRoomCommand,
-	"Appoint_new_room_owner":  commands.AppointNewOwnerCommand,
-	"Close_room":              commands.CloseRoomCommand,
-	"Set_room_password":       commands.SetRoomPasswordCommand,
-	"View_room_password":      commands.ViewRoomPasswordCommand,
+	"Login":                commands.LogInCommand,
+	"CreateRoom":           commands.CreateRoomCommand,
+	"JoinRoom":             commands.JoinRoomCommand,
+	"LeaveRoom":            commands.LeaveRoomCommand,
+	"ListRooms":            commands.ListRoomsCommand,
+	"ListUsersInRoom":      commands.ListUsersCommand,
+	"MessageToRoom":        commands.BroadcastMessageCommand,
+	"PrivateMessageToUser": commands.SendPrivateMessageCommand,
+	"KickUserFromRoom":     commands.KickUserFromRoomCommand,
+	"AppointNewRoomOwner":  commands.AppointNewOwnerCommand,
+	"CloseRoom":            commands.CloseRoomCommand,
+	"SetRoomPassword":      commands.SetRoomPasswordCommand,
+	"ViewRoomPassword":     commands.ViewRoomPasswordCommand,
 	// Other commands can be added as needed
 }
 
@@ -55,7 +55,8 @@ func HandleCommand(s *models.Server, c *models.Client, message response.ClientMe
 	command := strings.TrimSpace(message.Command)
 
 	if command != "Login" && c.Name == "" {
-		c.Conn.Write([]byte(response.CodeForbidden + " Must be logged in to send commands\n"))
+		code, data := response.GetErrorResponse(response.CodeError, "Must be logged in to send commands\n")
+		response.SendResponse(c.Conn, code, data)
 		return
 	}
 

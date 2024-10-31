@@ -2,9 +2,13 @@ local networkCommands = {}
 
 local logger  = require("logger")
 local loginCommandHandler = require("network.commands.handle_login_command")
+local createRoomCommandHandler = require("network.commands.handle_create_room_command")
+local joinRoomCommandHandler = require("network.commands.handle_join_room_command")
 
 local commandHandlers = {
     Login = loginCommandHandler.HandleLoginCommand,
+    CreateRoom = createRoomCommandHandler.HandleCreateRoomCommand,
+    JoinRoom = joinRoomCommandHandler.HandleJoinRoomCommand,
     -- More commands can be added here
 }
 
@@ -26,7 +30,7 @@ end
 -- function only used for testing
 function networkCommands:processCommand(command)
     local commandName, commandParams = parseCommand(command)
-    local handler = commandHandlers["Login"]
+    local handler = commandHandlers[commandName]
     if handler then
         handler(commandName, commandParams)
     else

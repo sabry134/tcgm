@@ -1,4 +1,5 @@
 local server = require("network.server.server")
+local p2p = require("network.p2p.p2p")
 local commands = require("network.commands.commands")
 local globals = require("network.globals")
 local networkConfig = require("network.loadNetworkConfig")
@@ -18,6 +19,8 @@ end
 function love.update()
     if globals.mode == "server" then
         server:update()
+    else
+        p2p:update()
     end
 end
 

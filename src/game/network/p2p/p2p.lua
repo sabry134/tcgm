@@ -1,54 +1,106 @@
 local socket = require("socket")
 local globals = require("network.globals")
+local json = require("libs.dkjson.dkjson")
+local responseHandler = require("network.response.handle_response")
+local p2pCommands = require("network.p2p.p2p_commands")
+local logger      = require("logger")
 
 local p2p = {}
 
 p2p.host = nil
+p2p.peer = nil
 
-local function processPeerMessaging(message)
-    print("Received from peer:", message)
+local function processPeerMessaging(response)
+    local code = tonumber(response.command)
+    local data = response.data
+    logger.debug(string.format("Got message with code : %d", code))
+
+    if code == 500 then
+        responseHandler.ResponseHandlers["MessageReceived"](code, data)
+    else
+        responseHandler.ResponseHandlers[globals.state](code, data)
+    end
 end
 
-local function handlePeerConnection(peer)
-    love.update = function(dt)
-        local data, err = peer:receive()
-        if data then
-            processPeerMessaging(data)
-        elseif err ~= "timeout" then
-            print("Peer disconnected")
-            peer:close()
-        end
+function p2p:receiveResponse()
+    local data, err = self.peer:receive()
+    if data then
+        local response = json.decode(data)
+        processPeerMessaging(response)
+    elseif err and err ~= "timeout" then
+        print("Peer disconnected")
+        self.peer:close()
+        self.peer = nil
     end
+end
+
+function p2p:update()
+    if self.peer then
+        self:receiveResponse()
+    else
+        self:checkForIncomingConnection()
+    end
+end
+
+function p2p:send(message)
+    if self.peer then
+        local success, err = self.peer:send(message .. "\n")
+        if not success then
+            print("Failed to send message:", err)
+            self.peer:close()
+            self.peer = nil
+        end
+    else
+        print("No peer connected.")
+    end
+end
+
+function p2p:sendCommand(command, data)
+    local response = {
+        command = command,
+        data = data
+    }
+    local jsonMessage = json.encode(response)
+    logger.debug(string.format("about to send json message %s", jsonMessage))
+    p2p:send(jsonMessage)
 end
 
 function p2p:StartP2P(port)
-    print("port is : " .. port)
-    local listener = assert(socket.bind("*", port))
-    listener:settimeout(0)
-    p2p.host = "self"
-    print("P2P: Listening on port", port)
-
-    love.update = function(dt)
-        local peer, err = listener:accept()
-        if peer then
-            print("Connected to a peer!")
-            peer:settimeout(0)
-            handlePeerConnection(peer)
-        end
+    logger.info("Starting P2P listener on port: " .. port)
+    local listener, err = socket.bind("*", port)
+    if not listener then
+        logger.error(string.format("Failed to bind to port:%s", err))
+        return
     end
+    listener:settimeout(0)
+    self.host = "self"
+    self.listener = listener
 end
 
 function p2p:ConnectToPeer(address, port)
-    print("address is " .. address)
-    print("port is " .. port)
-    local peer = socket.connect(address, port)
+    logger.info("Connecting to peer at " .. address .. ":" .. port)
+    local peer, err = socket.connect(address, port)
     if peer then
         self.host = address
-        print("Connected to peer at " .. address .. ":" .. port .. ".")
+        logger.info("Connected to peer at " .. address .. ":" .. port)
         peer:settimeout(0)
-        handlePeerConnection(peer)
+        self.peer = peer
     else
-        print("Failed to connect to peer.")
+        logger.error(string.format("Failed to connect to peer:%s", err))
+    end
+end
+
+function p2p:checkForIncomingConnection()
+    if self.listener then
+        local peer, err = self.listener:accept()
+        if peer then
+            logger.info("Peer connected!")
+            peer:settimeout(0)
+            self.peer = peer
+            p2pCommands:SendMessageCommand(self, "Welcome to the room !")
+        elseif err and err ~= "timeout" then
+            logger.error(string.format("Listener error:%s", err))
+        end
     end
 end
 

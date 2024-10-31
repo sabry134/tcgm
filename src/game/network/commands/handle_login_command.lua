@@ -4,7 +4,6 @@ local server = require("network.server.server")
 
 function loginCommandHandler.HandleLoginCommand(command, commandParams)
     globals.state = "Login"
-    globals.inputText = "" -- Clear previous input
     server:init()
     local data = {
         username = commandParams[1]

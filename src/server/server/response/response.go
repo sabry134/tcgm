@@ -32,7 +32,7 @@ type ClientMessage struct {
 
 func GetErrorResponse(code string, reason string) (string, interface{}) {
 	message := map[string]interface{}{
-		"data": reason, // Should rename to reason when better handled client side
+		"reason": reason, // Should rename to reason when better handled client side
 	}
 
 	return code, message

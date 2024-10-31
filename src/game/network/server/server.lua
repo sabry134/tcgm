@@ -1,7 +1,7 @@
 local socket = require("socket")
 local globals = require("network.globals")
 local json = require("libs.dkjson.dkjson")
-local response_handler = require("network.response.handle_response")
+local responseHandler = require("network.response.handle_response")
 local logger = require("logger")
 
 local server = {}
@@ -71,7 +71,11 @@ function server:handleServerResponse(response)
     local code = tonumber(response.command)
     local data = response.data
 
-    response_handler.ServerResponseHandlers[globals.state](code, data)
+    if code == 500 then
+        responseHandler.ResponseHandlers["MessageReceived"](code, data)
+    else
+        responseHandler.ResponseHandlers[globals.state](code, data)
+    end
 end
 
 function server:close()

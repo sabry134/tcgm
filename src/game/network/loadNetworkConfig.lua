@@ -17,7 +17,6 @@ end
 function networkConfig:LoadNetworkConfig(filename)
     local config = loadConfig(filename)
     globals.mode = config.mode
-    globals.p2p_port = config.p2p_port
     globals.server_address = config.server_address
     globals.server_port = config.server_port
 end

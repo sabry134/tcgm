@@ -8,7 +8,7 @@ logger.levels = {
     DEBUG = { name = "DEBUG", color = "\27[34m" },     -- Blue
 }
 
-logger.current_level = logger.levels.DEBUG
+logger.current_level = logger.levels.ERROR
 
 -- This function determines if the log should be output to console
 local function should_log(level)

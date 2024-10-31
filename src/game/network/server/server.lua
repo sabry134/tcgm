@@ -1,9 +1,12 @@
 local socket = require("socket")
 local globals = require("network.globals")
+local json = require("libs.dkjson.dkjson")
+local response_handler = require("network.response.handle_response")
+local logger = require("logger")
 
 local server = {}
 
-server.host = "" -- Should load from config file later
+server.host = ""
 server.port = 12345
 server.client = nil
 server.mode = "none"
@@ -15,10 +18,10 @@ function server:init()
     self.client:settimeout(5)
     local success, err = self.client:connect(self.host, self.port)
     if not success then
-        print("Connection failed: " .. err)
+        logger.error("Connection failed: " .. err)
         self.client = nil
     else
-        print("Connected to server!")
+        logger.info("Connected to server!")
         self.client:settimeout(0)
     end
 end
@@ -27,32 +30,37 @@ function server:send(message)
     if self.client then
         self.client:send(message .. "\n")
     else
-        print("Not connected to server")
+        logger.error("Not connected to server")
     end
 end
 
+function server:sendCommand(command, data)
+    local response = {
+        command = command,
+        data = data
+    }
+    local jsonMessage = json.encode(response)
+    server:send(jsonMessage)
+end
+
 function server:receiveResponse()
-    local line, err = self.client.receive()
-    if not err then
-        local response = json.decode(line)
-        self:handleServerResponse(response)
-    end
+    local line
+        repeat
+            line, err = self.client:receive()
+            if line then
+                local response = json.decode(line)
+                self:handleServerResponse(response)
+            end
+        until not line or err == "timeout"
 end
 
 function server:update()
     if self.client then
-        local response
-        repeat
-            response, err = self.client:receive()
-            if response then
-                -- print("Server says: " .. response)  -- Log received message
-                self:handleServerResponse(response)  -- Process the received response
-            end
-        until not response or err == "timeout"
+        self:receiveResponse()
 
         -- Handle connection errors
         if err and err ~= "timeout" then
-            print("Server connection error: " .. err)
+            logger.error("Server connection error: " .. err)
             self.client:close()
             self.client = nil
         end
@@ -60,39 +68,10 @@ function server:update()
 end
 
 function server:handleServerResponse(response)
-    local code = response.code
+    local code = tonumber(response.command)
     local data = response.data
-    local message = data.data
 
-    if code and message then
-        code = tonumber(code)
-        if code == 200 then
-            print("Success :", message)
-            self.mode = "none"
-        elseif code == 300 then
-            print("Server prompt :", message)
-            globals.inputText = ""
-            self.mode = "responding"
-        elseif code == 400 then
-            print("Server error :", message)
-            self.mode = "none"
-        elseif code == 401 then
-            print("Invalid password :", message)
-            self.mode = "none"
-        elseif code == 403 then
-            print("Forbidden ressource :", message)
-            self.mode = "none"
-        elseif code == 404 then
-            print("Ressource not found :", message)
-            self.mode = "none"
-        elseif code == 500 then
-            print(message)
-            self.mode = "none"
-        elseif code == 501 then
-            print("Info : ", message)
-            self.mode = "none"
-        end
-    end
+    response_handler.ServerResponseHandlers[globals.state](code, data)
 end
 
 function server:close()

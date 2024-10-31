@@ -1,5 +1,6 @@
 {
-    "mode": "p2p",
-    "server_address": "127.0.0.1:12345",
+    "mode": "server",
+    "server_address": "127.0.0.1",
+    "server_port": "12345",
     "p2p_port": 12346
 }

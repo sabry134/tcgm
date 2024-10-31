@@ -1,5 +1,6 @@
 local json = require("libs.dkjson.dkjson")
 local globals = require("network.globals")
+local logger = require("logger")
 
 local networkConfig = {}
 
@@ -8,7 +9,7 @@ local function loadConfig(filename)
     if configFile then
         return json.decode(configFile)
     else
-        print("Error loading config.json")
+        logger.error("Error loading config.json")
         return nil
     end
 end
@@ -18,6 +19,7 @@ function networkConfig:LoadNetworkConfig(filename)
     globals.mode = config.mode
     globals.p2p_port = config.p2p_port
     globals.server_address = config.server_address
+    globals.server_port = config.server_port
 end
 
 return networkConfig

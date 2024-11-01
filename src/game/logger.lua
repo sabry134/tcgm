@@ -10,24 +10,51 @@ logger.levels = {
 
 logger.current_level = logger.levels.DEBUG
 
--- This function determines if the log should be output to console
 local function should_log(level)
     local priority = { INFO = 1, WARNING = 2, ERROR = 3, DEBUG = 4 }
     return priority[level.name] <= priority[logger.current_level.name]
 end
 
+local function ensure_log_directory()
+    local logs_dir = "logs"
+    os.execute("mkdir -p " .. logs_dir)
+    return logs_dir
+end
+
+local function get_log_file_name()
+    local logs_dir = ensure_log_directory()
+    return logs_dir .. "/" .. os.date("%Y-%m-%d") .. ".log"
+end
+
+-- Function to write log message to file
+local function write_to_file(message)
+    local file_name = get_log_file_name()
+    local file = io.open(file_name, "a")
+    if file then
+        file:write(message .. "\n")
+        file:close()
+    else
+        print("Error: Could not open log file for writing.")
+    end
+end
+
 function logger.log(level, message)
     if should_log(level) then
         local timestamp = os.date("%Y-%m-%d %H:%M:%S")
-        local reset_color = "\27[0m"  -- ANSI code to reset color
-        print(string.format("%s[%s] %s%s: %s%s", 
-            level.color,            -- Color for the level
-            timestamp,              -- Timestamp
-            level.name,             -- Log level name (INFO, WARNING, etc.)
-            reset_color,            -- Reset color after level name
+        local reset_color = "\27[0m"
+        local formatted_message = string.format("%s[%s] %s%s: %s%s", 
+            level.color,
+            timestamp,
+            level.name,
+            reset_color,
             message,
-            reset_color             -- Reset color at the end
-        ))
+            reset_color
+        )
+        
+        print(formatted_message)
+        
+        local plain_message = string.format("[%s] %s: %s", timestamp, level.name, message)
+        write_to_file(plain_message)
     end
 end
 

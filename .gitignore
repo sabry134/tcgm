@@ -17,6 +17,7 @@ tutoriel_ogl
 tcgm
 *.zip
 *.love
+*.log
 
 # Hidden files
 .vscode

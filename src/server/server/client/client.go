@@ -3,6 +3,7 @@ package client
 import (
 	"fmt"
 	"net"
+	"server/logger"
 	"server/server/models"
 	"server/server/room"
 )
@@ -42,5 +43,5 @@ func LoginClient(s *models.Server, client *models.Client, username string) {
 		s.Clients[client] = true
 	})
 
-	fmt.Printf("New client connected: %v with username : %s\n", client.Conn.RemoteAddr(), client.Name)
+	logger.Info(fmt.Sprintf("New client connected: %v with username : %s", client.Conn.RemoteAddr(), client.Name))
 }

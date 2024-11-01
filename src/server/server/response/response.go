@@ -3,8 +3,9 @@ package response
 import (
 	"bufio"
 	"encoding/json"
-	"log"
+	"fmt"
 	"net"
+	"server/logger"
 	"server/server/models"
 	"strings"
 )
@@ -45,7 +46,7 @@ func SendResponse(conn net.Conn, command string, data interface{}) {
 	}
 	jsonMessage, err := json.Marshal(response)
 	if err != nil {
-		log.Println("Error encoding JSON:", err)
+		logger.Error(fmt.Sprint("Error encoding JSON ", err))
 		return
 	}
 	conn.Write(append(jsonMessage, '\n'))
@@ -58,7 +59,7 @@ func SendInfo(client *models.Client, data interface{}) {
 	}
 	jsonMessage, err := json.Marshal(response)
 	if err != nil {
-		log.Println("Error encoding JSON:", err)
+		logger.Error(fmt.Sprint("Error encoding JSON ", err))
 		return
 	}
 	client.Conn.Write(append(jsonMessage, '\n'))
@@ -71,7 +72,7 @@ func SendMessage(client *models.Client, data interface{}) {
 	}
 	jsonMessage, err := json.Marshal(response)
 	if err != nil {
-		log.Println("Error encoding JSON:", err)
+		logger.Error(fmt.Sprint("Error encoding JSON ", err))
 		return
 	}
 	client.Conn.Write(append(jsonMessage, '\n'))
@@ -89,14 +90,14 @@ func ReceiveClientInput(client *models.Client) string {
 func CheckForData(msgData interface{}, requiredFields []string) bool {
 	data, ok := msgData.(map[string]interface{})
 	if !ok {
-		log.Println("Error: data is not a valid map")
+		logger.Error("Error: data is not a valid map")
 		return false
 	}
 
 	for _, field := range requiredFields {
 		_, fieldExists := data[field].(string)
 		if !fieldExists {
-			log.Printf("Error : Missing  or invalid '%s' field\n", field)
+			logger.Error(fmt.Sprintf("Error : Missing  or invalid '%s' field", field))
 			return false
 		}
 	}

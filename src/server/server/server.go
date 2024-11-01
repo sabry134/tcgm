@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"server/logger"
 	"server/server/client"
 	"server/server/handler"
 	"server/server/models"
@@ -16,11 +17,11 @@ func Start(s *models.Server) {
 	}
 	s.Listener = listener
 
-	fmt.Printf("Server started on port %d\n", s.Port)
+	logger.Info(fmt.Sprintf("Server started on port %d", s.Port))
 
 	go func() {
 		<-s.Quit
-		fmt.Println("Shutting down server...")
+		logger.Info("Shutting down server")
 		s.Listener.Close()        // Close the listener
 		client.CloseAllClients(s) // Close all active client connections
 	}()
@@ -31,7 +32,7 @@ func Start(s *models.Server) {
 			if opErr, ok := err.(*net.OpError); ok && opErr.Op == "accept" {
 				break
 			}
-			log.Printf("Failed to accept connection: %v", err)
+			logger.Error(fmt.Sprintf("Failed to accept connection: %v", err))
 			continue
 		}
 

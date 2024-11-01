@@ -3,8 +3,9 @@ package main_test
 import (
 	"bufio"
 	"encoding/json"
-	"log"
+	"fmt"
 	"net"
+	"server/logger"
 	"server/server/response"
 )
 
@@ -15,7 +16,7 @@ func sendCommand(conn net.Conn, command string, data interface{}) {
 	}
 	jsonMessage, err := json.Marshal(response)
 	if err != nil {
-		log.Println("Error encoding JSON:", err)
+		logger.Error(fmt.Sprint("Error encoding JSON:", err))
 		return
 	}
 	conn.Write(append(jsonMessage, '\n'))

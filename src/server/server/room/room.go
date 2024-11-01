@@ -2,6 +2,7 @@ package room
 
 import (
 	"fmt"
+	"server/logger"
 	"server/server/models"
 	"server/server/response"
 	"time"
@@ -147,7 +148,7 @@ func BroadcastMessage(r *models.Room, client *models.Client, message string) {
 	}
 	for c := range client.Room.Clients {
 		if c != client {
-			fmt.Println("Sending message " + message + " from client: " + client.Name + " to " + c.Name)
+			logger.Debug(fmt.Sprintf("Sending message " + message + " from client: " + client.Name + " to " + c.Name))
 			response.SendMessage(c, data)
 		}
 	}
@@ -162,7 +163,7 @@ func SendPrivateMessage(r *models.Room, client *models.Client, name string, mess
 				"sender":    client.Name,
 				"timestamp": getTimeStampAsString(),
 			}
-			fmt.Println("Sending private message " + message + " from client: " + client.Name + " to " + c.Name)
+			logger.Debug(fmt.Sprintf("Sending private message " + message + " from client: " + client.Name + " to " + c.Name))
 			response.SendMessage(c, data)
 			return true
 		}

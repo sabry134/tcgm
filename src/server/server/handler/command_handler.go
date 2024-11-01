@@ -3,7 +3,8 @@ package handler
 import (
 	"bufio"
 	"encoding/json"
-	"log"
+	"fmt"
+	"server/logger"
 	"server/server/client"
 	"server/server/commands"
 	"server/server/models"
@@ -34,7 +35,7 @@ func HandleMessage(s *models.Server, c *models.Client, message []byte) {
 	var msg response.ClientMessage
 	err := json.Unmarshal(message, &msg)
 	if err != nil {
-		log.Println("Error decoding JSON", err)
+		logger.Error(fmt.Sprint("Error decoding JSON ", err))
 		return
 	}
 	HandleCommand(s, c, msg)

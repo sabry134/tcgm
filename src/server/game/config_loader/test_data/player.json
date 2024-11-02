@@ -1,0 +1,9 @@
+{
+    "player":
+        {
+            "values": {
+                "Life": 20,
+                "StartingMana": 0
+            }
+        }
+}

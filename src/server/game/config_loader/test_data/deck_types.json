@@ -1,0 +1,20 @@
+{
+    "decks_types": [
+        {
+            "name": "MainDeck",
+            "card_limit_lower": 60,
+            "card_limit_upper": 60,
+            "public": false,
+            "copies_limit": 4,
+            "shared_limit_with": ["SideDeck"]
+        },
+        {
+                "name": "SideDeck",
+                "card_limit_lower": 0,
+                "card_limit_upper": 15,
+                "public": false,
+                "copies_limit": 4,
+                "shared_limit_with": ["MainDeck"]
+        }
+    ]
+}

@@ -1,0 +1,15 @@
+{
+    "boards": [
+        {
+        "name": "Field",
+        "zones": [
+            {
+            "zone_name": "CreatureZone",
+            "quantity": 3
+            }
+        ],
+        "area": "free",
+        "ordered_zones": true
+        }
+    ]
+}

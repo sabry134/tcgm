@@ -1,5 +1,9 @@
 package config
 
-type PlayerConfig struct {
-	Values map[string]int `json:"values"`
+type Player struct {
+	Values map[string]interface{} `json:"values"`
+}
+
+type PlayersConfig struct {
+	Player Player `json:"player"`
 }

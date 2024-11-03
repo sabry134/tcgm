@@ -192,8 +192,14 @@ func JoinGameCommand(s *models.Server, client *models.Client, msgData interface{
 	if r == nil {
 		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
 	}
+
 	if client.Game != nil {
 		return response.GetErrorResponse(response.CodeError, "You are already in a game.")
+	}
+
+	maxPlayers := 2 // Should get this from rules later
+	if client.Game.PlayerCount == maxPlayers {
+		return response.GetErrorResponse(response.CodeError, "Game has already reached it's maximum player count.")
 	}
 
 	if !response.CheckForData(msgData, []string{"gameId"}) {

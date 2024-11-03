@@ -27,6 +27,7 @@ func CreateGame(r *models.Room, client *models.Client) *models.Game {
 		newGame.Players[client] = true
 		newGame.Creator = client
 		newGame.PlayerCount = 1
+		newGame.GameStarted = false
 	})
 
 	data := map[string]interface{}{
@@ -109,5 +110,23 @@ func LeaveGame(g *models.Game, client *models.Client, s *models.Server) {
 	}
 	for c := range g.Players {
 		response.SendInfo(c, data)
+	}
+}
+
+func StartGame(g *models.Game, client *models.Client) {
+	g.WithLock(func(g *models.Game) {
+		g.GameStarted = true
+		g.GameState = initGameSate(g)
+	})
+	gameStateData := getGameStateData(g)
+	data := map[string]interface{}{
+		"message":     "Game has started.",
+		"playerCount": g.PlayerCount,
+		"gameState":   gameStateData,
+	}
+
+	for p := range g.Players {
+		p.InGame = true
+		response.SendInfo(p, data)
 	}
 }

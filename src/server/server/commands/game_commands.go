@@ -20,6 +20,19 @@ func LeaveGameCommand(s *models.Server, client *models.Client, msgData interface
 }
 
 func StartGameCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
-	//TODO
-	return "", 0
+	g := client.Game
+	if g == nil {
+		response.GetErrorResponse(response.CodeNotFound, "You are not in a game.")
+	}
+	if client != g.Creator {
+		response.GetErrorResponse(response.CodeForbidden, "Only game creator can start it.")
+	}
+	minPlayers := 2 // Should get this from rules later
+	if g.PlayerCount < minPlayers {
+		response.GetErrorResponse(response.CodeError, "Game has not yet reached the required player count.")
+	}
+
+	game.StartGame(g, client)
+	data := map[string]interface{}{}
+	return response.CodeSuccess, data
 }

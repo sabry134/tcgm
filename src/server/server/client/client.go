@@ -18,9 +18,10 @@ func DisconnectClient(s *models.Server, client *models.Client) {
 
 func CreateClient(s *models.Server, conn net.Conn) *models.Client {
 	client := &models.Client{
-		Conn: conn,
-		Name: "",
-		Room: nil,
+		Conn:   conn,
+		Name:   "",
+		Room:   nil,
+		InGame: false,
 	}
 
 	return client

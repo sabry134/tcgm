@@ -6,10 +6,11 @@ import (
 )
 
 type Client struct {
-	Conn net.Conn
-	Name string
-	Room *Room
-	Game *Game
+	Conn   net.Conn
+	Name   string
+	Room   *Room
+	Game   *Game
+	InGame bool
 }
 
 type Room struct {
@@ -35,7 +36,12 @@ type Game struct {
 	Players     map[*Client]bool
 	Creator     *Client
 	PlayerCount int
+	GameStarted bool
+	GameState   *GameState
 	Mu          sync.Mutex
+}
+
+type GameState struct {
 }
 
 func (r *Room) WithLock(fn func(*Room)) {

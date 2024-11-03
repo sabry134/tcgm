@@ -50,7 +50,7 @@ func CloseRoom(r *models.Room, s *models.Server) {
 func JoinRoom(r *models.Room, client *models.Client) {
 	client.Room = r
 	r.WithLock(func(r *models.Room) {
-		delete(r.Clients, client)
+		r.Clients[client] = true
 	})
 
 	data := map[string]interface{}{

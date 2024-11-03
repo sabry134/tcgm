@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"server/server/game"
 	"server/server/models"
 	"server/server/response"
 	"server/server/room"
@@ -166,6 +167,66 @@ func CloseRoomCommand(s *models.Server, client *models.Client, msgData interface
 	room.CloseRoom(client.Room, s)
 	data := map[string]interface{}{
 		"data": fmt.Sprintf("Room '%s' has been closed.", roomName),
+	}
+	return response.CodeSuccess, data
+}
+
+func CreateGameCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
+	if client.Room == nil {
+		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
+	}
+	if client.Game != nil {
+		return response.GetErrorResponse(response.CodeError, "You are already in a game. Leave it first to create a new one.")
+	}
+
+	game.CreateGame(client.Room, client)
+
+	data := map[string]interface{}{
+		"message": fmt.Sprintf("Game created and joined."),
+	}
+	return response.CodeSuccess, data
+}
+
+func JoinGameCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
+	r := client.Room
+	if r == nil {
+		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
+	}
+	if client.Game != nil {
+		return response.GetErrorResponse(response.CodeError, "You are already in a game.")
+	}
+
+	if !response.CheckForData(msgData, []string{"gameId"}) {
+		return response.GetErrorResponse(response.CodeError, "Wrong parameters to command.")
+	}
+
+	gameId := response.GetMsgDataByName(msgData, "gameId")
+
+	g, exists := r.Games[gameId]
+	if !exists {
+		return response.GetErrorResponse(response.CodeNotFound, "Game does not exist.")
+	}
+
+	game.JoinGame(g, client)
+
+	data := map[string]interface{}{
+		"message": fmt.Sprintf("Joined game '%s'.", gameId),
+	}
+	return response.CodeSuccess, data
+}
+
+func ListGamesCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
+	if client.Room == nil {
+		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
+	}
+	r := client.Room
+
+	if len(r.Games) == 0 {
+		return response.GetErrorResponse(response.CodeNotFound, "No games available.")
+	}
+	gamesList := game.GetGamesList(r)
+	data := map[string]interface{}{
+		"gamesList": gamesList,
 	}
 	return response.CodeSuccess, data
 }

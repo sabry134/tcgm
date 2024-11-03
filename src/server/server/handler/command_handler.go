@@ -28,6 +28,10 @@ var commandHandlers = map[string]CommandHandler{
 	"CloseRoom":            commands.CloseRoomCommand,
 	"SetRoomPassword":      commands.SetRoomPasswordCommand,
 	"ViewRoomPassword":     commands.ViewRoomPasswordCommand,
+	"CreateGame":           commands.CreateGameCommand,
+	"JoinGame":             commands.JoinGameCommand,
+	"LeaveGame":            commands.LeaveGameCommand,
+	"ListGames":            commands.ListGamesCommand,
 	// Other commands can be added as needed
 }
 

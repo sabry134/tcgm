@@ -9,11 +9,13 @@ type Client struct {
 	Conn net.Conn
 	Name string
 	Room *Room
+	Game *Game
 }
 
 type Room struct {
 	Name     string
 	Clients  map[*Client]bool
+	Games    map[string]*Game
 	Owner    *Client
 	Password string
 	Mu       sync.Mutex
@@ -28,6 +30,14 @@ type Server struct {
 	Quit     chan struct{}
 }
 
+type Game struct {
+	GameId      string
+	Players     map[*Client]bool
+	Creator     *Client
+	PlayerCount int
+	Mu          sync.Mutex
+}
+
 func (r *Room) WithLock(fn func(*Room)) {
 	r.Mu.Lock()
 	defer r.Mu.Unlock()
@@ -38,4 +48,10 @@ func (s *Server) WithLock(fn func(*Server)) {
 	s.Mu.Lock()
 	defer s.Mu.Unlock()
 	fn(s)
+}
+
+func (g *Game) WithLock(fn func(*Game)) {
+	g.Mu.Lock()
+	defer g.Mu.Unlock()
+	fn(g)
 }

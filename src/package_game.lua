@@ -3,7 +3,8 @@ local assets = require("assets")
 function createLoveFile(sourceDir, outputFile)
     local result
     if love.system.getOS() == "Windows" then
-        result = os.execute(string.format('powershell Compress-Archive -Path "%s"\\* -DestinationPath "%s".zip', sourceDir, outputFile))
+        -- I have an issue with the specified path, conflict with the path used for electrons
+        result = os.execute(string.format('powershell -Command "Compress-Archive -Path ..\\src\\%s -DestinationPath ..\\src\\%s.zip"', sourceDir, outputFile))
         if result ~= 0 then
             error("Failed to create .zip file")
         end

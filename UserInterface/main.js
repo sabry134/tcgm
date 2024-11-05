@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const { exec } = require('child_process');  // Node.js child_process to run cmd commands
+const os = require('os');  // Required to detect the operating system
 
 let win;
 
@@ -36,7 +37,21 @@ app.on('window-all-closed', () => {
 // Listen for the "run-command" event from renderer process
 ipcMain.handle('run-command', (event, command) => {
     return new Promise((resolve, reject) => {
-        exec(command, (error, stdout, stderr) => {
+        let shellCommand;
+
+        if (os.platform() === 'win32') {
+            // Windows uses cmd.exe
+            shellCommand = `cmd.exe /c ${command}`;
+        } else if (os.platform() === 'linux' || os.platform() === 'darwin') {
+            // Linux and macOS use bash or sh
+            shellCommand = `sh -c "${command}"`;
+        } else {
+            reject('Unsupported OS');
+            return;
+        }
+
+        // Execute the shell command
+        exec(shellCommand, (error, stdout, stderr) => {
             if (error) {
                 reject(`Error: ${error.message}`);
             } else if (stderr) {

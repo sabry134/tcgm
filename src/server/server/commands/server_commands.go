@@ -8,6 +8,8 @@ import (
 	"server/server/room"
 )
 
+// LogInCommand is the function called when the LogIn command is used by a client.
+// If the client is not already logged in, they will be logged in with the username sent in the request.
 func LogInCommand(s *models.Server, c *models.Client, msgData interface{}) (string, interface{}) {
 	if c.Name != "" {
 		return response.GetErrorResponse(response.CodeError, "Already logged in!.")
@@ -26,6 +28,8 @@ func LogInCommand(s *models.Server, c *models.Client, msgData interface{}) (stri
 	return response.CodeSuccess, data
 }
 
+// ListRoomsCommand is the function called when the ListRooms command is used by a client.
+// The client will receive a list of rooms open on the server.
 func ListRoomsCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	if len(s.Rooms) == 0 {
 		return response.GetErrorResponse(response.CodeNotFound, "No rooms available.")
@@ -37,6 +41,9 @@ func ListRoomsCommand(s *models.Server, client *models.Client, msgData interface
 	return response.CodeSuccess, data
 }
 
+// CreateRoomCommand is the function called when the CreateRoom command is used by a client.
+// The client will create a new room with a name and password that he sent in the request.
+// If no password was sent, then "" will be set by default.
 func CreateRoomCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	if client.Room != nil {
 		return response.GetErrorResponse(response.CodeError, "You are already in a room. Leave it first to create a new one.")
@@ -61,6 +68,9 @@ func CreateRoomCommand(s *models.Server, client *models.Client, msgData interfac
 	return response.CodeSuccess, data
 }
 
+// JoinRoomCommand is the function called when the JoinRoom command is used by a client.
+// If the client is not in a room, they will join the one they specified in the request if it exists.
+// The room password must be sent in the request.
 func JoinRoomCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	if client.Room != nil {
 		return response.GetErrorResponse(response.CodeError, "You are already in a room.")

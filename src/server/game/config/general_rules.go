@@ -19,3 +19,13 @@ type GeneralRules struct {
 type GeneralRulesConfig struct {
 	GeneralRules GeneralRules `json:"general_rules"`
 }
+
+var (
+	generalRulesConfig sync.Once
+	GeneralRulesConfigVar GeneralRulesConfig
+)
+
+// GetGeneralRulesConfig allows to get the game configuration linked to the general rules globally.
+func GetGeneralRulesConfig() GeneralRulesConfig {
+	return GeneralRulesConfigVar
+}

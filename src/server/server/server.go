@@ -10,6 +10,7 @@ import (
 	"server/server/models"
 )
 
+// Start starts the server and starts listening for client connections.
 func Start(s *models.Server) {
 	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", s.Port))
 	if err != nil {
@@ -43,6 +44,7 @@ func Start(s *models.Server) {
 	}
 }
 
+// Close closes all server connections then shuts down the server.
 func Close(s *models.Server) error {
 	close(s.Quit)          // Signal the server to stop
 	if s.Listener != nil { // Close the listener

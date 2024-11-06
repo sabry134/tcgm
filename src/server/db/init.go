@@ -4,6 +4,7 @@ import (
 	"server/logger"
 )
 
+// InitDatabases calls all initializer functions linked to different databases used.
 func InitDatabases() error {
 	if err := InitPostgres(); err != nil {
 		return err

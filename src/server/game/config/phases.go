@@ -11,3 +11,13 @@ type Phase struct {
 type PhasesConfig struct {
 	Phases []Phase `json:"phases"`
 }
+
+var (
+	phasesConfig sync.Once
+	PhasesConfigVar PhasesConfig
+)
+
+// GetPhasesConfig allows to get the game configuration linked to phases globally.
+func GetPhasesConfig() PhasesConfig {
+	return PhasesConfigVar
+}

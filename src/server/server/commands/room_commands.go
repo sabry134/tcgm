@@ -8,6 +8,8 @@ import (
 	"server/server/room"
 )
 
+// ViewRoomPasswordCommand is the function called when the ViewRoomPassword command is used by a client.
+// If the client is in a room and is it's owner, they will be sent the password to the room.
 func ViewRoomPasswordCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	if client.Room == nil {
 		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
@@ -23,6 +25,8 @@ func ViewRoomPasswordCommand(s *models.Server, client *models.Client, msgData in
 	return response.CodeSuccess, data
 }
 
+// SetRoomPasswordCommand is the function called when the SetRoomPassword command is used by a client.
+// If the client is in a room and is it's owner, the password will be changed to the one they sent in the request.
 func SetRoomPasswordCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	if client.Room == nil {
 		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
@@ -45,6 +49,8 @@ func SetRoomPasswordCommand(s *models.Server, client *models.Client, msgData int
 	return response.CodeSuccess, data
 }
 
+// LeaveRoomCommand is the function called when the LeaveRoom command is used by a client.
+// If the client is in a room, they will leave it.
 func LeaveRoomCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	if client.Room == nil {
 		response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
@@ -57,6 +63,9 @@ func LeaveRoomCommand(s *models.Server, client *models.Client, msgData interface
 	return response.CodeSuccess, data
 }
 
+// ListUsersCommand is the function called when the ListUsers command is used by a client.
+// If the client is in a room, they will get a list of all users also present in the room.
+// The response will contain a list of each user in the room as "userList"
 func ListUsersCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	if client.Room == nil {
 		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
@@ -68,6 +77,8 @@ func ListUsersCommand(s *models.Server, client *models.Client, msgData interface
 	return response.CodeSuccess, data
 }
 
+// BroadcastMessageCommand is the function called when the BroadcastMessage command is used by a client.
+// If the client is in a room, the message sent in the request will be sent to all clients in the room.
 func BroadcastMessageCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	if client.Room == nil {
 		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
@@ -86,6 +97,8 @@ func BroadcastMessageCommand(s *models.Server, client *models.Client, msgData in
 	return response.CodeSuccess, data
 }
 
+// SendPrivateMessageCommand is the function called when the SendPrivateMessage command is used by a client.
+// If the client is in a room, the message will be sent to a client in that room who's username matches the one sent in the request.
 func SendPrivateMessageCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	if client.Room == nil {
 		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
@@ -108,6 +121,8 @@ func SendPrivateMessageCommand(s *models.Server, client *models.Client, msgData 
 	}
 }
 
+// KickUserFromRoomCommand is the function called when the KickUserFromRoom command is used by a client.
+// If the client is in a room and is it's owner, the user who's username was in the request will be removed from the room.
 func KickUserFromRoomCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	if client.Room == nil {
 		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
@@ -132,6 +147,8 @@ func KickUserFromRoomCommand(s *models.Server, client *models.Client, msgData in
 	}
 }
 
+// AppointNewOwnerCommand is the function called when the AppointNewOwnerCommand command is used by a client.
+// If the client is in a room and is it's owner, the client who's username is in the request will be made the new owner of the room.
 func AppointNewOwnerCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	if client.Room == nil {
 		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
@@ -156,6 +173,8 @@ func AppointNewOwnerCommand(s *models.Server, client *models.Client, msgData int
 	}
 }
 
+// CloseRoomCommand is the function called when the CloseRoom command is used by a client.
+// If the client is in a room and is it's owner, all clients in the room will be removed from it and the room will be closed.
 func CloseRoomCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	if client.Room == nil {
 		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
@@ -171,6 +190,8 @@ func CloseRoomCommand(s *models.Server, client *models.Client, msgData interface
 	return response.CodeSuccess, data
 }
 
+// CreateGameCommand is the function called when the CreateGame command is used by a client.
+// If the client is in a room, and is not currently in a game, they will create a new game of which they will be the creator.
 func CreateGameCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	if client.Room == nil {
 		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
@@ -187,6 +208,8 @@ func CreateGameCommand(s *models.Server, client *models.Client, msgData interfac
 	return response.CodeSuccess, data
 }
 
+// JoinGameCommand is the function called when the JoinGame command is used by a client.
+// If the client is in a room, is not in a game, and the target game hasn't reached it's max player count, they will join it.
 func JoinGameCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	r := client.Room
 	if r == nil {
@@ -221,6 +244,8 @@ func JoinGameCommand(s *models.Server, client *models.Client, msgData interface{
 	return response.CodeSuccess, data
 }
 
+// ListGamesCommand is the function called when the ListGamesCommand command is used by a client.
+// If the client is in a room, they will list the games hosted in that room.
 func ListGamesCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	if client.Room == nil {
 		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")

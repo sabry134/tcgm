@@ -11,6 +11,8 @@ import (
 
 var PostgresDB *pgx.Conn
 
+// InitPostgres initializes a connection with a postgres database.
+// It takes the necessary parameters from environment variables.
 func InitPostgres() error {
 	var err error
 	pgHost := os.Getenv("POSTGRES_HOST")
@@ -28,6 +30,7 @@ func InitPostgres() error {
 	return nil
 }
 
+// ClosePostgres closes the connection to the postgres database.
 func ClosePostgres() {
 	if PostgresDB != nil {
 		PostgresDB.Close(context.Background())

@@ -7,6 +7,8 @@ import (
 	"server/server/response"
 )
 
+// LeaveGameCommand is the function called when the LeaveGame command is used by a client.
+// It removes the client from the game they are in if any.
 func LeaveGameCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	if client.Game == nil {
 		response.GetErrorResponse(response.CodeNotFound, "You are not in a game.")
@@ -19,6 +21,8 @@ func LeaveGameCommand(s *models.Server, client *models.Client, msgData interface
 	return response.CodeSuccess, data
 }
 
+// StartGameCommand is the function called when the StartGame command is used by a client.
+// It will start the game the client is in if any, and if the required amount of players are present in it.
 func StartGameCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	g := client.Game
 	if g == nil {

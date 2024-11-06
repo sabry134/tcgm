@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+
+// CreateRoom created a new Room object within the server.
 func CreateRoom(s *models.Server, client *models.Client, roomName string, roomPassword string) {
 	newRoom := &models.Room{Name: roomName, Clients: make(map[*models.Client]bool), Password: roomPassword}
 
@@ -23,12 +25,15 @@ func CreateRoom(s *models.Server, client *models.Client, roomName string, roomPa
 	})
 }
 
+// SetPassword sets the password of a room.
 func SetPassword(r *models.Room, password string) {
 	r.WithLock(func(r *models.Room) {
 		r.Password = password
 	})
 }
 
+// CloseRoom closes an existing room.
+// It sends an info message to all clients in the room to notify them of it.
 func CloseRoom(r *models.Room, s *models.Server) {
 	data := map[string]interface{}{
 		"info": "Room has been closed by owner",
@@ -47,6 +52,8 @@ func CloseRoom(r *models.Room, s *models.Server) {
 	})
 }
 
+// JoinRoom adds a client to a room.
+// It sends an info message to all clients in the room to notify them of it.
 func JoinRoom(r *models.Room, client *models.Client) {
 	client.Room = r
 	r.WithLock(func(r *models.Room) {
@@ -63,6 +70,8 @@ func JoinRoom(r *models.Room, client *models.Client) {
 	}
 }
 
+// LeaveRoom removes the client from the room.
+// It sends an info message to all clients in the room to notify them of it.
 func LeaveRoom(r *models.Room, client *models.Client, s *models.Server) {
 	r.WithLock(func(r *models.Room) {
 		delete(r.Clients, client)
@@ -81,12 +90,14 @@ func LeaveRoom(r *models.Room, client *models.Client, s *models.Server) {
 	}
 }
 
+// KickUser removes target player from the room.
+// It sends an info message to that client to notify him of it.
 func KickUser(r *models.Room, s *models.Server, name string) bool {
 	for c := range r.Clients {
 		if c.Name == name {
 			c.Room = nil
 			data := map[string]interface{}{
-				"message": "You have been kicked from the room.",
+				"info": "You have been kicked from the room.",
 			}
 			response.SendInfo(c, data)
 			r.WithLock(func(r *models.Room) {
@@ -98,19 +109,8 @@ func KickUser(r *models.Room, s *models.Server, name string) bool {
 	return false
 }
 
-func ListUsersAsString(r *models.Room) string {
-	usersList := "Users in room '" + r.Name + "': "
-	for c := range r.Clients {
-		owner := ""
-		if c == r.Owner {
-			owner = " (owner)"
-		}
-		usersList += c.Name + owner + ", "
-	}
-	usersList = usersList[:len(usersList)-2]
-	return usersList
-}
-
+// GetRoomsList returns a list of all rooms open on the server.
+// It will specify in the response if a room requires a password or not.
 func GetRoomsList(s *models.Server) interface{} {
 	var roomsList []map[string]interface{}
 	for name, room := range s.Rooms {
@@ -123,6 +123,8 @@ func GetRoomsList(s *models.Server) interface{} {
 	return roomsList
 }
 
+// GetUsersList returns a list of all users in a room.
+// It will specify in the response if a user is the owner.
 func GetUsersList(r *models.Room) interface{} {
 	var usersList []map[string]interface{}
 	for c := range r.Clients {
@@ -135,11 +137,14 @@ func GetUsersList(r *models.Room) interface{} {
 	return usersList
 }
 
+// getTimeStampAsString returns the current time as a string.
 func getTimeStampAsString() string {
 	currentTime := time.Now()
 	return currentTime.Format("2006-01-02 15:04:05")
 }
 
+// BroadcastMessage sends a message to all clients in a room.
+// It specifies the message's sender as well as the time it was sent.
 func BroadcastMessage(r *models.Room, client *models.Client, message string) {
 	data := map[string]interface{}{
 		"message":   message,
@@ -154,6 +159,8 @@ func BroadcastMessage(r *models.Room, client *models.Client, message string) {
 	}
 }
 
+// SendPrivateMessage sends a message to a specified client.
+// It specifies the message's sender as well as the time it was sent.
 func SendPrivateMessage(r *models.Room, client *models.Client, name string, message string) bool {
 	for c := range r.Clients {
 		if c != client && c.Name == name {
@@ -171,6 +178,7 @@ func SendPrivateMessage(r *models.Room, client *models.Client, name string, mess
 	return false
 }
 
+// AppointNewOwner changes the owner of a room to a different one.
 func AppointNewOwner(r *models.Room, name string) bool {
 	for c := range r.Clients {
 		if c.Name == name {

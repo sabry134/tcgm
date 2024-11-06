@@ -9,3 +9,13 @@ type Action struct {
 type ActionsConfig struct {
 	Actions []Action `json:"actions"`
 }
+
+var (
+	actionsConfig sync.Once
+	ActionsConfigVar ActionsConfig
+)
+
+// GetActionsConfig allows to get the game configuration linked to actions globally.
+func GetActionsConfig() ActionsConfig {
+	return ActionsConfig
+}

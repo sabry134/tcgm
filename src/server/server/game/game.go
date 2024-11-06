@@ -12,6 +12,7 @@ func generateGameId() string {
 	return uuid.New().String()
 }
 
+// CreateGame created a new instance of the Game struct.
 func CreateGame(r *models.Room, client *models.Client) *models.Game {
 	gameId := generateGameId()
 
@@ -45,6 +46,8 @@ func CreateGame(r *models.Room, client *models.Client) *models.Game {
 	return newGame
 }
 
+// JoinGame adds a client to a game.
+// It sends an info message in the process to notify the other players in the game.
 func JoinGame(g *models.Game, c *models.Client) {
 	c.Game = g
 	g.WithLock(func(g *models.Game) {
@@ -64,6 +67,7 @@ func JoinGame(g *models.Game, c *models.Client) {
 	}
 }
 
+// GetGamesList returns a list of games hosted in a room.
 func GetGamesList(r *models.Room) interface{} {
 	var gamesList []map[string]interface{}
 	for gameId, g := range r.Games {
@@ -77,6 +81,8 @@ func GetGamesList(r *models.Room) interface{} {
 	return gamesList
 }
 
+// CloseGame closes an existing game.
+// It sends an info message in the process to notify them.
 func CloseGame(g *models.Game, r *models.Room) {
 	data := map[string]interface{}{
 		"info": "Game has been closed by owner",
@@ -95,6 +101,8 @@ func CloseGame(g *models.Game, r *models.Room) {
 	})
 }
 
+// LeaveGame removes a client from a room.
+// It sends an info message in the process to all other players in the game to notify them.
 func LeaveGame(g *models.Game, client *models.Client, s *models.Server) {
 	g.WithLock(func(g *models.Game) {
 		delete(g.Players, client)
@@ -113,6 +121,8 @@ func LeaveGame(g *models.Game, client *models.Client, s *models.Server) {
 	}
 }
 
+// StartGame starts a game.
+// It sends an info message to all players in the game to notify them.
 func StartGame(g *models.Game, client *models.Client) {
 	g.WithLock(func(g *models.Game) {
 		g.GameStarted = true

@@ -12,6 +12,7 @@ import (
 	"strings"
 )
 
+// CommandHandler is the bridge between each command and their corresponding handler.
 type CommandHandler func(*models.Server, *models.Client, interface{}) (string, interface{})
 
 var commandHandlers = map[string]CommandHandler{
@@ -35,6 +36,7 @@ var commandHandlers = map[string]CommandHandler{
 	// Other commands can be added as needed
 }
 
+// HandleMessage deserializes the json obejct sent by the client to be interpreted as a command.
 func HandleMessage(s *models.Server, c *models.Client, message []byte) {
 	var msg response.ClientMessage
 	err := json.Unmarshal(message, &msg)
@@ -45,17 +47,7 @@ func HandleMessage(s *models.Server, c *models.Client, message []byte) {
 	HandleCommand(s, c, msg)
 }
 
-func parseCommand(input string) (string, []string) {
-	parts := strings.Fields(input)
-	if len(parts) == 0 {
-		return "", nil
-	}
-	command := parts[0]
-	params := parts[1:]
-
-	return command, params
-}
-
+// HandleCommand send the command data to the corresponding command handler.
 func HandleCommand(s *models.Server, c *models.Client, message response.ClientMessage) {
 	command := strings.TrimSpace(message.Command)
 

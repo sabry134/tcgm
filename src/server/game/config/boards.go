@@ -15,3 +15,13 @@ type Board struct {
 type BoardsConfig struct {
 	Boards []Board `json:"boards"`
 }
+
+var (
+	boardsConfig sync.Once
+	BoardsConfigVar BoardsConfig
+)
+
+// GetBoardsConfig allows to get the game configuration linked to boards globally.
+func GetBoardsConfig() BoardsConfig {
+	return BoardsConfigVar
+}

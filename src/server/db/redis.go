@@ -11,6 +11,8 @@ import (
 
 var RedisClient *redis.Client
 
+// InitRedis initializes a connection to a redis service.
+// It takes the necessary parameters from environment variables.
 func InitRedis() error {
 	redisHost := os.Getenv("REDIS_HOST")
 	redisPort := os.Getenv("REDIS_PORT")
@@ -28,6 +30,7 @@ func InitRedis() error {
 	return nil
 }
 
+// CloseRedis closes the connection to a redis service.
 func CloseRedis() {
 	if RedisClient != nil {
 		RedisClient.Close()

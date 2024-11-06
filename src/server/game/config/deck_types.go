@@ -12,3 +12,13 @@ type DeckType struct {
 type DeckTypesConfig struct {
 	DeckTypes []DeckType `json:"decks_types"`
 }
+
+var (
+	deckTypesConfig sync.Once
+	DeckTypesConfigVar DeckTypesConfig
+)
+
+// GetDeckTypesConfig allows to get the game configuration linked to deck types globally.
+func GetDeckTypesConfig() DeckTypesConfig {
+	return DeckTypesConfigVar
+}

@@ -2,6 +2,8 @@ package db
 
 import (
 	"context"
+	"fmt"
+	"os"
 	"server/logger"
 
 	"github.com/go-redis/redis/v8"
@@ -9,11 +11,12 @@ import (
 
 var RedisClient *redis.Client
 
-func InitRedis(addr, password string, db int) error {
+func InitRedis() error {
+	redisHost := os.Getenv("REDIS_HOST")
+	redisPort := os.Getenv("REDIS_PORT")
+
 	RedisClient = redis.NewClient(&redis.Options{
-		Addr:     addr,
-		Password: password,
-		DB:       db,
+		Addr: fmt.Sprintf("%s:%s", redisHost, redisPort),
 	})
 
 	_, err := RedisClient.Ping(context.Background()).Result()

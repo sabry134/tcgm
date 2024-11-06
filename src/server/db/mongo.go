@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"os"
 	"server/logger"
 	"time"
 
@@ -11,12 +12,13 @@ import (
 
 var MongoClient *mongo.Client
 
-func InitMongo(connectionString string) error {
+func InitMongo() error {
+	mongoURI := os.Getenv("MONGO_URI")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
 	var err error
-	MongoClient, err = mongo.Connect(ctx, options.Client().ApplyURI((connectionString)))
+	MongoClient, err = mongo.Connect(ctx, options.Client().ApplyURI(mongoURI))
 	if err != nil {
 		return err
 	}

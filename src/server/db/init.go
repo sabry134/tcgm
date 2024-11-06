@@ -1,18 +1,20 @@
 package db
 
-import "server/logger"
+import (
+	"server/logger"
+)
 
-func InitDatabases(pgConnStr, mongoConnStr, redisAddr, redisPass string, redisDB int) error {
-	if err := InitPostgres(pgConnStr); err != nil {
+func InitDatabases() error {
+	if err := InitPostgres(); err != nil {
 		return err
 	}
 
-	if err := InitMongo(mongoConnStr); err != nil {
+	if err := InitMongo(); err != nil {
 		ClosePostgres()
 		return err
 	}
 
-	if err := InitRedis(redisAddr, redisPass, redisDB); err != nil {
+	if err := InitRedis(); err != nil {
 		ClosePostgres()
 		CloseMongo()
 		return err

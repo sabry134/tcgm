@@ -1,5 +1,7 @@
 package config
 
+import "sync"
+
 type PlayRequirement struct {
 	Name       string                 `json:"name"`
 	Parameters map[string]interface{} `json:"parameters"`
@@ -22,7 +24,7 @@ type CardTypesConfig struct {
 }
 
 var (
-	cardTypesConfig sync.Once
+	cardTypesConfig    sync.Once
 	CardTypesConfigVar CardTypesConfig
 )
 

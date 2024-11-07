@@ -1,5 +1,7 @@
 package config
 
+import "sync"
+
 type Action struct {
 	Name               string                 `json:"name"`
 	ActionType         string                 `json:"action_type"`
@@ -11,11 +13,11 @@ type ActionsConfig struct {
 }
 
 var (
-	actionsConfig sync.Once
+	actionsConfig    sync.Once
 	ActionsConfigVar ActionsConfig
 )
 
 // GetActionsConfig allows to get the game configuration linked to actions globally.
 func GetActionsConfig() ActionsConfig {
-	return ActionsConfig
+	return ActionsConfigVar
 }

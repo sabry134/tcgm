@@ -1,5 +1,7 @@
 package config
 
+import "sync"
+
 type Phase struct {
 	Name                string   `json:"name"`
 	StartActions        []string `json:"start_actions"`
@@ -13,7 +15,7 @@ type PhasesConfig struct {
 }
 
 var (
-	phasesConfig sync.Once
+	phasesConfig    sync.Once
 	PhasesConfigVar PhasesConfig
 )
 

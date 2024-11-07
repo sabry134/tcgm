@@ -1,5 +1,7 @@
 package config
 
+import "sync"
+
 type HandExceedAction struct {
 	Name       string                 `json:"name"`
 	Parameters map[string]interface{} `json:"parameters"`
@@ -21,7 +23,7 @@ type GeneralRulesConfig struct {
 }
 
 var (
-	generalRulesConfig sync.Once
+	generalRulesConfig    sync.Once
 	GeneralRulesConfigVar GeneralRulesConfig
 )
 

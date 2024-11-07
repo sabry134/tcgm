@@ -1,5 +1,7 @@
 package config
 
+import "sync"
+
 type Zone struct {
 	ZoneName string `json:"zone_name"`
 	Quantity int    `json:"quantity"`
@@ -17,7 +19,7 @@ type BoardsConfig struct {
 }
 
 var (
-	boardsConfig sync.Once
+	boardsConfig    sync.Once
 	BoardsConfigVar BoardsConfig
 )
 

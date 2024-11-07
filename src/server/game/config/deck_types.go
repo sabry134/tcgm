@@ -1,5 +1,7 @@
 package config
 
+import "sync"
+
 type DeckType struct {
 	Name            string   `json:"name"`
 	CardLimitLower  int      `json:"card_limit_lower"`
@@ -14,7 +16,7 @@ type DeckTypesConfig struct {
 }
 
 var (
-	deckTypesConfig sync.Once
+	deckTypesConfig    sync.Once
 	DeckTypesConfigVar DeckTypesConfig
 )
 

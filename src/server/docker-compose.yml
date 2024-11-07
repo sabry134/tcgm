@@ -1,13 +1,12 @@
 version: '3.8'
 
 services:
-  # Go server service
   server:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "12345:12345"    # Map the host port to the server port
+      - "12345:12345"
     depends_on:
       - postgres
       - mongodb
@@ -22,7 +21,6 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
 
-  # PostgreSQL service
   postgres:
     image: postgres:13
     environment:
@@ -32,25 +30,22 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
-      - "5432:5432"   # Map PostgreSQL to host
+      - "5432:5432"
 
-  # MongoDB service
   mongodb:
     image: mongo:5
     ports:
-      - "27017:27017" # Map MongoDB to host
+      - "27017:27017"
     volumes:
       - mongo-data:/data/db
 
-  # Redis service
   redis:
     image: redis:alpine
     ports:
-      - "6379:6379"   # Map Redis to host
+      - "6379:6379"
     volumes:
       - redis-data:/data
 
-# Named volumes for persistent storage
 volumes:
   pgdata:
   mongo-data:

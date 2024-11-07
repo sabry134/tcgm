@@ -1,5 +1,7 @@
 package config
 
+import "sync"
+
 type WinCondition struct {
 	Name         string        `json:"name"`
 	Requirements []Requirement `json:"requirements"`
@@ -10,7 +12,7 @@ type WinConditionsConfig struct {
 }
 
 var (
-	winConditionsConfig sync.Once
+	winConditionsConfig    sync.Once
 	WinConditionsConfigVar WinConditionsConfig
 )
 

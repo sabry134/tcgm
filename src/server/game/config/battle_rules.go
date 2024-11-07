@@ -1,5 +1,7 @@
 package config
 
+import "sync"
+
 type BattleRules struct {
 	Attackers     []string `json:"attackers"`
 	TauntTypes    []string `json:"taunt_types"`
@@ -13,7 +15,7 @@ type BattleRulesConfig struct {
 }
 
 var (
-	battleRulesConfig sync.Once
+	battleRulesConfig    sync.Once
 	BattleRulesConfigVar BattleRulesConfig
 )
 

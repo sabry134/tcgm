@@ -1,5 +1,7 @@
 package config
 
+import "sync"
+
 type Player struct {
 	Values map[string]interface{} `json:"values"`
 }
@@ -9,7 +11,7 @@ type PlayersConfig struct {
 }
 
 var (
-	playersConfig sync.Once
+	playersConfig    sync.Once
 	PlayersConfigVar PlayersConfig
 )
 

@@ -1,5 +1,7 @@
 package config
 
+import "sync"
+
 type Requirement struct {
 	Name       string                 `json:"name"`
 	Parameters map[string]interface{} `json:"parameters"`
@@ -39,7 +41,7 @@ type CardsConfig struct {
 }
 
 var (
-	cardsConfig sync.Once
+	cardsConfig    sync.Once
 	CardsConfigVar CardsConfig
 )
 

@@ -13,18 +13,20 @@ local button = {
 	onLongPress = function () end,
 	onDraw = function () end,
 	onUpdate = function () end,
+	isHovered = false,
+	isClicked = false,
 }
 
-local isHovered = false;
-local isClicked = false;
+-- local isHovered = false;
+-- local isClicked = false;
 
 function button:draw(text, x,y,w,h, backgroundColor, hoveredColor, clickColor, textColor)
 	local currentFont = love.graphics.getFont()
 	love.graphics.setColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a)
-	if (isHovered) then
+	if (button.isHovered) then
     	love.graphics.setColor(hoveredColor.r, hoveredColor.g, hoveredColor.b, hoveredColor.a)
 	end
-	if (isClicked) then
+	if (button.isClicked) then
 		love.graphics.setColor(clickColor.r, clickColor.g, clickColor.b, clickColor.a)
 	end
 	love.graphics.rectangle('fill', x,y, w,h, 4, 4)
@@ -38,18 +40,17 @@ end
 function button:update(core, x,y,w,h, onHit, onLongPress)
 	local mousex = love.mouse.getX()
  	local mousey = love.mouse.getY()
-	isHovered = core:isHover(mousex, mousey, x, y, w, h)
+	button.isHovered = core:isHover(mousex, mousey, x, y, w, h)
 	local isDown = love.mouse.isDown(1)
-	if (isClicked and not isDown) then
+	if (button.isClicked and not isDown) then
 		onHit()
 	end
-	if (isHovered and isDown) then
-		isHovered = false
-		isClicked = true
+	if (button.isHovered and isDown) then
+		button.isHovered = false
+		button.isClicked = true
 	else 
-		isClicked = false
+		button.isClicked = false
 	end
-	
 end
 
 

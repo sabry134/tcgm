@@ -1,13 +1,16 @@
-const { app, BrowserWindow, Menu } = require('electron');
+const path = require('path');
+const { app, BrowserWindow, Menu, ipcMain } = require('electron');
+const fs = require('fs');
 
 function createWindow() {
     const win = new BrowserWindow({
         width: 1920,
         height: 1080,
         webPreferences: {
-            nodeIntegration: true,
-            contextIsolation: false,
-        },
+            nodeIntegration: false,
+            contextIsolation: true,
+            preload: path.join(__dirname, 'preload.js'),
+        }
     });
 
     win.loadFile('./src/index.html');
@@ -26,7 +29,7 @@ function createWindow() {
             submenu: [],
         },
         {
-            label: 'GameObject',
+            label: 'Setting',
             submenu: [],
         },
         {
@@ -38,7 +41,12 @@ function createWindow() {
                         win.webContents.send('add-button');
                     },
                 },
-                { label: 'Card', click: () => { console.log('Card clicked'); } },
+                { 
+                    label: 'Card', 
+                    click: () => { 
+                        win.webContents.send('add-card');
+                    } 
+                },
                 { label: 'Figure', click: () => { console.log('Figure clicked'); } },
             ],
         },
@@ -50,10 +58,34 @@ function createWindow() {
             label: 'Help',
             submenu: [],
         },
+        {
+            label: 'Sabry',
+            click: () => {
+                win.webContents.openDevTools();
+            },
+        },
     ]);
 
     Menu.setApplicationMenu(menu);
 }
+
+ipcMain.handle('savePositionToFile', (event, position, fileName) => {
+    console.log(fileName);
+    const finalFileName = fileName || 'button.json';
+    const filePath = path.join(__dirname, finalFileName);
+
+    const dir = path.dirname(filePath);
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+
+    fs.writeFileSync(filePath, JSON.stringify(position, null, 2), 'utf8');
+    console.log(`Position saved to ${finalFileName}:`, position);
+});
+
+
+
+
 
 app.whenReady().then(createWindow);
 

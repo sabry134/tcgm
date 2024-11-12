@@ -1,4 +1,5 @@
 const { app, BrowserWindow, Menu } = require('electron');
+const { buildProject } = require('./component');
 
 function createWindow() {
     const win = new BrowserWindow({
@@ -10,16 +11,31 @@ function createWindow() {
         },
     });
 
-    win.loadFile('./src/index.html');
+    win.loadFile('./html/index.html');
 
     const menu = Menu.buildFromTemplate([
         {
             label: 'File',
-            submenu: [{ role: 'quit' }],
+            submenu: [
+                {
+                    label: 'Build',
+                    click: () => {
+                        buildProject();
+                    }
+                },
+                {
+                    role: 'quit'
+                }],
         },
         {
             label: 'Edit',
-            submenu: [{ role: 'undo' }, { role: 'redo' }],
+            submenu: [
+                {
+                    role: 'undo'
+                },
+                {
+                    role: 'redo'
+                }],
         },
         {
             label: 'Assets',
@@ -38,9 +54,14 @@ function createWindow() {
                         win.webContents.send('add-button');
                     },
                 },
-                { label: 'Card', click: () => { console.log('Card clicked'); } },
-                { label: 'Figure', click: () => { console.log('Figure clicked'); } },
-            ],
+                {
+                    label: 'Card',
+                    click: () => { console.log('Card clicked'); }
+                },
+                {
+                    label: 'Figure',
+                    click: () => { console.log('Figure clicked'); }
+                }],
         },
         {
             label: 'Windows',

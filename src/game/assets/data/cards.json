@@ -1,0 +1,49 @@
+{
+    "cards": [
+      {
+        "name": "Red Dragon",
+        "effects": [
+          {
+            "name": "FlameStrike",
+            "requirements": [
+              {
+                "name": "HasMana",
+                "parameters": {
+                  "amount": 3
+                }
+              }
+            ],
+            "actions": [
+              {
+                "name": "DealDamage",
+                "parameters": {
+                  "target": "Damageable",
+                  "value": 10
+                }
+              }
+            ],
+            "action_resolution_order": "",
+            "speed": "quick",
+            "description": "Use 3 mana to deal 10 damage to target creature.",
+            "turn_usage_limit": 1,
+            "game_usage_limit": -1
+          }
+        ],
+        "types": ["Dragon"],
+        "limit_per_deck": 3,
+        "limit_per_board": 0,
+        "play_requirements": [
+          {
+            "name": "HasMana",
+            "parameters": {
+              "amount": 2
+            }
+          }
+        ],
+        "custom_values": {
+          "attack": 200
+        },
+        "keywords": ["Flying"]
+      }
+    ]
+  }

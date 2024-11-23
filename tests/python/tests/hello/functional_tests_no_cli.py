@@ -31,7 +31,7 @@ for option in options:
 firefox_options.binary_location = '/usr/bin/firefox'  # Adjust path if needed
 
 driver = webdriver.Firefox(service=firefox_service, options=firefox_options)
-driver.get("file:///home/aurelien/Epitech/EIP_TCGM/src/index.html")
+driver.get("https://sabry134.github.io/tcgm_tests.io/")
 
 assert driver.title == "Home", "Page title is incorrect"
 print("Page title is correct")

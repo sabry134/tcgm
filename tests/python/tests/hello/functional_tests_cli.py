@@ -12,7 +12,7 @@ load_dotenv()
 
 driver = webdriver.Firefox()
 
-driver.get("file:///home/aurelien/Epitech/EIP_TCGM/src/index.html")
+driver.get("https://sabry134.github.io/tcgm_tests.io")
 
 assert driver.title == "Home", "Page title is incorrect"
 print("Page title is correct")

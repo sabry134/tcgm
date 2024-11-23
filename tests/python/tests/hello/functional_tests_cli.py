@@ -1,5 +1,4 @@
 import os
-import time
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -7,124 +6,101 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
 from dotenv import load_dotenv
 import requests
+from time import sleep
 
 load_dotenv()
 
-def update_test(key, percentage):
-    url = "http://localhost:8081/server-health"
-    data = {key: f"{percentage}%"}
-
-    requests.post(url, json=data)
-
-tester_password = os.getenv("TESTER_PASSWORD")
-bad_tester_password = os.getenv("BAD_TESTER_PASSWORD")
-
-update_test("dashboard", 0)
-update_test("community", 0)
-
-
 driver = webdriver.Firefox()
-driver.get("http://localhost:8080/website_requests")
 
-help_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//li[contains(@class, 'MuiMenuItem-root') and text()='Help']")))
-help_button.click()
-time.sleep(2)
-about_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//li[contains(@class, 'MuiMenuItem-root') and text()='About']")))
-about_button.click()
-time.sleep(2)
-mobile_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//li[contains(@class, 'MuiMenuItem-root') and text()='Mobile']")))
-mobile_button.click()
-time.sleep(2)
-home_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//li[contains(@class, 'MuiMenuItem-root') and text()='Get Started']")))
-home_button.click()
-time.sleep(2)
+driver.get("file:///home/aurelien/Epitech/EIP_TCGM/src/index.html")
 
-driver.get("http://localhost:8080/website_requests/#/bot_entrance")
-token_field = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//input[@id='bot-token-input']")))
-token_field.send_keys(bad_tester_password)
-token_field.send_keys(Keys.SPACE)
-time.sleep(2)
+assert driver.title == "Home", "Page title is incorrect"
+print("Page title is correct")
 
-driver.get("http://localhost:8080/website_requests/#/bot_entrance")
-token_field = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//input[@id='bot-token-input']")))
-token_field.send_keys(tester_password)
-token_field.send_keys(Keys.SPACE)
+start_button = driver.find_element(By.XPATH, "//button[text()='Start new project']")
+assert start_button.is_displayed(), "Start new project button is not visible"
+assert start_button.is_enabled(), "Start new project button is not clickable"
+print("Start new project button is visible and clickable")
 
-time.sleep(2)
-dashboard_li = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//li[contains(., 'Dashboard')]")))
-dashboard_li.click()
-time.sleep(2)
-community_li = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//li[contains(., 'Community')]")))
-community_li.click()
-time.sleep(2)
-newProject_li = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//li[contains(., 'New Project')]")))
-newProject_li.click()
-time.sleep(2)
-new_request_li = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//li[contains(., 'New Request')]")))
-new_request_li.click()
-time.sleep(2)
-followup_li = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//li[contains(., 'Follow Up')]")))
-followup_li.click()
-time.sleep(2)
-packages_li = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//li[contains(., 'Packages')]")))
-packages_li.click()
-time.sleep(2)
-alerts_li = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//li[contains(., 'Alerts')]")))
-alerts_li.click()
-time.sleep(2)
-maintenance_li = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//li[contains(., 'Maintenance')]")))
-maintenance_li.click()
-time.sleep(2)
-settings_li = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//li[contains(., 'Settings')]")))
-settings_li.click()
-time.sleep(2)
-community_li = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//li[contains(., 'Community')]")))
-community_li.click()
-add_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@aria-label, 'add')]")))
+recent_title = driver.find_element(By.CLASS_NAME, "recent-title")
+assert recent_title.is_displayed(), "'Open recent' title is not visible"
+print("'Open recent' title is visible")
 
-add_button.click()
-time.sleep(2)
-image_input = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//label[text()='Image Link']/following-sibling::div//input")))
-image_input.send_keys("https://cdn-icons-png.flaticon.com/512/4712/4712010.png")
-update_test("community", 10)
-time.sleep(2)
-description_input = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//label[text()='Post Description']/following-sibling::div//input")))
-description_input.send_keys("Don't mind me, I'm just a tester")
-time.sleep(2)
-update_test("community", 20)
-cancel_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[text()='Cancel']")))
-cancel_button.click()
-time.sleep(2)
-update_test("community", 30)
-add_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@aria-label, 'add')]")))
+recent_paths_section = driver.find_element(By.CLASS_NAME, "recent-paths")
+assert recent_paths_section.is_displayed(), "Recent paths section is not visible"
+print("Recent paths section is visible")
 
-add_button.click()
-time.sleep(2)
-update_test("community", 40)
-description_input = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//label[text()='Post Description']/following-sibling::div//input")))
-description_input.send_keys("Don't mind me, I'm just a tester")
-time.sleep(2)
-update_test("community", 50)
-submit_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'MuiButton-root') and contains(@class, 'MuiButton-text') and contains(@class, 'MuiButton-colorPrimary') and text()='Submit']")))
-submit_button.click()
-time.sleep(2)
-update_test("community", 60)
-add_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@aria-label, 'add')]")))
+recent_paths = driver.find_elements(By.CLASS_NAME, "recent-path")
+assert len(recent_paths) > 0, "Recent paths are not displayed"
+assert recent_paths[0].text == "../Michael/zosia", "First recent path is incorrect"
+print("First recent path is displayed correctly")
+assert recent_paths[1].text == "../Documents/Projects", "Second recent path is incorrect"
+print("Second recent path is displayed correctly")
 
-add_button.click()
-time.sleep(2)
-update_test("community", 70)
-image_input = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//label[text()='Image Link']/following-sibling::div//input")))
-image_input.send_keys("https://cdn-icons-png.flaticon.com/512/4712/4712010.png")
-time.sleep(2)
-update_test("community", 80)
-description_input = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//label[text()='Post Description']/following-sibling::div//input")))
-description_input.send_keys("Don't mind me, I'm just a tester")
-time.sleep(2)
-update_test("community", 90)
-submit_button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(@class, 'MuiButton-root') and contains(@class, 'MuiButton-text') and contains(@class, 'MuiButton-colorPrimary') and text()='Submit']")))
-submit_button.click()
-time.sleep(10)
-update_test("community", 100)
+logo_image = driver.find_element(By.XPATH, "//img[@alt='JCCE Logo']")
+assert logo_image.is_displayed(), "Logo image is not visible"
+print("Logo image is visible")
 
-driver.close()
+assert start_button.text == "Start new project", "Button text is incorrect"
+print("Button text is correct")
+
+recent_paths_div = driver.find_element(By.CLASS_NAME, "recent-paths")
+assert recent_paths_div is not None, "Recent paths div is missing"
+print("Recent paths div is present")
+
+assert logo_image.get_attribute("alt") == "JCCE Logo", "Logo alt text is incorrect"
+print("Logo alt text is correct")
+
+header_container = driver.find_element(By.CLASS_NAME, "header-container")
+assert header_container.is_displayed(), "Header container is not visible"
+print("Header container is visible")
+
+left_container = driver.find_element(By.CLASS_NAME, "left-container")
+right_container = driver.find_element(By.CLASS_NAME, "right-container")
+assert left_container.is_displayed(), "Left container is not visible"
+assert right_container.is_displayed(), "Right container is visible"
+print("Left and right containers are visible")
+
+assert "Open recent" in recent_title.text, "'Open recent' title text is incorrect"
+print("'Open recent' title text is correct")
+
+start_button.click()
+assert "component-selection" in driver.current_url, "Redirection URL is incorrect"
+print("Redirection URL is correct")
+
+assert driver.title == "Layout Design", "Page title is incorrect on component-selection page"
+print("Page title is correct on component-selection page")
+
+left_sidebar = driver.find_element(By.CLASS_NAME, "left-sidebar")
+assert left_sidebar.is_displayed(), "Left sidebar is not visible"
+print("Left sidebar is visible")
+
+main_content = driver.find_element(By.ID, "main-content")
+assert main_content.is_displayed(), "Main content is not visible"
+print("Main content is visible")
+
+right_sidebar = driver.find_element(By.CLASS_NAME, "right-sidebar")
+assert right_sidebar.is_displayed(), "Right sidebar is not visible"
+print("Right sidebar is visible")
+
+footer = driver.find_element(By.CLASS_NAME, "footer")
+assert footer.is_displayed(), "Footer is not visible"
+print("Footer is visible")
+
+images = driver.find_elements(By.TAG_NAME, "img")
+for image in images:
+    assert image.get_attribute("naturalWidth") != "0", f"Broken image found: {image.get_attribute('src')}"
+print("No broken images found")
+
+links = driver.find_elements(By.TAG_NAME, "a")
+for link in links:
+    href = link.get_attribute("href")
+    if href:
+        try:
+            response = requests.head(href)
+            assert response.status_code == 200, f"Broken link found: {href}"
+        except requests.exceptions.RequestException as e:
+            print(f"Error with link {href}: {e}")
+print("All links are working correctly")
+
+driver.quit()

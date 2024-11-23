@@ -35,12 +35,11 @@ jobs:
     - name: Install Dependencies
       run: |
         pip install -r tests/python/requirements.txt
-        pip install coverage
+        pip install coverage requests selenium webdriver-manager
 
-    - name: Run Functional Tests with Coverage
+    - name: Run Tests with Coverage
       run: |
-        cd tests/python/
-        coverage run --source=tests/hello -m unittest discover -s tests/hello
+        coverage run -m unittest discover tests/python
         coverage report
         coverage html
 

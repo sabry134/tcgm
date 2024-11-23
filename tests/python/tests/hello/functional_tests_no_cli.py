@@ -51,9 +51,9 @@ print("Recent paths section is visible")
 
 recent_paths = driver.find_elements(By.CLASS_NAME, "recent-path")
 assert len(recent_paths) > 0, "Recent paths are not displayed"
-assert recent_paths[0].text == "../Michael/zosia", "First recent path is incorrect"
+assert recent_paths[0].text == "./Michael/zosia", "First recent path is incorrect"
 print("First recent path is displayed correctly")
-assert recent_paths[1].text == "../Documents/Projects", "Second recent path is incorrect"
+assert recent_paths[1].text == "./Documents/Projects", "Second recent path is incorrect"
 print("Second recent path is displayed correctly")
 
 logo_image = driver.find_element(By.XPATH, "//img[@alt='JCCE Logo']")

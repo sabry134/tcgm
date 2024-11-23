@@ -10,6 +10,11 @@ import requests
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
+import coverage
+
+# Start coverage tracking
+cov = coverage.Coverage()
+cov.start()
 
 load_dotenv()
 
@@ -123,3 +128,11 @@ for link in links:
 print("All links are working correctly")
 
 driver.quit()
+
+cov.stop()
+cov.save()
+
+cov.report()
+
+cov.html_report(directory="htmlcov")
+print("Coverage report saved in 'htmlcov' directory.")

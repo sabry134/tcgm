@@ -32,11 +32,20 @@ jobs:
         sudo apt update
         sudo apt install firefox -y
 
-    - name: Run Functional Tests
+    - name: Install Dependencies
+      run: |
+        pip install -r tests/python/requirements.txt
+        pip install coverage
 
+    - name: Run Functional Tests with Coverage
       run: |
         cd tests/python/
-        pip install -r requirements.txt
-        cd tests/hello
-        echo "Updating the tests results on the dashboard..."
-        python functional_tests_no_cli.py
+        coverage run --source=tests/hello -m unittest discover -s tests/hello
+        coverage report
+        coverage html
+
+    - name: Upload Coverage Report
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: tests/python/htmlcov/

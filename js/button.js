@@ -6,8 +6,16 @@ function addButtonToMainContent() {
         newButton.classList.add('button');
         newButton.innerText = 'Button';
 
-        newButton.addEventListener('click', () => {
-            console.log('Button clicked');
+        newButton.addEventListener('dblclick', (e) => {
+            e.stopPropagation();
+
+            const confirmDelete = confirm('Are you sure you want to delete this button?');
+            if (confirmDelete) {
+                newButton.remove();
+                console.log('Button deleted');
+            } else {
+                console.log('Button not deleted');
+            }
         });
 
         let isDragging = false;
@@ -47,7 +55,6 @@ function addButtonToMainContent() {
                 x: parseInt(newButton.style.left, 10),
                 y: parseInt(newButton.style.top, 10)
             };
-
 
             window.electronAPI.savePositionToFile(position, 'button.json');
         });

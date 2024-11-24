@@ -5,8 +5,20 @@ function addCardToMainContent() {
         const newCard = document.createElement('div');
         newCard.classList.add('card');
 
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.classList.add('delete-button');
+        
+        newCard.appendChild(deleteButton);
+
         newCard.addEventListener('click', () => {
             console.log('Card clicked');
+        });
+
+        deleteButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            newCard.remove();
+            console.log('Card deleted');
         });
 
         let isDragging = false;

@@ -44,16 +44,24 @@ body {
 }
 
 .button {
-    background-color: grey;
+    width: 100px;
+    height: 40px;
+    background-color: #4CAF50;
     color: white;
-    padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 16px;
-    margin-top: 10px;
     position: absolute;
+    text-align: center;
+    line-height: 40px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
 }
+
+.button:hover {
+    background-color: #45a049;
+}
+
 
 .card {
     width: 200px;
@@ -68,3 +76,21 @@ body {
     cursor: pointer;
 }
 
+.delete-button {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 5px 10px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+    background-color: #c0392b;
+}

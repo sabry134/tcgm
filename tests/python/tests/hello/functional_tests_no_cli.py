@@ -92,7 +92,7 @@ start_button.click()
 assert "component-selection" in driver.current_url, "Redirection URL is incorrect"
 print("Redirection URL is correct")
 
-assert driver.title == "Layout Design", "Page title is incorrect on component-selection page"
+assert driver.title == "TCGM", "Page title is incorrect on component-selection page"
 print("Page title is correct on component-selection page")
 
 left_sidebar = driver.find_element(By.CLASS_NAME, "left-sidebar")

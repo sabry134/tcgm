@@ -30,7 +30,20 @@ function createWindow() {
         },
         {
             label: 'Setting',
-            submenu: [],
+            submenu: [
+                {
+                    label: 'Card type',
+                    click: () => {
+                        loadContent(win, 'card.html');
+                    },
+                },
+                {
+                    label: 'Game rule',
+                    click: () => {
+                        loadContent(win, 'gamerule.html');
+                    },
+                },
+            ],
         },
         {
             label: 'Component',
@@ -47,7 +60,6 @@ function createWindow() {
                         win.webContents.send('add-card');
                     } 
                 },
-                { label: 'Figure', click: () => { console.log('Figure clicked'); } },
             ],
         },
         {
@@ -84,7 +96,9 @@ ipcMain.handle('savePositionToFile', (event, position, fileName) => {
 });
 
 
-
+function loadContent(win, fileName) {
+    win.loadFile(`./html/${fileName}`);
+}
 
 
 app.whenReady().then(createWindow);

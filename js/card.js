@@ -4,7 +4,6 @@ function addCardToMainContent() {
     if (!mainContent.querySelector('.card')) {
         const newCard = document.createElement('div');
         newCard.classList.add('card');
-        newCard.innerText = 'Card';
 
         newCard.addEventListener('click', () => {
             console.log('Card clicked');

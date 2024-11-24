@@ -11,10 +11,10 @@ executeBtn.addEventListener('click', () => {
 
         ipcRenderer.invoke('run-command', command)
             .then(result => {
-                output.textContent = result;  // Show command result in the output area
+                output.textContent = result;
             })
             .catch(error => {
-                output.textContent = error;  // Show error message if any
+                output.textContent = error;
             });
     } else {
         output.textContent = 'Please enter a command.';

@@ -1,6 +1,7 @@
 const path = require('path');
 const { app, BrowserWindow, Menu, ipcMain } = require('electron');
 const fs = require('fs');
+const { exec } = require('child_process');
 
 function createWindow() {
     const win = new BrowserWindow({
@@ -24,7 +25,7 @@ function createWindow() {
                     label: 'Build',
                     click: () => {
                         console.log('Build clicked');
-                        win.webContents.send('package-app');
+                        packageToLove2D();
                         console.log('Package app done');
                     }
                 },
@@ -110,6 +111,24 @@ function loadContent(win, fileName) {
     win.loadFile(`./html/${fileName}`);
 }
 
+function packageToLove2D() {
+    console.log("Packaging the app...");
+    const winCommand = "love .\\src";
+    const unixCommand = "love ./src";
+    const command = process.platform === "win32" ? winCommand : unixCommand;
+
+    console.log("Packaging the app...");
+
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`exec error: ${error}`);
+            return;
+        }
+
+        console.log(`stdout: ${stdout}`);
+        console.error(`stderr: ${stderr}`);
+    });
+}
 
 app.whenReady().then(createWindow);
 

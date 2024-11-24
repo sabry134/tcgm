@@ -22,3 +22,7 @@ tcgm
 .vscode
 .cmake
 .idea
+
+# Electron
+node_modules
+package-lock.json

@@ -18,7 +18,17 @@ function createWindow() {
     const menu = Menu.buildFromTemplate([
         {
             label: 'File',
-            submenu: [{ role: 'quit' }],
+            submenu: [
+                { role: 'quit' },
+                {
+                    label: 'Build',
+                    click: () => {
+                        console.log('Build clicked');
+                        win.webContents.send('package-app');
+                        console.log('Package app done');
+                    }
+                },
+            ],
         },
         {
             label: 'Edit',
@@ -54,11 +64,11 @@ function createWindow() {
                         win.webContents.send('add-button');
                     },
                 },
-                { 
-                    label: 'Card', 
-                    click: () => { 
+                {
+                    label: 'Card',
+                    click: () => {
                         win.webContents.send('add-card');
-                    } 
+                    }
                 },
             ],
         },

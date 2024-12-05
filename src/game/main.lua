@@ -1,5 +1,4 @@
 local server = require("network.server.server")
-local p2p = require("network.p2p.p2p")
 local commands = require("network.commands.commands")
 local globals = require("network.globals")
 local networkConfig = require("network.loadNetworkConfig")

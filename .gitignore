@@ -15,9 +15,13 @@ CMakeUserPresets.json
 # JCCE related
 tutoriel_ogl
 tcgm
+*.zip
+*.love
+*.log
 
 # Hidden files
 .vscode
 .cmake
 .idea
 *.log
+.env

@@ -1,0 +1,24 @@
+{
+    "card_types": [
+        {
+        "name": "Dragon",
+        "play_requirements": [
+            {
+            "name": "PayManaCost",
+            "parameters": {
+                "amount": 2
+            }
+            }
+        ],
+        "starting_location": "deck",
+        "limit_per_deck": 4,
+        "limit_per_board": 1,
+        "starting_deck_type": ["MainDeck"],
+        "custom_values": {
+            "power": 10
+        },
+        "keywords": ["Indestructable"],
+        "parentType": ["Creature"]
+        }
+    ]
+}

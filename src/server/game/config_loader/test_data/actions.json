@@ -1,0 +1,11 @@
+{
+    "actions": [
+        {
+            "name": "Draw",
+            "action_type": "Normal",
+            "required_parameters": {
+                "amount": 1
+            }
+        }
+    ]
+}

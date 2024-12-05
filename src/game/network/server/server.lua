@@ -73,8 +73,6 @@ function server:handleServerResponse(response)
 
     if code == 500 then
         responseHandler.ResponseHandlers["MessageReceived"](code, data)
-    elseif code == 501 then
-        responseHandler.ResponseHandlers["InfoReceived"](code, data)
     else
         responseHandler.ResponseHandlers[globals.state](code, data)
     end

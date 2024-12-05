@@ -17,7 +17,6 @@ func main() {
 	defer db.CloseDatabases()
 
 	//err = config_loader.LoadConfig()
-
 	s := &models.Server{
 		Rooms:   make(map[string]*models.Room),
 		Clients: make(map[*models.Client]bool),

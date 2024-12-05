@@ -1,0 +1,11 @@
+{
+    "phases": [
+        {
+            "name": "DrawPhase",
+            "start_actions": ["DrawForTurn"],
+            "end_actions": [],
+            "allowed_action_types": ["PlayerActions", "SystemActions"],
+            "allowed_effect_speeds": ["Quick"]
+        }
+    ]
+}

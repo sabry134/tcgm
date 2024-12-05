@@ -1,0 +1,15 @@
+{
+    "win_conditions": [
+        {
+            "name": "LifePointsAre0",
+            "requirements": [
+		            {
+			              "name": "PlayerLifePointsLesserOrEqual",
+		                "parameters": {
+	                      "amount": 0
+			              }
+			          }
+	          ]
+        }
+    ]
+}

@@ -1,0 +1,9 @@
+{
+    "battle_rules": {
+        "attackers": ["Creature"],
+        "taunt_types": ["Taunt"],
+        "blocking": true,
+        "face_attackers": ["Flying"],
+        "attack_order": "one_by_one"
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "general_rules": {
+    
+        "player_count": [2, 2],
+        "card_containers": [
+	          {"name": "graveyard", "public": true},
+	          {"name": "banish_zone", "public": true}
+        ],
+        "shared_board": false,
+        "starting_hand_size": 5,
+        "maximum_hand_size": 7,
+        "hand_exceed_action": 
+        {
+	        "name": "DiscardUntil",
+	        "parameters": {
+				"AmountLeft": 5
+	        }
+        },
+        "win_conditions": ["LifePointsAre0"],
+        "response_mode": "Stack"
+    }
+}

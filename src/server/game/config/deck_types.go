@@ -1,5 +1,7 @@
 package config
 
+import "sync"
+
 type DeckType struct {
 	Name            string   `json:"name"`
 	CardLimitLower  int      `json:"card_limit_lower"`
@@ -10,5 +12,16 @@ type DeckType struct {
 }
 
 type DeckTypesConfig struct {
+	MainDeck  string     `json:"main_deck"`
 	DeckTypes []DeckType `json:"decks_types"`
+}
+
+var (
+	deckTypesConfig    sync.Once
+	DeckTypesConfigVar DeckTypesConfig
+)
+
+// GetDeckTypesConfig allows to get the game configuration linked to deck types globally.
+func GetDeckTypesConfig() DeckTypesConfig {
+	return DeckTypesConfigVar
 }

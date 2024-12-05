@@ -1,5 +1,7 @@
 package config
 
+import "sync"
+
 type BattleRules struct {
 	Attackers     []string `json:"attackers"`
 	TauntTypes    []string `json:"taunt_types"`
@@ -10,4 +12,14 @@ type BattleRules struct {
 
 type BattleRulesConfig struct {
 	BattleRules BattleRules `json:"battle_rules"`
+}
+
+var (
+	battleRulesConfig    sync.Once
+	BattleRulesConfigVar BattleRulesConfig
+)
+
+// GetBattleRulesConfig allows to get the game configuration linked to battle rules globally.
+func GetBattleRulesConfig() BattleRulesConfig {
+	return BattleRulesConfigVar
 }

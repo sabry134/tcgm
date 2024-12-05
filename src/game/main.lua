@@ -1,17 +1,10 @@
 local server = require("network.server.server")
-local p2p = require("network.p2p.p2p")
 local commands = require("network.commands.commands")
 local globals = require("network.globals")
 local networkConfig = require("network.loadNetworkConfig")
-local ConfigLoader = require("config.load_config_data")
 local logger = require("logger")
 
 function love.load()
-    local configLoader = ConfigLoader:new()
-    configLoader:loadCards("assets/data/cards.json")
-
-    local testCard = configLoader:getCardByName("Red Dragon")
-    --testCard:printCard()
     networkConfig:LoadNetworkConfig("network/networkConfig.json")
     logger.debug("mode is : " .. globals.mode)
 end

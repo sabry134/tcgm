@@ -37,25 +37,27 @@ type Game struct {
 	Creator     *Client
 	PlayerCount int
 	GameStarted bool
-	GameState   *GameState
 	Mu          sync.Mutex
 }
 
-type GameState struct {
-}
-
+// WithLock allows to safely modify an instance of the Room struct.
+// It locks the mutex of the Room struct thus blocking other modifications from being done to it at that time.
 func (r *Room) WithLock(fn func(*Room)) {
 	r.Mu.Lock()
 	defer r.Mu.Unlock()
 	fn(r)
 }
 
+// WithLock allows to safely modify an instance of the Server struct.
+// It locks the mutex of the Server struct thus blocking other modifications from being done to it at that time.
 func (s *Server) WithLock(fn func(*Server)) {
 	s.Mu.Lock()
 	defer s.Mu.Unlock()
 	fn(s)
 }
 
+// WithLock allows to safely modify an instance of the Game struct.
+// It locks the mutex of the Game struct thus blocking other modifications from being done to it at that time.
 func (g *Game) WithLock(fn func(*Game)) {
 	g.Mu.Lock()
 	defer g.Mu.Unlock()

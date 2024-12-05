@@ -1,5 +1,6 @@
 package config_loader
 
+// valuesEqual is used to check if two values equl regardless of the type.
 func valuesEqual(a, b interface{}) bool {
 	switch va := a.(type) {
 	case int:
@@ -25,6 +26,7 @@ func valuesEqual(a, b interface{}) bool {
 	return false
 }
 
+// containsString is used to check if a string contains a value.
 func containsString(slice []string, value string) bool {
 	for _, v := range slice {
 		if v == value {

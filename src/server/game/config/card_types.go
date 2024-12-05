@@ -1,5 +1,7 @@
 package config
 
+import "sync"
+
 type PlayRequirement struct {
 	Name       string                 `json:"name"`
 	Parameters map[string]interface{} `json:"parameters"`
@@ -19,4 +21,14 @@ type CardType struct {
 
 type CardTypesConfig struct {
 	CardTypes []CardType `json:"card_types"`
+}
+
+var (
+	cardTypesConfig    sync.Once
+	CardTypesConfigVar CardTypesConfig
+)
+
+// GetCardTypesConfig allows to get the game configuration linked to card types globally.
+func GetCardTypesConfig() CardTypesConfig {
+	return CardTypesConfigVar
 }

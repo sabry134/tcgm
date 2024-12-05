@@ -23,3 +23,5 @@ tcgm
 .vscode
 .cmake
 .idea
+*.log
+.env

@@ -37,11 +37,7 @@ type Game struct {
 	Creator     *Client
 	PlayerCount int
 	GameStarted bool
-	GameState   *GameState
 	Mu          sync.Mutex
-}
-
-type GameState struct {
 }
 
 // WithLock allows to safely modify an instance of the Room struct.

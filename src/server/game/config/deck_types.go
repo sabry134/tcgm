@@ -12,6 +12,7 @@ type DeckType struct {
 }
 
 type DeckTypesConfig struct {
+	MainDeck  string     `json:"main_deck"`
 	DeckTypes []DeckType `json:"decks_types"`
 }
 

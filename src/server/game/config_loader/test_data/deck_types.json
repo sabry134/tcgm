@@ -1,4 +1,5 @@
 {
+    "main_deck": "MainDeck",
     "decks_types": [
         {
             "name": "MainDeck",

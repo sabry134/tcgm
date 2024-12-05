@@ -53,7 +53,7 @@ func SetRoomPasswordCommand(s *models.Server, client *models.Client, msgData int
 // If the client is in a room, they will leave it.
 func LeaveRoomCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	if client.Room == nil {
-		response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
+		return response.GetErrorResponse(response.CodeNotFound, "You are not in a room.")
 	}
 	leftRoom := client.Room.Name
 	room.LeaveRoom(client.Room, client, s)
@@ -185,7 +185,7 @@ func CloseRoomCommand(s *models.Server, client *models.Client, msgData interface
 	roomName := client.Room.Name
 	room.CloseRoom(client.Room, s)
 	data := map[string]interface{}{
-		"data": fmt.Sprintf("Room '%s' has been closed.", roomName),
+		"message": fmt.Sprintf("Room '%s' has been closed.", roomName),
 	}
 	return response.CodeSuccess, data
 }
@@ -203,7 +203,7 @@ func CreateGameCommand(s *models.Server, client *models.Client, msgData interfac
 	game.CreateGame(client.Room, client)
 
 	data := map[string]interface{}{
-		"message": fmt.Sprintf("Game created and joined."),
+		"message": "Game created and joined.",
 	}
 	return response.CodeSuccess, data
 }

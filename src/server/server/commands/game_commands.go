@@ -11,7 +11,7 @@ import (
 // It removes the client from the game they are in if any.
 func LeaveGameCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	if client.Game == nil {
-		response.GetErrorResponse(response.CodeNotFound, "You are not in a game.")
+		return response.GetErrorResponse(response.CodeNotFound, "You are not in a game.")
 	}
 	leftGame := client.Game.GameId
 	game.LeaveGame(client.Game, client, s)
@@ -26,14 +26,14 @@ func LeaveGameCommand(s *models.Server, client *models.Client, msgData interface
 func StartGameCommand(s *models.Server, client *models.Client, msgData interface{}) (string, interface{}) {
 	g := client.Game
 	if g == nil {
-		response.GetErrorResponse(response.CodeNotFound, "You are not in a game.")
+		return response.GetErrorResponse(response.CodeNotFound, "You are not in a game.")
 	}
 	if client != g.Creator {
-		response.GetErrorResponse(response.CodeForbidden, "Only game creator can start it.")
+		return response.GetErrorResponse(response.CodeForbidden, "Only game creator can start it.")
 	}
 	minPlayers := 2 // Should get this from rules later
 	if g.PlayerCount < minPlayers {
-		response.GetErrorResponse(response.CodeError, "Game has not yet reached the required player count.")
+		return response.GetErrorResponse(response.CodeError, "Game has not yet reached the required player count.")
 	}
 
 	game.StartGame(g, client)

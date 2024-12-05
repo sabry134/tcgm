@@ -20,3 +20,4 @@ tcgm
 .vscode
 .cmake
 .idea
+*.log

@@ -50,6 +50,7 @@ func HandleMessage(s *models.Server, c *models.Client, message []byte) {
 // HandleCommand send the command data to the corresponding command handler.
 func HandleCommand(s *models.Server, c *models.Client, message response.ClientMessage) {
 	command := strings.TrimSpace(message.Command)
+	logger.Debug(fmt.Sprint("Received command %s", command))
 
 	if command != "Login" && c.Name == "" {
 		code, data := response.GetErrorResponse(response.CodeError, "Must be logged in to send commands\n")

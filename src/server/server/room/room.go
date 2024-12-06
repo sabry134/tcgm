@@ -8,7 +8,6 @@ import (
 	"time"
 )
 
-
 // CreateRoom created a new Room object within the server.
 func CreateRoom(s *models.Server, client *models.Client, roomName string, roomPassword string) {
 	newRoom := &models.Room{Name: roomName, Clients: make(map[*models.Client]bool), Password: roomPassword}
@@ -109,6 +108,14 @@ func KickUser(r *models.Room, s *models.Server, name string) bool {
 	return false
 }
 
+func roomsListDebug(roomsList []map[string]interface{}) {
+	for i, room := range roomsList {
+		logger.Debug(fmt.Sprintf("Room number %d", i))
+		logger.Debug(fmt.Sprintf("- Room name : %s", room["name"]))
+		logger.Debug(fmt.Sprintf("- Requires password : %d", room["requiresPassword"]))
+	}
+}
+
 // GetRoomsList returns a list of all rooms open on the server.
 // It will specify in the response if a room requires a password or not.
 func GetRoomsList(s *models.Server) interface{} {
@@ -120,6 +127,7 @@ func GetRoomsList(s *models.Server) interface{} {
 		}
 		roomsList = append(roomsList, roomData)
 	}
+	roomsListDebug(roomsList)
 	return roomsList
 }
 

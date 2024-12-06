@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"server/logger"
 	"server/server/game"
 	"server/server/models"
 	"server/server/response"
@@ -22,6 +23,7 @@ func ViewRoomPasswordCommand(s *models.Server, client *models.Client, msgData in
 	data := map[string]interface{}{
 		"password": fmt.Sprintf("Room password is : '%s'.", client.Room.Password),
 	}
+	logger.Debug(fmt.Sprintf("Sending password for room %s to user %s", client.Room.Name, client.Name))
 	return response.CodeSuccess, data
 }
 
@@ -46,6 +48,7 @@ func SetRoomPasswordCommand(s *models.Server, client *models.Client, msgData int
 	data := map[string]interface{}{
 		"message": "Changed room password",
 	}
+	logger.Debug(fmt.Sprintf("User %s changed room %s password to %s", client.Name, client.Room.Name, newPassword))
 	return response.CodeSuccess, data
 }
 
@@ -60,6 +63,7 @@ func LeaveRoomCommand(s *models.Server, client *models.Client, msgData interface
 	data := map[string]interface{}{
 		"message": fmt.Sprintf("You have left room '%s'.", leftRoom),
 	}
+	logger.Debug(fmt.Sprintf("User %s left room %s", client.Name, leftRoom))
 	return response.CodeSuccess, data
 }
 
@@ -74,6 +78,7 @@ func ListUsersCommand(s *models.Server, client *models.Client, msgData interface
 	data := map[string]interface{}{
 		"userList": usersList,
 	}
+	logger.Debug(fmt.Sprintf("Sending list of users in room %s to user %s", client.Name, client.Room.Name))
 	return response.CodeSuccess, data
 }
 
@@ -94,6 +99,7 @@ func BroadcastMessageCommand(s *models.Server, client *models.Client, msgData in
 	data := map[string]interface{}{
 		"message": "Message sent to room.",
 	}
+	logger.Debug(fmt.Sprintf("User %s broadcast message %s to room %s", client.Name, message, client.Room.Name))
 	return response.CodeSuccess, data
 }
 
@@ -115,6 +121,7 @@ func SendPrivateMessageCommand(s *models.Server, client *models.Client, msgData 
 		data := map[string]interface{}{
 			"message": "Message successfully sent.",
 		}
+		logger.Debug(fmt.Sprintf("User %s sent message %s to user %s", client.Name, message, username))
 		return response.CodeSuccess, data
 	} else {
 		return response.GetErrorResponse(response.CodeNotFound, "No such user in the room.")
@@ -141,6 +148,7 @@ func KickUserFromRoomCommand(s *models.Server, client *models.Client, msgData in
 		data := map[string]interface{}{
 			"message": fmt.Sprintf("%s has been kicked from the room.", username),
 		}
+		logger.Debug(fmt.Sprintf("User %s kicked user %s from room %s", client.Name, username, client.Room.Name))
 		return response.CodeSuccess, data
 	} else {
 		return response.GetErrorResponse(response.CodeNotFound, "No such user in the room.")
@@ -167,6 +175,7 @@ func AppointNewOwnerCommand(s *models.Server, client *models.Client, msgData int
 		data := map[string]interface{}{
 			"message": fmt.Sprintf("%s is now the owner of the room.", username),
 		}
+		logger.Debug(fmt.Sprintf("User %s appointed user %s as owner of room %s", client.Name, username, client.Room.Name))
 		return response.CodeSuccess, data
 	} else {
 		return response.GetErrorResponse(response.CodeNotFound, "No such user in the room.")
@@ -187,6 +196,7 @@ func CloseRoomCommand(s *models.Server, client *models.Client, msgData interface
 	data := map[string]interface{}{
 		"message": fmt.Sprintf("Room '%s' has been closed.", roomName),
 	}
+	logger.Debug(fmt.Sprintf("User %s has closed room %s", client.Name, roomName))
 	return response.CodeSuccess, data
 }
 
@@ -205,6 +215,7 @@ func CreateGameCommand(s *models.Server, client *models.Client, msgData interfac
 	data := map[string]interface{}{
 		"message": "Game created and joined.",
 	}
+	logger.Debug(fmt.Sprintf("User %s has created a game in room %s", client.Name, client.Room.Name))
 	return response.CodeSuccess, data
 }
 
@@ -241,6 +252,7 @@ func JoinGameCommand(s *models.Server, client *models.Client, msgData interface{
 	data := map[string]interface{}{
 		"message": fmt.Sprintf("Joined game '%s'.", gameId),
 	}
+	logger.Debug(fmt.Sprintf("User %s has joined game with id %s in room %s", client.Name, gameId, client.Room.Name))
 	return response.CodeSuccess, data
 }
 

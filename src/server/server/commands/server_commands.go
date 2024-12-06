@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"server/logger"
 	"server/server/client"
 	"server/server/models"
 	"server/server/response"
@@ -25,6 +26,7 @@ func LogInCommand(s *models.Server, c *models.Client, msgData interface{}) (stri
 	data := map[string]interface{}{
 		"message": fmt.Sprintf("Welcome %s!", username),
 	}
+	logger.Debug(fmt.Sprintf("Logged in user %s succes", c.Name))
 	return response.CodeSuccess, data
 }
 
@@ -38,6 +40,7 @@ func ListRoomsCommand(s *models.Server, client *models.Client, msgData interface
 	data := map[string]interface{}{
 		"roomList": roomsList,
 	}
+	logger.Debug("Sending rooms list")
 	return response.CodeSuccess, data
 }
 
@@ -65,6 +68,7 @@ func CreateRoomCommand(s *models.Server, client *models.Client, msgData interfac
 	data := map[string]interface{}{
 		"message": fmt.Sprintf("Room '%s' created and joined.", roomName),
 	}
+	logger.Debug(fmt.Sprintf("Created room with name %s and password %s", roomName, roomPassword))
 	return response.CodeSuccess, data
 }
 
@@ -98,5 +102,6 @@ func JoinRoomCommand(s *models.Server, client *models.Client, msgData interface{
 	data := map[string]interface{}{
 		"message": fmt.Sprintf("Joined room '%s'.", roomName),
 	}
+	logger.Debug(fmt.Sprintf("User %s joined room %s", client.Name, roomName))
 	return response.CodeSuccess, data
 }

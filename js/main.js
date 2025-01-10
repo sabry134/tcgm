@@ -106,6 +106,9 @@ ipcMain.handle('savePositionToFile', (event, position, fileName) => {
     console.log(`Position saved to ${finalFileName}:`, position);
 });
 
+ipcMain.on('add-card', (event) => {
+    event.sender.send('add-card');
+});
 
 function loadContent(win, fileName) {
     win.loadFile(`./html/${fileName}`);

@@ -4,7 +4,7 @@ import Config
 config :tcgm_web_app, TcgmWebApp.Repo,
   username: "postgres",
   password: "password",
-  hostname: "db",
+  hostname: "localhost",
   database: "my_db",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,

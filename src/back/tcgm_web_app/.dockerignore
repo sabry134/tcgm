@@ -1,0 +1,12 @@
+# Ignore dependencies
+/deps
+/_build
+/priv/static
+/node_modules
+
+# Ignore editor/OS files
+*.swp
+*.bak
+*.tmp
+.DS_Store
+*.log

@@ -41,14 +41,14 @@ defmodule TcgmWebApp.Gameplay do
 
   def handle_cast({:draw_card, player_id}, state) do
     player = find_player(state.players, player_id)
-    new_player = draw_card(player)
+    new_player = draw_card_logic(player)
     updated_state = update_player(state, player_id, new_player)
     {:noreply, updated_state}
   end
 
   def handle_cast({:play_card, player_id, card}, state) do
     player = find_player(state.players, player_id)
-    new_player = play_card(player, card)
+    new_player = play_card_logic(player, card)
     updated_state = update_player(state, player_id, new_player)
     {:noreply, updated_state}
   end
@@ -81,13 +81,13 @@ defmodule TcgmWebApp.Gameplay do
     %{state | players: players}
   end
 
-  defp draw_card(player) do
+  defp draw_card_logic(player) do
     [card | rest_deck] = player.deck
     new_hand = [card | player.hand]
     %{player | deck: rest_deck, hand: new_hand}
   end
 
-  defp play_card(player, card) do
+  defp play_card_logic(player, card) do
     new_hand = List.delete(player.hand, card)
     new_field = [card | player.field]
     %{player | hand: new_hand, field: new_field}

@@ -7,7 +7,7 @@ import Config
 # Run `mix help test` for more information.
 config :tcgm_web_app, TcgmWebApp.Repo,
   username: "postgres",
-  password: "postgres",
+  password: "password",
   hostname: "localhost",
   database: "tcgm_web_app_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,

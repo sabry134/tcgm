@@ -1,0 +1,228 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #383c4c;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  header {
+    background-color: #4c3311;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 20px;
+  }
+
+  header nav {
+    display: flex;
+    gap: 20px;
+  }
+
+  header nav a {
+    color: white;
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 5px;
+  }
+
+  /* Active link blue line */
+  header nav a.active {
+    border-bottom: 2px solid blue;
+  }
+
+  main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .sidebar {
+    background-color: #5b3a18;
+    width: 20%;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+
+  .content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .main-view {
+    flex: 1;
+    background-color: #cccccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+  .card {
+    width: 200px;
+    height: 300px;
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    color: black;
+    text-align: center;
+    font-size: 16px;
+    position: absolute;
+    cursor: pointer;
+  }
+
+  .delete-button {
+    background-color: red;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+
+  .delete-button:hover {
+    background-color: darkred;
+  }
+
+  .footer {
+    background-color: white;
+    height: 20%;
+    text-align: center;
+  }
+
+  .properties {
+    background-color: #5b3a18;
+    width: 20%;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+
+  .scene-inspector,
+  .file-selector {
+    margin-bottom: 20px;
+  }
+
+  .scene-inspector ul,
+  .file-selector ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .scene-inspector li,
+  .file-selector li {
+    margin-bottom: 5px;
+  }
+
+  .properties input[type="checkbox"] {
+    margin-right: 5px;
+  }
+
+  .properties .slider {
+    width: 100%;
+  }
+
+  .button {
+    background-color: #4c3311;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    position: relative;
+  }
+
+  .button:hover {
+    background-color: #3b2510;
+  }
+
+  .button:active {
+    background-color: #2a1a0d;
+  }
+
+  .cross {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 18px;
+    color: white;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    line-height: 20px;
+  }
+
+  .cross:hover {
+    background-color: red;
+  }
+
+  .scene-inspector ul {
+    list-style-type: disc;
+    margin-left: 20px;
+    padding: 0;
+  }
+
+  .scene-inspector li {
+    margin-bottom: 5px;
+    cursor: pointer;
+  }
+
+  .scene-inspector li.selected {
+    color: yellow;
+  }
+
+  .sidebar.properties {
+    padding: 10px;
+    background-color: #5b3a18;
+    box-sizing: border-box;
+    width: 20%;
+  }
+
+  .properties-box {
+    padding: 15px;
+    background-color: #4c3311;
+    border-radius: 8px;
+    border: 2px solid #333;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    max-height: 80%;
+    overflow-y: auto;
+  }
+
+  .property-item {
+    margin-bottom: 15px;
+  }
+
+  .property-item input[type="checkbox"],
+  .property-item input[type="range"] {
+    margin-right: 10px;
+  }
+
+  .property-item label {
+    color: white;
+    font-size: 16px;
+  }
+
+  .property-item input[type="range"] {
+    width: 100%;
+    cursor: pointer;
+  }
+
+  .property-item input[type="checkbox"]:checked {
+    background-color: #38a169;
+  }
+
+  .property-item input[type="range"]:focus {
+    outline: none;
+    border: 2px solid #38a169;
+  }

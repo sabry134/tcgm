@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Type</title>
+    <link rel="stylesheet" href="../css/cardtype.css">
+    <script defer src="../js/cardtype.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Card Type</h1>
+        </header>
+        <section class="form-section">
+            <div class="form-left">
+                <label>Name <input type="text" name="name" /></label>
+                <label>Starting location <input type="text" name="startingLocation" /></label>
+                <label>Limit per deck <input type="text" name="limitPerDeck" /></label>
+                <label>Limit per board <input type="text" name="limitPerBoard" /></label>
+                <label>Starting deck type <input type="text" name="startingDeckType" /></label>
+                <label>Power <input type="text" name="power" /></label>
+                <label>Keywords <input type="text" name="keywords" /></label>
+                <label>Parent Type <input type="text" name="parentType" /></label>
+            </div>
+            <div class="form-right">
+                <fieldset>
+                    <legend>play_requirements :</legend>
+                    <label>Name <input type="text" name="playRequirementName" /></label>
+                    <label>Parameters : <input type="text" name="parameters" placeholder="Amount" /></label>
+                </fieldset>
+            </div>
+        </section>
+        <footer>
+            <button class="save-button">Save</button>
+        </footer>
+    </div>
+</body>
+</html>

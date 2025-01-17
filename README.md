@@ -1,3 +1,4 @@
+
 Finir tt les pages de design graphique d'app (en attente de figma) ⚠️ ☑️
 Associé CI et CD ☑️
 Deployer le site sur une sandbox pour les tests ☑️

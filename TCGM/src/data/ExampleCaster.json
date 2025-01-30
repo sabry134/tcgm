@@ -16,6 +16,6 @@
 		}
 	],
 	"Text": "-3: Draw 2 cards from your deck.",
-	"Image": "iminyourwalls.jpeg",
+	"Image": "../images/iminyourwalls.png",
 	"DisplayColor": "Black"
 }

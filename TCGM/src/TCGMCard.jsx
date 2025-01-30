@@ -1,5 +1,5 @@
-import {Component} from "react";
-import ExampleCaster from "./assets/ExampleCaster.json";
+import { Component } from "react";
+import ExampleCaster from "./data/ExampleCaster.json";
 
 export class TCGMCard extends Component {
     render() {
@@ -7,7 +7,16 @@ export class TCGMCard extends Component {
             <div style={mainContainer}>
                 <div style={mainCardBorder}>
                     <div style={cardNameContainer}>
+                        <p style={cardName}>
+                            {ExampleCaster.Name}
+                        </p>
                     </div>
+                    <div style={cardImageContainer}>
+                        <img src={`${ExampleCaster.Image}`} alt="Example Caster" style={cardImage} />
+                    </div>
+                    {/*<div style={cardTextContainer}>*/}
+                    {/*    <p style={cardText}>{ExampleCaster.Text}</p>*/}
+                    {/*</div>*/}
                 </div>
             </div>
         );
@@ -18,7 +27,6 @@ const mainContainer = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#000", // Pitch black background
     width: "10%", // Portrait rectangle width
     height: "30%", // Portrait rectangle height
     margin: "auto", // Center the container
@@ -31,8 +39,7 @@ const mainContainer = {
 
 const mainCardBorder = {
     display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: "column", // Ensure column direction
     backgroundColor: "#FFF", // White background
     width: "100%", // Portrait rectangle width
     height: "100%", // Portrait rectangle height
@@ -41,18 +48,28 @@ const mainCardBorder = {
 }
 
 const cardNameContainer = {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
     width: "100%", // Portrait rectangle width
     height: "10%", // Portrait rectangle height
+    justifyContent: "center", // Center horizontally
+    alignItems: "center", // Center vertically
     backgroundColor: "#000", // Black background
     borderRadius: "10px 10px 0 0" // Rounded top corners
 }
 
-// const cardName = {
-//     color: "#000", // Black text
-//     fontSize: "1.5em", // 1.5 times the default font size
-//     fontWeight: "bold", // Bold text
-//     marginBottom: "100px" // 10px margin below the text
-// }
+const cardName = {
+    color: "#FFF", // White text
+    margin: "0", // Remove default margin
+    paddingLeft: "5%" // Add padding
+}
+
+const cardImageContainer = {
+    width: "100%", // Portrait rectangle width
+    height: "50%", // Portrait rectangle height
+    justifyContent: "center", // Center horizontally
+    alignItems: "center", // Center vertically
+}
+
+const cardImage = {
+    width: "100%",
+    height: "100%",
+}

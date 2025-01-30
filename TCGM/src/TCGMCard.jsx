@@ -14,9 +14,11 @@ export class TCGMCard extends Component {
                     <div style={cardImageContainer}>
                         <img src={`${ExampleCaster.Image}`} alt="Example Caster" style={cardImage} />
                     </div>
-                    {/*<div style={cardTextContainer}>*/}
-                    {/*    <p style={cardText}>{ExampleCaster.Text}</p>*/}
-                    {/*</div>*/}
+                    <div style={cardTextContainer}>
+                        <p style={cardText}>
+                            {ExampleCaster.Text}
+                        </p>
+                    </div>
                 </div>
             </div>
         );
@@ -72,4 +74,19 @@ const cardImageContainer = {
 const cardImage = {
     width: "100%",
     height: "100%",
+}
+
+const cardTextContainer = {
+    width: "100%", // Portrait rectangle width
+    height: "40%", // Portrait rectangle height
+    justifyContent: "center", // Center horizontally
+    alignItems: "center", // Center vertically
+    backgroundColor: "#000", // Black background
+    borderRadius: "0 0 10px 10px" // Rounded bottom corners
+}
+
+const cardText = {
+    color: "#FFF", // White text
+    margin: "0", // Remove default margin
+    paddingLeft: "5%" // Add padding
 }

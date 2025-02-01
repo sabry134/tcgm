@@ -30,4 +30,8 @@ defmodule TcgmWebApp.Cards.Cards do
     |> card.changeset(attrs)
     |> Repo.update()
   end
+
+  def get_cards_by_game_id(game_id) do
+    Repo.get_by(Card, game_id: game_id)
+  end
 end

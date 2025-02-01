@@ -30,4 +30,8 @@ defmodule TcgmWebApp.Effects.Effects do
     |> Effect.changeset(attrs)
     |> Repo.update()
   end
+
+  def get_effects_by_game_id(game_id) do
+    Repo.get_by(Effect, game_id: game_id)
+  end
 end

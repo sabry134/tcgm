@@ -30,4 +30,8 @@ defmodule TcgmWebApp.CardTypes.CardTypes do
     |> CardType.changeset(attrs)
     |> Repo.update()
   end
+
+  def get_card_types_by_game_id(game_id) do
+    Repo.get_by(CardType, game_id: game_id)
+  end
 end

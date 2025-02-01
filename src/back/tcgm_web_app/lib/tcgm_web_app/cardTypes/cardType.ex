@@ -5,7 +5,7 @@ defmodule TcgmWebApp.CardTypes.CardType do
   schema "types" do
     field :name, :string
     field :properties, {:array, :string}
-    field :game_id, :string
+    field :game_id, :id
 
     has_many :cards, TcgmWebApp.Cards.Card
 

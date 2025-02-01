@@ -1,14 +1,14 @@
 defmodule TcgmWebApp.Effects.Effect do
   use Ecto.Schema
   import Ecto.Changeset
+  alias TcgmWebApp.Games.Game
 
   schema "effects" do
     field :description, :string
 
     field :action_ids, {:array, :string}
 
-    belongs_to :game, TcgmWebApp.Games.Game
-    has_many :actions, TcgmWebApp.Actions.Action
+    belongs_to :game, Game
 
     timestamps()
   end

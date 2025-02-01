@@ -1,7 +1,6 @@
 defmodule TcgmWebApp.Cards.Card do
   use Ecto.Schema
   import Ecto.Changeset
-  alias TcgmWebApp.Cards.Card
 
   schema "cards" do
     field :name, :string

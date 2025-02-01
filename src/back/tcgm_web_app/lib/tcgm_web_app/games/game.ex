@@ -1,7 +1,6 @@
 defmodule TcgmWebApp.Games.Game do
   use Ecto.Schema
   import Ecto.Changeset
-  alias TcgmWebApp.Games.Game
 
   schema "games" do
     field :name, :string

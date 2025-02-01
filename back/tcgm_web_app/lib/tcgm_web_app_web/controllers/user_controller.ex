@@ -2,7 +2,14 @@ defmodule TcgmWebAppWeb.UserController do
   use TcgmWebAppWeb, :controller
 
   alias TcgmWebApp.Accounts
-  alias TcgmWebApp.Accounts.User
+
+  defp translate_errors(changeset) do
+    Ecto.Changeset.traverse_errors(changeset, fn {msg, opts} ->
+      Enum.reduce(opts, msg, fn {key, value}, acc ->
+        String.replace(acc, "%{#{key}}", to_string(value))
+      end)
+    end)
+  end
 
   def index(conn, _params) do
     users = Accounts.list_users()
@@ -23,7 +30,7 @@ defmodule TcgmWebAppWeb.UserController do
       {:error, %Ecto.Changeset{} = changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> json(changeset)
+        |> json(%{errors: translate_errors(changeset)})
     end
   end
 
@@ -35,7 +42,7 @@ defmodule TcgmWebAppWeb.UserController do
       {:error, %Ecto.Changeset{} = changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> json(changeset)
+        |> json(%{errors: translate_errors(changeset)})
     end
   end
 
@@ -49,7 +56,7 @@ defmodule TcgmWebAppWeb.UserController do
       {:error, _reason} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> json(%{error: "Could not delete user"})
+        |> json(%{errors: "Could not delete user"})
     end
   end
 end

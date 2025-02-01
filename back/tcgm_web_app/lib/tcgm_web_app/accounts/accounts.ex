@@ -24,12 +24,11 @@ defmodule TcgmWebApp.Accounts do
     Repo.all(User)
   end
 
-  def delete_user!(id) do
-    Repo.delete!(get_user!(id))
+  def delete_user!(%User{} = user) do
+    Repo.delete(user)
   end
 
-  def update_user(id, attrs) do
-    user = get_user!(id)
+  def update_user(%User{} = user, attrs) do
     user
     |> User.changeset(attrs)
     |> Repo.update()

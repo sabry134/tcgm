@@ -2,6 +2,8 @@ defmodule TcgmWebApp.Cards.Card do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:id, :name, :text, :image, :properties, :game_id, :card_type_id, :effect_ids, :inserted_at, :updated_at]}
+
   schema "cards" do
     field :name, :string
     field :text, :string

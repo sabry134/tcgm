@@ -27,7 +27,7 @@ defmodule TcgmWebApp.Actions.Actions do
     |> Repo.update()
   end
 
-  def delete_action(id) do
+  def delete_action!(id) do
     action = get_action!(id)
     Repo.delete!(action)
   end

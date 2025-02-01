@@ -2,6 +2,8 @@ defmodule TcgmWebApp.Effects.Effect do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:id, :description, :action_ids, :game_id, :inserted_at, :updated_at]}
+
   schema "effects" do
     field :description, :string
 

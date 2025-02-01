@@ -9,6 +9,8 @@ defmodule TcgmWebAppWeb.Router do
   scope "/api", TcgmWebAppWeb do
     pipe_through :api
 
+    resources "/users", UserController, only: [:index, :show, :create, :update, :delete]
+
     get "/hello", HelloController, :index
   end
 

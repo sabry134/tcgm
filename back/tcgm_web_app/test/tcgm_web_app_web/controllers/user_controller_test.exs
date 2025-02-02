@@ -1,7 +1,6 @@
 defmodule TcgmWebAppWeb.UserControllerTest do
   use TcgmWebAppWeb.ConnCase
 
-  alias ElixirLS.LanguageServer.Plugins.Ecto
   alias TcgmWebApp.Accounts.User
   alias TcgmWebApp.Repo
 

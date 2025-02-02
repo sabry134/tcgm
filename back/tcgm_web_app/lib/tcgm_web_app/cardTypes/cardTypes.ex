@@ -1,6 +1,7 @@
 defmodule TcgmWebApp.CardTypes.CardTypes do
   alias TcgmWebApp.CardTypes.CardType
   alias TcgmWebApp.Repo
+  import Ecto.Query, warn: false
 
   def create_cardType(attrs) do
     %CardType{}
@@ -20,18 +21,18 @@ defmodule TcgmWebApp.CardTypes.CardTypes do
     Repo.all(CardType)
   end
 
-  def delete_cardType!(id) do
-    Repo.delete!(get_cardType!(id))
+  def delete_cardType!(%CardType{} = cardType) do
+    Repo.delete!(cardType)
   end
 
-  def update_cardType(id, attrs) do
-    card_type = get_cardType!(id)
-    card_type
+  def update_cardType(%CardType{} = cardType, attrs) do
+    cardType
     |> CardType.changeset(attrs)
     |> Repo.update()
   end
 
   def get_cardTypes_by_game_id(game_id) do
-    Repo.get_by(CardType, game_id: game_id)
+    Repo.all(from c in CardType, where: c.game_id == ^game_id)
   end
+
 end

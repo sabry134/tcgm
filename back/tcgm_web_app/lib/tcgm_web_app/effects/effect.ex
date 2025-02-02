@@ -7,7 +7,7 @@ defmodule TcgmWebApp.Effects.Effect do
   schema "effects" do
     field :description, :string
 
-    field :action_ids, {:array, :string}
+    field :action_ids, {:array, :integer}
 
     field :game_id, :id
 

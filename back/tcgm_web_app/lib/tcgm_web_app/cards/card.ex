@@ -11,7 +11,7 @@ defmodule TcgmWebApp.Cards.Card do
     field :properties, {:array, :string}
     field :game_id, :id
     field :card_type_id, :id
-    field :effect_ids, {:array, :string}
+    field :effect_ids, {:array, :integer}
 
     timestamps()
   end

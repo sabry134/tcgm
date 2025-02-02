@@ -2,6 +2,7 @@ defmodule TcgmWebAppWeb.ActionController do
   use TcgmWebAppWeb, :controller
 
   alias TcgmWebApp.Actions.Actions
+  alias TcgmWebAppWeb.Helpers
 
   def index(conn, _params) do
     actions = Actions.list_actions()
@@ -22,7 +23,7 @@ defmodule TcgmWebAppWeb.ActionController do
       {:error, %Ecto.Changeset{} = changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> json(changeset)
+        |> json(%{errors: Helpers.translate_errors(changeset)})
     end
   end
 
@@ -34,21 +35,19 @@ defmodule TcgmWebAppWeb.ActionController do
       {:error, %Ecto.Changeset{} = changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> json(changeset)
+        |> json(%{errors: Helpers.translate_errors(changeset)})
     end
   end
 
   def delete(conn, %{"id" => id}) do
     action = Actions.get_action!(id)
+    Actions.delete_action!(action)
 
-    case Actions.delete_action!(action) do
-      {:ok, _action} ->
-        send_resp(conn, :no_content, "")
+    send_resp(conn, :no_content, "")
+  end
 
-      {:error, _reason} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(%{error: "Could not delete action"})
-    end
+  def get_action_by_name(conn, %{"name" => name}) do
+    action = Actions.get_action_by_name(name)
+    json(conn, action)
   end
 end

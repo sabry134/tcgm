@@ -41,27 +41,27 @@ defmodule TcgmWebAppWeb.CardController do
   def delete(conn, %{"id" => id}) do
     card = Cards.get_card!(id)
 
-    case Cards.delete_card!(card) do
-      {:ok, _card} ->
-        send_resp(conn, :no_content, "")
-
-      {:error, _reason} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(%{error: "Could not delete card"})
-    end
+    Cards.delete_card!(card)
+    send_resp(conn, :no_content, "")
   end
 
   def get_cards_by_game_id(conn, %{"game_id" => game_id}) do
     case Cards.get_cards_by_game_id(game_id) do
-      {:ok, cards} ->
+      [] ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "No cards found for game ID #{game_id}"})
+
+      cards when is_list(cards) ->
         conn
         |> put_status(:ok)
         |> json(cards)
-      {:error, _reason} ->
+
+      cards ->
+        IO.inspect(cards, label: "cards")
         conn
         |> put_status(:unprocessable_entity)
-        |> json(%{error: "Could not finds cards by game id"})
+        |> json(%{error: "Could not retrieve cards by game ID"})
     end
   end
 end

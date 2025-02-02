@@ -12,8 +12,10 @@ defmodule TcgmWebAppWeb.Router do
     resources "/users", UserController, only: [:index, :show, :create, :update, :delete]
 
     resources "/games", GameController, only: [:index, :show, :create, :update, :delete]
+    get "/games/name/:name", GameController, :get_game_by_name
 
     resources "/actions", ActionController, only: [:index, :show, :create, :update, :delete]
+    get "/actions/name/:name", ActionController, :get_action_by_name
 
     resources "/cards", CardController, only: [:index, :show, :create, :update, :delete]
     get "/cards/game/:game_id", CardController, :get_cards_by_game_id

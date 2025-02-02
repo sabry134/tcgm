@@ -2,6 +2,7 @@ defmodule TcgmWebAppWeb.CardTypeController do
   use TcgmWebAppWeb, :controller
 
   alias TcgmWebApp.CardTypes.CardTypes
+  alias TcgmWebAppWeb.Helpers
 
   def index(conn, _params) do
     cardTypes = CardTypes.list_cardTypes()
@@ -22,7 +23,7 @@ defmodule TcgmWebAppWeb.CardTypeController do
       {:error, %Ecto.Changeset{} = changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> json(changeset)
+        |> json(%{errors: Helpers.translate_errors(changeset)})
     end
   end
 
@@ -34,34 +35,35 @@ defmodule TcgmWebAppWeb.CardTypeController do
       {:error, %Ecto.Changeset{} = changeset} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> json(changeset)
+        |> json(%{errors: Helpers.translate_errors(changeset)})
     end
   end
 
   def delete(conn, %{"id" => id}) do
     cardType = CardTypes.get_cardType!(id)
 
-    case CardTypes.delete_cardType!(cardType) do
-      {:ok, _cardType} ->
-        send_resp(conn, :no_content, "")
-
-      {:error, _reason} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(%{error: "Could not delete cardType"})
-    end
+    CardTypes.delete_cardType!(cardType)
+    send_resp(conn, :no_content, "")
   end
 
   def get_cardTypes_by_game_id(conn, %{"game_id" => game_id}) do
     case CardTypes.get_cardTypes_by_game_id(game_id) do
-      {:ok, cardTypes} ->
+      [] ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "No cardTypes found for game ID #{game_id}"})
+
+      cardTypes when is_list(cardTypes) ->
         conn
         |> put_status(:ok)
         |> json(cardTypes)
-      {:error, _reason} ->
+
+      cardTypes ->
+        IO.inspect(cardTypes, label: "cardTypes")
         conn
         |> put_status(:unprocessable_entity)
-        |> json(%{error: "Could not finds cardTypes by game id"})
+        |> json(%{error: "Could not retrieve cardTypes by game ID"})
     end
   end
+
 end

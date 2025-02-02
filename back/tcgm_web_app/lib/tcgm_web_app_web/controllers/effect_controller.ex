@@ -41,27 +41,28 @@ defmodule TcgmWebAppWeb.EffectController do
   def delete(conn, %{"id" => id}) do
     effect = Effects.get_effect!(id)
 
-    case Effects.delete_effect!(effect) do
-      {:ok, _effect} ->
-        send_resp(conn, :no_content, "")
+    Effects.delete_effect!(effect)
+    send_resp(conn, :no_content, "")
 
-      {:error, _reason} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(%{error: "Could not delete effect"})
-    end
   end
 
   def get_effects_by_game_id(conn, %{"game_id" => game_id}) do
     case Effects.get_effects_by_game_id(game_id) do
-      {:ok, effects} ->
+      [] ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "No effects found for game ID #{game_id}"})
+
+      effects when is_list(effects) ->
         conn
         |> put_status(:ok)
         |> json(effects)
-      {:error, _reason} ->
+
+      effects ->
+        IO.inspect(effects, label: "effects")
         conn
         |> put_status(:unprocessable_entity)
-        |> json(%{error: "Could not get effects by game id"})
+        |> json(%{error: "Could not retrieve effects by game ID"})
     end
   end
 end

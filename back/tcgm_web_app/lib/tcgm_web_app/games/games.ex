@@ -20,12 +20,11 @@ defmodule TcgmWebApp.Games.Games do
     Repo.all(Game)
   end
 
-  def delete_game!(id) do
-    Repo.delete!(get_game!(id))
+  def delete_game!(%Game{} = game) do
+    Repo.delete!(game)
   end
 
-  def update_game(id, attrs) do
-    game = get_game!(id)
+  def update_game(%Game{} = game, attrs) do
     game
     |> Game.changeset(attrs)
     |> Repo.update()

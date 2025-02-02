@@ -7,7 +7,7 @@ defmodule TcgmWebApp.Repo.Migrations.CreateCards do
       add :text, :string, null: false
       add :image, :string, null: false
 
-      add :effect_ids, {:array, :string}, null: false
+      add :effect_ids, {:array, :integer}, null: false
 
       add :game_id, references(:games, on_delete: :delete_all), null: false
       add :card_type_id, references(:types, on_delete: :delete_all), null: false

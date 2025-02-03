@@ -17,7 +17,10 @@ defmodule TcgmWebApp.Application do
       # Start a worker by calling: TcgmWebApp.Worker.start_link(arg)
       # {TcgmWebApp.Worker, arg},
       # Start to serve requests, typically the last entry
-      TcgmWebAppWeb.Endpoint
+      TcgmWebAppWeb.Endpoint,
+
+      {Registry, keys: :unique, name: TcgmWebApp.Rooms.RoomRegistry},
+      {DynamicSupervisor, strategy: :one_for_one, name: TcgmWebApp.Rooms.RoomSupervisor}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

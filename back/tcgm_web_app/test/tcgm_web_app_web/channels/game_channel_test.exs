@@ -41,4 +41,42 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     # Ensure the card is added to the player's field
     assert "Fireball" in updated_state.players["player1"].field
   end
+
+  test "setting a deck updates game state", %{socket: socket, room_id: room_id} do
+    # Subscribe and join the room channel
+    {:ok, _, socket} = subscribe_and_join(socket, GameChannel, "room:" <> room_id, %{})
+
+    # Add the player after joining the channel
+    push(socket, "join_room", %{"player_id" => "player1"})
+    assert_broadcast("game_update", %{state: state})
+    assert Map.has_key?(state.players, "player1")
+
+    # Now, set the player's deck
+    push(socket, "set_deck", %{"player_id" => "player1", "deck" => ["Fireball"]})
+    assert_broadcast("game_update", %{state: updated_state})
+
+    # Ensure the deck is set
+    assert "Fireball" in updated_state.players["player1"].deck
+  end
+
+  test "drawing a card updates game state", %{socket: socket, room_id: room_id} do
+    # Subscribe and join the room channel
+    {:ok, _, socket} = subscribe_and_join(socket, GameChannel, "room:" <> room_id, %{})
+
+    # Add the player after joining the channel
+    push(socket, "join_room", %{"player_id" => "player1"})
+    assert_broadcast("game_update", %{state: state})
+    assert Map.has_key?(state.players, "player1")
+
+    # Set the player's deck
+    push(socket, "set_deck", %{"player_id" => "player1", "deck" => ["Fireball"]})
+    assert_broadcast("game_update", %{state: updated_state})
+
+    # Now, draw a card
+    push(socket, "draw_card", %{"player_id" => "player1"})
+    assert_broadcast("game_update", %{state: updated_state})
+
+    # Ensure the card is drawn
+    assert "Fireball" in updated_state.players["player1"].hand
+  end
 end

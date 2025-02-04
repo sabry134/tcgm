@@ -29,8 +29,16 @@ defmodule TcgmWebApp.Game.GameServer do
     GenServer.call(via_tuple(room_id), {:join, player_id})
   end
 
+  def set_deck(room_id, player_id, deck) do
+    GenServer.cast(via_tuple(room_id), {:set_deck, player_id, deck})
+  end
+
   def play_card(room_id, player_id, card) do
     GenServer.cast(via_tuple(room_id), {:play_card, player_id, card})
+  end
+
+  def draw_card(room_id, player_id) do
+    GenServer.cast(via_tuple(room_id), {:draw_card, player_id})
   end
 
   # Server interaction functions
@@ -45,8 +53,18 @@ defmodule TcgmWebApp.Game.GameServer do
     {:reply, :ok, new_state}
   end
 
+  def handle_cast({:set_deck, player_id, deck}, state) do
+    new_state = %{state | players: Map.update!(state.players, player_id, fn player -> %{player | deck: deck} end)}
+    {:noreply, new_state}
+  end
+
   def handle_cast({:play_card, player_id, card}, state) do
     new_state = GameLogic.play_card_logic(state, player_id, card)
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:draw_card, player_id}, state) do
+    new_state = GameLogic.draw_card(state, player_id)
     {:noreply, new_state}
   end
 end

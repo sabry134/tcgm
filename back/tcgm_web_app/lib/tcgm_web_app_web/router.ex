@@ -26,6 +26,10 @@ defmodule TcgmWebAppWeb.Router do
     resources "/effects", EffectController, only: [:index, :show, :create, :update, :delete]
     get "/effects/game/:game_id", EffectController, :get_effects_by_game_id
 
+    post "/rooms", RoomController, :create
+    get "/rooms/:room_id", RoomController, :state
+    post "/rooms/:room_id/join", RoomController, :join
+
     get "/hello", HelloController, :index
   end
 

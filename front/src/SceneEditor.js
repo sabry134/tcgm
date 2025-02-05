@@ -165,7 +165,6 @@ const SceneEditor = () => {
 
   return (
     <Box display="flex" flexDirection="column" height="100vh">
-      {/* Brown Banner with Menu */}
       <Box
         sx={{
           backgroundColor: "#5d3a00",
@@ -197,7 +196,6 @@ const SceneEditor = () => {
         </Button>
       </Box>
 
-      {/* Main Content Area */}
       <Box display="flex" flexGrow={1} bgcolor="#fff">
         <Paper
           className="sidebar"

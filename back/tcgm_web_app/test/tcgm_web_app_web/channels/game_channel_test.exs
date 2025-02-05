@@ -39,7 +39,7 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     assert_broadcast("game_update", %{state: updated_state})
 
     # Ensure the card is added to the player's field
-    assert "Fireball" in updated_state.players["player1"].field
+    assert "Fireball" in updated_state.players["player1"]["field"]
   end
 
   test "setting a deck updates game state", %{socket: socket, room_id: room_id} do
@@ -56,7 +56,7 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     assert_broadcast("game_update", %{state: updated_state})
 
     # Ensure the deck is set
-    assert "Fireball" in updated_state.players["player1"].deck
+    assert "Fireball" in updated_state.players["player1"]["deck"]
   end
 
   test "drawing a card updates game state", %{socket: socket, room_id: room_id} do
@@ -77,6 +77,6 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     assert_broadcast("game_update", %{state: updated_state})
 
     # Ensure the card is drawn
-    assert "Fireball" in updated_state.players["player1"].hand
+    assert "Fireball" in updated_state.players["player1"]["hand"]
   end
 end

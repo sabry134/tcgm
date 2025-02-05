@@ -48,13 +48,13 @@ defmodule TcgmWebApp.Game.GameServer do
   end
 
   def handle_call({:join, player_id}, _from, state) do
-    new_state = %{state | players: Map.put(state.players, player_id, %{hand: [], deck: [], field: [], graveyard: []})}
+    new_state = %{state | players: Map.put(state.players, player_id, %{"hand" => [], "deck" => [], "field" => [], "graveyard" => []})}
 
     {:reply, :ok, new_state}
   end
 
   def handle_cast({:set_deck, player_id, deck}, state) do
-    new_state = %{state | players: Map.update!(state.players, player_id, fn player -> %{player | deck: deck} end)}
+    new_state = %{state | players: Map.update!(state.players, player_id, fn player -> %{player | "deck" => deck} end)}
     {:noreply, new_state}
   end
 

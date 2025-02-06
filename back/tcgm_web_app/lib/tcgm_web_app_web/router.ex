@@ -10,6 +10,7 @@ defmodule TcgmWebAppWeb.Router do
     pipe_through :api
 
     resources "/users", UserController, only: [:index, :show, :create, :update, :delete]
+    post "/users/login", UserController, :login
 
     resources "/games", GameController, only: [:index, :show, :create, :update, :delete]
     get "/games/name/:name", GameController, :get_game_by_name

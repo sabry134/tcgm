@@ -1,0 +1,42 @@
+# Elixir
+/_build
+/deps
+/log
+/test/tmp
+/erl_crash.dump
+
+# Phoenix
+/assets/node_modules
+/assets/npm
+/priv/static
+/priv/gettext
+
+# IDEs and Editors
+# User-specific files
+*.swp
+*.swo
+.idea
+.vscode
+.project
+*.iml
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Docker
+.docker/
+docker-compose.override.yml
+
+# Coveralls (for test coverage reporting)
+.coverage/
+
+# Environment Files
+.env
+.env.local
+.env.production
+
+# personal files
+*.script
+
+

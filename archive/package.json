@@ -1,0 +1,32 @@
+{
+  "name": "eip_tcgm",
+  "version": "1.0.0",
+  "description": "",
+  "main": "js/main.js",
+  "scripts": {
+    "test": "mocha tests/**/*.js",
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sabry134/EIP_TCGM.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sabry134/EIP_TCGM/issues"
+  },
+  "homepage": "https://github.com/sabry134/EIP_TCGM#readme",
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "mocha": "^10.8.2",
+    "spectron": "^19.0.0"
+  },
+  "dependencies": {
+    "chai": "^4.3.6",
+    "jsdom": "^25.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}

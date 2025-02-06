@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scene Editor</title>
+  <link rel="stylesheet" href="../css/styles.css">
+    
+</head>
+
+<body>
+  <header>
+    <nav>
+      <a href="index.html" class="active">🌟 Scene</a>
+      <a href="templates.html">📜 Templates</a>
+      <a href="card_editor.html">🖼️ Card Editor</a>
+      <a href="community.html">🌍 Community</a>
+    </nav>
+  </header>
+  <main>
+    <div class="sidebar scene-inspector">
+      <h3>🔍 Scene Inspector</h3>
+      <button id="addSceneBtn" class="button">Add Scene</button>
+      <ul id="sceneList">
+      </ul>
+    </div>
+    
+
+    <div class="content">
+      <div class="main-view" id="main-content">
+      </div>
+      <div class="footer">
+      </div>
+    </div>
+    <div class="sidebar properties">
+        <div class="properties-box">
+          <h3 id="sceneTitle">⚙️ Select a Scene</h3>
+          <div class="property-item">
+            <input type="checkbox" id="true-false">
+            <label for="true-false">✅ True false properties</label>
+          </div>
+          <div class="property-item">
+            <label for="slider">🔧 Slider properties</label>
+            <input type="range" id="slider" class="slider" min="0" max="100">
+          </div>
+          <div class="property-item">
+            <button id="deleteSceneBtn" class="button">🗑️ Delete Scene</button>
+          </div>
+        </div>
+      </div>
+      
+    
+
+  </main>
+  <script src="../js/components.js" defer></script>
+</body>
+
+</html>

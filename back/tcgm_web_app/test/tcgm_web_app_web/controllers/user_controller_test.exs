@@ -62,4 +62,12 @@ defmodule TcgmWebAppWeb.UserControllerTest do
     assert Repo.get(User, user.id) == nil
   end
 
+  test "POST /api/users/login authenticates a user", %{conn: conn, user: user} do
+    conn = post(conn, "/api/users/login", user: %{username: user.username})
+    response = json_response(conn, 200)
+
+    assert response["id"] == user.id
+    assert response["username"] == user.username
+  end
+
 end

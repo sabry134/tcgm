@@ -52,4 +52,17 @@ defmodule TcgmWebAppWeb.UserController do
         |> json(%{errors: "Could not delete user"})
     end
   end
+
+  def login(conn, %{"user" => user_params}) do
+    case Accounts.authenticate_user(user_params) do
+      {:ok, user} ->
+        conn
+        |> put_status(:ok)
+        |> json(user)
+      {:error, _reason} ->
+        conn
+        |> put_status(:unauthorized)
+        |> json(%{errors: "Invalid email or password"})
+    end
+  end
 end

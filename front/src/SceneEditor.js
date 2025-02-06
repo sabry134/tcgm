@@ -184,7 +184,7 @@ const SceneEditor = () => {
             📜 Templates
           </Typography>
         </Button>
-        <Button onClick={() => navigate("/card-editor")} sx={{ borderRadius: 0 }}>
+        <Button onClick={() => navigate("/")} sx={{ borderRadius: 0 }}>
           <Typography variant="h6" sx={{ color: "white" }}>
             🖼️ Card Editor
           </Typography>
@@ -192,6 +192,11 @@ const SceneEditor = () => {
         <Button onClick={() => navigate("/community")} sx={{ borderRadius: 0 }}>
           <Typography variant="h6" sx={{ color: "white" }}>
             🌍 Community
+          </Typography>
+        </Button>
+        <Button onClick={() => navigate("/join")} sx={{ borderRadius: 0 }}>
+          <Typography variant="h6" sx={{ color: "white" }}>
+          🚪 Join Room
           </Typography>
         </Button>
       </Box>
@@ -247,7 +252,7 @@ const SceneEditor = () => {
             <Card
               key={card.id}
               sx={{
-                width: 150,
+                width: 250,
                 height: card.height,
                 position: "absolute",
                 left: card.x,
@@ -258,7 +263,7 @@ const SceneEditor = () => {
                 cursor: "grab",
                 p: 2,
                 bgcolor: "white",
-                borderRadius: 0,
+                borderRadius: 5,
               }}
               onMouseDown={(e) => handleCardMouseDown(e, card.id)}
             >

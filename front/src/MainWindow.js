@@ -16,8 +16,9 @@ import {
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { TCGMCard } from "./TCGMCard";
 
-const MainWindow = ({ LeftWidget = <div />, RightWidget = <div /> }) => {
+const MainWindow = () => {
     const navigate = useNavigate(); // Initialize useNavigate hook
 
     const [scenes, setScenes] = useState([]);
@@ -178,7 +179,7 @@ const MainWindow = ({ LeftWidget = <div />, RightWidget = <div /> }) => {
                     justifyContent: "space-around",
                 }}
             >
-                <Button onClick={() => navigate("/scene")} sx={{ borderRadius: 0 }}>
+                <Button onClick={() => navigate("/")} sx={{ borderRadius: 0 }}>
                     <Typography variant="h6" sx={{ color: "white" }}>
                         🌟 Scene
                     </Typography>
@@ -212,8 +213,6 @@ const MainWindow = ({ LeftWidget = <div />, RightWidget = <div /> }) => {
                         borderRadius: 0,
                     }}
                 >
-                    {LeftWidget}
-                    {/* left banner side */}
                 </Paper>
 
                 <Box
@@ -222,6 +221,7 @@ const MainWindow = ({ LeftWidget = <div />, RightWidget = <div /> }) => {
                     bgcolor="#c4c4c4"
                     position="relative"
                 >
+                    <TCGMCard />
                     {cards.map((card) => (
                         <Card
                             key={card.id}
@@ -298,9 +298,6 @@ const MainWindow = ({ LeftWidget = <div />, RightWidget = <div /> }) => {
                         borderRadius: 0,
                     }}
                 >
-                    {/* right banner side */}
-                    {RightWidget}
-
                 </Paper>
             </Box>
         </Box>

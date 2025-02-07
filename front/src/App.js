@@ -3,8 +3,6 @@ import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 import SceneEditor from './SceneEditor';
 import CardEditor from './CardEditor'
 
-
-
 function App() {
   return (
     <Router>

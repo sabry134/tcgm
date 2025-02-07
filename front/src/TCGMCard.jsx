@@ -25,12 +25,14 @@ export class TCGMCard extends Component {
     }
 }
 
+export default TCGMCard;
+
 const mainContainer = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     width: "10%", // Portrait rectangle width
-    height: "30%", // Portrait rectangle height
+    height: "20%", // Portrait rectangle height
     margin: "auto", // Center the container
     position: "absolute",
     top: "0",
@@ -61,7 +63,8 @@ const cardNameContainer = {
 const cardName = {
     color: "#FFF", // White text
     margin: "0", // Remove default margin
-    paddingLeft: "5%" // Add padding
+    paddingLeft: "5%", // Add padding
+    fontSize: "80%" // Dynamic font size
 }
 
 const cardImageContainer = {
@@ -88,5 +91,6 @@ const cardTextContainer = {
 const cardText = {
     color: "#FFF", // White text
     margin: "0", // Remove default margin
-    paddingLeft: "5%" // Add padding
+    paddingLeft: "5%", // Add padding
+    fontSize: "60%" // Dynamic font size
 }

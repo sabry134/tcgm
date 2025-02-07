@@ -34,6 +34,28 @@ defmodule TcgmWebAppWeb.Router do
     get "/hello", HelloController, :index
   end
 
+  def swagger_info do
+    %{
+      schemes: ["http", "https"],
+      info: %{
+        version: "1.0",
+        title: "TCGM Web API",
+        description: "API Documentation for TCGM v1",
+      },
+      consumes: ["application/json"],
+      produces: ["application/json"],
+      tags: [
+        %{name: "users", description: "Operations about users"},
+        %{name: "games", description: "Operations about games"},
+        %{name: "actions", description: "Operations about actions"},
+        %{name: "cards", description: "Operations about cards"},
+        %{name: "cardTypes", description: "Operations about cardTypes"},
+        %{name: "effects", description: "Operations about effects"},
+        %{name: "rooms", description: "Operations about rooms"},
+      ]
+    }
+  end
+
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:tcgm_web_app, :dev_routes) do
     # If you want to use the LiveDashboard in production, you should put

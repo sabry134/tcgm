@@ -1,18 +1,35 @@
 defmodule TcgmWebAppWeb.UserController do
   use TcgmWebAppWeb, :controller
+  import Plug.Conn.Status, only: [code: 1]
+  use PhoenixSwagger
 
   alias TcgmWebApp.Accounts
   alias TcgmWebAppWeb.Helpers
+
+  swagger_path :index do
+    get("/users")
+    description("List all users")
+    response(code(:ok), "Success")
+  end
 
   def index(conn, _params) do
     users = Accounts.list_users()
     json(conn, users)
   end
 
+  swagger_path :show do
+    get("/users/{id}")
+    description("Get a user by ID")
+    response(code(:ok), "Success")
+    response(code(:not_found), "User not found")
+  end
+
   def show(conn, %{"id" => id}) do
     user = Accounts.get_user!(id)
     json(conn, user)
   end
+
+  swagger_path()
 
   def create(conn, %{"user" => user_params}) do
     case Accounts.create_user(user_params) do

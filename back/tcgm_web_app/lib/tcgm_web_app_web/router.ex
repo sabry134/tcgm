@@ -9,22 +9,28 @@ defmodule TcgmWebAppWeb.Router do
   scope "/api", TcgmWebAppWeb do
     pipe_through :api
 
-    resources "/users", UserController, only: [:index, :show, :create, :update, :delete]
+    resources "/users", UserController, only: [:index, :show, :create, :update]
+    delete "/users/delete", UserController, :delete_user
     post "/users/login", UserController, :login
 
-    resources "/games", GameController, only: [:index, :show, :create, :update, :delete]
+    resources "/games", GameController, only: [:index, :show, :create, :update]
+    delete "/games/delete", GameController, :delete_game
     get "/games/name/:name", GameController, :get_game_by_name
 
-    resources "/actions", ActionController, only: [:index, :show, :create, :update, :delete]
+    resources "/actions", ActionController, only: [:index, :show, :create, :update]
+    delete "/actions/delete", ActionController, :delete_action
     get "/actions/name/:name", ActionController, :get_action_by_name
 
-    resources "/cards", CardController, only: [:index, :show, :create, :update, :delete]
+    resources "/cards", CardController, only: [:index, :show, :create, :update]
+    delete "/cards/delete", CardController, :delete_card
     get "/cards/game/:game_id", CardController, :get_cards_by_game_id
 
-    resources "/cardTypes", CardTypeController, only: [:index, :show, :create, :update, :delete]
+    resources "/cardTypes", CardTypeController, only: [:index, :show, :create, :update]
+    delete "/cardTypes/delete", CardTypeController, :delete_cardType
     get "/cardTypes/game/:game_id", CardTypeController, :get_cardTypes_by_game_id
 
-    resources "/effects", EffectController, only: [:index, :show, :create, :update, :delete]
+    resources "/effects", EffectController, only: [:index, :show, :create, :update]
+    delete "/effects/delete", EffectController, :delete_effect
     get "/effects/game/:game_id", EffectController, :get_effects_by_game_id
 
     post "/rooms", RoomController, :create

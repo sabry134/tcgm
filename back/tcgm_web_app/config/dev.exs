@@ -68,3 +68,13 @@ config :phoenix, :plug_init_mode, :runtime
 
 # Disable swoosh api client as it is only required for production adapters.
 config :swoosh, :api_client, false
+
+config :tcgm_web_app, :phoenix_swagger,
+  swagger_files: %{
+    "priv/static/swagger.json" => [
+      router: TcgmWebAppWeb.Router,
+      endpoint: TcgmWebAppWeb.Endpoint,
+    ]
+  }
+
+config :phoenix_swagger, json_library: Jason

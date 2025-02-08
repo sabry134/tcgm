@@ -184,7 +184,7 @@ const SceneEditor = () => {
             📜 Templates
           </Typography>
         </Button>
-        <Button onClick={() => navigate("/")} sx={{ borderRadius: 0 }}>
+        <Button onClick={() => navigate("/editor")} sx={{ borderRadius: 0 }}>
           <Typography variant="h6" sx={{ color: "white" }}>
             🖼️ Card Editor
           </Typography>

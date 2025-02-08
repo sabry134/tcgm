@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button, Typography, Box, Tabs, Tab, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-const JoinRoom = () => {
+const Login = () => {
   const navigate = useNavigate();
 
   const [scenes, setScenes] = useState([]);
@@ -48,19 +48,22 @@ const JoinRoom = () => {
   return (
     <Box display="flex" flexDirection="column" height="100vh">
       <Box sx={styles.navbar}>
-        <Button onClick={() => navigate("/scene")} sx={styles.navButton}>
+        <Button onClick={() => navigate("/")} sx={styles.navButton}>
           <Typography variant="h6" sx={styles.navText}>
-            🌟 Scene
+            🌟 Home
           </Typography>
         </Button>
-        <Button onClick={() => navigate("/templates")} sx={styles.navButton}>
+        <Button
+          onClick={() => navigate("/documentation")}
+          sx={styles.navButton}
+        >
           <Typography variant="h6" sx={styles.navText}>
-            📜 Templates
+            📜 Documentation
           </Typography>
         </Button>
-        <Button onClick={() => navigate("/editor")} sx={styles.navButton}>
+        <Button onClick={() => navigate("/forum")} sx={styles.navButton}>
           <Typography variant="h6" sx={styles.navText}>
-            🖼️ Card Editor
+            🖼️ Forum
           </Typography>
         </Button>
         <Button onClick={() => navigate("/community")} sx={styles.navButton}>
@@ -68,55 +71,70 @@ const JoinRoom = () => {
             🌍 Community
           </Typography>
         </Button>
-        <Button onClick={() => navigate("/join")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🚪 Join Room
-          </Typography>
-        </Button>
       </Box>
       <Box sx={styles.container}>
-        <Box sx={styles.contentBox}>
+        <Box sx={styles.formContainer}>
           <Tabs
             value={tabIndex}
             onChange={(_, newIndex) => setTabIndex(newIndex)}
             textColor="inherit"
             indicatorColor="secondary"
+            sx={styles.tabs}
           >
-            <Tab label="Join Room" />
-            <Tab label="Create Room" />
+            <Tab label="Login" />
+            <Tab label="Register" />
           </Tabs>
+
           {tabIndex === 0 ? (
             <Box sx={styles.formBox}>
               <TextField
                 fullWidth
-                label="Enter room username"
+                label="Enter username"
                 variant="outlined"
-                sx={styles.textField}
+                sx={styles.input}
+              />
+              <TextField
+                fullWidth
+                label="Enter Password"
+                variant="outlined"
+                sx={styles.input}
               />
               <Button
                 fullWidth
                 variant="contained"
                 sx={styles.button}
-                onClick={() => navigate("/room")}
+                onClick={() => navigate("/editor")}
               >
-                Join Room
+                Login
               </Button>
             </Box>
           ) : (
             <Box sx={styles.formBox}>
               <TextField
                 fullWidth
-                label="Room Name"
+                label="Enter Username"
                 variant="outlined"
-                sx={styles.textField}
+                sx={styles.input}
+              />
+              <TextField
+                fullWidth
+                label="Enter Password"
+                variant="outlined"
+                sx={styles.input}
+              />
+              <TextField
+                fullWidth
+                label="Repeat Password"
+                variant="outlined"
+                sx={styles.input}
               />
               <Button
                 fullWidth
                 variant="contained"
                 sx={styles.button}
-                onClick={() => navigate("/room")}
+                onClick={() => navigate("/editor")}
               >
-                Create Room
+                Register
               </Button>
             </Box>
           )}
@@ -149,25 +167,31 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
   },
-  contentBox: {
+  formContainer: {
     backgroundColor: "#5d3a00",
     padding: 3,
     borderRadius: 2,
     boxShadow: 3,
     textAlign: "center",
   },
+  tabs: {
+    display: "flex",
+    justifyContent: "center",
+    width: "100%",
+  },
   formBox: {
     mt: 3,
     width: "300px",
     textAlign: "center",
   },
-  textField: {
+  input: {
     backgroundColor: "white",
     borderRadius: 1,
+    marginTop: "5%",
   },
   button: {
     mt: 2,
   },
 };
 
-export default JoinRoom;
+export default Login;

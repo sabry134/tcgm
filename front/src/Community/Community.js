@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
     Button,
-    Checkbox,
-    FormControlLabel,
-    Slider,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemText,
     Typography,
     Box,
     Paper,

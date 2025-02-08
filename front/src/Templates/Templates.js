@@ -15,10 +15,9 @@ import {
     IconButton,
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
-import { TCGMCard } from "./TCGMCard";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 
-const MainWindow = () => {
+const Templates = () => {
     const navigate = useNavigate(); // Initialize useNavigate hook
 
     const [scenes, setScenes] = useState([]);
@@ -221,7 +220,6 @@ const MainWindow = () => {
                     bgcolor="#c4c4c4"
                     position="relative"
                 >
-                    <TCGMCard />
                     {cards.map((card) => (
                         <Card
                             key={card.id}
@@ -304,4 +302,4 @@ const MainWindow = () => {
     );
 };
 
-export default MainWindow;
+export default Templates;

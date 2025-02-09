@@ -1,12 +1,10 @@
 import React, { useEffect } from "react";
-import {
-    Button,
-    Typography,
-    Box,
-    Paper,
-} from "@mui/material";
+import {Box} from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { TCGMCard } from "../TCGMCard";
+import { TCGMCard } from "./components/TCGMCard";
+import {NavigationBar} from "./components/NavigationBar";
+import {LeftPanel} from "./components/LeftPanel";
+import {RightPanel} from "./components/RightPanel";
 
 const CardEditor = () => {
     const navigate = useNavigate(); // Initialize useNavigate hook
@@ -18,50 +16,11 @@ const CardEditor = () => {
     return (
         <Box display="flex" flexDirection="column" height="100vh">
             {/* Brown Banner with Menu */}
-            <Box
-                sx={{
-                    backgroundColor: "#5d3a00",
-                    color: "white",
-                    padding: "10px",
-                    display: "flex",
-                    justifyContent: "space-around",
-                }}
-            >
-                <Button onClick={() => navigate("/")} sx={{ borderRadius: 0 }}>
-                    <Typography variant="h6" sx={{ color: "white" }}>
-                        🌟 Scene
-                    </Typography>
-                </Button>
-                <Button onClick={() => navigate("/templates")} sx={{ borderRadius: 0 }}>
-                    <Typography variant="h6" sx={{ color: "white" }}>
-                        📜 Templates
-                    </Typography>
-                </Button>
-                <Button onClick={() => navigate("/card-editor")} sx={{ borderRadius: 0 }}>
-                    <Typography variant="h6" sx={{ color: "white" }}>
-                        🖼️ Card Editor
-                    </Typography>
-                </Button>
-                <Button onClick={() => navigate("/community")} sx={{ borderRadius: 0 }}>
-                    <Typography variant="h6" sx={{ color: "white" }}>
-                        🌍 Community
-                    </Typography>
-                </Button>
-            </Box>
+            <NavigationBar navigate={navigate} />
 
             {/* Main Content Area */}
             <Box display="flex" flexGrow={1} bgcolor="#fff">
-                <Paper
-                    className="sidebar"
-                    sx={{
-                        width: 250,
-                        p: 2,
-                        bgcolor: "#5d3a00",
-                        color: "white",
-                        borderRadius: 0,
-                    }}
-                >
-                </Paper>
+                <LeftPanel />
 
                 <Box
                     className="main-area"
@@ -72,17 +31,7 @@ const CardEditor = () => {
                     <TCGMCard />
                 </Box>
 
-                <Paper
-                    className="settings"
-                    sx={{
-                        width: 250,
-                        p: 2,
-                        bgcolor: "#5d3a00",
-                        color: "white",
-                        borderRadius: 0,
-                    }}
-                >
-                </Paper>
+                <RightPanel />
             </Box>
         </Box>
     );

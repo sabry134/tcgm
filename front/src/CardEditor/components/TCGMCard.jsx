@@ -1,5 +1,5 @@
 import { Component } from "react";
-import ExampleCaster from "./data/ExampleCaster.json";
+import ExampleCaster from "../data/ExampleCaster.json";
 
 export class TCGMCard extends Component {
     render() {

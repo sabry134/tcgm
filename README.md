@@ -20,3 +20,7 @@ TODO
 
 Have a scene specifically for cards/buttons
 Make other pages
+
+### CardEditor notes
+
+The images are taken from ./front/public/images

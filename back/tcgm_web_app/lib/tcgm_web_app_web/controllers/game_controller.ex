@@ -89,13 +89,13 @@ defmodule TcgmWebAppWeb.GameController do
   end
 
   swagger_path :delete do
-    delete("/games/{id}")
+    delete("/games/{game_id}")
     description("Delete a game by ID")
     parameter("id", :path, :integer, "Game ID", required: true)
     response(code(:no_content), "Game deleted")
   end
 
-  def delete_game(conn, %{"id" => id}) do
+  def delete_game(conn, %{"game_id" => id}) do
     game = Games.get_game!(id)
 
     Games.delete_game!(game)

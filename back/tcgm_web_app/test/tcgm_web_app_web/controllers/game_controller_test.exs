@@ -72,7 +72,7 @@ defmodule TcgmWebAppWeb.GameControllerTest do
   end
 
   test "DELETE /api/games/:id deletes an existing game", %{conn: conn, game: game} do
-    conn = delete(conn, "/api/games/#{game.id}")
+    conn = delete(conn, "/api/games/delete/#{game.id}")
     assert response(conn, 204) == ""
 
     assert Repo.get(Game, game.id) == nil

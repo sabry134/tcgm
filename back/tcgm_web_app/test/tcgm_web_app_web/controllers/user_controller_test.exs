@@ -56,7 +56,7 @@ defmodule TcgmWebAppWeb.UserControllerTest do
   end
 
   test "DELETE /api/users/:id deletes an existing user", %{conn: conn, user: user} do
-    conn = delete(conn, "/api/users/#{user.id}")
+    conn = delete(conn, "/api/users/delete/#{user.id}")
     assert response(conn, 204) == ""
 
     assert Repo.get(User, user.id) == nil

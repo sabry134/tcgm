@@ -75,13 +75,13 @@ defmodule TcgmWebAppWeb.CardController do
   end
 
   swagger_path :delete do
-    delete("/cards/{id}")
+    delete("/cards/{card_id}")
     description("Delete a card by ID")
     parameter("id", :path, :integer, "Card ID", required: true)
     response(code(:no_content), "Card deleted")
   end
 
-  def delete_card(conn, %{"id" => id}) do
+  def delete_card(conn, %{"card_id" => id}) do
     card = Cards.get_card!(id)
 
     Cards.delete_card!(card)

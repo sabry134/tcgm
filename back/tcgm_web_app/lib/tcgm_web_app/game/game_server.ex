@@ -48,7 +48,7 @@ defmodule TcgmWebApp.Game.GameServer do
   end
 
   def handle_call({:join, player_id}, _from, state) do
-    new_state = %{state | players: Map.put(state.players, player_id, %{"hand" => [], "deck" => [], "field" => [], "graveyard" => []})}
+    new_state = %{state | players: Map.put(state.players, player_id, %{"hand" => %{}, "deck" => %{}, "field" => %{}, "graveyard" => %{}})}
 
     {:reply, :ok, new_state}
   end

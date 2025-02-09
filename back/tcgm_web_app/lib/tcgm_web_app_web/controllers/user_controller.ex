@@ -76,14 +76,14 @@ defmodule TcgmWebAppWeb.UserController do
   end
 
   swagger_path :delete do
-    delete("/users/{id}")
+    delete("/users/{user_id}")
     description("Delete a user by ID")
     parameter("id", :path, :integer, "User ID", required: true)
     response(code(:no_content), "User deleted")
     response(code(:unprocessable_entity), "Could not delete user")
   end
 
-  def delete_user(conn, %{"id" => id}) do
+  def delete_user(conn, %{"user_id" => id}) do
     user = Accounts.get_user!(id)
 
     case Accounts.delete_user!(user) do

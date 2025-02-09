@@ -72,13 +72,13 @@ defmodule TcgmWebAppWeb.ActionController do
   end
 
   swagger_path :delete do
-    delete("/actions/{id}")
+    delete("/actions/{action_id}")
     description("Delete an action by ID")
     parameter("id", :path, :integer, "Action ID", required: true)
     response(code(:no_content), "Action deleted")
   end
 
-  def delete_action(conn, %{"id" => id}) do
+  def delete_action(conn, %{"action_id" => id}) do
     action = Actions.get_action!(id)
     Actions.delete_action!(action)
 

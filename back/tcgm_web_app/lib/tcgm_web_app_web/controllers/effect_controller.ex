@@ -75,13 +75,13 @@ defmodule TcgmWebAppWeb.EffectController do
   end
 
   swagger_path :delete do
-    delete("/effects/{id}")
+    delete("/effects/{effect_id}")
     description("Delete an effect by ID")
     parameter("id", :path, :integer, "Effect ID", required: true)
     response(code(:no_content), "Effect deleted")
   end
 
-  def delete_effect(conn, %{"id" => id}) do
+  def delete_effect(conn, %{"effect_id" => id}) do
     effect = Effects.get_effect!(id)
 
     Effects.delete_effect!(effect)

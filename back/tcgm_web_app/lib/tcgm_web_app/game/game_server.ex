@@ -43,14 +43,48 @@ defmodule TcgmWebApp.Game.GameServer do
 
   # Server interaction functions
 
+  # Helper function to load game config from file
+  defp load_game_config(game_id) do
+    config_path = "assets/game_config/#{game_id}.json"
+
+    case File.read(config_path) do
+      {:ok, content} ->
+        case Jason.decode(content) do
+          {:ok, config} -> {:ok, config}
+          {:error, reason} -> {:error, {:invalid_json, reason}}
+        end
+
+      {:error, reason} -> {:error, {:file_not_found, reason}}
+    end
+  end
+
+  # Helper function to create player data from config
+  defp create_player(config) do
+    containers =
+      config["card_containers"]
+      |> Map.keys()
+      |> Enum.map(fn container -> {container, %{}} end)
+      |> Enum.into(%{})
+
+    Map.merge(containers, config["player_properties"])
+  end
+
   def handle_call(:get_state, _from, state) do
     {:reply, state, state}
   end
 
   def handle_call({:join, player_id}, _from, state) do
-    new_state = %{state | players: Map.put(state.players, player_id, %{"hand" => %{}, "deck" => %{}, "field" => %{}, "graveyard" => %{}})}
+    game_id = 1
 
-    {:reply, :ok, new_state}
+    case load_game_config(game_id) do
+      {:ok, config} ->
+        player_data = create_player(config)
+        new_state = %{state | players: Map.put(state.players, player_id, player_data)}
+        {:reply, :ok, new_state}
+
+      {:error, reason} ->
+        {:reply, {:error, reason}, state}
+    end
   end
 
   def handle_cast({:set_deck, player_id, deck}, state) do

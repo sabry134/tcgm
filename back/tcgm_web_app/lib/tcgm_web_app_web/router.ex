@@ -1,9 +1,16 @@
 defmodule TcgmWebAppWeb.Router do
   use TcgmWebAppWeb, :router
 
+  def cors_plug(conn, _opts) do
+    conn
+    |> put_resp_header("access-control-allow-origin", "*")
+    |> put_resp_header("access-control-allow-methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+    |> put_resp_header("access-control-allow-headers", "authorization, content-type, accept")
+  end
+
   pipeline :api do
     plug :accepts, ["json"]
-    plug CORSPlug, origin: "*", methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    plug :cors_plug
   end
 
   scope "/api", TcgmWebAppWeb do

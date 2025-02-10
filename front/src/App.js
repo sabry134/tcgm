@@ -5,8 +5,8 @@ import JoinRoom from './JoinRoom';
 import Login from './Login';
 import Room from './Room'
 import Documentation from './Documentation';
-
-
+import Template from './Template';
+import Community from './Community';
 
 function App() {
   return (
@@ -17,6 +17,8 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/room" element={<Room />} />
         <Route path="/documentation" element={<Documentation />} />
+        <Route path="/templates" element={<Template />} />
+        <Route path="/community" element={<Community />} />
       </Routes>
     </Router>
   );

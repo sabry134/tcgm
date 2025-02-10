@@ -44,6 +44,32 @@ const Room = () => {
     document.title = "JCCE";
   }, []);
 
+  useEffect(() => {
+    const room_id = localStorage.getItem("room_id");
+
+    if (!room_id) {
+      console.error("No room_id found in localStorage");
+      return;
+    }
+
+    fetch("http://localhost:4000/rooms/join", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ room_id })
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to join room");
+        return response.json();
+      })
+      .then((data) => {
+        localStorage.setItem("player_id", data.player_id);
+        localStorage.setItem("room_id", data.room_id);
+      })
+      .catch((error) => console.error(error));
+  }, [navigate]);
+
   return (
     <Box display="flex" flexDirection="column" height="100vh">
       <Box sx={styles.navbar}>

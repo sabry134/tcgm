@@ -45,6 +45,48 @@ const JoinRoom = () => {
     document.title = "JCCE";
   }, []);
 
+  const joinRoom = async (navigate) => {
+    try {
+      const response = await fetch("http://localhost:4000/join", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to join room");
+
+      const data = await response.json();
+      localStorage.setItem("player_id", data.player_id);
+      localStorage.setItem("room_id", data.room_id);
+
+      navigate("/room");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const createRoom = async (navigate) => {
+    try {
+      const response = await fetch("http://localhost:4000/rooms", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to create room");
+
+      const data = await response.json();
+      localStorage.setItem("player_id", data.player_id);
+      localStorage.setItem("room_id", data.room_id);
+
+      navigate("/room");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <Box display="flex" flexDirection="column" height="100vh">
       <Box sx={styles.navbar}>
@@ -97,7 +139,7 @@ const JoinRoom = () => {
                 fullWidth
                 variant="contained"
                 sx={styles.button}
-                onClick={() => navigate("/room")}
+                onClick={() => joinRoom(navigate)}
               >
                 Join Room
               </Button>
@@ -114,7 +156,7 @@ const JoinRoom = () => {
                 fullWidth
                 variant="contained"
                 sx={styles.button}
-                onClick={() => navigate("/room")}
+                onClick={() => createRoom(navigate)}
               >
                 Create Room
               </Button>

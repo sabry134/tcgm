@@ -1,0 +1,79 @@
+defmodule TcgmWebApp.Game.GameServerTest do
+  use ExUnit.Case, async: true
+  alias TcgmWebApp.Game.GameServer
+
+  setup do
+    room_id = "test_room"
+    {:ok, _pid} = GameServer.start_link(room_id)
+    {:ok, room_id: room_id}
+  end
+
+  test "players can join a room", %{room_id: room_id} do
+    assert :ok = GameServer.join_room(room_id, "player1")
+
+    state = GameServer.get_state(room_id)
+    assert Map.has_key?(state.players, "player1")
+  end
+
+  test "players can play a card", %{room_id: room_id} do
+    GameServer.join_room(room_id, "player1")
+
+    initial_state = GameServer.get_state(room_id)
+
+    assert map_size(initial_state.players["player1"]["field"]) == 0
+
+    card = %{"Card X" => %{
+      "name" => "king",
+      "properties" => %{"attack" => 15, "defense" => 10}
+    }}
+    state_with_card_in_hand = put_in(initial_state.players["player1"]["hand"], card)
+    :ok = GameServer.play_card(room_id, "player1", card)
+
+    updated_state = GameServer.get_state(room_id)
+
+    assert map_size(updated_state.players["player1"]["field"]) == 1
+    assert Map.has_key?(updated_state.players["player1"]["field"], "Card X") == true
+  end
+
+  test "players can set their deck", %{room_id: room_id} do
+    GameServer.join_room(room_id, "player1")
+
+    initial_state = GameServer.get_state(room_id)
+
+    assert map_size(initial_state.players["player1"]["deck"]) == 0
+
+    card = %{"Card X" => %{
+      "name" => "king",
+      "properties" => %{"attack" => 15, "defense" => 10}
+    }}
+    :ok = GameServer.set_deck(room_id, "player1", card)
+
+    updated_state = GameServer.get_state(room_id)
+
+    assert map_size(updated_state.players["player1"]["deck"]) == 1
+    assert Map.has_key?(updated_state.players["player1"]["deck"], "Card X") == true
+  end
+
+  test "players can draw a card", %{room_id: room_id} do
+    GameServer.join_room(room_id, "player1")
+
+    card = %{"Card X" => %{
+      "name" => "king",
+      "properties" => %{"attack" => 15, "defense" => 10}
+    }}
+    :ok = GameServer.set_deck(room_id, "player1", card)
+
+    initial_state = GameServer.get_state(room_id)
+
+    assert map_size(initial_state.players["player1"]["hand"]) == 0
+
+    :ok = GameServer.draw_card(room_id, "player1")
+
+    updated_state = GameServer.get_state(room_id)
+
+    assert map_size(updated_state.players["player1"]["hand"]) == 1
+    assert Map.has_key?(updated_state.players["player1"]["hand"], "Card X") == true
+
+    assert map_size(updated_state.players["player1"]["deck"]) == 0
+  end
+end

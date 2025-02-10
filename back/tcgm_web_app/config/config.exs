@@ -20,7 +20,13 @@ config :tcgm_web_app, TcgmWebAppWeb.Endpoint,
     layout: false
   ],
   pubsub_server: TcgmWebApp.PubSub,
-  live_view: [signing_salt: "ELFAOkvb"]
+  live_view: [signing_salt: "ELFAOkvb"],
+  cors: [
+    origins: "*",
+    allowed_methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowed_headers: ["authorization", "content-type", "accept"],
+    allow_credentials: true
+  ]
 
 # Configures the mailer
 #

@@ -1,13 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
     Button,
-    Checkbox,
-    FormControlLabel,
-    Slider,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemText,
     Typography,
     Box,
     Paper,
@@ -15,9 +8,9 @@ import {
     IconButton,
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 
-const MainWindow = ({ LeftWidget = <div />, RightWidget = <div /> }) => {
+const Templates = () => {
     const navigate = useNavigate(); // Initialize useNavigate hook
 
     const [scenes, setScenes] = useState([]);
@@ -178,7 +171,7 @@ const MainWindow = ({ LeftWidget = <div />, RightWidget = <div /> }) => {
                     justifyContent: "space-around",
                 }}
             >
-                <Button onClick={() => navigate("/scene")} sx={{ borderRadius: 0 }}>
+                <Button onClick={() => navigate("/")} sx={{ borderRadius: 0 }}>
                     <Typography variant="h6" sx={{ color: "white" }}>
                         🌟 Scene
                     </Typography>
@@ -212,8 +205,6 @@ const MainWindow = ({ LeftWidget = <div />, RightWidget = <div /> }) => {
                         borderRadius: 0,
                     }}
                 >
-                    {LeftWidget}
-                    {/* left banner side */}
                 </Paper>
 
                 <Box
@@ -298,13 +289,10 @@ const MainWindow = ({ LeftWidget = <div />, RightWidget = <div /> }) => {
                         borderRadius: 0,
                     }}
                 >
-                    {/* right banner side */}
-                    {RightWidget}
-
                 </Paper>
             </Box>
         </Box>
     );
 };
 
-export default MainWindow;
+export default Templates;

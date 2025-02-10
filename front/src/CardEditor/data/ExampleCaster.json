@@ -1,0 +1,21 @@
+{
+	"Name": "example",
+	"Type": "Caster",
+	"Properties": [
+		{"Color": "Black"},
+		{"Mana": 3},
+		{"Growth": 3},
+		{"Health": 18}
+	],
+	"Effects": [
+		{
+			"Type": "Trigger",
+			"Action": "Draw",
+			"Action_params": [2],
+			"Cost": 3
+		}
+	],
+	"Text": "-3: Draw 2 cards from your deck.",
+	"Image": "../images/iminyourwalls.png",
+	"DisplayColor": "Black"
+}

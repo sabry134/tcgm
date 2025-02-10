@@ -75,7 +75,7 @@ defmodule TcgmWebAppWeb.EffectControllerTest do
   end
 
   test "DELETE /api/effects/:id deletes an existing effect", %{conn: conn, effect: effect} do
-    conn = delete(conn, "/api/effects/#{effect.id}")
+    conn = delete(conn, "/api/effects/delete/#{effect.id}")
     assert response(conn, 204) == ""
 
     assert Repo.get(Effect, effect.id) == nil

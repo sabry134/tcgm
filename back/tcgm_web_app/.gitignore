@@ -4,6 +4,7 @@
 /log
 /test/tmp
 /erl_crash.dump
+/.elixir_ls
 
 # Phoenix
 /assets/node_modules

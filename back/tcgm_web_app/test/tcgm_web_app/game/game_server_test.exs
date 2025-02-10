@@ -12,7 +12,6 @@ defmodule TcgmWebApp.Game.GameServerTest do
     assert :ok = GameServer.join_room(room_id, "player1")
 
     state = GameServer.get_state(room_id)
-    # Ensure state contains `players`
     assert Map.has_key?(state.players, "player1")
   end
 
@@ -21,16 +20,19 @@ defmodule TcgmWebApp.Game.GameServerTest do
 
     initial_state = GameServer.get_state(room_id)
 
-    # Ensure player1 starts with an empty field
-    assert length(initial_state.players["player1"].field) == 0
+    assert map_size(initial_state.players["player1"]["field"]) == 0
 
-    :ok = GameServer.play_card(room_id, "player1", "Test Card")
+    card = %{"Card X" => %{
+      "name" => "king",
+      "properties" => %{"attack" => 15, "defense" => 10}
+    }}
+    state_with_card_in_hand = put_in(initial_state.players["player1"]["hand"], card)
+    :ok = GameServer.play_card(room_id, "player1", card)
 
     updated_state = GameServer.get_state(room_id)
 
-    # Ensure card is now in the field
-    assert length(updated_state.players["player1"].field) == 1
-    assert "Test Card" in updated_state.players["player1"].field
+    assert map_size(updated_state.players["player1"]["field"]) == 1
+    assert Map.has_key?(updated_state.players["player1"]["field"], "Card X") == true
   end
 
   test "players can set their deck", %{room_id: room_id} do
@@ -38,37 +40,40 @@ defmodule TcgmWebApp.Game.GameServerTest do
 
     initial_state = GameServer.get_state(room_id)
 
-    # Ensure player1 starts with an empty deck
-    assert length(initial_state.players["player1"].deck) == 0
+    assert map_size(initial_state.players["player1"]["deck"]) == 0
 
-    :ok = GameServer.set_deck(room_id, "player1", ["Test Card"])
+    card = %{"Card X" => %{
+      "name" => "king",
+      "properties" => %{"attack" => 15, "defense" => 10}
+    }}
+    :ok = GameServer.set_deck(room_id, "player1", card)
 
     updated_state = GameServer.get_state(room_id)
 
-    # Ensure player1 now has a deck with the card
-    assert length(updated_state.players["player1"].deck) == 1
-    assert "Test Card" in updated_state.players["player1"].deck
+    assert map_size(updated_state.players["player1"]["deck"]) == 1
+    assert Map.has_key?(updated_state.players["player1"]["deck"], "Card X") == true
   end
 
   test "players can draw a card", %{room_id: room_id} do
     GameServer.join_room(room_id, "player1")
-    GameServer.set_deck(room_id, "player1", ["Test Card"])
+
+    card = %{"Card X" => %{
+      "name" => "king",
+      "properties" => %{"attack" => 15, "defense" => 10}
+    }}
+    :ok = GameServer.set_deck(room_id, "player1", card)
 
     initial_state = GameServer.get_state(room_id)
 
-    :ok = GameServer.set_deck(room_id, "player1", ["Test Card"])
-    # Ensure player1 starts with an empty hand
-    assert length(initial_state.players["player1"].hand) == 0
+    assert map_size(initial_state.players["player1"]["hand"]) == 0
 
     :ok = GameServer.draw_card(room_id, "player1")
 
     updated_state = GameServer.get_state(room_id)
 
-    # Ensure player1 now has a hand with the card
-    assert length(updated_state.players["player1"].hand) == 1
-    assert "Test Card" in updated_state.players["player1"].hand
+    assert map_size(updated_state.players["player1"]["hand"]) == 1
+    assert Map.has_key?(updated_state.players["player1"]["hand"], "Card X") == true
 
-    # Ensure player1's deck is now empty
-    assert length(updated_state.players["player1"].deck) == 0
+    assert map_size(updated_state.players["player1"]["deck"]) == 0
   end
 end

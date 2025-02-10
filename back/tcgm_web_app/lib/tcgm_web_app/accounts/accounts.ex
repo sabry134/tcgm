@@ -33,4 +33,12 @@ defmodule TcgmWebApp.Accounts do
     |> User.changeset(attrs)
     |> Repo.update()
   end
+
+  def authenticate_user(%{"username" => username}) do
+    user = get_user_by_username(username)
+    case user do
+      nil -> {:error, "User not found"}
+      _ -> {:ok, user}
+    end
+  end
 end

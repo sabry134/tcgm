@@ -69,7 +69,7 @@ defmodule TcgmWebApp.Game.GameLogic do
         [card_id | _rest] = Map.keys(card)
         cond do
           map_size(state.players[player_id]["hand"]) <= 0 ->
-            {:error, "Le deck est vide"}
+            {:error, "La main est vide"}
           Map.has_key?(state.players[player_id]["hand"], card_id) == false ->
             {:error, "la carte n'existe pas"}
           true ->

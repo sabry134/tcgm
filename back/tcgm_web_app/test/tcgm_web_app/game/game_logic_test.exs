@@ -96,7 +96,7 @@ defmodule TcgmWebApp.Game.GameLogicTest do
     action_args = %{"card" => card1}
     new_state = GameLogic.play_card_logic(state, "player1", action_args)
 
-    assert new_state == {:error, "Le deck est vide"}
+    assert new_state == {:error, "La main est vide"}
   end
 
   test "play_card with undefined card", %{initial_state: state} do

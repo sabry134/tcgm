@@ -109,8 +109,7 @@ defmodule TcgmWebAppWeb.CardController do
         |> put_status(:ok)
         |> json(cards)
 
-      cards ->
-        IO.inspect(cards, label: "cards")
+      _ ->
         conn
         |> put_status(:unprocessable_entity)
         |> json(%{error: "Could not retrieve cards by game ID"})

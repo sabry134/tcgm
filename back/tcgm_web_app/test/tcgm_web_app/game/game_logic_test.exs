@@ -21,15 +21,24 @@ defmodule TcgmWebApp.Game.GameLogicTest do
     {:ok, initial_state: initial_state}
   end
 
+  test "draw_card with undefined amount", %{initial_state: state} do
+    action_args = %{}
+    new_state = GameLogic.draw_card(state, "player1", action_args)
+
+    assert new_state == {:error, "Missing required action arguments: amount"}
+  end
+
   test "draw_card with undefined player", %{initial_state: state} do
-    new_state = GameLogic.draw_card(state, "player undefined")
+    action_args = %{"amount" => 1}
+    new_state = GameLogic.draw_card(state, "player undefined", action_args)
 
     assert new_state == {:error, "Le player n'existe pas"}
   end
 
   test "draw_card with empty deck", %{initial_state: state} do
     updated_state = update_in(state[:players]["player1"]["deck"], fn _deck -> %{} end)
-    new_state = GameLogic.draw_card(updated_state, "player1")
+    action_args = %{"amount" => 1}
+    new_state = GameLogic.draw_card(updated_state, "player1", action_args)
 
     assert new_state == {:error, "Le deck est vide"}
   end
@@ -40,7 +49,8 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       |> Enum.take(1)
       |> Enum.into(%{})
     end)
-    new_state = GameLogic.draw_card(updated_state, "player1")
+    action_args = %{"amount" => 1}
+    new_state = GameLogic.draw_card(updated_state, "player1", action_args)
 
     assert map_size(new_state.players["player1"]["hand"]) == 1
     assert map_size(new_state.players["player1"]["deck"]) == 0
@@ -48,11 +58,22 @@ defmodule TcgmWebApp.Game.GameLogicTest do
   end
 
   test "draw_card moves card from deck to hand", %{initial_state: state} do
-    new_state = GameLogic.draw_card(state, "player1")
+    action_args = %{"amount" => 1}
+    new_state = GameLogic.draw_card(state, "player1", action_args)
 
     assert map_size(new_state.players["player1"]["hand"]) == 1
     assert map_size(new_state.players["player1"]["deck"]) == 2
     assert Map.has_key?(new_state.players["player1"]["hand"], "Card A") == true
+  end
+
+  test "draw_card draws more than one card", %{initial_state: state} do
+    action_args = %{"amount" => 2}
+    new_state = GameLogic.draw_card(state, "player1", action_args)
+
+    assert map_size(new_state.players["player1"]["hand"]) == 2
+    assert map_size(new_state.players["player1"]["deck"]) == 1
+    assert Map.has_key?(new_state.players["player1"]["hand"], "Card A") == true
+    assert Map.has_key?(new_state.players["player1"]["hand"], "Card B") == true
   end
 
   test "play_card with undefined player", %{initial_state: state} do
@@ -60,8 +81,9 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "king",
       "properties" => %{"attack" => 15, "defense" => 10}
     }}
+    action_args = %{"card" => card1}
     state_with_card_in_hand = put_in(state.players["player1"]["hand"], card1)
-    new_state = GameLogic.play_card_logic(state_with_card_in_hand, "player undefined", card1)
+    new_state = GameLogic.play_card_logic(state_with_card_in_hand, "player undefined", action_args)
 
     assert new_state == {:error, "Le player n'existe pas"}
   end
@@ -71,9 +93,10 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "king",
       "properties" => %{"attack" => 15, "defense" => 10}
     }}
-    new_state = GameLogic.play_card_logic(state, "player1", card1)
+    action_args = %{"card" => card1}
+    new_state = GameLogic.play_card_logic(state, "player1", action_args)
 
-    assert new_state == {:error, "Le deck est vide"}
+    assert new_state == {:error, "La main est vide"}
   end
 
   test "play_card with undefined card", %{initial_state: state} do
@@ -85,8 +108,9 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "zombi",
       "properties" => %{"attack" => 3, "defense" => 9}
     }}
+    action_args = %{"card" => card2}
     state_with_card_in_hand = put_in(state.players["player1"]["hand"], card1)
-    new_state = GameLogic.play_card_logic(state_with_card_in_hand, "player1", card2)
+    new_state = GameLogic.play_card_logic(state_with_card_in_hand, "player1", action_args)
 
     assert new_state == {:error, "la carte n'existe pas"}
   end
@@ -96,8 +120,9 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "king",
       "properties" => %{"attack" => 15, "defense" => 10}
     }}
+    action_args = %{"card" => card1}
     state_with_card_in_hand = put_in(state.players["player1"]["hand"], card1)
-    new_state = GameLogic.play_card_logic(state_with_card_in_hand, "player1", card1)
+    new_state = GameLogic.play_card_logic(state_with_card_in_hand, "player1", action_args)
 
     assert map_size(new_state.players["player1"]["hand"]) == 0
     assert map_size(new_state.players["player1"]["field"]) == 1
@@ -109,8 +134,9 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "Dragon",
       "properties" => %{"attack" => 10, "defense" => 5}
     }}
+    action_args = %{"source" => "graveyard", "dest" => "hand", "card" => card1}
     state_with_card_in_graveyard = put_in(state.players["player1"]["graveyard"], card1)
-    new_state = GameLogic.move_card_logic(state_with_card_in_graveyard, "player undefined", "graveyard", "hand", card1)
+    new_state = GameLogic.move_card_logic(state_with_card_in_graveyard, "player undefined", action_args)
 
     assert new_state == {:error, "Le player n'existe pas"}
   end
@@ -120,8 +146,9 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "Dragon",
       "properties" => %{"attack" => 10, "defense" => 5}
     }}
+    action_args = %{"source" => "cemetery", "dest" => "hand", "card" => card1}
     state_with_card_in_graveyard = put_in(state.players["player1"]["graveyard"], card1)
-    new_state = GameLogic.move_card_logic(state_with_card_in_graveyard, "player1", "cemetery", "hand", card1)
+    new_state = GameLogic.move_card_logic(state_with_card_in_graveyard, "player1", action_args)
 
     assert new_state == {:error, "la source n'existe pas"}
   end
@@ -131,7 +158,8 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "Dragon",
       "properties" => %{"attack" => 10, "defense" => 5}
     }}
-    new_state = GameLogic.move_card_logic(state, "player1", "graveyard", "deck", card1)
+    action_args = %{"source" => "graveyard", "dest" => "deck", "card" => card1}
+    new_state = GameLogic.move_card_logic(state, "player1", action_args)
 
     assert new_state == {:error, "La source est vide"}
   end
@@ -145,8 +173,9 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "zombi",
       "properties" => %{"attack" => 3, "defense" => 9}
     }}
+    action_args = %{"source" => "graveyard", "dest" => "deck", "card" => card2}
     state_with_card_in_graveyard = put_in(state.players["player1"]["graveyard"], card1)
-    new_state = GameLogic.move_card_logic(state_with_card_in_graveyard, "player1", "graveyard", "deck", card2)
+    new_state = GameLogic.move_card_logic(state_with_card_in_graveyard, "player1", action_args)
 
     assert new_state == {:error, "la carte n'existe pas"}
   end
@@ -156,8 +185,9 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "Dragon",
       "properties" => %{"attack" => 10, "defense" => 5}
     }}
+    action_args = %{"source" => "graveyard", "dest" => "cemetery", "card" => card1}
     state_with_card_in_graveyard = put_in(state.players["player1"]["graveyard"], card1)
-    new_state = GameLogic.move_card_logic(state_with_card_in_graveyard, "player1", "graveyard", "main", card1)
+    new_state = GameLogic.move_card_logic(state_with_card_in_graveyard, "player1", action_args)
 
     assert new_state == {:error, "la destination n'existe pas"}
   end
@@ -168,7 +198,8 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "properties" => %{"attack" => 10, "defense" => 5}
     }}
     state_with_card_in_graveyard = put_in(state.players["player1"]["graveyard"], card1)
-    new_state = GameLogic.move_card_logic(state_with_card_in_graveyard, "player1", "graveyard", "deck", card1)
+    action_args = %{"source" => "graveyard", "dest" => "deck", "card" => card1}
+    new_state = GameLogic.move_card_logic(state_with_card_in_graveyard, "player1", action_args)
 
     assert map_size(new_state.players["player1"]["graveyard"]) == 0
     assert map_size(new_state.players["player1"]["deck"]) == 4
@@ -180,8 +211,9 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "Dragon",
       "properties" => %{"attack" => 10, "defense" => 5}
     }}
+    action_args = %{"source" => "graveyard", "dest" => "hand", "card" => card1}
     state_with_card_in_graveyard = put_in(state.players["player1"]["graveyard"], card1)
-    new_state = GameLogic.move_card_logic(state_with_card_in_graveyard, "player1", "graveyard", "hand", card1)
+    new_state = GameLogic.move_card_logic(state_with_card_in_graveyard, "player1", action_args)
 
     assert map_size(new_state.players["player1"]["graveyard"]) == 0
     assert map_size(new_state.players["player1"]["hand"]) == 1
@@ -193,8 +225,10 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "Dragon",
       "properties" => %{"attack" => 10, "defense" => 5}
     }}
-    state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", "graveyard", card1)
-    new_state = GameLogic.update_values_logic(state_with_card_in_graveyard, "player undefined", "graveyard", "attack", 7, "card1")
+    insert_args = %{"location" => "graveyard", "card" => card1}
+    state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", insert_args)
+    update_values_args = %{"location" => "graveyard", "key" => "attack", "value" => 7, "card" => "card1"}
+    new_state = GameLogic.update_values_logic(state_with_card_in_graveyard, "player undefined", update_values_args)
 
     assert new_state == {:error, "Le player n'existe pas"}
   end
@@ -204,8 +238,10 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "Dragon",
       "properties" => %{"attack" => 10, "defense" => 5}
     }}
-    state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", "graveyard", card1)
-    new_state = GameLogic.update_values_logic(state_with_card_in_graveyard, "player1", "cemetery", "attack", 7, "card1")
+    insert_args = %{"location" => "graveyard", "card" => card1}
+    state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", insert_args)
+    update_values_args = %{"location" => "cemetery", "key" => "attack", "value" => 7, "card" => "card1"}
+    new_state = GameLogic.update_values_logic(state_with_card_in_graveyard, "player1", update_values_args)
 
     assert new_state == {:error, "la location n'existe pas"}
   end
@@ -215,8 +251,10 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "Dragon",
       "properties" => %{"attack" => 10, "defense" => 5}
     }}
-    state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", "graveyard", card1)
-    new_state = GameLogic.update_values_logic(state_with_card_in_graveyard, "player1", "graveyard", "attack", 7, "card z")
+    insert_args = %{"location" => "graveyard", "card" => card1}
+    state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", insert_args)
+    update_values_args = %{"location" => "graveyard", "key" => "attack", "value" => 7, "card" => "card z"}
+    new_state = GameLogic.update_values_logic(state_with_card_in_graveyard, "player1", update_values_args)
 
     assert new_state == {:error, "la carte n'existe pas"}
   end
@@ -226,8 +264,10 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "Dragon",
       "properties" => %{"attack" => 10, "defense" => 5}
     }}
-    state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", "graveyard", card1)
-    new_state = GameLogic.update_values_logic(state_with_card_in_graveyard, "player1", "graveyard", "invincibilite", 7, "card1")
+    insert_args = %{"location" => "graveyard", "card" => card1}
+    state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", insert_args)
+    update_values_args = %{"location" => "graveyard", "key" => "invincibilite", "value" => 7, "card" => "card1"}
+    new_state = GameLogic.update_values_logic(state_with_card_in_graveyard, "player1", update_values_args)
 
     assert new_state == {:error, "la propriete n'existe pas"}
   end
@@ -237,8 +277,10 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "Dragon",
       "properties" => %{"attack" => 10, "defense" => 5}
     }}
-    state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", "graveyard", card1)
-    new_state = GameLogic.update_values_logic(state_with_card_in_graveyard, "player1", "graveyard", "attack", 7, "card1")
+    insert_args = %{"location" => "graveyard", "card" => card1}
+    state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", insert_args)
+    update_values_args = %{"location" => "graveyard", "key" => "attack", "value" => 7, "card" => "card1"}
+    new_state = GameLogic.update_values_logic(state_with_card_in_graveyard, "player1", update_values_args)
 
     assert new_state.players["player1"]["graveyard"]["card1"]["properties"]["attack"] == 7
   end
@@ -248,7 +290,8 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "Dragon",
       "properties" => %{"attack" => 10, "defense" => 5}
     }}
-    state_with_card_in_graveyard = GameLogic.insert_card(state, "player undefined", "graveyard", card1)
+    action_args = %{"location" => "graveyard", "card" => card1}
+    state_with_card_in_graveyard = GameLogic.insert_card(state, "player undefined", action_args)
 
     assert state_with_card_in_graveyard == {:error, "Le player n'existe pas"}
   end
@@ -258,7 +301,8 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "Zombie",
       "properties" => %{"attack" => 5, "defense" => 11}
     }}
-    state_with_card_in_deck = GameLogic.insert_card(state, "player1", "deck", card1)
+    action_args = %{"location" => "deck", "card" => card1}
+    state_with_card_in_deck = GameLogic.insert_card(state, "player1", action_args)
 
     assert state_with_card_in_deck == {:error, "la carte existe deja"}
   end
@@ -268,7 +312,8 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "Dragon",
       "properties" => %{"attack" => 10, "defense" => 5}
     }}
-    state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", "cemetery", card1)
+    action_args = %{"location" => "cemetery", "card" => card1}
+    state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", action_args)
 
     assert state_with_card_in_graveyard == {:error, "la destination n'existe pas"}
   end
@@ -278,7 +323,8 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "Dragon",
       "properties" => %{"attack" => 10, "defense" => 5}
     }}
-    state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", "graveyard", card1)
+    action_args = %{"location" => "graveyard", "card" => card1}
+    state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", action_args)
 
     assert Map.has_key?(state_with_card_in_graveyard.players["player1"]["graveyard"], "Card Y") == true
   end
@@ -288,7 +334,8 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "name" => "Dragon",
       "properties" => %{"attack" => 10, "defense" => 5}
     }}
-    state_with_card_in_deck = GameLogic.insert_card(state, "player1", "deck", card1)
+    action_args = %{"location" => "deck", "card" => card1}
+    state_with_card_in_deck = GameLogic.insert_card(state, "player1", action_args)
 
     assert Map.has_key?(state_with_card_in_deck.players["player1"]["deck"], "Card A") == true
     assert Map.has_key?(state_with_card_in_deck.players["player1"]["deck"], "Card B") == true

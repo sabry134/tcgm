@@ -110,8 +110,7 @@ defmodule TcgmWebAppWeb.CardTypeController do
         |> put_status(:ok)
         |> json(cardTypes)
 
-      cardTypes ->
-        IO.inspect(cardTypes, label: "cardTypes")
+      _ ->
         conn
         |> put_status(:unprocessable_entity)
         |> json(%{error: "Could not retrieve cardTypes by game ID"})

@@ -41,16 +41,58 @@ defmodule TcgmWebApp.Game.GameServer do
     GenServer.cast(via_tuple(room_id), {:draw_card, player_id})
   end
 
+  def insert_card(room_id, player_id, card, location) do
+    GenServer.cast(via_tuple(room_id), {:insert_card, player_id, card, location})
+  end
+
+  def start_game(room_id) do
+    GenServer.cast(via_tuple(room_id), {:start_game})
+  end
+
   # Server interaction functions
+
+  # Helper function to load game config from file
+  defp load_game_config(game_id) do
+    config_path = "assets/game_config/#{game_id}.json"
+
+    case File.read(config_path) do
+      {:ok, content} ->
+        case Jason.decode(content) do
+          {:ok, config} -> {:ok, config}
+          {:error, reason} -> {:error, {:invalid_json, reason}}
+        end
+
+      {:error, reason} -> {:error, {:file_not_found, reason}}
+    end
+  end
+
+  # Helper function to create player data from config
+  defp create_player(config) do
+    containers =
+      config["card_containers"]
+      |> Map.keys()
+      |> Enum.map(fn container -> {container, %{}} end)
+      |> Enum.into(%{})
+
+    Map.merge(containers, config["player_properties"])
+  end
 
   def handle_call(:get_state, _from, state) do
     {:reply, state, state}
   end
 
   def handle_call({:join, player_id}, _from, state) do
-    new_state = %{state | players: Map.put(state.players, player_id, %{"hand" => %{}, "deck" => %{}, "field" => %{}, "graveyard" => %{}})}
+    game_id = 1
 
-    {:reply, :ok, new_state}
+    case load_game_config(game_id) do
+      {:ok, config} ->
+        player_data = create_player(config)
+        new_state = %{state | players: Map.put(state.players, player_id, player_data)}
+        {:reply, :ok, new_state}
+
+      {:error, reason} ->
+        {:reply, {:error, reason}, state}
+    end
   end
 
   def handle_cast({:set_deck, player_id, deck}, state) do
@@ -59,12 +101,35 @@ defmodule TcgmWebApp.Game.GameServer do
   end
 
   def handle_cast({:play_card, player_id, card}, state) do
-    new_state = GameLogic.play_card_logic(state, player_id, card)
+    new_state = GameLogic.play_card_logic(state, player_id, %{"card" => card})
     {:noreply, new_state}
   end
 
   def handle_cast({:draw_card, player_id}, state) do
-    new_state = GameLogic.draw_card(state, player_id)
+    new_state = GameLogic.draw_card(state, player_id, %{"amount" => 1})
     {:noreply, new_state}
+  end
+
+  def handle_cast({:insert_card, player_id, card, location}, state) do
+    new_state = GameLogic.insert_card(state, player_id, %{"card" => card, "location" => location})
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:start_game}, state) do
+    game_id = 1
+
+    case load_game_config(game_id) do
+      {:ok, config} ->
+        starting_hand_size = config["starting_hand_size"]
+
+        new_state = Enum.reduce(state.players, state, fn {player_id, _player_data}, acc_state ->
+          GameLogic.draw_card(acc_state, player_id, %{"amount" => starting_hand_size})
+        end)
+
+        {:noreply, new_state}
+
+      {:error, reason} ->
+        {:reply, {:error, reason}, state}
+    end
   end
 end

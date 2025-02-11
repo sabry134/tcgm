@@ -29,8 +29,14 @@ const mainContainer = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    width: "30%", // Portrait rectangle width
-    height: "70%", // Portrait rectangle height
+
+    width: "clamp(250px, 30%, 400px)", // Responsive width
+    maxWidth: "90vw", // Responsive width
+
+    height: "auto", // Responsive height
+    minHeight: "150px", // Minimum height
+    maxHeight: "500px", // Maximum height
+
     margin: "auto", // Center the container
     position: "absolute",
     top: "0",

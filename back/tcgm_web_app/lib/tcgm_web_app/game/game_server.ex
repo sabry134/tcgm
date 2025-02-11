@@ -123,9 +123,7 @@ defmodule TcgmWebApp.Game.GameServer do
         starting_hand_size = config["starting_hand_size"]
 
         new_state = Enum.reduce(state.players, state, fn {player_id, _player_data}, acc_state ->
-          Enum.reduce(1..starting_hand_size, acc_state, fn _, acc_state_inner ->
-            GameLogic.draw_card(acc_state_inner, player_id)
-          end)
+          GameLogic.draw_card(acc_state, player_id, %{"amount" => starting_hand_size})
         end)
 
         {:noreply, new_state}

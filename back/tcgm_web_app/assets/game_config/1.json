@@ -5,7 +5,7 @@
         "graveyard": "graveyard",
         "field": "field"
     },
-    "starting_hand_size": 5,
+    "starting_hand_size": 2,
     "player_properties": {
         "health": 20
     },

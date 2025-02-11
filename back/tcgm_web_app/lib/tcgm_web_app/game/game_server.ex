@@ -41,6 +41,10 @@ defmodule TcgmWebApp.Game.GameServer do
     GenServer.cast(via_tuple(room_id), {:draw_card, player_id})
   end
 
+  def start_game(room_id) do
+    GenServer.cast(via_tuple(room_id), {:start_game})
+  end
+
   # Server interaction functions
 
   # Helper function to load game config from file
@@ -100,5 +104,25 @@ defmodule TcgmWebApp.Game.GameServer do
   def handle_cast({:draw_card, player_id}, state) do
     new_state = GameLogic.draw_card(state, player_id)
     {:noreply, new_state}
+  end
+
+  def handle_cast({:start_game}, state) do
+    game_id = 1
+
+    case load_game_config(game_id) do
+      {:ok, config} ->
+        starting_hand_size = config["starting_hand_size"]
+
+        new_state = Enum.reduce(state.players, state, fn {player_id, _player_data}, acc_state ->
+          Enum.reduce(1..starting_hand_size, acc_state, fn _, acc_state_inner ->
+            GameLogic.draw_card(acc_state_inner, player_id)
+          end)
+        end)
+
+        {:noreply, new_state}
+
+      {:error, reason} ->
+        {:reply, {:error, reason}, state}
+    end
   end
 end

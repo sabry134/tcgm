@@ -1,19 +1,20 @@
 import { Button, Paper } from "@mui/material";
 import React, { Component } from "react";
-import txt from '../data/ExampleCaster.json';
 
 
 export class LeftPanel extends Component {
 
   saveCard(json) {
     const apiUrl = 'http://localhost:4000/api/cards';
+    const card = localStorage.getItem("currentEditedCard")
+
 
     fetch(apiUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(txt)
+      body: JSON.stringify(card)
     })
       .then((response) => {
         if (!response.ok) {

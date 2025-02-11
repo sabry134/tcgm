@@ -51,7 +51,7 @@ defmodule TcgmWebAppWeb.GameChannelTest do
       "properties" => %{"attack" => 15, "defense" => 10}
     }}
     push(socket, "insert_card", %{"player_id" => "player1", "card" => card, "location" => "hand"})
-    assert_broadcast("game_update", %{state: updated_state})
+    assert_broadcast("game_update", %{state: _updated_state})
     push(socket, "play_card", %{"player_id" => "player1", "card" => card})
     assert_broadcast("game_update", %{state: updated_state})
 
@@ -89,7 +89,7 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     }}
     deck = %{"Card X" => card}
     push(socket, "set_deck", %{"player_id" => "player1", "deck" => deck})
-    assert_broadcast("game_update", %{state: updated_state})
+    assert_broadcast("game_update", %{state: _updated_state})
 
     push(socket, "draw_card", %{"player_id" => "player1"})
     assert_broadcast("game_update", %{state: updated_state})

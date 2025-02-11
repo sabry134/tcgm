@@ -73,7 +73,7 @@ defmodule TcgmWebAppWeb.ActionControllerTest do
   end
 
   test "DELETE /api/actions/:id deletes an existing action", %{conn: conn, action: action} do
-    conn = delete(conn, "/api/actions/#{action.id}")
+    conn = delete(conn, "/api/actions/delete/#{action.id}")
     assert response(conn, 204) == ""
 
     assert Repo.get(Action, action.id) == nil

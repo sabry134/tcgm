@@ -105,7 +105,7 @@ defmodule TcgmWebAppWeb.CardControllerTest do
   end
 
   test "DELETE /api/cards/:id deletes a card", %{conn: conn, card: card} do
-    conn = delete(conn, "/api/cards/#{card.id}")
+    conn = delete(conn, "/api/cards/delete/#{card.id}")
     assert response(conn, 204) == ""
 
     assert Repo.get(Card, card.id) == nil

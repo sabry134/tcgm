@@ -178,7 +178,7 @@ const SceneEditor = () => {
           justifyContent: "space-around",
         }}
       >
-        <Button onClick={() => navigate("/scene")} sx={{ borderRadius: 0 }}>
+        <Button onClick={() => navigate("/")} sx={{ borderRadius: 0 }}>
           <Typography variant="h6" sx={{ color: "white" }}>
             🌟 Scene
           </Typography>

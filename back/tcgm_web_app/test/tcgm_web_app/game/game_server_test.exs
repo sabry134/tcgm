@@ -93,4 +93,32 @@ defmodule TcgmWebApp.Game.GameServerTest do
 
     assert map_size(updated_state.players["player1"]["deck"]) == 0
   end
+
+  test "game start", %{room_id: room_id} do
+    GameServer.join_room(room_id, "player1")
+    GameServer.join_room(room_id, "player2")
+
+    card1 = %{"Card X" => %{
+      "name" => "king",
+      "properties" => %{"attack" => 15, "defense" => 10}
+    }}
+    card2 = %{"Card Y" => %{
+      "name" => "queen",
+      "properties" => %{"attack" => 10, "defense" => 15}
+    }}
+    card3 = %{"Card Z" => %{
+      "name" => "pawn",
+      "properties" => %{"attack" => 5, "defense" => 5}
+    }}
+    deck = %{"card1" => card1, "card2" => card2, "card3" => card3}
+    :ok = GameServer.set_deck(room_id, "player1", deck)
+    :ok = GameServer.set_deck(room_id, "player2", deck)
+
+    :ok = GameServer.start_game(room_id)
+
+    state = GameServer.get_state(room_id)
+
+    assert map_size(state.players["player1"]["hand"]) == 2
+    assert map_size(state.players["player2"]["hand"]) == 2
+  end
 end

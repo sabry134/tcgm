@@ -15,6 +15,23 @@ defmodule TcgmWebApp.Game.GameServerTest do
     assert Map.has_key?(state.players, "player1")
   end
 
+  test "card can be inserted to location", %{room_id: room_id} do
+    GameServer.join_room(room_id, "player1")
+
+    initial_state = GameServer.get_state(room_id)
+
+    assert map_size(initial_state.players["player1"]["hand"]) == 0
+
+    card = %{"Card X" => %{
+      "name" => "king",
+      "properties" => %{"attack" => 15, "defense" => 10}
+    }}
+    :ok = GameServer.insert_card(room_id, "player1", card, "hand")
+
+    updated_state = GameServer.get_state(room_id)
+    assert map_size(updated_state.players["player1"]["hand"]) == 1
+  end
+
   test "players can play a card", %{room_id: room_id} do
     GameServer.join_room(room_id, "player1")
 
@@ -26,7 +43,7 @@ defmodule TcgmWebApp.Game.GameServerTest do
       "name" => "king",
       "properties" => %{"attack" => 15, "defense" => 10}
     }}
-    put_in(initial_state.players["player1"]["hand"], card)
+    :ok = GameServer.insert_card(room_id, "player1", card, "hand")
     :ok = GameServer.play_card(room_id, "player1", card)
 
     updated_state = GameServer.get_state(room_id)

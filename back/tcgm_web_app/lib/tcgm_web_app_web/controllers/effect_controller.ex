@@ -110,8 +110,7 @@ defmodule TcgmWebAppWeb.EffectController do
         |> put_status(:ok)
         |> json(effects)
 
-      effects ->
-        IO.inspect(effects, label: "effects")
+      _ ->
         conn
         |> put_status(:unprocessable_entity)
         |> json(%{error: "Could not retrieve effects by game ID"})

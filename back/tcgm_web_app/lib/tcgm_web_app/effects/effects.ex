@@ -1,6 +1,7 @@
 defmodule TcgmWebApp.Effects.Effects do
   alias TcgmWebApp.Effects.Effect
   alias TcgmWebApp.Repo
+  import Ecto.Query, warn: false
 
   def create_effect(attrs) do
     %Effect{}
@@ -20,18 +21,17 @@ defmodule TcgmWebApp.Effects.Effects do
     Repo.all(Effect)
   end
 
-  def delete_effect!(id) do
-    Repo.delete!(get_effect!(id))
+  def delete_effect!(%Effect{} = effect) do
+    Repo.delete!(effect)
   end
 
-  def update_effect(id, attrs) do
-    effect = get_effect!(id)
+  def update_effect(%Effect{} = effect, attrs) do
     effect
     |> Effect.changeset(attrs)
     |> Repo.update()
   end
 
   def get_effects_by_game_id(game_id) do
-    Repo.get_by(Effect, game_id: game_id)
+    Repo.all(from e in Effect, where: e.game_id == ^game_id)
   end
 end

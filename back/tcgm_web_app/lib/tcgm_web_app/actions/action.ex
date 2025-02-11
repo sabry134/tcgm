@@ -2,6 +2,8 @@ defmodule TcgmWebApp.Actions.Action do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:id, :name, :description, :inserted_at, :updated_at]}
+
   schema "actions" do
     field :name, :string
     field :description, :string

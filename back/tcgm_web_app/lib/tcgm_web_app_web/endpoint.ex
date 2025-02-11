@@ -45,7 +45,7 @@ defmodule TcgmWebAppWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
+  plug CORSPlug, origin: "*"
   plug TcgmWebAppWeb.Router
 
-  plug CORSPlug, origin: "*", methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], headers: ["content-type", "authorization"]
 end

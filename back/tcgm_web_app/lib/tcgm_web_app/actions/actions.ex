@@ -20,15 +20,13 @@ defmodule TcgmWebApp.Actions.Actions do
     Repo.all(Action)
   end
 
-  def update_action(id, attrs) do
-    action = get_action!(id)
+  def update_action(%Action{} = action, attrs) do
     action
     |> Action.changeset(attrs)
     |> Repo.update()
   end
 
-  def delete_action(id) do
-    action = get_action!(id)
+  def delete_action!(%Action{} = action) do
     Repo.delete!(action)
   end
 

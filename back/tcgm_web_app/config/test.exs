@@ -9,7 +9,7 @@ config :tcgm_web_app, TcgmWebApp.Repo,
   username: "postgres",
   password: "password",
   hostname: "localhost",
-  database: "tcgm_web_app_test#{System.get_env("MIX_TEST_PARTITION")}",
+  database: "my_db",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
 

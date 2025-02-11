@@ -2,6 +2,8 @@ defmodule TcgmWebApp.Accounts.User do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, only: [:id, :username, :inserted_at, :updated_at]}
+
   schema "users" do
     field :username, :string
 

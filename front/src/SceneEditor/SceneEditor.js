@@ -15,10 +15,10 @@ import {
   IconButton,
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useNavigate } from "react-router-dom";
 
 const SceneEditor = () => {
-  const navigate = useNavigate(); // Initialize useNavigate hook
+  const navigate = useNavigate();
 
   const [scenes, setScenes] = useState([]);
   const [selectedScene, setSelectedScene] = useState("");
@@ -27,12 +27,11 @@ const SceneEditor = () => {
   const [cards, setCards] = useState([]);
   const [buttons, setButtons] = useState([]);
 
-  // Load scenes and their respective data (cards and buttons) from localStorage and sessionStorage
   useEffect(() => {
     const savedScenes = JSON.parse(localStorage.getItem("scenes")) || [];
     if (savedScenes.length > 0) {
       setScenes(savedScenes);
-      setSelectedScene(savedScenes[0]); // Default to the first scene
+      setSelectedScene(savedScenes[0]);
     }
   }, []);
 
@@ -46,14 +45,12 @@ const SceneEditor = () => {
     }
   }, [selectedScene]);
 
-  // Save scene data (cards and buttons) for the selected scene to sessionStorage
   useEffect(() => {
     if (selectedScene) {
       sessionStorage.setItem(selectedScene, JSON.stringify({ cards, buttons }));
     }
   }, [cards, buttons, selectedScene]);
 
-  // Save scenes to localStorage whenever they change
   useEffect(() => {
     if (scenes.length > 0) {
       localStorage.setItem("scenes", JSON.stringify(scenes));
@@ -168,7 +165,6 @@ const SceneEditor = () => {
 
   return (
     <Box display="flex" flexDirection="column" height="100vh">
-      {/* Brown Banner with Menu */}
       <Box
         sx={{
           backgroundColor: "#5d3a00",
@@ -178,7 +174,7 @@ const SceneEditor = () => {
           justifyContent: "space-around",
         }}
       >
-        <Button onClick={() => navigate("/scene")} sx={{ borderRadius: 0 }}>
+        <Button onClick={() => navigate("/")} sx={{ borderRadius: 0 }}>
           <Typography variant="h6" sx={{ color: "white" }}>
             🌟 Scene
           </Typography>
@@ -188,7 +184,7 @@ const SceneEditor = () => {
             📜 Templates
           </Typography>
         </Button>
-        <Button onClick={() => navigate("/card-editor")} sx={{ borderRadius: 0 }}>
+        <Button onClick={() => navigate("/editor")} sx={{ borderRadius: 0 }}>
           <Typography variant="h6" sx={{ color: "white" }}>
             🖼️ Card Editor
           </Typography>
@@ -198,9 +194,13 @@ const SceneEditor = () => {
             🌍 Community
           </Typography>
         </Button>
+        <Button onClick={() => navigate("/join")} sx={{ borderRadius: 0 }}>
+          <Typography variant="h6" sx={{ color: "white" }}>
+          🚪 Join Room
+          </Typography>
+        </Button>
       </Box>
 
-      {/* Main Content Area */}
       <Box display="flex" flexGrow={1} bgcolor="#fff">
         <Paper
           className="sidebar"
@@ -252,7 +252,7 @@ const SceneEditor = () => {
             <Card
               key={card.id}
               sx={{
-                width: 150,
+                width: 250,
                 height: card.height,
                 position: "absolute",
                 left: card.x,
@@ -263,7 +263,7 @@ const SceneEditor = () => {
                 cursor: "grab",
                 p: 2,
                 bgcolor: "white",
-                borderRadius: 0,
+                borderRadius: 5,
               }}
               onMouseDown={(e) => handleCardMouseDown(e, card.id)}
             >
@@ -295,7 +295,7 @@ const SceneEditor = () => {
                   marginBottom: 2,
                   borderRadius: 0,
                 }}
-                onMouseDown={(e) => handleButtonMouseDown(e, button.id)} // Enable dragging for buttons
+                onMouseDown={(e) => handleButtonMouseDown(e, button.id)}
               >
                 {button.label}
               </Button>

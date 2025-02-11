@@ -1,16 +1,24 @@
 import React, { useEffect } from "react";
-import {Box} from "@mui/material";
+import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { TCGMCard } from "./components/TCGMCard";
-import {NavigationBar} from "./components/NavigationBar";
-import {LeftPanel} from "./components/LeftPanel";
-import {RightPanel} from "./components/RightPanel";
+import { NavigationBar } from "./components/NavigationBar";
+import { LeftPanel } from "./components/LeftPanel";
+import { RightPanel } from "./components/RightPanel";
+import defaultData from "./data/ExampleCaster.json"
 
 const CardEditor = () => {
     const navigate = useNavigate(); // Initialize useNavigate hook
 
     useEffect(() => {
         document.title = "JCCE";
+
+        // Check if localStorage already has data
+        if (!localStorage.getItem("currentEditedCard")) {
+            localStorage.setItem("currentEditedCard", JSON.stringify(defaultData));
+            console.log("Initialized JSON in localStorage:", defaultData);
+
+        }
     }, []);
 
     return (

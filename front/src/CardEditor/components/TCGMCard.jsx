@@ -1,22 +1,48 @@
 import { Component } from "react";
-import ExampleCaster from "../data/ExampleCaster.json";
 
 export class TCGMCard extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            cardData: {
+            }
+        };
+    }
+
+    componentDidMount() {
+        this.handleStorageChange({})
+
+        window.addEventListener("storage", this.handleStorageChange);
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener("storage", this.handleStorageChange);
+    }
+
+    handleStorageChange = (event) => {
+        const storedData = localStorage.getItem("currentEditedCard");
+        if (storedData) {
+            this.setState({ cardData: JSON.parse(storedData) });
+        }
+    };
+
     render() {
+        const { cardData } = this.state;
+
         return (
             <div style={mainContainer}>
                 <div style={mainCardBorder}>
                     <div style={cardNameContainer}>
                         <p style={cardName}>
-                            {ExampleCaster.Name}
+                            {cardData.Name}
                         </p>
                     </div>
                     <div style={cardImageContainer}>
-                        <img src={`${ExampleCaster.Image}`} alt="Example Caster" style={cardImage} />
+                        <img src={cardData.Image} alt="Card" style={cardImage} />
                     </div>
                     <div style={cardTextContainer}>
                         <p style={cardText}>
-                            {ExampleCaster.Text}
+                            {cardData.Text}
                         </p>
                     </div>
                 </div>

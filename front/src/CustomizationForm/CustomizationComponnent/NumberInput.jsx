@@ -5,8 +5,8 @@ export class NumberInput extends FormComponnent {
     render() {
         return (
             <TextField
+                style={{ backgroundColor: 'white' }}
                 id="standard-number"
-                label="Number"
                 type="number"
                 variant="standard"
                 slotProps={{

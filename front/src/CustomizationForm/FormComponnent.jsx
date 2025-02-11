@@ -18,7 +18,6 @@ export class FormComponnent extends Component {
 
 
     componentDidMount() {
-        console.log(this.props.name)
         this.setState({ inputValue: this.getValueByPath(JSON.parse(localStorage.getItem("currentEditedCard")), this.props.name) });
     }
 

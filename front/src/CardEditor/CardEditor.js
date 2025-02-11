@@ -16,8 +16,6 @@ const CardEditor = () => {
         // Check if localStorage already has data
         if (!localStorage.getItem("currentEditedCard")) {
             localStorage.setItem("currentEditedCard", JSON.stringify(defaultData));
-            console.log("Initialized JSON in localStorage:", defaultData);
-
         }
     }, []);
 

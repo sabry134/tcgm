@@ -2,7 +2,12 @@
 	"Name": "example",
 	"Type": "Caster",
 	"Properties": {
-		"Color": "Black",
+		"Color": [
+			0,
+			0,
+			0,
+			1
+		],
 		"Mana": 3,
 		"Growth": 3,
 		"Health": 18
@@ -19,5 +24,10 @@
 	],
 	"Text": "-3: Draw 2 cards from your deck.",
 	"Image": "../images/iminyourwalls.png",
-	"DisplayColor": "Black"
+	"DisplayColor": [
+		0,
+		0,
+		0,
+		1
+	]
 }

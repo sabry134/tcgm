@@ -5,8 +5,8 @@ export class CustomInput extends FormComponnent {
     render() {
         return (
             <TextField
+                style={{ backgroundColor: 'white' }}
                 id="standard-basic"
-                label="Standard"
                 variant="standard"
                 value={this.state.inputValue}
                 onChange={this.handleChange}

@@ -184,7 +184,7 @@ const SceneEditor = () => {
             📜 Templates
           </Typography>
         </Button>
-        <Button onClick={() => navigate("/editor")} sx={{ borderRadius: 0 }}>
+        <Button onClick={() => navigate("/card-editor")} sx={{ borderRadius: 0 }}>
           <Typography variant="h6" sx={{ color: "white" }}>
             🖼️ Card Editor
           </Typography>
@@ -196,7 +196,7 @@ const SceneEditor = () => {
         </Button>
         <Button onClick={() => navigate("/join")} sx={{ borderRadius: 0 }}>
           <Typography variant="h6" sx={{ color: "white" }}>
-          🚪 Join Room
+            🚪 Join Room
           </Typography>
         </Button>
       </Box>

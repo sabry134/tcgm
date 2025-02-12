@@ -116,8 +116,8 @@ export class LeftPanel extends Component {
           console.log(error);
         });
     else
-      fetch(apiUrl + '/:' + storedId, {
-        method: 'POST',
+      fetch(apiUrl + '/' + storedId, {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },

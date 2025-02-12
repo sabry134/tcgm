@@ -85,7 +85,7 @@ export class LeftPanel extends Component {
       });
   }
 
-  saveCard(json) {
+  saveCard() {
     const apiUrl = this.baseApiUrl + 'cards';
     const card = localStorage.getItem("currentEditedCard")
 
@@ -218,7 +218,7 @@ export class LeftPanel extends Component {
           borderRadius: 0,
         }}
       >
-        <Button onClick={this.saveCard} sx={{ color: "white", paddingBottom: 5 }}>
+        <Button onClick={(event) => this.saveCard()} sx={{ color: "white", paddingBottom: 5 }}>
           Save Card
         </Button>
         <TextField style={{ backgroundColor: 'white' }}

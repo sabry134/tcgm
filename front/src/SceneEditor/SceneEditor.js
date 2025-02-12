@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { NavigationBar } from "../NavigationBar";
 
 const SceneEditor = () => {
   const navigate = useNavigate();
@@ -165,41 +166,9 @@ const SceneEditor = () => {
 
   return (
     <Box display="flex" flexDirection="column" height="100vh">
-      <Box
-        sx={{
-          backgroundColor: "#5d3a00",
-          color: "white",
-          padding: "10px",
-          display: "flex",
-          justifyContent: "space-around",
-        }}
-      >
-        <Button onClick={() => navigate("/")} sx={{ borderRadius: 0 }}>
-          <Typography variant="h6" sx={{ color: "white" }}>
-            🌟 Scene
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/templates")} sx={{ borderRadius: 0 }}>
-          <Typography variant="h6" sx={{ color: "white" }}>
-            📜 Templates
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/card-editor")} sx={{ borderRadius: 0 }}>
-          <Typography variant="h6" sx={{ color: "white" }}>
-            🖼️ Card Editor
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/community")} sx={{ borderRadius: 0 }}>
-          <Typography variant="h6" sx={{ color: "white" }}>
-            🌍 Community
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/join")} sx={{ borderRadius: 0 }}>
-          <Typography variant="h6" sx={{ color: "white" }}>
-            🚪 Join Room
-          </Typography>
-        </Button>
-      </Box>
+
+      <NavigationBar navigate={navigate}></NavigationBar>
+
 
       <Box display="flex" flexGrow={1} bgcolor="#fff">
         <Paper

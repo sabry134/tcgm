@@ -1,5 +1,5 @@
-import {Box, Button, Typography} from "@mui/material";
-import React, {Component} from "react";
+import { Box, Button, Typography } from "@mui/material";
+import React, { Component } from "react";
 
 export class NavigationBar extends Component {
     render() {
@@ -31,6 +31,11 @@ export class NavigationBar extends Component {
                 <Button onClick={() => this.props.navigate("/community")} sx={{ borderRadius: 0 }}>
                     <Typography variant="h6" sx={{ color: "white" }}>
                         🌍 Community
+                    </Typography>
+                </Button>
+                <Button onClick={() => this.props.navigate("/join")} sx={{ borderRadius: 0 }}>
+                    <Typography variant="h6" sx={{ color: "white" }}>
+                        🚪 Join Room
                     </Typography>
                 </Button>
             </Box>

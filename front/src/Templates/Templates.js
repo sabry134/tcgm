@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-
+import { NavigationBar } from "../NavigationBar";
 const Templates = () => {
     const navigate = useNavigate(); // Initialize useNavigate hook
 
@@ -162,36 +162,8 @@ const Templates = () => {
     return (
         <Box display="flex" flexDirection="column" height="100vh">
             {/* Brown Banner with Menu */}
-            <Box
-                sx={{
-                    backgroundColor: "#5d3a00",
-                    color: "white",
-                    padding: "10px",
-                    display: "flex",
-                    justifyContent: "space-around",
-                }}
-            >
-                <Button onClick={() => navigate("/")} sx={{ borderRadius: 0 }}>
-                    <Typography variant="h6" sx={{ color: "white" }}>
-                        🌟 Scene
-                    </Typography>
-                </Button>
-                <Button onClick={() => navigate("/templates")} sx={{ borderRadius: 0 }}>
-                    <Typography variant="h6" sx={{ color: "white" }}>
-                        📜 Templates
-                    </Typography>
-                </Button>
-                <Button onClick={() => navigate("/card-editor")} sx={{ borderRadius: 0 }}>
-                    <Typography variant="h6" sx={{ color: "white" }}>
-                        🖼️ Card Editor
-                    </Typography>
-                </Button>
-                <Button onClick={() => navigate("/community")} sx={{ borderRadius: 0 }}>
-                    <Typography variant="h6" sx={{ color: "white" }}>
-                        🌍 Community
-                    </Typography>
-                </Button>
-            </Box>
+            <NavigationBar navigate={navigate}></NavigationBar>
+
 
             {/* Main Content Area */}
             <Box display="flex" flexGrow={1} bgcolor="#fff">

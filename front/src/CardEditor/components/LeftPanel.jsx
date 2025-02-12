@@ -1,5 +1,6 @@
 import { Button, Paper, TextField } from "@mui/material";
 import React, { Component } from "react";
+import { CardPicker } from "./CardPicker";
 
 
 export class LeftPanel extends Component {
@@ -26,6 +27,11 @@ export class LeftPanel extends Component {
 
   componentDidMount() {
     this.getCard()
+  }
+
+
+  componentWillUnmount() {
+    localStorage.clear()
   }
 
   createCardType() {
@@ -88,26 +94,48 @@ export class LeftPanel extends Component {
   saveCard() {
     const apiUrl = this.baseApiUrl + 'cards';
     const card = localStorage.getItem("currentEditedCard")
+    const storedId = localStorage.getItem("editIdPick");
+    if (!storedId || storedId === "0")
+      fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: card
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          };
+        })
+        .then((data) => {
+          console.log(data)
+          this.getCard();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    else
+      fetch(apiUrl + '/:' + storedId, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: card
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          };
+        })
+        .then((data) => {
+          console.log(data)
+          this.getCard();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
 
-    fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: card
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        };
-      })
-      .then((data) => {
-        console.log(data)
-        this.getCard();
-      })
-      .catch((error) => {
-        console.log(error);
-      });
   }
 
   getCard() {
@@ -218,6 +246,7 @@ export class LeftPanel extends Component {
           borderRadius: 0,
         }}
       >
+        <CardPicker />
         <Button onClick={(event) => this.saveCard()} sx={{ color: "white", paddingBottom: 5 }}>
           Save Card
         </Button>

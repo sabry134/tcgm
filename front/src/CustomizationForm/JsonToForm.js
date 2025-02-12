@@ -6,6 +6,7 @@ import { ExpandLess } from "@mui/icons-material";
 import { ExpandMore } from "@mui/icons-material";
 import { ColorPicker } from "./CustomizationComponnent/ColorPicker";
 import { CardTypePicker } from "./CustomizationComponnent/CardTypePicker";
+import { GamePicker } from "./CustomizationComponnent/GamePicker";
 
 const JsonToForm = ({ data = {}, predecessor = "" }) => {
   const keys = Object.keys(data)
@@ -37,8 +38,8 @@ const switchForm = (value, key, predecessor) => {
       return <ColorPicker name={path} />
     case "cardType":
       return <CardTypePicker name={path} />;
-    case "effectType":
-      break;
+    case "game":
+      return <GamePicker name={path} />
     case "action":
       break;
     case "params":

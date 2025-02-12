@@ -1,12 +1,13 @@
-import { FormComponnent } from "../FormComponnent";
+import { FormComponnent } from "../../CustomizationForm/FormComponnent";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 
-export class CardTypePicker extends FormComponnent {
+
+export class CardPicker extends FormComponnent {
     constructor(props) {
         super(props);
         this.state = {
-            inputValue: "",
-            cardTypes: [], // Store fetched data
+            inputValue: 0,
+            cards: [], // Store fetched data
         };
         this.baseApiUrl = process.env.REACT_APP_API_URL;
         if (!this.baseApiUrl) {
@@ -16,14 +17,11 @@ export class CardTypePicker extends FormComponnent {
 
     componentDidMount() {
         this.fetchType()
-        const currentCard = localStorage.getItem("currentEditedCard")
-        if (currentCard) {
-            this.setState({ inputValue: JSON.parse(currentCard).card.card_type_id })
-        }
     }
 
+
     fetchType = () => {
-        const apiUrl = this.baseApiUrl + 'cardTypes';
+        const apiUrl = this.baseApiUrl + 'cards';
 
         fetch(apiUrl, {
             method: 'GET',
@@ -35,7 +33,7 @@ export class CardTypePicker extends FormComponnent {
                 return response.json();
             })
             .then((data) => {
-                this.setState({ cardTypes: data });
+                this.setState({ cards: data });
             })
             .catch((error) => {
                 console.log(error);
@@ -44,9 +42,8 @@ export class CardTypePicker extends FormComponnent {
 
     handleChange = (event) => {
         const newValue = event.target.value;
-
         this.setState({ inputValue: newValue });
-        this.updateJsonFile(newValue.toString());
+        localStorage.setItem("editIdPick", newValue.toString())
     };
 
     render() {
@@ -58,14 +55,16 @@ export class CardTypePicker extends FormComponnent {
                     labelId="card-type-picke-label"
                     id="card-type-picker"
                     value={this.state.inputValue}
+                    defaultValue={0}
                     label="Type"
                     onChange={this.handleChange}
                     onOpen={this.fetchType}
                 >
-                    {this.state.cardTypes.length > 0 ? (
-                        this.state.cardTypes.map((type, index) => (
-                            <MenuItem key={index} value={type.id}>
-                                {type.name}
+                    <MenuItem key={"new"} value={0}>➕ New Card </MenuItem>
+                    {this.state.cards.length > 0 ? (
+                        this.state.cards.map((card, index) => (
+                            <MenuItem key={index} value={card.id}>
+                                {card.name}
                             </MenuItem>
                         ))
                     ) : (

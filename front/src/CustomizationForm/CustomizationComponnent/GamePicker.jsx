@@ -1,7 +1,7 @@
 import { FormComponnent } from "../FormComponnent";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
 
-export class CardTypePicker extends FormComponnent {
+export class GamePicker extends FormComponnent {
     constructor(props) {
         super(props);
         this.state = {
@@ -18,12 +18,12 @@ export class CardTypePicker extends FormComponnent {
         this.fetchType()
         const currentCard = localStorage.getItem("currentEditedCard")
         if (currentCard) {
-            this.setState({ inputValue: JSON.parse(currentCard).card.card_type_id })
+            this.setState({ inputValue: JSON.parse(currentCard).card.game_id })
         }
     }
 
     fetchType = () => {
-        const apiUrl = this.baseApiUrl + 'cardTypes';
+        const apiUrl = this.baseApiUrl + 'games';
 
         fetch(apiUrl, {
             method: 'GET',

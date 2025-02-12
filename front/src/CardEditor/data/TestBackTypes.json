@@ -6,7 +6,7 @@
         "properties": [
             "text"
         ],
-        "game_id": "text",
+        "game_id": "game",
         "card_type_id": "cardType",
         "effect_ids": []
     }

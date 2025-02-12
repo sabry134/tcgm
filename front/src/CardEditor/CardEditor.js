@@ -10,6 +10,8 @@ import defaultData from "./data/TestBack.json"
 const CardEditor = () => {
     const navigate = useNavigate(); // Initialize useNavigate hook
 
+
+
     useEffect(() => {
         document.title = "JCCE";
 

@@ -48,8 +48,9 @@ export class CardTypePicker extends FormComponnent {
     render() {
         return (
             <FormControl fullWidth>
-                <InputLabel id="card-type-picke-label">Age</InputLabel>
+                <InputLabel id="card-type-picke-label"></InputLabel>
                 <Select
+                    style={{ backgroundColor: 'white' }}
                     labelId="card-type-picke-label"
                     id="card-type-picker"
                     value={this.state.inputValue}

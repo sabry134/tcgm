@@ -18,9 +18,9 @@ export class LeftPanel extends Component {
       },
       cardList: []
     };
-    this.apiUrl = process.env.REACT_APP_API_URL;
-    if (!this.apiUrl) {
-      this.apiUrl = "http://localhost:4000/api/"
+    this.baseApiUrl = process.env.REACT_APP_API_URL;
+    if (!this.baseApiUrl) {
+      this.baseApiUrl = "http://localhost:4000/api/"
     }
   }
 
@@ -29,7 +29,7 @@ export class LeftPanel extends Component {
   }
 
   createCardType() {
-    const apiUrl = '${this.apiUrl}cardTypes';
+    const apiUrl = this.baseApiUrl + 'cardTypes';
 
     fetch(apiUrl, {
       method: 'POST',
@@ -57,8 +57,8 @@ export class LeftPanel extends Component {
       });
   }
 
-  createGame(json) {
-    const apiUrl = this.apiUrl + 'games';
+  createGame() {
+    const apiUrl = this.baseApiUrl + 'games';
 
     fetch(apiUrl, {
       method: 'POST',
@@ -86,7 +86,7 @@ export class LeftPanel extends Component {
   }
 
   saveCard(json) {
-    const apiUrl = this.apiUrl + 'cards';
+    const apiUrl = this.baseApiUrl + 'cards';
     const card = localStorage.getItem("currentEditedCard")
 
     fetch(apiUrl, {
@@ -111,7 +111,7 @@ export class LeftPanel extends Component {
   }
 
   getCard() {
-    const apiUrl = this.apiUrl + 'cards';
+    const apiUrl = this.baseApiUrl + 'cards';
 
     fetch(apiUrl, {
       method: 'GET',
@@ -132,7 +132,7 @@ export class LeftPanel extends Component {
   }
 
   login(json) {
-    const apiUrl = this.apiUrl + 'login';
+    const apiUrl = this.baseApiUrl + 'login';
 
     fetch(apiUrl, {
       method: 'POST',
@@ -157,8 +157,7 @@ export class LeftPanel extends Component {
   }
 
   register(json) {
-    const apiUrl = this.apiUrl + 'users';
-
+    const apiUrl = this.baseApiUrl + 'users';
 
     fetch(apiUrl, {
       method: 'POST',
@@ -234,7 +233,7 @@ export class LeftPanel extends Component {
           label="game description"
           value={this.state.createGameInput.description}
           onChange={(event) => this.handleCreateGameInput(event, "description")} />
-        <Button onClick={this.createGame} sx={{ color: "white", paddingBottom: 5 }} >
+        <Button onClick={(event) => this.createGame()} sx={{ color: "white", paddingBottom: 5 }} >
           Create Game
         </Button>
         <TextField style={{ backgroundColor: 'white' }}

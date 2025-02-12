@@ -21,9 +21,12 @@ export class TCGMCard extends Component {
 
     handleStorageChange = (event) => {
         const storedData = localStorage.getItem("currentEditedCard");
-        const data = JSON.parse(storedData).card
         if (storedData) {
-            this.setState({ cardData: data });
+            const data = JSON.parse(storedData).card
+            console.log(data)
+            if (storedData) {
+                this.setState({ cardData: data });
+            }
         }
     };
 

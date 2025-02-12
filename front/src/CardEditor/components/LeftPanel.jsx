@@ -15,10 +15,14 @@ export class LeftPanel extends Component {
       createGameInput: {
         "name": "",
         "description": ""
-      }
+      },
+      cardList: []
     };
   }
 
+  componentDidMount() {
+    this.getCard()
+  }
 
   createCardType() {
     const apiUrl = 'http://localhost:4000/api/cardTypes';
@@ -95,6 +99,28 @@ export class LeftPanel extends Component {
       })
       .then((data) => {
         console.log(data)
+        this.getCard();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  getCard() {
+    const apiUrl = 'http://localhost:4000/api/cards';
+
+    fetch(apiUrl, {
+      method: 'GET',
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        };
+        return response.json()
+
+      })
+      .then((data) => {
+        this.setState({ cardList: data })
       })
       .catch((error) => {
         console.log(error);
@@ -172,6 +198,11 @@ export class LeftPanel extends Component {
     this.setState({ createTypeInput: newType });
   }
 
+  loadCard(card) {
+    localStorage.setItem("currentEditedCard", JSON.stringify({ "card": card }));
+    window.dispatchEvent(new Event('storage'))
+  }
+
   render() {
     return (
       <Paper
@@ -184,7 +215,7 @@ export class LeftPanel extends Component {
           borderRadius: 0,
         }}
       >
-        <Button onClick={this.saveCard}>
+        <Button onClick={this.saveCard} sx={{ color: "white", paddingBottom: 5 }}>
           Save Card
         </Button>
         <TextField style={{ backgroundColor: 'white' }}
@@ -199,7 +230,7 @@ export class LeftPanel extends Component {
           label="game description"
           value={this.state.createGameInput.description}
           onChange={(event) => this.handleCreateGameInput(event, "description")} />
-        <Button onClick={this.createGame} >
+        <Button onClick={this.createGame} sx={{ color: "white", paddingBottom: 5 }} >
           Create Game
         </Button>
         <TextField style={{ backgroundColor: 'white' }}
@@ -208,9 +239,26 @@ export class LeftPanel extends Component {
           label="Type name"
           value={this.state.createTypeInput.name}
           onChange={(event) => this.handleCreateTypeInput(event, "name")} />
-        <Button onClick={(event) => this.createCardType()} >
+        <Button onClick={(event) => this.createCardType()} sx={{ color: "white" }} >
           Create Type
         </Button>
+        <div style={{ marginTop: 20 }}>
+          <h3>Cards List:</h3>
+          {this.state.cardList.length > 0 ? (
+            this.state.cardList.map((card, index) => (
+              <Button
+                key={index}
+                variant="contained"
+                onClick={(event) => this.loadCard(card)}
+                sx={{ bgcolor: "white", color: "#5d3a00", margin: "5px 0" }}
+              >
+                {card.name}
+              </Button>
+            ))
+          ) : (
+            <p>No cards available.</p>
+          )}
+        </div>
       </Paper>
     )
   }

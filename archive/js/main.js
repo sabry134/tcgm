@@ -1,0 +1,148 @@
+const path = require('path');
+const { app, BrowserWindow, Menu, ipcMain } = require('electron');
+const fs = require('fs');
+const { exec } = require('child_process');
+
+function createWindow() {
+    const win = new BrowserWindow({
+        width: 1920,
+        height: 1080,
+        webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true,
+            preload: path.join(__dirname, 'preload.js'),
+        }
+    });
+
+    win.loadFile('./html/index.html');
+
+    const menu = Menu.buildFromTemplate([
+        {
+            label: 'File',
+            submenu: [
+                { role: 'quit' },
+                {
+                    label: 'Build',
+                    click: () => {
+                        console.log('Build clicked');
+                        packageToLove2D();
+                        console.log('Package app done');
+                    }
+                },
+            ],
+        },
+        {
+            label: 'Edit',
+            submenu: [{ role: 'undo' }, { role: 'redo' }],
+        },
+        {
+            label: 'Assets',
+            submenu: [],
+        },
+        {
+            label: 'Setting',
+            submenu: [
+                {
+                    label: 'Card type',
+                    click: () => {
+                        loadContent(win, 'card.html');
+                    },
+                },
+                {
+                    label: 'Game rule',
+                    click: () => {
+                        loadContent(win, 'gamerule.html');
+                    },
+                },
+            ],
+        },
+        {
+            label: 'Component',
+            submenu: [
+                {
+                    label: 'Button',
+                    click: () => {
+                        win.webContents.send('add-button');
+                    },
+                },
+                {
+                    label: 'Card',
+                    click: () => {
+                        win.webContents.send('add-card');
+                    }
+                },
+            ],
+        },
+        {
+            label: 'Windows',
+            submenu: [],
+        },
+        {
+            label: 'Help',
+            submenu: [],
+        },
+        {
+            label: 'Sabry',
+            click: () => {
+                win.webContents.openDevTools();
+            },
+        },
+    ]);
+
+    Menu.setApplicationMenu(menu);
+}
+
+ipcMain.handle('savePositionToFile', (event, position, fileName) => {
+    console.log(fileName);
+    const finalFileName = fileName || 'button.json';
+    const filePath = path.join(__dirname, finalFileName);
+
+    const dir = path.dirname(filePath);
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+
+    fs.writeFileSync(filePath, JSON.stringify(position, null, 2), 'utf8');
+    console.log(`Position saved to ${finalFileName}:`, position);
+});
+
+ipcMain.on('add-card', (event) => {
+    event.sender.send('add-card');
+});
+
+function loadContent(win, fileName) {
+    win.loadFile(`./html/${fileName}`);
+}
+
+function packageToLove2D() {
+    console.log("Packaging the app...");
+    const winCommand = "love .\\src";
+    const unixCommand = "love ./src";
+    const command = process.platform === "win32" ? winCommand : unixCommand;
+
+    console.log("Packaging the app...");
+
+    exec(command, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`exec error: ${error}`);
+            return;
+        }
+
+        console.log(`stdout: ${stdout}`);
+        console.error(`stderr: ${stderr}`);
+    });
+}
+
+app.whenReady().then(createWindow);
+
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
+});
+
+app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) {
+        createWindow();
+    }
+});

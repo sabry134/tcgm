@@ -15,8 +15,14 @@ CMakeUserPresets.json
 # JCCE related
 tutoriel_ogl
 tcgm
+*.zip
+*.love
 
 # Hidden files
 .vscode
 .cmake
 .idea
+
+# Electron
+jcce/node_modules
+jcce/package-lock.json

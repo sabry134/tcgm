@@ -5,7 +5,7 @@ import { TCGMCard } from "./components/TCGMCard";
 import { NavigationBar } from "./components/NavigationBar";
 import { LeftPanel } from "./components/LeftPanel";
 import { RightPanel } from "./components/RightPanel";
-import defaultData from "./data/ExampleCaster.json"
+import defaultData from "./data/TestBack.json"
 
 const CardEditor = () => {
     const navigate = useNavigate(); // Initialize useNavigate hook

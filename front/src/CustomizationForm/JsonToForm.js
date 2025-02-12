@@ -5,6 +5,7 @@ import { useState } from "react";
 import { ExpandLess } from "@mui/icons-material";
 import { ExpandMore } from "@mui/icons-material";
 import { ColorPicker } from "./CustomizationComponnent/ColorPicker";
+import { CardTypePicker } from "./CustomizationComponnent/CardTypePicker";
 
 const JsonToForm = ({ data = {}, predecessor = "" }) => {
   const keys = Object.keys(data)
@@ -13,7 +14,7 @@ const JsonToForm = ({ data = {}, predecessor = "" }) => {
     <div style={{ paddingLeft: '8px' }}>
       {keys.map((item, index) => {
         return (
-          <div className="shadow-md p-4 rounded-lg">
+          <div key={index} className="shadow-md p-4 rounded-lg">
 
             <div>
               <DropDown item={item} predecessor={predecessor} data={data} />
@@ -35,7 +36,7 @@ const switchForm = (value, key, predecessor) => {
     case "color":
       return <ColorPicker name={path} />
     case "cardType":
-      break;
+      return <CardTypePicker name={path} />;
     case "effectType":
       break;
     case "action":
@@ -52,10 +53,23 @@ const switchForm = (value, key, predecessor) => {
 const DropDown = ({ item, data, predecessor }) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  const switchTitle = (value) => {
+    switch (value) {
+      case "effect_ids":
+        return "effects"
+      case "card_type_id":
+        return "card type"
+      case "game_id":
+        return "game"
+      default:
+        return value;
+    }
+  }
+
   return (
     <div className="display: flex">
       <h2 style={{ cursor: 'pointer' }} onClick={() => setIsOpen(!isOpen)} className="text-lg font-bold cursor:pointer">
-        {item}
+        {switchTitle(item)}
         {isOpen ? <ExpandLess /> : <ExpandMore />}
       </h2>
       {isOpen && typeof data[item] !== "object" &&

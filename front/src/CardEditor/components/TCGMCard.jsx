@@ -21,28 +21,28 @@ export class TCGMCard extends Component {
 
     handleStorageChange = (event) => {
         const storedData = localStorage.getItem("currentEditedCard");
+        const data = JSON.parse(storedData).card
         if (storedData) {
-            this.setState({ cardData: JSON.parse(storedData) });
+            this.setState({ cardData: data });
         }
     };
 
     render() {
-        const { cardData } = this.state;
 
         return (
             <div style={mainContainer}>
                 <div style={mainCardBorder}>
                     <div style={cardNameContainer}>
                         <p style={cardName}>
-                            {cardData.Name}
+                            {this.state.cardData.name}
                         </p>
                     </div>
                     <div style={cardImageContainer}>
-                        <img src={cardData.Image} alt="Card" style={cardImage} />
+                        <img src={this.state.cardData.image} alt="Card" style={cardImage} />
                     </div>
                     <div style={cardTextContainer}>
                         <p style={cardText}>
-                            {cardData.Text}
+                            {this.state.cardData.text}
                         </p>
                     </div>
                 </div>

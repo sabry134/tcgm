@@ -1,7 +1,7 @@
 import { Paper } from "@mui/material";
 import React, { Component } from "react";
 import JsonToForm from "../../CustomizationForm/JsonToForm";
-import txt from "../data/ExampleCardTypes.json"
+import txt from "../data/TestBackTypes.json"
 
 
 export class RightPanel extends Component {

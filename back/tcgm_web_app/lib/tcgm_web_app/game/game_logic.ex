@@ -1,5 +1,9 @@
 defmodule TcgmWebApp.Game.GameLogic do
 
+  @moduledoc """
+    This module is responsible for handling game logic.
+  """
+
   defp check_action_args(args, required_keys) do
     missing_keys = Enum.filter(required_keys, &(!Map.has_key?(args, &1)))
 
@@ -35,6 +39,11 @@ defmodule TcgmWebApp.Game.GameLogic do
     end
   end
 
+  @doc """
+    Adds the top card of the player's deck to their hand.
+    The required args are:
+    - amount: the amount of cards to draw.
+  """
   def draw_card(state, player_id, args) do
     case check_valid_params(args, ["amount"], state.players, player_id, ["deck", "hand"]) do
       {:error, message} ->
@@ -60,6 +69,11 @@ defmodule TcgmWebApp.Game.GameLogic do
     end
   end
 
+  @doc """
+    Plays a card from the player's hand to the field.
+    The required args are:
+    - card: the card to play.
+  """
   def play_card_logic(state, player_id, card) do
     expected_args = ["card"]
     case check_valid_params(card, expected_args, state.players, player_id, ["hand", "field"]) do
@@ -86,6 +100,13 @@ defmodule TcgmWebApp.Game.GameLogic do
     end
   end
 
+  @doc """
+    Moves a card from one location to another.
+    The required args are:
+    - source: the source location.
+    - dest: the destination location.
+    - card: the card to move.
+  """
   def move_card_logic(state, player_id, args) do
     expected_args = ["source", "dest", "card"]
     case check_valid_params(args, expected_args, state.players, player_id, []) do
@@ -119,6 +140,12 @@ defmodule TcgmWebApp.Game.GameLogic do
     end
   end
 
+  @doc """
+    Inserts a card into a location.
+    The required args are:
+    - location: the location to insert the card.
+    - card: the card to insert.
+  """
   def insert_card(state, player_id, args) do
     expected_args = ["location", "card"]
     case check_valid_params(args, expected_args, state.players, player_id, []) do
@@ -139,10 +166,19 @@ defmodule TcgmWebApp.Game.GameLogic do
       end
   end
 
+  @doc false
   def update_card_values(key, value, card) do
     update_in(card, ["properties", key], fn _ -> value end)
   end
 
+  @doc """
+    Updates the values of a card.
+    The required args are:
+    - location: the location of the card.
+    - card: the card to update.
+    - key: the key of the property to update.
+    - value: the new value of the property.
+  """
   def update_values_logic(state, player_id, args) do
     expected_args = ["location", "card", "key", "value"]
     case check_valid_params(args, expected_args, state.players, player_id, []) do

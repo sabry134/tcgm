@@ -1,10 +1,28 @@
 defmodule TcgmWebAppWeb.GameChannel do
   use Phoenix.Channel
 
+  @moduledoc """
+    This module is responsible for handling game channels.
+  """
+
+  @doc """
+    Joins the room with the given id.
+  """
   def join("room:" <> room_id, _params, socket) do
     {:ok, socket |> assign(:room_id, room_id)}
   end
 
+  @doc """
+    Handles incoming messages.
+
+    ## Variants:
+
+    * `join_room` - Joins the room.
+    * `play_card` - Plays a card.
+    * `set_deck` - Sets the deck.
+    * `draw_card` - Draws a card.
+    * `insert_card` - Inserts a card.
+  """
   def handle_in("join_room", %{"player_id" => player_id}, socket) do
     TcgmWebApp.Game.GameServer.join_room(socket.assigns.room_id, player_id)
     broadcast!(socket, "game_update", %{state: TcgmWebApp.Game.GameServer.get_state(socket.assigns.room_id)})

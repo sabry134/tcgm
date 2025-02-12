@@ -3,6 +3,13 @@ defmodule TcgmWebApp.Game.GameServer do
 
   alias TcgmWebApp.Game.GameLogic
 
+  @moduledoc """
+    This module is responsible for handling game servers.
+  """
+
+  @doc """
+    Starts a game server with the given room id.
+  """
   def start_link(room_id) do
     GenServer.start_link(__MODULE__, room_id, name: via_tuple(room_id))
   end
@@ -51,7 +58,6 @@ defmodule TcgmWebApp.Game.GameServer do
 
   # Server interaction functions
 
-  # Helper function to load game config from file
   defp load_game_config(game_id) do
     config_path = "assets/game_config/#{game_id}.json"
 
@@ -66,7 +72,6 @@ defmodule TcgmWebApp.Game.GameServer do
     end
   end
 
-  # Helper function to create player data from config
   defp create_player(config) do
     containers =
       config["card_containers"]
@@ -77,6 +82,15 @@ defmodule TcgmWebApp.Game.GameServer do
     Map.merge(containers, config["player_properties"])
   end
 
+  # GenServer callbacks
+
+  @doc """
+    Handles game server calls.
+
+    ## Variants:
+    - `:get_state` - Retrieves the game state.
+    - `{:join, player_id}` - Has player with player_id join the game.
+  """
   def handle_call(:get_state, _from, state) do
     {:reply, state, state}
   end
@@ -95,6 +109,16 @@ defmodule TcgmWebApp.Game.GameServer do
     end
   end
 
+  @doc """
+    Handles game server casts.
+
+    ## Variants:
+    - `{:set_deck, player_id, deck}` - Sets the deck of the player with player_id.
+    - `{:play_card, player_id, card}` - Plays the card for the player with player_id.
+    - `{:draw_card, player_id}` - Draws a card for the player with player_id.
+    - `{:insert_card, player_id, card, location}` - Inserts the card for the player with player_id.
+    - `{:start_game}` - Starts the game with initial game state.
+  """
   def handle_cast({:set_deck, player_id, deck}, state) do
     new_state = %{state | players: Map.update!(state.players, player_id, fn player -> %{player | "deck" => deck} end)}
     {:noreply, new_state}

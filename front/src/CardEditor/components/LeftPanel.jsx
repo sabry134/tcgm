@@ -31,7 +31,7 @@ export class LeftPanel extends Component {
 
 
   componentWillUnmount() {
-    localStorage.clear()
+    localStorage.removeItem("editIdPick")
   }
 
   createCardType() {

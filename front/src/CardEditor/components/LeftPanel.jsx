@@ -18,6 +18,10 @@ export class LeftPanel extends Component {
       },
       cardList: []
     };
+    this.apiUrl = process.env.REACT_APP_API_URL;
+    if (!this.apiUrl) {
+      this.apiUrl = "http://localhost:4000/api/"
+    }
   }
 
   componentDidMount() {
@@ -25,7 +29,7 @@ export class LeftPanel extends Component {
   }
 
   createCardType() {
-    const apiUrl = 'http://localhost:4000/api/cardTypes';
+    const apiUrl = '${this.apiUrl}cardTypes';
 
     fetch(apiUrl, {
       method: 'POST',
@@ -54,7 +58,7 @@ export class LeftPanel extends Component {
   }
 
   createGame(json) {
-    const apiUrl = 'http://localhost:4000/api/games';
+    const apiUrl = this.apiUrl + 'games';
 
     fetch(apiUrl, {
       method: 'POST',
@@ -82,7 +86,7 @@ export class LeftPanel extends Component {
   }
 
   saveCard(json) {
-    const apiUrl = 'http://localhost:4000/api/cards';
+    const apiUrl = this.apiUrl + 'cards';
     const card = localStorage.getItem("currentEditedCard")
 
     fetch(apiUrl, {
@@ -107,7 +111,7 @@ export class LeftPanel extends Component {
   }
 
   getCard() {
-    const apiUrl = 'http://localhost:4000/api/cards';
+    const apiUrl = this.apiUrl + 'cards';
 
     fetch(apiUrl, {
       method: 'GET',
@@ -128,7 +132,7 @@ export class LeftPanel extends Component {
   }
 
   login(json) {
-    const apiUrl = 'http://localhost:4000/api/users/login';
+    const apiUrl = this.apiUrl + 'login';
 
     fetch(apiUrl, {
       method: 'POST',
@@ -153,7 +157,7 @@ export class LeftPanel extends Component {
   }
 
   register(json) {
-    const apiUrl = 'http://localhost:4000/api/users';
+    const apiUrl = this.apiUrl + 'users';
 
 
     fetch(apiUrl, {

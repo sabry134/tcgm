@@ -11,7 +11,6 @@ defmodule TcgmWebApp.MixProject do
       aliases: aliases(),
       deps: deps(),
       test_coverage: [
-        tool: ExCoveralls,
         ignore_modules: [
           TcgmWebApp.RoomRegistry,
           TcgmWebAppWeb.ChangesetJSON,

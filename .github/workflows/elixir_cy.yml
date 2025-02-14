@@ -1,0 +1,62 @@
+name: Elixir CI
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: my_db
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.15'  # Adjust as needed
+          otp-version: '26'        # Adjust as needed
+
+      - name: Cache Dependencies
+        uses: actions/cache@v2
+        with:
+          path: deps
+          key: mix-${{ runner.os }}-${{ hashFiles('mix.lock') }}
+          restore-keys: mix-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: mix deps.get
+        working-directory: ./back/tcgm_web_app
+
+      - name: Setup Database
+        run: |
+          mix ecto.create
+          mix ecto.migrate
+        working-directory: ./back/tcgm_web_app
+        env:
+          MIX_ENV: test
+          DATABASE_URL: "postgres://postgres:postgres@localhost:5432/my_db"
+
+      - name: Run Tests
+        run: mix test --cover
+        working-directory: ./back/tcgm_web_app
+
+      - name: Upload Test Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: elixir-coverage
+          path: cover/

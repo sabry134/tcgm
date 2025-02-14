@@ -1,0 +1,49 @@
+name: Elixir CI
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Elixir
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: '1.15'  # Adjust as needed
+          otp-version: '26'        # Adjust as needed
+
+      - name: Cache Dependencies
+        uses: actions/cache@v2
+        with:
+          path: deps
+          key: mix-${{ runner.os }}-${{ hashFiles('mix.lock') }}
+          restore-keys: mix-${{ runner.os }}-
+
+      - name: Install Dependencies
+        run: mix deps.get
+
+      - name: Setup Database
+        run: |
+          mix ecto.create
+          mix ecto.migrate
+        env:
+          MIX_ENV: test
+          DATABASE_URL: "postgres://postgres:postgres@localhost:5432/my_db"
+
+      - name: Run Tests
+        run: mix test --cover
+
+      - name: Upload Test Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: elixir-coverage
+          path: cover/

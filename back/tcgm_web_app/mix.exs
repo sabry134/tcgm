@@ -9,7 +9,22 @@ defmodule TcgmWebApp.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      test_coverage: [
+        tool: ExCoveralls,
+        ignore_modules: [
+          TcgmWebApp.RoomRegistry,
+          TcgmWebAppWeb.ChangesetJSON,
+          TcgmWebAppWeb.FallbackController,
+          TcgmWebAppWeb.Gettext,
+          TcgmWebAppWeb.Schemas,
+          TcgmWebApp.DataCase,
+          TcgmWebApp.Repo,
+          TcgmWebAppWeb.Telemetry,
+          TcgmWebApp.Application,
+          TcgmWebAppWeb.Router
+        ]
+      ],
     ]
   end
 

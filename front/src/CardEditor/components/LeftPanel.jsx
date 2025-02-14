@@ -1,7 +1,11 @@
 import { Button, Paper, TextField } from "@mui/material";
 import React, { Component } from "react";
 import { CardPicker } from "./CardPicker";
-
+import { createCardTypeRequest } from "../api/cardTypesRequest";
+import { createGameRequest } from "../api/gamesRequest";
+import { saveCardRequest, getCardRequest } from "../api/cardsRequest";
+import { loginRequest } from "../api/loginRequest";
+import { createUserRequest } from "../api/usersRequest";
 
 export class LeftPanel extends Component {
   constructor(props) {
@@ -29,184 +33,93 @@ export class LeftPanel extends Component {
     this.getCard()
   }
 
-
   componentWillUnmount() {
     localStorage.removeItem("editIdPick")
   }
 
   createCardType() {
-    const apiUrl = this.baseApiUrl + 'cardTypes';
-
-    fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
+    try {
+      createCardTypeRequest({
         cardType: {
           "name": this.state.createTypeInput.name,
           "properties": this.state.createTypeInput.properties,
           "game_id": this.state.createTypeInput.game_id
         }
-      })
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        };
-      })
-      .then((data) => {
+      }).then((data) => {
         console.log(data)
       })
-      .catch((error) => {
-        console.log(error);
-      });
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   createGame() {
-    const apiUrl = this.baseApiUrl + 'games';
-
-    fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
+    try {
+      createGameRequest({
         game: {
           "name": this.state.createGameInput.name,
           "description": this.state.createGameInput.description
         }
-      })
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        };
-      })
-      .then((data) => {
+      }).then((data) => {
         console.log(data)
       })
-      .catch((error) => {
-        console.log(error);
-      });
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   saveCard() {
-    const apiUrl = this.baseApiUrl + 'cards';
     const card = localStorage.getItem("currentEditedCard")
     const storedId = localStorage.getItem("editIdPick");
-    if (!storedId || storedId === "0")
-      fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: card
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          };
-        })
-        .then((data) => {
-          console.log(data)
-          this.getCard();
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    else
-      fetch(apiUrl + '/' + storedId, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: card
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          };
-        })
-        .then((data) => {
-          console.log(data)
-          this.getCard();
-        })
-        .catch((error) => {
-          console.log(error);
-        });
 
+    try {
+      if (!storedId || storedId === "0") {
+        saveCardRequest(storedId, card).then((data) => {
+          console.log(data)
+        })
+        this.getCard();
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   getCard() {
-    const apiUrl = this.baseApiUrl + 'cards';
-
-    fetch(apiUrl, {
-      method: 'GET',
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        };
-        return response.json()
-
-      })
-      .then((data) => {
+    try {
+      getCardRequest().then((data) => {
+        if (!data) {
+          return [];
+        }
         this.setState({ cardList: data })
+        return data
       })
-      .catch((error) => {
-        console.log(error);
-      });
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   login(json) {
-    const apiUrl = this.baseApiUrl + 'login';
-
-    fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
+    try {
+      loginRequest({
         "user": { "username": "zac" }
-      })
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        };
-      })
-      .then((data) => {
+      }).then((data) => {
         console.log(data)
       })
-      .catch((error) => {
-        console.log(error);
-      });
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   register(json) {
-    const apiUrl = this.baseApiUrl + 'users';
-
-    fetch(apiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
+    try {
+      createUserRequest({
         "user": { "username": "zac" }
-      })
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        };
-      })
-      .then((data) => {
+      }).then((data) => {
         console.log(data)
       })
-      .catch((error) => {
-        console.log(error);
-      });
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   handleCreateGameInput(event, key) {
@@ -246,32 +159,32 @@ export class LeftPanel extends Component {
           borderRadius: 0,
         }}
       >
-        <CardPicker />
+        <CardPicker/>
         <Button onClick={(event) => this.saveCard()} sx={{ color: "white", paddingBottom: 5 }}>
           Save Card
         </Button>
         <TextField style={{ backgroundColor: 'white' }}
-          id="game-name"
-          variant="standard"
-          label="game name"
-          value={this.state.createGameInput.name}
-          onChange={(event) => this.handleCreateGameInput(event, "name")} />
+                   id="game-name"
+                   variant="standard"
+                   label="game name"
+                   value={this.state.createGameInput.name}
+                   onChange={(event) => this.handleCreateGameInput(event, "name")}/>
         <TextField style={{ backgroundColor: 'white' }}
-          id="game-description"
-          variant="standard"
-          label="game description"
-          value={this.state.createGameInput.description}
-          onChange={(event) => this.handleCreateGameInput(event, "description")} />
-        <Button onClick={(event) => this.createGame()} sx={{ color: "white", paddingBottom: 5 }} >
+                   id="game-description"
+                   variant="standard"
+                   label="game description"
+                   value={this.state.createGameInput.description}
+                   onChange={(event) => this.handleCreateGameInput(event, "description")}/>
+        <Button onClick={(event) => this.createGame()} sx={{ color: "white", paddingBottom: 5 }}>
           Create Game
         </Button>
         <TextField style={{ backgroundColor: 'white' }}
-          id="type-name"
-          variant="standard"
-          label="Type name"
-          value={this.state.createTypeInput.name}
-          onChange={(event) => this.handleCreateTypeInput(event, "name")} />
-        <Button onClick={(event) => this.createCardType()} sx={{ color: "white" }} >
+                   id="type-name"
+                   variant="standard"
+                   label="Type name"
+                   value={this.state.createTypeInput.name}
+                   onChange={(event) => this.handleCreateTypeInput(event, "name")}/>
+        <Button onClick={(event) => this.createCardType()} sx={{ color: "white" }}>
           Create Type
         </Button>
         <div style={{ marginTop: 20 }}>

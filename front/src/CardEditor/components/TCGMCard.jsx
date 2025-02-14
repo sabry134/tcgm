@@ -37,15 +37,15 @@ export class TCGMCard extends Component {
                 <div style={mainCardBorder}>
                     <div style={cardNameContainer}>
                         <p style={cardName}>
-                            {this.state.cardData.name}
+                            {this.state.cardData ? this.state.cardData.name : "Card Name"}
                         </p>
                     </div>
                     <div style={cardImageContainer}>
-                        <img src={this.state.cardData.image} alt="Card" style={cardImage} />
+                        <img src={this.state.cardData ? this.state.cardData.image : "../images/iminyourwalls.png"} alt="Card" style={cardImage} />
                     </div>
                     <div style={cardTextContainer}>
                         <p style={cardText}>
-                            {this.state.cardData.text}
+                            {this.state.cardData ? this.state.cardData.text : "Card Text"}
                         </p>
                     </div>
                 </div>

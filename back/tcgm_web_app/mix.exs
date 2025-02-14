@@ -9,7 +9,23 @@ defmodule TcgmWebApp.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      test_coverage: [
+        tool: ExCoveralls,
+        minimum_coverage: 85,
+        ignore_modules: [
+          TcgmWebApp.RoomRegistry,
+          TcgmWebAppWeb.ChangesetJSON,
+          TcgmWebAppWeb.FallbackController,
+          TcgmWebAppWeb.Gettext,
+          TcgmWebAppWeb.Schemas,
+          TcgmWebApp.DataCase,
+          TcgmWebApp.Repo,
+          TcgmWebAppWeb.Telemetry,
+          TcgmWebApp.Application,
+          TcgmWebAppWeb.Router
+        ]
+      ],
     ]
   end
 
@@ -51,7 +67,8 @@ defmodule TcgmWebApp.MixProject do
       {:uuid, "~> 1.1"},
       {:phoenix_swagger, "~> 0.8"},
       {:ex_json_schema, "~> 0.7.0"},
-      {:ex_doc, "~> 0.30", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.30", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.17", only: [:test], runtime: false}
     ]
   end
 

@@ -28,8 +28,9 @@ jobs:
           key: mix-${{ runner.os }}-${{ hashFiles('mix.lock') }}
           restore-keys: mix-${{ runner.os }}-
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: mix deps.get
+        working-directory: /back/tcgm_web_app
 
       - name: Setup Database
         run: |

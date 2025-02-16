@@ -1,10 +1,10 @@
 import { Box, Button, Slide, Typography } from '@mui/material'
 import React, { Component, useRef } from 'react'
 import './GameBox.css'
+import { useNavigate } from 'react-router-dom'
 
 const height = '120px'
 const width = '140px'
-// the translate is half of the width
 
 export class GameBox extends Component {
   constructor (props) {
@@ -15,10 +15,6 @@ export class GameBox extends Component {
     }
 
     this.game = props.game
-  }
-
-  chooseGame (id) {
-    localStorage.setItem('gameSelected', id)
   }
 
   handleMouseEnter = event => {
@@ -38,7 +34,7 @@ export class GameBox extends Component {
         onMouseLeave={this.handleMouseLeave}
       >
         <Box>
-          <Deck checked={this.state.checked} />
+          <Deck checked={this.state.checked} gameId={this.game.id} />
           <Typography variant='h5' gutterBottom>
             {this.game.name}
           </Typography>
@@ -47,25 +43,53 @@ export class GameBox extends Component {
     )
   }
 }
-// connect buttons to back
-// reduce number of columns and increase size of box and buttons
-// make a new form to create Games
 
-const Deck = ({ checked }) => {
+const Deck = ({ checked, gameId }) => {
+  const navigate = useNavigate()
+
+  const handleEditButton = event => {
+    localStorage.setItem('gameSelected', gameId)
+    navigate('/')
+  }
+
+  const handleClickButton = event => {
+    // make a callback that open the rooms page
+  }
+
   return (
     <Box className='game'>
-      <Box className='cube '>
-        <Box className='face left'></Box>
-        <Box className='face bottom'></Box>
-        <Box className='face back'></Box>
-        {!checked && (
-          <Box className='middle' display={'flex'} flexDirection={'column'}>
-            <Button className='button'> Edit </Button>
-            <Button className='button'> Play </Button>
-          </Box>
-        )}
+      <Box className={!checked ? 'cube bottomCubeAnimation' : 'cube'}>
+        <Box className='face front leftSide' />
+        <Box className='face front rightSide' />
+        <Box className='face front bottomSide' />
+
+        <Box className='face right' />
+        <Box className='face left' />
+        <Box className='face back' />
       </Box>
-      <Box className={!checked ? 'cube cubeAnimation' : 'cube'}>
+      {!checked && (
+        <Box className='middle' display={'flex'} flexDirection={'column'}>
+          <Button
+            sx={{ m: 1 }}
+            variant='contained'
+            color='success'
+            className='button'
+            onClick={handleEditButton}
+          >
+            Edit
+          </Button>
+          <Button
+            variant='contained'
+            color='primary'
+            className='button'
+            onClick={handleClickButton}
+          >
+            Play
+          </Button>
+        </Box>
+      )}
+
+      <Box className={!checked ? 'cube topCubeAnimation' : 'cube'}>
         <Box className='face front'>
           <img
             width={width}

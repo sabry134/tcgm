@@ -47,7 +47,7 @@ export class CommunityGamePicker extends Component {
           container
           rowSpacing={0}
           alignItems={'center'}
-          columns={{ md: 20 }}
+          columns={{ md: 16 }}
         >
           {this.state.gameList ? (
             this.state.gameList.map((game, index) => (

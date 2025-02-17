@@ -6,7 +6,7 @@ export async function getGamesRequest() {
 }
 
 // Create a new game
-// data: {
+// game: {
 //   "name": "string",
 //   "description": "string"
 // }

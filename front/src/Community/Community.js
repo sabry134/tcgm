@@ -1,13 +1,27 @@
-import React from "react";
-import { Box } from "@mui/material";
+import { React, useRef, useState } from "react";
+import { Box, Popper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { NavigationBar } from "./../NavigationBar";
 import { LeftPanel } from "./Components/LeftPanel";
 import { RightPanel } from "./Components/RightPanel";
 import { CommunityGamePicker } from "./Components/CommunityGamePicker";
+import { CreateGamePopupBody } from "./Components/CreateGamePopupBody";
 
 const Community = () => {
     const navigate = useNavigate(); // Initialize useNavigate hook
+    const [anchor, setAnchor] = useState(null);
+    const spanRef = useRef()
+
+    const openPopup = (event) => {
+        setAnchor(anchor ? null : spanRef);
+    };
+
+    const closePopup = () => {
+        setAnchor(null)
+    }
+
+    const open = Boolean(anchor);
+    const id = open ? 'simple-popper' : undefined;
 
     return (
         <Box display="flex" flexDirection="column" height="100vh">
@@ -16,14 +30,17 @@ const Community = () => {
 
             {/* Main Content Area */}
             <Box display="flex" flexGrow={1} bgcolor="#fff">
-                <LeftPanel />
-
+                <LeftPanel popupCallback={openPopup} />
                 <Box
+                    ref={spanRef}
                     className="main-area"
                     flexGrow={1}
                     bgcolor="#c4c4c4"
                     position="relative"
                 >
+                    <Popper id={id} open={open} anchorEl={anchor}>
+                        <CreateGamePopupBody closeCallback={closePopup} />
+                    </Popper>
                     <CommunityGamePicker />
                 </Box>
 

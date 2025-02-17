@@ -1,7 +1,8 @@
-import { Box, Button, Slide, Typography } from '@mui/material'
-import React, { Component, useRef } from 'react'
+import { Box, Button, Typography } from '@mui/material'
+import React, { Component } from 'react'
 import './GameBox.css'
 import { useNavigate } from 'react-router-dom'
+import logo from './../../assets/TCGMlogo.png'
 
 const height = '120px'
 const width = '140px'
@@ -91,12 +92,7 @@ const Deck = ({ checked, gameId }) => {
 
       <Box className={!checked ? 'cube topCubeAnimation' : 'cube'}>
         <Box className='face front'>
-          <img
-            width={width}
-            height={height}
-            alt='TCGM'
-            src='https://www.shutterstock.com/shutterstock/photos/1881111823/display_1500/stock-photo-man-watching-sunset-at-duffey-lake-duffey-lake-provincial-park-british-columbia-canada-1881111823.jpg'
-          />
+          <img width={width} height={height} alt='TCGM' src={logo} />
         </Box>
         <Box className='face right'></Box>
         <Box className='face top'></Box>

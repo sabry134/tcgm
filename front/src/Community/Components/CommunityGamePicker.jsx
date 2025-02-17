@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Grid2, Box } from '@mui/material'
 import { GameBox } from './GameBox'
+import { getGamesRequest } from '../../Api/gamesRequest'
 
 export class CommunityGamePicker extends Component {
   constructor (props) {
@@ -8,35 +9,19 @@ export class CommunityGamePicker extends Component {
     this.state = {
       gameList: []
     }
-    this.baseApiUrl = process.env.REACT_APP_API_URL
-    if (!this.baseApiUrl) {
-      this.baseApiUrl = 'http://localhost:4000/api/'
-    }
   }
 
   componentDidMount () {
-    this.getGames()
+    if (this.state.gameList.length === 0) this.getGames()
   }
 
   async getGames () {
-    const apiUrl = this.baseApiUrl + 'games'
-
     try {
-      const response = await fetch(apiUrl, { method: 'GET' })
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok')
-      }
-
-      const data = await response.json()
-
-      // ✅ Set state AFTER fetching data
+      const data = await getGamesRequest()
       this.setState({ gameList: data })
-
-      return data // ✅ Return the fetched data
     } catch (error) {
+      this.setState({ gameList: [] })
       console.error('Error fetching games:', error)
-      return {} // ✅ Return empty object if there's an error
     }
   }
 

@@ -1,11 +1,11 @@
 import { Button, Paper, TextField } from "@mui/material";
 import React, { Component } from "react";
 import { CardPicker } from "./CardPicker";
-import { createCardTypeRequest } from "../api/cardTypesRequest";
-import { createGameRequest } from "../api/gamesRequest";
-import { saveCardRequest, getCardRequest } from "../api/cardsRequest";
-import { loginRequest } from "../api/loginRequest";
-import { createUserRequest } from "../api/usersRequest";
+import { createCardTypeRequest } from "../../Api/cardTypesRequest";
+import { createGameRequest } from "../../Api/gamesRequest";
+import { saveCardRequest, getCardRequest } from "../../Api/cardsRequest";
+import { loginRequest } from "../../Api/loginRequest";
+import { createUserRequest } from "../../Api/usersRequest";
 
 export class LeftPanel extends Component {
   constructor(props) {
@@ -23,10 +23,6 @@ export class LeftPanel extends Component {
       },
       cardList: []
     };
-    this.baseApiUrl = process.env.REACT_APP_API_URL;
-    if (!this.baseApiUrl) {
-      this.baseApiUrl = "http://localhost:4000/api/"
-    }
   }
 
   componentDidMount() {

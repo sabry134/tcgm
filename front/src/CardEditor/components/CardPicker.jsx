@@ -1,5 +1,6 @@
 import { FormComponnent } from "../../CustomizationForm/FormComponnent";
 import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { getCardRequest } from "../../Api/cardsRequest";
 
 export class CardPicker extends FormComponnent {
   constructor(props) {
@@ -8,10 +9,6 @@ export class CardPicker extends FormComponnent {
       inputValue: 0,
       cards: [], // Store fetched data
     };
-    this.baseApiUrl = process.env.REACT_APP_API_URL;
-    if (!this.baseApiUrl) {
-      this.baseApiUrl = "http://localhost:4000/api/"
-    }
   }
 
   componentDidMount() {
@@ -20,24 +17,17 @@ export class CardPicker extends FormComponnent {
 
 
   fetchType = () => {
-    const apiUrl = this.baseApiUrl + 'cards';
-
-    fetch(apiUrl, {
-      method: 'GET',
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+    try {
+      getCardRequest().then((data) => {
+        if (!data) {
+          return [];
         }
-        return response.json();
-      })
-      .then((data) => {
         this.setState({ cards: data });
-      })
-      .catch((error) => {
-        console.log(error);
       });
-  }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   handleChange = (event) => {
     const newValue = event.target.value;

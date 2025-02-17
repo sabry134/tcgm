@@ -4,8 +4,7 @@ import { CardPicker } from "./CardPicker";
 import { createCardTypeRequest } from "../../Api/cardTypesRequest";
 import { createGameRequest } from "../../Api/gamesRequest";
 import { saveCardRequest, getCardRequest } from "../../Api/cardsRequest";
-import { loginRequest } from "../../Api/loginRequest";
-import { createUserRequest } from "../../Api/usersRequest";
+import { loginUserRequest, createUserRequest } from "../../Api/usersRequest";
 
 export class LeftPanel extends Component {
   constructor(props) {
@@ -69,12 +68,10 @@ export class LeftPanel extends Component {
     const storedId = localStorage.getItem("editIdPick");
 
     try {
-      if (!storedId || storedId === "0") {
-        saveCardRequest(storedId, card).then((data) => {
-          console.log(data)
-        })
-        this.getCard();
-      }
+      saveCardRequest(storedId, card).then((data) => {
+        console.log(data)
+      })
+      this.getCard();
     } catch (error) {
       console.log(error)
     }
@@ -96,7 +93,7 @@ export class LeftPanel extends Component {
 
   login(json) {
     try {
-      loginRequest({
+      loginUserRequest({
         "user": { "username": "zac" }
       }).then((data) => {
         console.log(data)

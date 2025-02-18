@@ -34,12 +34,10 @@ export class GameBox extends Component {
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
       >
-        <Box>
-          <Deck checked={this.state.checked} gameId={this.game.id} />
-          <Typography variant='h5' gutterBottom>
-            {this.game.name}
-          </Typography>
-        </Box>
+        <Deck checked={this.state.checked} gameId={this.game.id} />
+        <Typography variant='h5' gutterBottom>
+          {this.game.name}
+        </Typography>
       </div>
     )
   }

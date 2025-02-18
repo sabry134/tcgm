@@ -50,7 +50,8 @@ const Deck = ({ checked, gameId }) => {
 
   const handleEditButton = event => {
     localStorage.setItem('gameSelected', gameId)
-    navigate('/')
+    window.dispatchEvent(new Event('gameSelected'))
+    navigate('/card-editor')
   }
 
   const handleClickButton = event => {

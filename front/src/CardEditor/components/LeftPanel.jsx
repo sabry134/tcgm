@@ -1,46 +1,46 @@
-import { Button, Paper, TextField } from "@mui/material";
-import React, { Component } from "react";
-import { CardPicker } from "./CardPicker";
-import { createCardTypeRequest } from "../../Api/cardTypesRequest";
-import { createGameRequest } from "../../Api/gamesRequest";
-import { saveCardRequest, getCardRequest } from "../../Api/cardsRequest";
-import { loginUserRequest, createUserRequest } from "../../Api/usersRequest";
+import { Button, Paper, TextField } from '@mui/material'
+import React, { Component } from 'react'
+import { CardPicker } from './CardPicker'
+import { createCardTypeRequest } from '../../Api/cardTypesRequest'
+import { saveCardRequest, getCardRequest } from '../../Api/cardsRequest'
+import { loginUserRequest, createUserRequest } from '../../Api/usersRequest'
 
 export class LeftPanel extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
     this.state = {
       createTypeInput: {
-        "name": "",
-        "properties": [""],
-        "game_id": 1
-
+        name: '',
+        properties: [''],
+        game_id: 1
       },
       createGameInput: {
-        "name": "",
-        "description": ""
+        name: '',
+        description: ''
       },
       cardList: []
-    };
+    }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     this.getCard()
   }
 
-  componentWillUnmount() {
-    localStorage.removeItem("editIdPick")
+  componentWillUnmount () {
+    localStorage.removeItem('editIdPick')
   }
 
-  createCardType() {
+  createCardType () {
+    const gameSelected = localStorage.getItem('gameSelected')
+
     try {
       createCardTypeRequest({
         cardType: {
-          "name": this.state.createTypeInput.name,
-          "properties": this.state.createTypeInput.properties,
-          "game_id": this.state.createTypeInput.game_id
+          name: this.state.createTypeInput.name,
+          properties: this.state.createTypeInput.properties,
+          game_id: gameSelected
         }
-      }).then((data) => {
+      }).then(data => {
         console.log(data)
       })
     } catch (error) {
@@ -48,40 +48,25 @@ export class LeftPanel extends Component {
     }
   }
 
-  createGame() {
+  saveCard () {
+    const card = localStorage.getItem('currentEditedCard')
+    const storedId = localStorage.getItem('editIdPick')
+
     try {
-      createGameRequest({
-        game: {
-          "name": this.state.createGameInput.name,
-          "description": this.state.createGameInput.description
-        }
-      }).then((data) => {
+      saveCardRequest(storedId, JSON.parse(card)).then(data => {
         console.log(data)
       })
+      this.getCard()
     } catch (error) {
       console.log(error)
     }
   }
 
-  saveCard() {
-    const card = localStorage.getItem("currentEditedCard")
-    const storedId = localStorage.getItem("editIdPick");
-
+  getCard () {
     try {
-      saveCardRequest(storedId, card).then((data) => {
-        console.log(data)
-      })
-      this.getCard();
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  getCard() {
-    try {
-      getCardRequest().then((data) => {
+      getCardRequest().then(data => {
         if (!data) {
-          return [];
+          return []
         }
         this.setState({ cardList: data })
         return data
@@ -91,11 +76,11 @@ export class LeftPanel extends Component {
     }
   }
 
-  login(json) {
+  login (json) {
     try {
       loginUserRequest({
-        "user": { "username": "zac" }
-      }).then((data) => {
+        user: { username: 'zac' }
+      }).then(data => {
         console.log(data)
       })
     } catch (error) {
@@ -103,11 +88,11 @@ export class LeftPanel extends Component {
     }
   }
 
-  register(json) {
+  register (json) {
     try {
       createUserRequest({
-        "user": { "username": "zac" }
-      }).then((data) => {
+        user: { username: 'zac' }
+      }).then(data => {
         console.log(data)
       })
     } catch (error) {
@@ -115,69 +100,53 @@ export class LeftPanel extends Component {
     }
   }
 
-  handleCreateGameInput(event, key) {
-    const newValue = event.target.value;
-    const newGame = {
-      "name": key === "name" ? newValue : this.state.createGameInput.name,
-      "description": key === "description" ? newValue : this.state.createGameInput.description,
-    }
-
-    this.setState({ createGameInput: newGame });
-  }
-
-  handleCreateTypeInput(event, key) {
-    const newValue = event.target.value;
+  handleCreateTypeInput (event, key) {
+    const newValue = event.target.value
     const newType = {
-      "name": key === "name" ? newValue : this.state.createTypeInput.name,
-      "game_id": key === "game_id" ? newValue : this.state.createTypeInput.game_id,
-      "properties": this.state.createTypeInput.properties
+      name: key === 'name' ? newValue : this.state.createTypeInput.name,
+      game_id:
+        key === 'game_id' ? newValue : this.state.createTypeInput.game_id,
+      properties: this.state.createTypeInput.properties
     }
-    this.setState({ createTypeInput: newType });
+    this.setState({ createTypeInput: newType })
   }
 
-  loadCard(card) {
-    localStorage.setItem("currentEditedCard", JSON.stringify({ "card": card }));
+  loadCard (card) {
+    localStorage.setItem('currentEditedCard', JSON.stringify({ card: card }))
     window.dispatchEvent(new Event('storage'))
   }
 
-  render() {
+  render () {
     return (
       <Paper
-        className="sidebar"
+        className='sidebar'
         sx={{
           width: 250,
           p: 2,
-          bgcolor: "#5d3a00",
-          color: "white",
-          borderRadius: 0,
+          bgcolor: '#5d3a00',
+          color: 'white',
+          borderRadius: 0
         }}
       >
-        <CardPicker/>
-        <Button onClick={(event) => this.saveCard()} sx={{ color: "white", paddingBottom: 5 }}>
+        <CardPicker />
+        <Button
+          onClick={event => this.saveCard()}
+          sx={{ color: 'white', paddingBottom: 5 }}
+        >
           Save Card
         </Button>
-        <TextField style={{ backgroundColor: 'white' }}
-                   id="game-name"
-                   variant="standard"
-                   label="game name"
-                   value={this.state.createGameInput.name}
-                   onChange={(event) => this.handleCreateGameInput(event, "name")}/>
-        <TextField style={{ backgroundColor: 'white' }}
-                   id="game-description"
-                   variant="standard"
-                   label="game description"
-                   value={this.state.createGameInput.description}
-                   onChange={(event) => this.handleCreateGameInput(event, "description")}/>
-        <Button onClick={(event) => this.createGame()} sx={{ color: "white", paddingBottom: 5 }}>
-          Create Game
-        </Button>
-        <TextField style={{ backgroundColor: 'white' }}
-                   id="type-name"
-                   variant="standard"
-                   label="Type name"
-                   value={this.state.createTypeInput.name}
-                   onChange={(event) => this.handleCreateTypeInput(event, "name")}/>
-        <Button onClick={(event) => this.createCardType()} sx={{ color: "white" }}>
+        <TextField
+          style={{ backgroundColor: 'white' }}
+          id='type-name'
+          variant='standard'
+          label='Type name'
+          value={this.state.createTypeInput.name}
+          onChange={event => this.handleCreateTypeInput(event, 'name')}
+        />
+        <Button
+          onClick={event => this.createCardType()}
+          sx={{ color: 'white' }}
+        >
           Create Type
         </Button>
         <div style={{ marginTop: 20 }}>
@@ -186,9 +155,9 @@ export class LeftPanel extends Component {
             this.state.cardList.map((card, index) => (
               <Button
                 key={index}
-                variant="contained"
-                onClick={(event) => this.loadCard(card)}
-                sx={{ bgcolor: "white", color: "#5d3a00", margin: "5px 0" }}
+                variant='contained'
+                onClick={event => this.loadCard(card)}
+                sx={{ bgcolor: 'white', color: '#5d3a00', margin: '5px 0' }}
               >
                 {card.name}
               </Button>

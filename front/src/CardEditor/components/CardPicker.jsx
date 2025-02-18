@@ -1,55 +1,58 @@
-import { FormComponnent } from "../../CustomizationForm/FormComponnent";
-import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-import { getCardRequest } from "../../Api/cardsRequest";
+import { FormComponnent } from '../../CustomizationForm/FormComponnent'
+import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
+import { getCardsByGameRequest } from '../../Api/cardsRequest'
 
 export class CardPicker extends FormComponnent {
-  constructor(props) {
-    super(props);
+  constructor (props) {
+    super(props)
     this.state = {
       inputValue: 0,
-      cards: [], // Store fetched data
-    };
+      cards: [] // Store fetched data
+    }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     this.fetchType()
   }
 
-
   fetchType = () => {
+    const gameSelected = localStorage.getItem('gameSelected')
+
     try {
-      getCardRequest().then((data) => {
+      getCardsByGameRequest(gameSelected).then(data => {
         if (!data) {
-          return [];
+          return []
         }
-        this.setState({ cards: data });
-      });
+        this.setState({ cards: data })
+      })
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  };
+  }
 
-  handleChange = (event) => {
-    const newValue = event.target.value;
-    this.setState({ inputValue: newValue });
-    localStorage.setItem("editIdPick", newValue.toString())
-  };
+  handleChange = event => {
+    const newValue = event.target.value
+    this.setState({ inputValue: newValue })
+    localStorage.setItem('editIdPick', newValue.toString())
+  }
 
-  render() {
+  render () {
     return (
       <FormControl fullWidth>
-        <InputLabel id="card-type-picke-label"></InputLabel>
+        <InputLabel id='card-type-picke-label'></InputLabel>
         <Select
           style={{ backgroundColor: 'white' }}
-          labelId="card-type-picke-label"
-          id="card-type-picker"
+          labelId='card-type-picke-label'
+          id='card-type-picker'
           value={this.state.inputValue}
           defaultValue={0}
-          label="Type"
+          label='Type'
           onChange={this.handleChange}
           onOpen={this.fetchType}
         >
-          <MenuItem key={"new"} value={0}>➕ New Card </MenuItem>
+          <MenuItem key={'new'} value={0}>
+            ➕ New Card{' '}
+          </MenuItem>
           {this.state.cards.length > 0 ? (
             this.state.cards.map((card, index) => (
               <MenuItem key={index} value={card.id}>
@@ -61,6 +64,6 @@ export class CardPicker extends FormComponnent {
           )}
         </Select>
       </FormControl>
-    );
+    )
   }
 }

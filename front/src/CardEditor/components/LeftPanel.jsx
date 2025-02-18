@@ -2,7 +2,7 @@ import { Button, Paper, TextField } from '@mui/material'
 import React, { Component } from 'react'
 import { CardPicker } from './CardPicker'
 import { createCardTypeRequest } from '../../Api/cardTypesRequest'
-import { saveCardRequest, getCardRequest } from '../../Api/cardsRequest'
+import { saveCardRequest, getCardsByGameRequest } from '../../Api/cardsRequest'
 import { loginUserRequest, createUserRequest } from '../../Api/usersRequest'
 
 export class LeftPanel extends Component {
@@ -63,8 +63,10 @@ export class LeftPanel extends Component {
   }
 
   getCard () {
+    const gameSelected = localStorage.getItem('gameSelected')
+
     try {
-      getCardRequest().then(data => {
+      getCardsByGameRequest(gameSelected).then(data => {
         if (!data) {
           return []
         }

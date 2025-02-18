@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
     Button,
-    Typography,
     Box,
     Paper,
     Card,
@@ -15,8 +14,6 @@ const Templates = () => {
 
     const [scenes, setScenes] = useState([]);
     const [selectedScene, setSelectedScene] = useState("");
-    const [trueFalseProperty, setTrueFalseProperty] = useState(true);
-    const [sliderValue, setSliderValue] = useState(50);
     const [cards, setCards] = useState([]);
     const [buttons, setButtons] = useState([]);
 
@@ -56,33 +53,6 @@ const Templates = () => {
     useEffect(() => {
         document.title = "JCCE";
     }, []);
-
-    const addScene = () => {
-        const newScene = `Scene ${scenes.length + 1}`;
-        setScenes([...scenes, newScene]);
-        setSelectedScene(newScene);
-    };
-
-    const deleteScene = () => {
-        const updatedScenes = scenes.filter((scene) => scene !== selectedScene);
-        setScenes(updatedScenes);
-        setSelectedScene(updatedScenes[0] || "");
-    };
-
-    const addCard = () => {
-        const newCard = { id: Date.now(), x: 100, y: 100, height: 400 };
-        setCards([...cards, newCard]);
-    };
-
-    const addButton = () => {
-        const newButton = {
-            id: Date.now(),
-            label: `Button ${buttons.length + 1}`,
-            x: 100,
-            y: 200,
-        };
-        setButtons([...buttons, newButton]);
-    };
 
     const handleCardMouseDown = (event, id) => {
         const card = cards.find((c) => c.id === id);

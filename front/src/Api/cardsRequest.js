@@ -19,6 +19,9 @@ export async function getCardRequest() {
 //   "card_type_id": 0
 // }
 export async function saveCardRequest(storedId, data) {
+  const gameSelected = localStorage.getItem('gameSelected')
+  data.card.game_id = gameSelected
+
   if (!storedId || storedId === "0") {
     return await baseRequest('cards', 'POST', data, {
       'Content-Type': 'application/json'

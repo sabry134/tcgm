@@ -1,13 +1,12 @@
 {
-    "card": {
-        "name": "text",
-        "text": "text",
-        "image": "text",
-        "properties": [
-            "text"
-        ],
-        "game_id": "game",
-        "card_type_id": "cardType",
-        "effect_ids": []
-    }
+  "card": {
+    "name": "text",
+    "text": "text",
+    "image": "text",
+    "properties": [
+      "text"
+    ],
+    "card_type_id": "cardType",
+    "effect_ids": []
+  }
 }

@@ -7,7 +7,7 @@ import Config
 # before starting your production server.
 config :tcgm_web_app, TcgmWebAppWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json",
-  http: [port: 4000, transport_options: [socket_opts: [:inet6]]],
+  http: [ip: {0, 0, 0, 0}, port: 4000],
   url: [host: "2001:41d0:304:300::6c75", port: 4000],
   server: true,
   check_origin: false,  # Make sure this is set as you need it (for development purposes)

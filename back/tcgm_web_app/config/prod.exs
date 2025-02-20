@@ -8,7 +8,7 @@ import Config
 config :tcgm_web_app, TcgmWebAppWeb.Endpoint,
   cache_static_manifest: "priv/static/cache_manifest.json",
   http: [ip: {0, 0, 0, 0, 0, 0, 0, 0}, port: 4000],
-  url: [host: "2001:41d0:304:300::6c75", port: 4000],
+  url: [host: "79.137.11.227", port: 4000],
   server: true,
   check_origin: false,  # Make sure this is set as you need it (for development purposes)
   secret_key_base: "nRiIgIQXI1tGiBKfhvGM8+LmD8dPeCg9iv8AHgDZUeasZkBJuV9cppGrpGcTsptL"

@@ -29,12 +29,12 @@ export class NavigationBar extends Component {
     return (
       <Box
         sx={{
-          backgroundColor: '#5d3a00',
+          backgroundColor: '#C4C4C4',
           color: 'white',
           padding: '10px',
           display: 'flex',
           justifyContent: 'space-around'
-        }}
+      }}
       >
         {/*<Button onClick={() => this.props.navigate("/")} sx={{ borderRadius: 0 }}>
                     <Typography variant="h6" sx={{ color: "white" }}>
@@ -43,7 +43,7 @@ export class NavigationBar extends Component {
             </Button>*/}
         <Button
           onClick={() => this.props.navigate('/')}
-          sx={{ borderRadius: 0 }}
+          sx={ buttonStyle }
         >
           <Typography variant='h6' sx={{ color: 'white' }}>
             🌍 Community
@@ -52,22 +52,29 @@ export class NavigationBar extends Component {
         <Button
           disabled={this.state.noGameChosen}
           onClick={() => this.props.navigate('/card-editor')}
-          sx={{ borderRadius: 0 }}
+          sx={ buttonStyle }
         >
-          <Typography variant='h6' sx={{ color: 'white' }}>
+          <Typography variant='h6' sx={{ color: this.state.noGameChosen ? 'gray' : 'white' }}>
             🖼️ Card Editor
           </Typography>
         </Button>
         <Button
           disabled={this.state.noGameChosen}
           onClick={() => this.props.navigate('/templates')}
-          sx={{ borderRadius: 0 }}
+          sx={ buttonStyle }
         >
-          <Typography variant='h6' sx={{ color: 'white' }}>
+          <Typography variant='h6' sx={{ color: this.state.noGameChosen ? 'gray' : 'white' }}>
             📜 Templates
           </Typography>
         </Button>
       </Box>
     )
   }
+}
+
+const buttonStyle = {
+  padding: '10px 20px', // Add padding
+  backgroundColor: '#5d3a00', // Add background color
+  flexGrow: 1, // Fill the container
+  margin: '0 10px' // Add margin
 }

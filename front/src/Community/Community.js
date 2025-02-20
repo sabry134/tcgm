@@ -1,7 +1,7 @@
 import { React, useRef, useState } from "react";
 import { Box, Popper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { NavigationBar } from "./../NavigationBar";
+import { NavigationBar } from "../Components/NavigationBar";
 import { LeftPanel } from "./Components/LeftPanel";
 import { RightPanel } from "./Components/RightPanel";
 import { CommunityGamePicker } from "./Components/CommunityGamePicker";

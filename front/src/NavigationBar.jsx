@@ -58,6 +58,16 @@ export class NavigationBar extends Component {
             🖼️ Card Editor
           </Typography>
         </Button>
+
+        <Button
+          disabled={this.state.noGameChosen}
+          onClick={() => this.props.navigate('/type-editor')}
+          sx={{ borderRadius: 0 }}
+        >
+          <Typography variant='h6' sx={{ color: 'white' }}>
+            🔨 Type Editor
+          </Typography>
+        </Button>
         <Button
           disabled={this.state.noGameChosen}
           onClick={() => this.props.navigate('/templates')}

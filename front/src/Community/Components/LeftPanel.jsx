@@ -1,6 +1,7 @@
 import { Paper, TextField, Button } from '@mui/material'
 import React, { Component } from 'react'
 import './CreateGamePopupBody.css'
+import { TCGMButton } from '../../Components/TCGMButton'
 export class LeftPanel extends Component {
   constructor (props) {
     super(props)
@@ -67,9 +68,7 @@ export class LeftPanel extends Component {
           borderRadius: 0
         }}
       >
-        <div onClick={this.popupCallback} className='button'>
-          Create Game
-        </div>
+        <TCGMButton onClick={this.popupCallback}>Create Game</TCGMButton>
       </Paper>
     )
   }

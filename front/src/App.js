@@ -6,6 +6,7 @@ import CardEditor from './CardEditor/CardEditor'
 import Community from "./Community/Community";
 import { ThemeProvider } from '@emotion/react';
 import theme from './Theme'
+import TypeEditor from './TypeEditor/TypeEditor';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           {/*<Route path="/" element={<SceneEditor />} />*/}
           <Route path="/templates" element={<Templates />} />
           <Route path="/card-editor" element={<CardEditor />} />
+          <Route path="/type-editor" element={<TypeEditor />} />
           <Route path="/" element={<Community />} />
         </Routes>
       </Router>

@@ -319,4 +319,29 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
     db_quantity = Repo.get(CardCollection, id).quantity
     assert db_quantity == 2
   end
+
+  test "GET /api/card_collections/get_cards/:card_collection_id returns a list of cards in a collection", %{conn: conn, card_collection: card_collection, card: card} do
+    attrs = %{ name: "test_aha", quantity: 1, game_id: card_collection.game_id, user_id: card_collection.user_id, type: "Test_type" }
+    conn = post(conn, "/api/card_collections", card_collection: attrs)
+
+    id = json_response(conn, 201)["id"]
+    name = json_response(conn, 201)["name"]
+
+    conn = post(conn, "/api/card_collections/add_card/#{id}/card/#{card.id}/quantity/2")
+    response = json_response(conn, 200)
+
+    assert response["message"] == "Card added to collection"
+
+    conn = get(conn, "/api/card_collections/get_cards/#{id}")
+    response = json_response(conn, 200)
+
+    assert length(response) == 2
+    assert Enum.all?(response, fn c -> c["name"] == card.name end)
+    assert Enum.all?(response, fn c -> c["text"] == card.text end)
+    assert Enum.all?(response, fn c -> c["image"] == card.image end)
+    assert Enum.all?(response, fn c -> c["properties"] == card.properties end)
+    assert Enum.all?(response, fn c -> c["game_id"] == card.game_id end)
+    assert Enum.all?(response, fn c -> c["card_type_id"] == card.card_type_id end)
+    assert Enum.all?(response, fn c -> c["effect_ids"] == card.effect_ids end)
+  end
 end

@@ -350,4 +350,25 @@ defmodule TcgmWebAppWeb.CardCollectionController do
       end
     end)
   end
+
+  def get_cards_in_collection(conn, %{"card_collection_id" => card_collection_id}) do
+    card_collection = CardCollections.get_card_collection!(card_collection_id)
+    file_path = get_file_path(card_collection)
+    file_content = read_file_content(file_path)
+
+    collection = Enum.find(file_content, fn c -> to_string(c["id"]) == to_string(card_collection_id) end)
+    card_quantities = collection["cards"]
+
+    card_names = Map.keys(card_quantities)
+    cards = Cards.get_cards_by_names(card_names)
+
+    cards_with_quantities = Enum.flat_map(cards, fn card ->
+      quantity = card_quantities[card.name]
+      Enum.map(1..quantity, fn _ -> Map.put(card, :quantity, quantity) end)
+    end)
+
+    conn
+    |> put_status(:ok)
+    |> json(cards_with_quantities)
+  end
 end

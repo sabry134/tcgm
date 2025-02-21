@@ -40,6 +40,11 @@ defmodule TcgmWebAppWeb.Router do
     delete "/effects/delete/:effect_id", EffectController, :delete_effect
     get "/effects/game/:game_id", EffectController, :get_effects_by_game_id
 
+    resources "/card_collections", CardCollectionController, only: [:index, :show, :create, :update]
+    delete "/card_collections/delete/:card_collection_id", CardCollectionController, :delete_card_collection
+    get "/card_collections/game/:game_id", CardCollectionController, :get_card_collections_by_game_id
+    get "/card_collections/game/:game_id/type/:type", CardCollectionController, :get_card_collections_by_game_id_and_type
+
     post "/rooms", RoomController, :create
     get "/rooms/:room_id", RoomController, :state
     post "/rooms/:room_id/join", RoomController, :join

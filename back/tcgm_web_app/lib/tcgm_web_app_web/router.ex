@@ -44,6 +44,10 @@ defmodule TcgmWebAppWeb.Router do
     delete "/card_collections/delete/:card_collection_id", CardCollectionController, :delete_card_collection
     get "/card_collections/game/:game_id", CardCollectionController, :get_card_collections_by_game_id
     get "/card_collections/game/:game_id/type/:type", CardCollectionController, :get_card_collections_by_game_id_and_type
+    get "/card_collections/user/:user_id", CardCollectionController, :get_card_collections_by_user_id
+    get "/card_collections/user/:user_id/game/:game_id", CardCollectionController, :get_card_collections_by_user_id_and_game_id
+    post "/card_collections/add_card/:card_collection_id/card/:card_id/quantity/:quantity", CardCollectionController, :add_card_to_collection
+    post "/card_collections/remove_card/:card_collection_id/card/:card_id/quantity/:quantity", CardCollectionController, :remove_card_from_collection
 
     post "/rooms", RoomController, :create
     get "/rooms/:room_id", RoomController, :state

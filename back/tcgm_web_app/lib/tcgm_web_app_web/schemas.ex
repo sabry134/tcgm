@@ -64,6 +64,16 @@ defmodule TcgmWebAppWeb.Schemas do
           player_id: %{type: :string, description: "ID of the player"},
         },
         required: [:name, :description, :game_id]
+      },
+      CardCollectionRequest: %{
+        type: :object,
+        properties: %{
+          name: %{type: :string, description: "Name of the card collection"},
+          quantity: %{type: :integer, description: "Quantity of the card"},
+          game_id: %{type: :integer, description: "ID of the game"},
+          type: %{type: :string, description: "Type of the card"}
+        },
+        required: [:quantity, :game_id, :type]
       }
     }
   end

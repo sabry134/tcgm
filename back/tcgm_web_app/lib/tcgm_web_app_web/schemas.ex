@@ -74,6 +74,32 @@ defmodule TcgmWebAppWeb.Schemas do
           type: %{type: :string, description: "Type of the card"}
         },
         required: [:quantity, :game_id, :type]
+      },
+      CardTypeProperties: %{
+        type: :object,
+        properties: %{
+          property_name: %{type: :string, description: "Name of the property"},
+          cardtype_id: %{type: :integer, description: "ID of the card type"},
+          type: %{type: :string, description: "Type of the property"},
+          font: %{type: :string, description: "Font of the property"},
+          font_size: %{type: :integer, description: "Font size of the property"},
+          font_color: %{type: :string, description: "Font color of the property"},
+          position_x: %{type: :integer, description: "Position X of the property"},
+          position_y: %{type: :integer, description: "Position Y of the property"},
+          rotation: %{type: :integer, description: "Rotation of the property"},
+          scale_x: %{type: :integer, description: "Scale X of the property"},
+          scale_y: %{type: :integer, description: "Scale Y of the property"},
+          image: %{type: :string, description: "Image of the property"},
+          image_width: %{type: :integer, description: "Image width of the property"},
+          image_height: %{type: :integer, description: "Image height of the property"},
+          image_position_x: %{type: :integer, description: "Image position X of the property"},
+          image_position_y: %{type: :integer, description: "Image position Y of the property"},
+          image_rotation: %{type: :integer, description: "Image rotation of the property"},
+          image_scale_x: %{type: :integer, description: "Image scale X of the property"},
+          image_scale_y: %{type: :integer, description: "Image scale Y of the property"},
+          image_opacity: %{type: :integer, description: "Image opacity of the property"},
+        },
+        required: [:property_name, :cardtype_id, :type, :position_x, :position_y, :rotation, :scale_x, :scale_y]
       }
     }
   end

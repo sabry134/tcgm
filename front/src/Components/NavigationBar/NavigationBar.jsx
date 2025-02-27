@@ -1,5 +1,6 @@
 import { Box, Button, Typography } from '@mui/material'
 import React, { Component } from 'react'
+import { GameSelectedAddOn } from "./GameSelectedAddOn";
 
 export class NavigationBar extends Component {
   constructor (props) {
@@ -46,27 +47,14 @@ export class NavigationBar extends Component {
           sx={ buttonStyle }
         >
           <Typography variant='h6' sx={{ color: 'white' }}>
-            🌍 Community
+            Game List
           </Typography>
         </Button>
-        <Button
-          disabled={this.state.noGameChosen}
-          onClick={() => this.props.navigate('/card-editor')}
-          sx={ buttonStyle }
-        >
-          <Typography variant='h6' sx={{ color: this.state.noGameChosen ? 'gray' : 'white' }}>
-            🖼️ Card Editor
-          </Typography>
-        </Button>
-        <Button
-          disabled={this.state.noGameChosen}
-          onClick={() => this.props.navigate('/templates')}
-          sx={ buttonStyle }
-        >
-          <Typography variant='h6' sx={{ color: this.state.noGameChosen ? 'gray' : 'white' }}>
-            📜 Templates
-          </Typography>
-        </Button>
+        {!this.state.noGameChosen && (
+          <>
+            <GameSelectedAddOn />
+          </>
+        )}
       </Box>
     )
   }

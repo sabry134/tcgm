@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { NavigationBar } from "../Components/NavigationBar";
+import { NavigationBar } from "../Components/NavigationBar/NavigationBar";
 
 const SceneEditor = () => {
   const navigate = useNavigate();

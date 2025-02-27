@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { TCGMCard } from "./components/TCGMCard";
-import { NavigationBar } from "../Components/NavigationBar";
+import { NavigationBar } from "../Components/NavigationBar/NavigationBar";
 import { LeftPanel } from "./components/LeftPanel";
 import { RightPanel } from "./components/RightPanel";
 import defaultData from "./data/TestBack.json"

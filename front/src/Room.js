@@ -44,25 +44,6 @@ const Room = () => {
     }
   }, []);
 
-  /*
-  useEffect(() => {
-    if (selectedScene) {
-      const savedSceneData =
-        JSON.parse(sessionStorage.getItem(selectedScene)) || { cards: [], buttons: [] };
-      setCards(savedSceneData.cards);
-      setButtons(savedSceneData.buttons);
-    }
-  }, [selectedScene]);
-  */
-
-  /*
-  useEffect(() => {
-    if (selectedScene) {
-      sessionStorage.setItem(selectedScene, JSON.stringify({ cards, buttons }));
-    }
-  }, [cards, buttons, selectedScene]);
-  */
-
   useEffect(() => {
     if (scenes.length > 0) {
       localStorage.setItem("scenes", JSON.stringify(scenes));
@@ -75,33 +56,55 @@ const Room = () => {
 
   useEffect(() => {
     const room_id = localStorage.getItem("room_id");
-
     if (!room_id) {
       console.error("No room_id found in localStorage");
-      //navigate("/join");
+      navigate("/join");
       return;
     }
 
-    fetch("http://localhost:4000/rooms/join", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ room_id }),
-    })
-      .then((response) => {
+    let playerUsername = localStorage.getItem("playerUsername");
+    if (!playerUsername) {
+      const counter = parseInt(localStorage.getItem("playerCounter") || "1", 10);
+      playerUsername = `Player ${counter}`;
+      localStorage.setItem("playerUsername", playerUsername);
+    }
+
+    const joinRoomFetch = (username) => {
+      return fetch(`http://79.137.11.227:4000/api/rooms/${room_id}/join`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ player_id: username }),
+      }).then((response) => {
         if (!response.ok) throw new Error("Failed to join room");
         return response.json();
-      })
+      });
+    };
+
+    joinRoomFetch(playerUsername)
       .then((data) => {
         localStorage.setItem("player_id", data.player_id);
-        localStorage.setItem("room_id", data.room_id);
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error("Join room failed with username", playerUsername, error);
+        const currentCounter = parseInt(localStorage.getItem("playerCounter") || "1", 10);
+        const newCounter = currentCounter + 1;
+        const newUsername = `Player ${newCounter}`;
+        localStorage.setItem("playerCounter", newCounter.toString());
+        localStorage.setItem("playerUsername", newUsername);
+
+        joinRoomFetch(newUsername)
+          .then((data) => {
+            localStorage.setItem("player_id", data.player_id);
+          })
+          .catch((err) =>
+            console.error("Retry join room failed with username", newUsername, err)
+          );
+      });
   }, [navigate]);
 
   useEffect(() => {
-    // ajouter la room ID et player ID dans le ws du serveur -> après avoir fix avec ulysse
     const ws = new WebSocket("ws://localhost:4000/api/hello");
 
     ws.onopen = () => {

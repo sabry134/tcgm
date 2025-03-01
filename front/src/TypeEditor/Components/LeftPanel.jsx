@@ -18,11 +18,11 @@ export class LeftPanel extends Component {
     }
   }
 
-  createCardType () {
+  async createCardType () {
     const gameSelected = localStorage.getItem('gameSelected')
 
     try {
-      createCardTypeRequest({
+      await createCardTypeRequest({
         cardType: {
           name: this.state.createTypeInput.name,
           properties: this.state.createTypeInput.properties,

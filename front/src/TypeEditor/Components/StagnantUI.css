@@ -32,6 +32,29 @@
   cursor: pointer;
 }
 
+.roundButton.selected {
+  background-color: #656d4a;
+}
+
 .roundButton:hover {
   background: #b6ad90;
+}
+
+.verticalSeparator {
+  display: flex;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  width: 1px;
+  height: 30px;
+  box-shadow: 0px 0px 2px 2px #b6ad90bb;
+  background-color: #b6ad90;
+}
+
+.subAddMenu {
+  display: flex;
+  flex-direction: column;
+  background-color: #a68a64;
+  margin-top: 15px;
+  border-radius: 20px;
+  margin-left: 10px;
 }

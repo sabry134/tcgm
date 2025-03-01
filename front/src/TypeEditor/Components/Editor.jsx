@@ -2,6 +2,7 @@ import { Component, React } from 'react'
 import StagnantUI from './StagnantUI'
 import { TCGMTextField } from './Properties/PropertiesTextField'
 import { Box } from '@mui/material'
+import './Editor.css'
 export class Editor extends Component {
   constructor (props) {
     super(props)
@@ -22,10 +23,9 @@ export class Editor extends Component {
 
     const mainArea = document.querySelector('.editor')
     const mainRect = mainArea.getBoundingClientRect()
-    const rect = event.target.getBoundingClientRect()
 
-    const offsetX = mainRect.left + event.clientX - rect.left
-    const offsetY = mainRect.top + event.clientY - rect.top
+    const offsetX = event.clientX - this.state.position.x
+    const offsetY = event.clientY - this.state.position.y
 
     this.setState({
       dragged: true,
@@ -46,7 +46,11 @@ export class Editor extends Component {
   }
 
   handleOnDragEnd = () => {
-    //set properties of state and local storage
+    if (this.state.idSelected === -1) return
+    const tmpproperties = this.state.properties
+    tmpproperties[this.state.idSelected].position = this.state.position
+    this.setState({ properties: tmpproperties })
+    localStorage.setItem('currentTypeProperties', JSON.stringify(tmpproperties))
     this.setState({ dragged: false })
   }
 
@@ -57,7 +61,7 @@ export class Editor extends Component {
         {
           type: 'text',
           value: 'Text Field',
-          position: { x: '50%', y: '50%' }
+          position: { x: 50, y: 50 }
         }
       ]
       localStorage.setItem(
@@ -86,7 +90,11 @@ export class Editor extends Component {
 
   handleSelectedOnClick = (event, index) => {
     event.stopPropagation()
-    this.setState({ idSelected: index })
+    window.dispatchEvent(new Event('ComponnentSelected'))
+    this.setState({
+      idSelected: index,
+      position: this.state.properties[index].position
+    })
   }
 
   handleDeselectedOnClick = () => {
@@ -105,7 +113,7 @@ export class Editor extends Component {
       >
         <StagnantUI addTextField={this.addTextField} />
         {this.state.properties.map((value, index) => (
-          <Box
+          <div
             key={index}
             onClick={event => this.handleSelectedOnClick(event, index)}
           >
@@ -114,13 +122,14 @@ export class Editor extends Component {
               index,
               this.state.idSelected === index
             )}
-          </Box>
+          </div>
         ))}
       </Box>
     )
   }
 }
 
+// quand on select ou deselect il faut que la pos follow
 // revoir les calcul
 // montrer quand qqc est selected
 // add right pannel customization possibility

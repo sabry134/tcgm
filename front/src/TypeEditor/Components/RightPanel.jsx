@@ -6,6 +6,10 @@ export class RightPanel extends Component {
     super(props)
   }
 
+  componentDidMount () {
+    window.addEventListener('ComponnentSelected', this.handleComponnentSelected)
+  }
+
   render () {
     return (
       <Paper

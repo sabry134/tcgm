@@ -1,0 +1,9 @@
+.editorElement {
+  position: absolute;
+  cursor: grab;
+}
+
+.editorElement.selected {
+  border-width: 1px;
+  border-color: #656d4a;
+}

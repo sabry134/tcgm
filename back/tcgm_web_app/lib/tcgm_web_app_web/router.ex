@@ -40,6 +40,21 @@ defmodule TcgmWebAppWeb.Router do
     delete "/effects/delete/:effect_id", EffectController, :delete_effect
     get "/effects/game/:game_id", EffectController, :get_effects_by_game_id
 
+    resources "/cardTypeProperties", CardTypePropertyController, only: [:index, :show, :create, :update]
+    delete "/cardTypeProperties/delete/:cardTypeProperty_id", CardTypePropertyController, :delete_cardType_property
+    get "/cardTypeProperties/cardType/:cardType_id", CardTypePropertyController, :get_card_type_properties_by_card_type_id
+    get "/cardTypeProperties/cardType/:cardType_id/property/:property_name", CardTypePropertyController, :get_card_type_properties_by_card_type_id_and_property_name
+
+    resources "/card_collections", CardCollectionController, only: [:index, :show, :create, :update]
+    delete "/card_collections/delete/:card_collection_id", CardCollectionController, :delete_card_collection
+    get "/card_collections/game/:game_id", CardCollectionController, :get_card_collections_by_game_id
+    get "/card_collections/game/:game_id/type/:type", CardCollectionController, :get_card_collections_by_game_id_and_type
+    get "/card_collections/user/:user_id", CardCollectionController, :get_card_collections_by_user_id
+    get "/card_collections/user/:user_id/game/:game_id", CardCollectionController, :get_card_collections_by_user_id_and_game_id
+    post "/card_collections/add_card/:card_collection_id/card/:card_id/quantity/:quantity", CardCollectionController, :add_card_to_collection
+    post "/card_collections/remove_card/:card_collection_id/card/:card_id/quantity/:quantity", CardCollectionController, :remove_card_from_collection
+    get "/card_collections/get_cards/:card_collection_id", CardCollectionController, :get_cards_in_collection
+
     post "/rooms", RoomController, :create
     get "/rooms/:room_id", RoomController, :state
     post "/rooms/:room_id/join", RoomController, :join

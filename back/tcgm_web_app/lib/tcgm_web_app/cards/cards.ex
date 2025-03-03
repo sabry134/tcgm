@@ -59,4 +59,18 @@ defmodule TcgmWebApp.Cards.Cards do
   def get_cards_by_game_id(game_id) do
     Repo.all(from c in Card, where: c.game_id == ^game_id)
   end
+
+  @doc """
+    Retrieves a card by it's name.
+  """
+  def get_card_by_name(name) do
+    Repo.all(from c in Card, where: c.name == ^name)
+  end
+
+  @doc """
+    Retrieves cards by names.
+  """
+  def get_cards_by_names(names) do
+    Repo.all(from c in Card, where: c.name in ^names)
+  end
 end

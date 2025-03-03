@@ -128,8 +128,3 @@ export class Editor extends Component {
     )
   }
 }
-
-// quand on select ou deselect il faut que la pos follow
-// revoir les calcul
-// montrer quand qqc est selected
-// add right pannel customization possibility

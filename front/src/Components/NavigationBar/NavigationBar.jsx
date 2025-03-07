@@ -1,6 +1,7 @@
 import { Box, Button, Typography } from '@mui/material'
 import React, { Component } from 'react'
 import { GameSelectedAddOn } from "./GameSelectedAddOn";
+import { buttonStyle } from "./Style";
 
 export class NavigationBar extends Component {
   constructor (props) {
@@ -58,11 +59,4 @@ export class NavigationBar extends Component {
       </Box>
     )
   }
-}
-
-const buttonStyle = {
-  padding: '10px 20px', // Add padding
-  backgroundColor: '#5d3a00', // Add background color
-  flexGrow: 1, // Fill the container
-  margin: '0 10px' // Add margin
 }

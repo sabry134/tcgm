@@ -1,6 +1,8 @@
-import { Button, Typography } from "@mui/material";
+import { Button, SvgIcon, Typography } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { buttonStyle } from "./Style";
+import CancelIcon from '@mui/icons-material/Cancel';
 
 export const GameSelectedAddOn = (noGameChosen) => {
   const navigate = useNavigate()
@@ -39,19 +41,18 @@ export const GameSelectedAddOn = (noGameChosen) => {
       </Button>
       <Button
         onClick={ unselectGame }
-        sx={ buttonStyle }
+        sx={ smallButtonStyle }
+        title={ 'Unselect the game' }
       >
-        <Typography variant='h6' sx={{ color: 'white' }}>
-          Unselect Game
-        </Typography>
+        <SvgIcon
+          component={ CancelIcon }
+          sx={{ color: '#c4c4c4' }}
+        />
       </Button>
     </>
   )
 }
 
-const buttonStyle = {
-  padding: '10px 20px', // Add padding
-  backgroundColor: '#5d3a00', // Add background color
-  flexGrow: 1, // Fill the container
-  margin: '0 10px' // Add margin
+const smallButtonStyle = {
+  backgroundColor: '#5d3a00',
 }

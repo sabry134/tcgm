@@ -3,6 +3,7 @@ import StagnantUI from './StagnantUI'
 import { TCGMTextField } from './Properties/PropertiesTextField'
 import { Box } from '@mui/material'
 import './Editor.css'
+import { saveNewCardTypesPropertiesRequest } from '../../Api/cardTypesPropertiesRequest'
 export class Editor extends Component {
   constructor (props) {
     super(props)
@@ -11,10 +12,24 @@ export class Editor extends Component {
       properties: [],
       idSelected: -1,
       dragged: false,
-      position: { x: 0, y: 0 },
+      position_x: 0,
+      position_y: 0,
       offsetX: 0,
       offsetY: 0
     }
+  }
+
+  componentDidMount () {
+    window.addEventListener('PropertiesSet', this.handlePropertiesSet)
+  }
+  componentWillUnmount () {
+    window.removeEventListener('PropertiesSet', this.handlePropertiesSet)
+  }
+
+  handlePropertiesSet = () => {
+    const tmp = localStorage.getItem('currentTypeProperties')
+
+    this.setState({ properties: JSON.parse(tmp) })
   }
 
   handleOnDragStart = event => {
@@ -24,8 +39,8 @@ export class Editor extends Component {
     const mainArea = document.querySelector('.editor')
     const mainRect = mainArea.getBoundingClientRect()
 
-    const offsetX = event.clientX - this.state.position.x
-    const offsetY = event.clientY - this.state.position.y
+    const offsetX = event.clientX - this.state.position_x
+    const offsetY = event.clientY - this.state.position_y
 
     this.setState({
       dragged: true,
@@ -48,22 +63,42 @@ export class Editor extends Component {
   handleOnDragEnd = () => {
     if (this.state.idSelected === -1) return
     const tmpproperties = this.state.properties
-    tmpproperties[this.state.idSelected].position = this.state.position
+    tmpproperties[this.state.idSelected] = {
+      ...tmpproperties[this.state.idSelected],
+      position_x: this.state.position_x,
+      position_y: this.state.position_y
+    }
     this.setState({ properties: tmpproperties })
     localStorage.setItem('currentTypeProperties', JSON.stringify(tmpproperties))
     this.setState({ dragged: false })
   }
 
   addTextField = () => {
+    const typeId = localStorage.getItem('currentTypeSeleceted')
+
+    const tmpProperties = {
+      property_name: 'TextField',
+      cardtype_id: typeId,
+      type: 'text',
+      value: 'Text',
+      variant: [],
+      mutable: true,
+      font: 'Arial',
+      font_size: 12,
+      font_color: 'black',
+      position_x: 50,
+      position_y: 50,
+      rotation: 0,
+      border_width: 0,
+      border_color: 'black',
+      border_radius: 0,
+      scale_x: 1,
+      scale_y: 1,
+      opacity: 1
+    }
+
     this.setState(prevState => {
-      const newProperties = [
-        ...prevState.properties,
-        {
-          type: 'text',
-          value: 'Text Field',
-          position: { x: 50, y: 50 }
-        }
-      ]
+      const newProperties = [...prevState.properties, tmpProperties]
       localStorage.setItem(
         'currentTypeProperties',
         JSON.stringify(newProperties)
@@ -78,7 +113,8 @@ export class Editor extends Component {
         return (
           <TCGMTextField
             value={value.value}
-            position={selected ? this.state.position : value.position}
+            positionX={selected ? this.state.position_x : value.position_x}
+            positionY={selected ? this.state.position_y : value.position_y}
           />
         )
       }

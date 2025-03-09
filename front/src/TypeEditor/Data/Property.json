@@ -1,0 +1,20 @@
+{
+  "property_name": "TextField",
+  "cardtype_id": "none",
+  "type": "none",
+  "value": "mut",
+  "variant": "variant",
+  "mutable": "boolean",
+  "font": "text",
+  "font_size": "number",
+  "font_color": "color",
+  "position_x": "number",
+  "position_y": "number",
+  "rotation": "number",
+  "border_width": "number",
+  "border_color": "color",
+  "border_radius": "number",
+  "scale_x": "number",
+  "scale_y": "number",
+  "opacity": "number,"
+}

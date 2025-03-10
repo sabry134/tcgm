@@ -7,52 +7,38 @@ import {
   CardContent,
   CardMedia,
   Grid,
+  TextField,
+  Popover,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-
-const cards_json = [
-  {
-    card_name: "Ace of Spades",
-    card_description: "The highest card in the deck.",
-    card_image: "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
-  },
-  {
-    card_name: "Queen of Hearts",
-    card_description: "Represents love and compassion.",
-    card_image: "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
-  },
-  {
-    card_name: "Joker",
-    card_description: "The wild card, unpredictable and fun.",
-    card_image: "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
-  },
-];
+import { Socket } from "phoenix";
+import LinkIcon from "@mui/icons-material/Link";
 
 const Room = () => {
   const navigate = useNavigate();
-
-  const [scenes, setScenes] = useState([]);
-  const [selectedScene, setSelectedScene] = useState("");
-  const [cards, setCards] = useState(cards_json);
-  const [buttons, setButtons] = useState([]);
-
-  useEffect(() => {
-    const savedScenes = JSON.parse(localStorage.getItem("scenes")) || [];
-    if (savedScenes.length > 0) {
-      setScenes(savedScenes);
-      setSelectedScene(savedScenes[0]);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (scenes.length > 0) {
-      localStorage.setItem("scenes", JSON.stringify(scenes));
-    }
-  }, [scenes]);
-
-  useEffect(() => {
-    document.title = "JCCE";
-  }, []);
+  const [cards, setCards] = useState([
+    {
+      card_name: "Ace of Spades",
+      card_description: "The highest card in the deck.",
+      card_image:
+        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
+    },
+    {
+      card_name: "Queen of Hearts",
+      card_description: "Represents love and compassion.",
+      card_image:
+        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
+    },
+    {
+      card_name: "Joker",
+      card_description: "The wild card, unpredictable and fun.",
+      card_image:
+        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
+    },
+  ]);
+  const [roomId, setRoomId] = useState("");
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [copyButtonText, setCopyButtonText] = useState("Copy");
 
   useEffect(() => {
     const room_id = localStorage.getItem("room_id");
@@ -61,75 +47,73 @@ const Room = () => {
       navigate("/join");
       return;
     }
+    setRoomId(room_id);
 
     let playerUsername = localStorage.getItem("playerUsername");
     if (!playerUsername) {
-      const counter = parseInt(localStorage.getItem("playerCounter") || "1", 10);
+      const counter = parseInt(
+        localStorage.getItem("playerCounter") || "1",
+        10
+      );
       playerUsername = `Player ${counter}`;
       localStorage.setItem("playerUsername", playerUsername);
     }
-
-    const joinRoomFetch = (username) => {
-      return fetch(`http://79.137.11.227:4000/api/rooms/${room_id}/join`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ player_id: username }),
-      }).then((response) => {
-        if (!response.ok) throw new Error("Failed to join room");
-        return response.json();
-      });
-    };
-
-    joinRoomFetch(playerUsername)
-      .then((data) => {
-        localStorage.setItem("player_id", data.player_id);
-      })
-      .catch((error) => {
-        console.error("Join room failed with username", playerUsername, error);
-        const currentCounter = parseInt(localStorage.getItem("playerCounter") || "1", 10);
-        const newCounter = currentCounter + 1;
-        const newUsername = `Player ${newCounter}`;
-        localStorage.setItem("playerCounter", newCounter.toString());
-        localStorage.setItem("playerUsername", newUsername);
-
-        joinRoomFetch(newUsername)
-          .then((data) => {
-            localStorage.setItem("player_id", data.player_id);
-          })
-          .catch((err) =>
-            console.error("Retry join room failed with username", newUsername, err)
-          );
-      });
   }, [navigate]);
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:4000/api/hello");
+    console.log("Connecting to room", roomId);
+    const socket = new Socket("ws://79.137.11.227:4000/socket");
+    socket.connect();
 
-    ws.onopen = () => {
-      console.log("WebSocket connection established");
-    };
+    const channel = socket.channel(`room:${roomId}`, {});
 
-    ws.onmessage = (event) => {
-      console.log("Received WebSocket message:", event.data);
-    };
+    channel
+      .join()
+      .receive("ok", (resp) => {
+        console.log("WebSocket connection established", resp);
+      })
+      .receive("error", (resp) => {
+        console.error("WebSocket connection failed", resp);
+      });
 
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error);
-    };
-
-    ws.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
+    channel.on("game_update", (payload) => {
+      console.log("Game update received", payload);
+    });
 
     return () => {
-      ws.close();
+      channel.leave();
+      socket.disconnect();
     };
-  }, []);
+  }, [roomId]);
+
+  const handleIconClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+    setCopyButtonText("Copy");
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard
+      .writeText(roomId)
+      .then(() => {
+        setCopyButtonText("Copied");
+        setTimeout(() => {
+          setCopyButtonText("Copy");
+        }, 2000);
+      })
+      .catch((err) => {
+        console.error("Failed to copy room id: ", err);
+      });
+  };
+
+  const open = Boolean(anchorEl);
+  const popoverId = open ? "room-id-popover" : undefined;
 
   return (
-    <Box display="flex" flexDirection="column" height="100vh">
+    <Box display="flex" flexDirection="column" height="100vh" position="relative">
       <Box sx={styles.navbar}>
         <Button onClick={() => navigate("/")} sx={styles.navButton}>
           <Typography variant="h6" sx={styles.navText}>
@@ -152,6 +136,57 @@ const Room = () => {
           </Typography>
         </Button>
       </Box>
+
+      <Box sx={styles.linkIconBox}>
+        <Button onClick={handleIconClick} sx={styles.linkIconButton}>
+          <LinkIcon sx={{ color: "white" }} />
+        </Button>
+        <Popover
+          id={popoverId}
+          open={open}
+          anchorEl={anchorEl}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          PaperProps={{
+            sx: {
+              padding: "10px",
+              backgroundColor: "#5d3a00",
+              color: "white",
+              maxWidth: "250px",
+            },
+          }}
+        >
+          <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+            Room ID
+          </Typography>
+          <Typography variant="body2" sx={{ marginBottom: "8px" }}>
+            This is the room ID. Share it with others to invite them.
+          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <TextField
+              value={roomId}
+              variant="standard"
+              InputProps={{
+                readOnly: true,
+                disableUnderline: true,
+                style: { color: "white", fontWeight: 500 },
+              }}
+              sx={{ width: "auto", marginRight: 1 }}
+            />
+            <Button variant="text" onClick={handleCopy} sx={{ color: "white" }}>
+              {copyButtonText}
+            </Button>
+          </Box>
+        </Popover>
+      </Box>
+
       <Box sx={styles.container}>
         <Typography variant="h4" gutterBottom>
           Cards
@@ -167,7 +202,7 @@ const Room = () => {
                   alt={card.card_name}
                 />
                 <CardContent>
-                  <Typography gutterBottom variant="h5" component="div">
+                  <Typography gutterBottom variant="h5">
                     {card.card_name}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
@@ -189,13 +224,24 @@ const styles = {
     color: "white",
     padding: "10px",
     display: "flex",
+    alignItems: "center",
     justifyContent: "space-around",
   },
   navButton: {
     borderRadius: 0,
+    marginRight: "10px",
   },
   navText: {
     color: "white",
+  },
+  linkIconBox: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+  },
+  linkIconButton: {
+    minWidth: "auto",
+    padding: 0,
   },
   container: {
     flexGrow: 1,

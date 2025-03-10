@@ -125,7 +125,7 @@ const JoinRoom = () => {
       });
 
       if (!response.ok) throw new Error("Failed to create room");
-
+      
       const data = await response.json();
       localStorage.setItem("player_id", data.player_id);
       localStorage.setItem("room_id", data.room_id);

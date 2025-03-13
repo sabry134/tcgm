@@ -1,8 +1,8 @@
 import { Button, SvgIcon, Typography } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { buttonStyle } from "./Style";
-import CancelIcon from '@mui/icons-material/Cancel';
+import "./NavigationBar.css";
+import { ArrowBack } from "@mui/icons-material";
 
 export const GameSelectedAddOn = (noGameChosen) => {
   const navigate = useNavigate()
@@ -16,16 +16,28 @@ export const GameSelectedAddOn = (noGameChosen) => {
   return (
     <>
       <Button
+        onClick={ unselectGame }
+        className="navbarSmallButton"
+        title={ 'Unselect the game' }
+      >
+        <SvgIcon
+          component={ ArrowBack }
+          sx={{ color: '#c4c4c4' }}
+        />
+      </Button>
+      <Button
         onClick={() => navigate('/card-editor')}
-        sx={ buttonStyle }
+        className="navbarButton"
+        title={ 'Edit the cards' }
       >
         <Typography variant='h6' sx={{ color: 'white' }}>
-          Card Editor
+          Editor
         </Typography>
       </Button>
       <Button
         onClick={() => navigate('/templates')}
-        sx={ buttonStyle }
+        className="navbarButton"
+        title={ 'Edit the templates' }
       >
         <Typography variant='h6' sx={{ color: 'white' }}>
           Templates
@@ -33,26 +45,14 @@ export const GameSelectedAddOn = (noGameChosen) => {
       </Button>
       <Button
         onClick={() => console.log('game settings')}
-        sx={ buttonStyle }
+        className="navbarButton"
+        title={ 'Edit the game settings' }
       >
         <Typography variant='h6' sx={{ color: 'white' }}>
           Game Settings
         </Typography>
       </Button>
-      <Button
-        onClick={ unselectGame }
-        sx={ smallButtonStyle }
-        title={ 'Unselect the game' }
-      >
-        <SvgIcon
-          component={ CancelIcon }
-          sx={{ color: '#c4c4c4' }}
-        />
-      </Button>
+
     </>
   )
-}
-
-const smallButtonStyle = {
-  backgroundColor: '#5d3a00',
 }

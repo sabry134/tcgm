@@ -1,7 +1,6 @@
-import { Box, Button, Typography } from '@mui/material'
+import { Box, Typography } from '@mui/material'
 import React, { Component } from 'react'
 import { GameSelectedAddOn } from "./GameSelectedAddOn";
-import { buttonStyle } from "./Style";
 
 export class NavigationBar extends Component {
   constructor (props) {
@@ -29,34 +28,35 @@ export class NavigationBar extends Component {
 
   render () {
     return (
-      <Box
-        sx={{
-          backgroundColor: '#C4C4C4',
-          color: 'white',
-          padding: '10px',
-          display: 'flex',
-          justifyContent: 'space-around'
-      }}
-      >
-        {/*<Button onClick={() => this.props.navigate("/")} sx={{ borderRadius: 0 }}>
-                    <Typography variant="h6" sx={{ color: "white" }}>
-                        🌟 Scene
-                    </Typography>
-            </Button>*/}
-        <Button
-          onClick={() => this.props.navigate('/')}
-          sx={ buttonStyle }
-        >
-          <Typography variant='h6' sx={{ color: 'white' }}>
-            Game List
-          </Typography>
-        </Button>
-        {!this.state.noGameChosen && (
-          <>
-            <GameSelectedAddOn />
-          </>
+      <>
+        { this.state.noGameChosen ? (
+          <Box
+            sx={{
+              backgroundColor: '#5d3a00',
+              color: 'white',
+              padding: '20px',
+              display: 'flex',
+              justifyContent: 'space-around'
+            }}
+          >
+            <Typography variant='h5' sx={{ color: 'white' }}>
+              Game List
+            </Typography>
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              backgroundColor: '#C4C4C4',
+              color: 'white',
+              padding: '10px',
+              display: 'flex',
+              justifyContent: 'space-around'
+            }}
+          >
+            <GameSelectedAddOn noGameChosen={ this.state.noGameChosen } />
+          </Box>
         )}
-      </Box>
+      </>
     )
   }
 }

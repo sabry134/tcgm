@@ -20,16 +20,15 @@ export class Editor extends Component {
   }
 
   componentDidMount () {
-    window.addEventListener('PropertiesSet', this.handlePropertiesSet)
+    window.addEventListener('storeProperties', this.handlePropertiesSet)
   }
   componentWillUnmount () {
-    window.removeEventListener('PropertiesSet', this.handlePropertiesSet)
+    window.removeEventListener('storeProperties', this.handlePropertiesSet)
   }
 
   handlePropertiesSet = () => {
-    const tmp = localStorage.getItem('currentTypeProperties')
-
-    this.setState({ properties: JSON.parse(tmp) })
+    const tmp = JSON.parse(localStorage.getItem('currentTypeProperties'))
+    this.setState({ properties: tmp })
   }
 
   handleOnDragStart = event => {
@@ -129,7 +128,8 @@ export class Editor extends Component {
     window.dispatchEvent(new Event('ComponnentSelected'))
     this.setState({
       idSelected: index,
-      position: this.state.properties[index].position
+      position_x: this.state.properties[index].position_x,
+      position_y: this.state.properties[index].position_y
     })
   }
 

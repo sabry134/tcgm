@@ -1,11 +1,9 @@
 import { baseRequest } from "./baseRequest";
 
-
 // Get all types properties
 export async function getCardTypesPropertiesRequest() {
     return await baseRequest('cardTypeProperties', 'GET');
 }
-
 
 // data should look like this
 // cardTypeProperty: {

@@ -56,7 +56,7 @@ export class LeftPanel extends Component {
         }
         localStorage.setItem('currentTypeProperties', JSON.stringify(data))
         localStorage.setItem('currentTypeSelected', typeId)
-        window.dispatchEvent(new Event('PropertiesSet'))
+        window.dispatchEvent(new Event('storeProperties'))
         this.setState({ selected: index })
         return data
       })

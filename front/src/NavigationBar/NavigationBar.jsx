@@ -23,6 +23,8 @@ export class NavigationBar extends Component {
   handleStorageChange = () => {
     if (localStorage.getItem('gameSelected')) {
       this.setState({ noGameChosen: false })
+    } else {
+      this.setState({ noGameChosen: true })
     }
   }
 
@@ -53,7 +55,7 @@ export class NavigationBar extends Component {
               justifyContent: 'space-around'
             }}
           >
-            <GameSelectedAddOn noGameChosen={ this.state.noGameChosen } />
+            <GameSelectedAddOn />
           </Box>
         )}
       </>

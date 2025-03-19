@@ -1,13 +1,15 @@
 import { Box, Typography } from '@mui/material'
 import React, { Component } from 'react'
 import { GameSelectedAddOn } from "./GameSelectedAddOn";
+import { ListEditorsAddOn } from "./ListEditorsAddOn";
 
 export class NavigationBar extends Component {
   constructor (props) {
     super(props)
 
     this.state = {
-      noGameChosen: true
+      noGameChosen: true,
+      showEditors: false
     }
   }
   componentDidMount () {
@@ -26,6 +28,10 @@ export class NavigationBar extends Component {
     } else {
       this.setState({ noGameChosen: true })
     }
+  }
+
+  toggleDisplayEditors = () => {
+    this.setState({ showEditors: !this.state.showEditors })
   }
 
   render () {
@@ -55,7 +61,13 @@ export class NavigationBar extends Component {
               justifyContent: 'space-around'
             }}
           >
-            <GameSelectedAddOn />
+            { this.state.showEditors ? (
+              <>
+                <ListEditorsAddOn toggleDisplay={this.toggleDisplayEditors} />
+              </>
+            ) : (
+              <GameSelectedAddOn toggleDisplay={ this.toggleDisplayEditors } />
+            )}
           </Box>
         )}
       </>

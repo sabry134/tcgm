@@ -1,5 +1,5 @@
 import { Button, SvgIcon, Typography } from "@mui/material";
-import './NavigationBar.css';
+import './navbarButton.css';
 import React from "react";
 
 export const NavbarButton = ({ event, altText, buttonText }) => {

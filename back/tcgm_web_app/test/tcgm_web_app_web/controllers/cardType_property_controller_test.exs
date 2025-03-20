@@ -16,7 +16,7 @@ defmodule TcgmWebAppWeb.CardTypePropertyControllerTest do
     |> Repo.insert!()
 
     cardTypeProperty = %CardTypeProperty{}
-    |> CardTypeProperty.changeset(%{ property_name: "property1", cardtype_id: cardType.id, type: "text", font: "Arial", font_size: 12, font_color: "black", position_x: 0, position_y: 0, rotation: 0, scale_x: 1, scale_y: 1, image: "image", image_width: 100, image_height: 100, image_position_x: 0, image_position_y: 0, image_rotation: 0, image_scale_x: 1, image_scale_y: 1, image_opacity: 100 })
+    |> CardTypeProperty.changeset(%{ property_name: "property1", cardtype_id: cardType.id, type: "text", value: "test", variant: "test", mutable: true, font: "Arial", font_size: 12, font_color: "black", position_x: 0, position_y: 0, rotation: 0, scale_x: 1, scale_y: 1, border_width: 1, border_color: "red", border_radius: "130", opacity: 2, image: "image", image_width: 100, image_height: 100, image_position_x: 0, image_position_y: 0, image_rotation: 0, image_scale_x: 1, image_scale_y: 1, image_opacity: 100 })
     |> Repo.insert!()
 
     {:ok, cardTypeProperty: cardTypeProperty, cardType: cardType}
@@ -127,7 +127,7 @@ defmodule TcgmWebAppWeb.CardTypePropertyControllerTest do
   end
 
   test "POST /api/cardTypeProperties creates a new cardTypeProperty", %{conn: conn, cardType: cardType} do
-    attrs = %{ property_name: "property2", cardtype_id: cardType.id, type: "text", font: "Arial", font_size: 12, font_color: "black", position_x: 0, position_y: 0, rotation: 0, scale_x: 1, scale_y: 1, image: "image", image_width: 100, image_height: 100, image_position_x: 0, image_position_y: 0, image_rotation: 0, image_scale_x: 1, image_scale_y: 1, image_opacity: 100 }
+    attrs = %{ property_name: "property2", cardtype_id: cardType.id, type: "text", value: "test", variant: "test", mutable: true, font: "Arial", font_size: 12, font_color: "black", position_x: 0, position_y: 0, rotation: 0, scale_x: 1, scale_y: 1, border_width: 1, border_color: "red", border_radius: "130", opacity: 2, image: "image", image_width: 100, image_height: 100, image_position_x: 0, image_position_y: 0, image_rotation: 0, image_scale_x: 1, image_scale_y: 1, image_opacity: 100 }
     conn = post(conn, "/api/cardTypeProperties", cardTypeProperty: attrs)
     response = json_response(conn, 201)
 

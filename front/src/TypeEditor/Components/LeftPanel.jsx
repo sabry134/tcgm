@@ -7,6 +7,7 @@ import {
 import CheckIcon from '@mui/icons-material/Check'
 import './LeftPanel.css'
 import { TCGMButton } from '../../Components/TCGMButton'
+import { getCardTypesPropertiesbyTypeRequest } from '../../Api/cardTypesPropertiesRequest'
 
 export class LeftPanel extends Component {
   constructor (props) {
@@ -41,10 +42,6 @@ export class LeftPanel extends Component {
     this.getGameTypes(gameId)
   }
 
-  componentWillUnmount () {
-    localStorage.removeItem('typeSelected')
-  }
-
   getGameTypes (gameId) {
     getCardTypesByGameRequest(gameId).then(data => {
       if (data) this.setState({ types: data })
@@ -52,8 +49,20 @@ export class LeftPanel extends Component {
   }
 
   selectType (typeId, index) {
-    localStorage.setItem('typeSelected', typeId)
-    this.setState({ selected: index })
+    try {
+      getCardTypesPropertiesbyTypeRequest(typeId).then(data => {
+        if (!data) {
+          return []
+        }
+        localStorage.setItem('currentTypeProperties', JSON.stringify(data))
+        localStorage.setItem('currentTypeSelected', typeId)
+        window.dispatchEvent(new Event('storeProperties'))
+        this.setState({ selected: index })
+        return data
+      })
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   render () {

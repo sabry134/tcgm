@@ -16,7 +16,6 @@ const JsonToForm = ({ data = {}, predecessor = "" }) => {
       {keys.map((item, index) => {
         return (
           <div key={index} className="shadow-md p-4 rounded-lg">
-
             <div>
               <DropDown item={item} predecessor={predecessor} data={data} />
             </div>
@@ -90,9 +89,5 @@ const DropDown = ({ item, data, predecessor }) => {
     </div>
   );
 }
-
-
-// ajouter chaque custom widget
-// connecter au back (envoie carte, recup carte)
 
 export default JsonToForm;

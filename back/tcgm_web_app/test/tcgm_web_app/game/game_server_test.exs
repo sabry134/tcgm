@@ -130,7 +130,7 @@ defmodule TcgmWebApp.Game.GameServerTest do
     location = "hand"
 
     :ok = GameServer.set_deck(room_id, "player1", card)
-    
+
     :ok = GameServer.draw_card(room_id, "player1")
     draw_state = GameServer.get_state(room_id)
     assert draw_state.players["player1"][location]["Card Y"]["properties"]["attack"] == 9
@@ -138,6 +138,30 @@ defmodule TcgmWebApp.Game.GameServerTest do
     updated_state = GameServer.get_state(room_id)
 
     assert updated_state.players["player1"][location]["Card Y"]["properties"]["attack"] == 20
+  end
+
+  test "set_turn set the turn state", %{room_id: room_id} do
+    GameServer.join_room(room_id, "player1")
+    player = "player2"
+
+    :ok = GameServer.set_turn(room_id, player)
+
+    updated_state = GameServer.get_state(room_id)
+    assert updated_state.turn == "player2"
+  end
+
+  test "pass_turn pass the turn to another player", %{room_id: room_id} do
+    GameServer.join_room(room_id, "player1")
+
+    player = "player2"
+
+    :ok = GameServer.set_turn(room_id, "player1")
+    :ok = GameServer.pass_turn(room_id, player)
+
+    updated_state = GameServer.get_state(room_id)
+
+    assert updated_state.turn == "player2"
+    assert updated_state.turnCount == 1
   end
 
   test "game start", %{room_id: room_id} do

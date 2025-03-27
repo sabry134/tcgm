@@ -20,7 +20,8 @@ defmodule TcgmWebApp.Game.GameServer do
     state = %{
       id: room_id,
       players: %{},
-      turn: nil,
+      turn: "",
+      turnCount: 0,
       phase: :waiting
     }
     {:ok, state}
@@ -64,6 +65,13 @@ defmodule TcgmWebApp.Game.GameServer do
     GenServer.cast(via_tuple(room_id), {:start_game})
   end
 
+  def set_turn(room_id, player_id) do
+    GenServer.cast(via_tuple(room_id), {:set_turn, player_id})
+  end
+
+  def pass_turn(room_id, player_id) do
+    GenServer.cast(via_tuple(room_id), {:pass_turn, player_id})
+  end
   # Server interaction functions
 
   defp load_game_config(game_id) do
@@ -154,6 +162,16 @@ defmodule TcgmWebApp.Game.GameServer do
 
   def handle_cast({:update_card, player_id, location, card, key, value}, state) do
     new_state = GameLogic.update_values_logic(state, player_id, %{"location" => location, "card" => card, "key" => key, "value" => value})
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:set_turn, player_id}, state) do
+    new_state = GameLogic.set_turn(state, player_id, %{})
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:pass_turn, player_id}, state) do
+    new_state = GameLogic.pass_turn_logic(state, player_id, %{})
     {:noreply, new_state}
   end
 

@@ -63,14 +63,14 @@ const JoinRoom = () => {
       if (!roomId.trim()) {
         throw new Error("Room ID is required");
       }
-
+  
       let username = playerUsername.trim();
       if (!username) {
         const counter = parseInt(localStorage.getItem("playerCounter") || "1", 10);
         username = `Player ${counter}`;
         localStorage.setItem("playerUsername", username);
       }
-
+  
       const joinRoomFetch = async (username) => {
         const response = await fetch(
           `http://79.137.11.227:4000/api/rooms/${roomId}/join`,
@@ -83,9 +83,11 @@ const JoinRoom = () => {
           }
         );
         if (!response.ok) throw new Error("Failed to join room");
-        return await response.json();
+        const data = await response.json();
+        console.log(data);
+        return data;
       };
-
+      
       try {
         const data = await joinRoomFetch(username);
         localStorage.setItem("player_id", data.player_id);
@@ -114,6 +116,7 @@ const JoinRoom = () => {
       setSnackbarOpen(true);
     }
   };
+  
 
   const createRoom = async (navigate) => {
     try {

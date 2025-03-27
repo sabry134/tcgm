@@ -149,11 +149,19 @@ const Room = () => {
   const handleCloseDrawCard = () => setOpenDrawCard(false);
   const handleSubmitDrawCard = () => {
     if (channel && playerId) {
-      channel.push("draw_card", { player_id: playerId, amount: drawAmount });
+      channel
+        .push("draw_card", { player_id: playerId, amount: drawAmount })
+        .receive("ok", (response) => {
+          console.log("Draw card response:", response);
+        })
+        .receive("error", (error) => {
+          console.error("Error drawing card:", error);
+        });
     }
     setOpenDrawCard(false);
     setDrawAmount(1);
   };
+  
 
   const handleOpenInsertCard = () => setOpenInsertCard(true);
   const handleCloseInsertCard = () => setOpenInsertCard(false);

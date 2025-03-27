@@ -137,10 +137,40 @@ defmodule TcgmWebAppWeb.GameChannelTest do
 
     push(socket, "draw_card", %{"player_id" => "player1"})
     assert_broadcast("game_update", %{state: updated_state})
-    
+
     push(socket, "update_card", %{"player_id" => "player1", "location" => location, "card" => "Card Y", "key" => "attack", "value" => 20})
     assert_broadcast("game_update", %{state: updated_state})
 
     assert updated_state.players["player1"][location]["Card Y"]["properties"]["attack"] == 20
+  end
+
+  test "setting the turn state", %{socket: socket, room_id: room_id} do
+    {:ok, _, socket} = subscribe_and_join(socket, GameChannel, "room:" <> room_id, %{})
+
+    push(socket, "join_room", %{"player_id" => "player1"})
+    assert_broadcast("game_update", %{state: state})
+    assert Map.has_key?(state.players, "player1")
+
+    push(socket, "set_turn", %{"player_id" => "player1"})
+    assert_broadcast("game_update", %{state: updated_state})
+
+    assert updated_state.turn == "player1"
+  end
+
+  test "passing the turn to another player", %{socket: socket, room_id: room_id} do
+    {:ok, _, socket} = subscribe_and_join(socket, GameChannel, "room:" <> room_id, %{})
+
+    push(socket, "join_room", %{"player_id" => "player1"})
+    assert_broadcast("game_update", %{state: state})
+    assert Map.has_key?(state.players, "player1")
+
+    push(socket, "set_turn", %{"player_id" => "player1"})
+    assert_broadcast("game_update", %{state: _updated_state})
+
+    push(socket, "pass_turn", %{"player_id" => "player2"})
+    assert_broadcast("game_update", %{state: updated_state})
+
+    assert updated_state.turn == "player2"
+    assert updated_state.turnCount == 1
   end
 end

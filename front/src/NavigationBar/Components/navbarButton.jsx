@@ -1,13 +1,13 @@
 import { Button, SvgIcon, Typography } from "@mui/material";
-import './navbarButton.css';
+import { navbarButtonStyle } from "./navbarButtonStyle";
 import React from "react";
 
 export const NavbarButton = ({ event, altText, buttonText }) => {
   return (
     <Button
       onClick={ event }
-      className="navbarButton"
       title={ altText }
+      sx={{ ...navbarButtonStyle.navbarButton }}
     >
       <Typography variant='h6' sx={{ color: 'white' }}>
         { buttonText }
@@ -20,8 +20,8 @@ export const NavbarSmallButton = ({ event, altText, svgComponent }) => {
   return (
     <Button
       onClick={ event }
-      className="navbarSmallButton"
       title={ altText }
+      sx={{ ...navbarButtonStyle.navbarSmallButton }}
     >
       <SvgIcon
         component={ svgComponent }

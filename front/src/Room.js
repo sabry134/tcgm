@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   CardMedia,
-  Grid,
   TextField,
   Popover,
   Modal,
@@ -29,7 +28,8 @@ const modalStyle = {
 
 const Room = () => {
   const navigate = useNavigate();
-  const [cards, setCards] = useState([
+
+  const initialCards = [
     {
       card_name: "Ace of Spades",
       card_description: "The highest card in the deck.",
@@ -48,7 +48,66 @@ const Room = () => {
       card_image:
         "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
     },
-  ]);
+    {
+      card_name: "Ace of Spades",
+      card_description: "The highest card in the deck.",
+      card_image:
+        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
+    },
+    {
+      card_name: "Queen of Hearts",
+      card_description: "Represents love and compassion.",
+      card_image:
+        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
+    },
+    {
+      card_name: "Joker",
+      card_description: "The wild card, unpredictable and fun.",
+      card_image:
+        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
+    },
+    {
+      card_name: "Ace of Spades",
+      card_description: "The highest card in the deck.",
+      card_image:
+        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
+    },
+    {
+      card_name: "Queen of Hearts",
+      card_description: "Represents love and compassion.",
+      card_image:
+        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
+    },
+    {
+      card_name: "Joker",
+      card_description: "The wild card, unpredictable and fun.",
+      card_image:
+        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
+    },
+    {
+      card_name: "Ace of Spades",
+      card_description: "The highest card in the deck.",
+      card_image:
+        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
+    },
+    {
+      card_name: "Queen of Hearts",
+      card_description: "Represents love and compassion.",
+      card_image:
+        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
+    },
+    {
+      card_name: "Joker",
+      card_description: "The wild card, unpredictable and fun.",
+      card_image:
+        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
+    },
+  ];
+
+  const [deck, setDeck] = useState(initialCards);
+  const [hand, setHand] = useState([]);
+  const [selectedCard, setSelectedCard] = useState(null);
+
   const [roomId, setRoomId] = useState("");
   const [playerId, setPlayerId] = useState("");
   const [channel, setChannel] = useState(null);
@@ -61,6 +120,9 @@ const Room = () => {
   const [openInsertCard, setOpenInsertCard] = useState(false);
   const [insertCardInput, setInsertCardInput] = useState("");
   const [insertLocation, setInsertLocation] = useState("");
+
+  const cardBackImage =
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Card_back_06.svg/1200px-Card_back_06.svg.png";
 
   useEffect(() => {
     const room_id = localStorage.getItem("room_id");
@@ -161,22 +223,61 @@ const Room = () => {
     setOpenDrawCard(false);
     setDrawAmount(1);
   };
-  
 
   const handleOpenInsertCard = () => setOpenInsertCard(true);
   const handleCloseInsertCard = () => setOpenInsertCard(false);
   const handleSubmitInsertCard = () => {
     if (channel && playerId) {
       const cardObj = { [insertCardInput]: insertCardInput };
-      channel.push("insert_card", { player_id: playerId, card: cardObj, location: insertLocation });
+      channel.push("insert_card", {
+        player_id: playerId,
+        card: cardObj,
+        location: insertLocation,
+      });
     }
     setOpenInsertCard(false);
     setInsertCardInput("");
     setInsertLocation("");
   };
 
+  const handlePiocheClick = () => {
+    if (deck.length > 0) {
+      const drawnCard = deck[0];
+      setDeck(deck.slice(1));
+      setHand([...hand, drawnCard]);
+    }
+  };
+
+  const handleCardClick = (index) => {
+    if (selectedCard === index) {
+      setSelectedCard(null);
+    } else {
+      setSelectedCard(index);
+    }
+  };
+
   const open = Boolean(anchorEl);
   const popoverId = open ? "room-id-popover" : undefined;
+
+  const handContainerStyle = {
+    position: "relative",
+    height: "300px",
+    width: "100%",
+    margin: "auto",
+  };
+
+  const deckContainerStyle = {
+    position: "relative",
+    height: "200px",
+    width: "100%",
+    margin: "auto",
+    cursor: "pointer",
+  };
+
+  const cardWidth = 180;
+
+  const handFanAngle = 10;
+  const deckFanAngle = 5;
 
   return (
     <Box display="flex" flexDirection="column" height="100vh" position="relative">
@@ -255,7 +356,7 @@ const Room = () => {
 
       <Box sx={styles.container}>
         <Typography variant="h4" gutterBottom>
-          Cards
+          Your Cards
         </Typography>
         <Box sx={{ mb: 2, display: "flex", gap: 2 }}>
           <Button variant="contained" onClick={handleOpenSetDeck}>
@@ -269,28 +370,80 @@ const Room = () => {
           </Button>
         </Box>
 
-        <Grid container spacing={2}>
-          {cards.map((card, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
-              <Card sx={styles.card}>
-                <CardMedia
-                  component="img"
-                  height="140"
-                  image={card.card_image}
-                  alt={card.card_name}
-                />
-                <CardContent>
-                  <Typography gutterBottom variant="h5">
-                    {card.card_name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {card.card_description}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+        <Box sx={deckContainerStyle} onClick={handlePiocheClick}>
+          {deck.map((_, index) => {
+            const midIndex = (deck.length - 1) / 2;
+            const rotation = (index - midIndex) * deckFanAngle;
+            const offsetX = (index - midIndex) * (cardWidth / 4);
+            return (
+              <Box
+                key={index}
+                sx={{
+                  position: "absolute",
+                  left: "50%",
+                  top: 0,
+                  width: `${cardWidth}px`,
+                  transform: `translateX(${offsetX}px) rotate(${rotation}deg)`,
+                  transformOrigin: "center center",
+                }}
+              >
+                <Card sx={{ ...styles.card, width: `${cardWidth}px` }}>
+                  <CardMedia
+                    component="img"
+                    height="140"
+                    image={cardBackImage}
+                    alt="Card Back"
+                  />
+                </Card>
+              </Box>
+            );
+          })}
+        </Box>
+
+        <Box sx={handContainerStyle}>
+          {hand.map((card, index) => {
+            const midIndex = (hand.length - 1) / 2;
+            const rotation = (index - midIndex) * handFanAngle;
+            const offsetX = (index - midIndex) * (cardWidth / 3);
+            const extraY = selectedCard === index ? -100 : 0;
+            return (
+              <Box
+                key={index}
+                onClick={() => handleCardClick(index)}
+                sx={{
+                  position: "absolute",
+                  left: "50%",
+                  bottom: 0,
+                  width: `${cardWidth}px`,
+                  transform: `translateX(${offsetX}px) translateY(${extraY}px) rotate(${rotation}deg)`,
+                  transformOrigin: "bottom center",
+                  transition: "transform 0.3s",
+                  cursor: "pointer",
+                  zIndex: selectedCard === index ? 10 : 1,
+                }}
+              >
+                <Card sx={styles.card}>
+                  <CardMedia
+                    component="img"
+                    height="140"
+                    image={card.card_image}
+                    alt={card.card_name}
+                  />
+                  <CardContent>
+                    <Typography gutterBottom variant="h5">
+                      {card.card_name}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {selectedCard === index
+                        ? card.card_description
+                        : card.card_description.substring(0, 30) + '...'}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Box>
+            );
+          })}
+        </Box>
       </Box>
 
       <Modal open={openSetDeck} onClose={handleCloseSetDeck}>

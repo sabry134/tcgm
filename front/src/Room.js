@@ -85,8 +85,7 @@ const Room = () => {
 
   useEffect(() => {
     if (!roomId) return;
-    console.log("Connecting to room", roomId);
-    const socket = new Socket("ws://79.137.11.227:4000/socket");
+    const socket = new Socket("ws://localhost:4000/socket");
     socket.connect();
 
     const chan = socket.channel(`room:${roomId}`, {});
@@ -149,13 +148,12 @@ const Room = () => {
   const handleCloseDrawCard = () => setOpenDrawCard(false);
   const handleSubmitDrawCard = () => {
     if (channel && playerId) {
-      channel
-        .push("draw_card", { player_id: playerId, amount: drawAmount })
-        .receive("ok", (response) => {
-          console.log("Draw card response:", response);
+      channel.push("draw_card", { player_id: playerId, amount: drawAmount })
+        .receive("ok", response => {
+          console.log("draw_card", response)
         })
-        .receive("error", (error) => {
-          console.error("Error drawing card:", error);
+        .receive("error", response => {
+          console.error("Error inserting card:", response);
         });
     }
     setOpenDrawCard(false);
@@ -168,7 +166,13 @@ const Room = () => {
   const handleSubmitInsertCard = () => {
     if (channel && playerId) {
       const cardObj = { [insertCardInput]: insertCardInput };
-      channel.push("insert_card", { player_id: playerId, card: cardObj, location: insertLocation });
+      channel.push("insert_card", { player_id: playerId, card: cardObj, location: insertLocation })
+        .receive("ok", response => {
+          console.log("insert_card", response)
+        })
+        .receive("error", response => {
+          console.error("Error inserting card:", response);
+        });
     }
     setOpenInsertCard(false);
     setInsertCardInput("");

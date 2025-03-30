@@ -11,6 +11,7 @@ import {
   Alert 
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { createRoomRequest, joinRoomRequest } from "./Api/roomRequest";
 
 const JoinRoom = () => {
   const navigate = useNavigate();
@@ -72,25 +73,20 @@ const JoinRoom = () => {
       }
   
       const joinRoomFetch = async (username) => {
-        const response = await fetch(
-          `http://79.137.11.227:4000/api/rooms/${roomId}/join`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ player_id: username }),
-          }
-        );
-        if (!response.ok) throw new Error("Failed to join room");
-        const data = await response.json();
-        console.log(data);
-        return data;
+        try {
+          const response = await joinRoomRequest(roomId, { player_id: username });
+          console.log("response to join room:", response);
+          return response;
+        } catch (error) {
+          console.error("Error joining room:", error);
+          throw error;
+        }
       };
       
       try {
         const data = await joinRoomFetch(username);
-        localStorage.setItem("player_id", data.player_id);
+        localStorage.setItem("player_id", username);
+        localStorage.setItem("playerUsername", username);
         localStorage.setItem("room_id", roomId);
         navigate("/room");
       } catch (error) {
@@ -120,18 +116,11 @@ const JoinRoom = () => {
 
   const createRoom = async (navigate) => {
     try {
-      const response = await fetch("http://79.137.11.227:4000/api/rooms", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) throw new Error("Failed to create room");
+      const response = await createRoomRequest();
       
-      const data = await response.json();
-      localStorage.setItem("player_id", data.player_id);
-      localStorage.setItem("room_id", data.room_id);
+      console.log("response to create room:", response);
+      localStorage.setItem("player_id", response.player_id);
+      localStorage.setItem("room_id", response.room_id);
 
       navigate("/room");
     } catch (error) {

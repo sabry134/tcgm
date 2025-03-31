@@ -120,6 +120,10 @@ const Room = () => {
   const [openInsertCard, setOpenInsertCard] = useState(false);
   const [insertCardInput, setInsertCardInput] = useState("");
   const [insertLocation, setInsertLocation] = useState("");
+  const [moveCardInput, setMoveCardInput] = useState("");
+  const [moveSource, setMoveSource] = useState("");
+  const [moveDestination, setMoveDestination] = useState("");
+  const [openMoveCard, setOpenMoveCard] = useState(false);
 
   const cardBackImage =
     "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Card_back_06.svg/1200px-Card_back_06.svg.png";
@@ -200,10 +204,45 @@ const Room = () => {
   const handleCloseSetDeck = () => setOpenSetDeck(false);
   const handleSubmitSetDeck = () => {
     if (channel && playerId) {
-      channel.push("set_deck", { player_id: playerId, deck: deckInput });
+      let parsedDeck;
+
+      console.log("deckInput:", deckInput);
+      try {
+        parsedDeck = typeof deckInput === "string" ? JSON.parse(deckInput) : deckInput;
+      } catch (error) {
+        console.error("Invalid JSON format for deck:", error);
+        return;
+      }
+      console.log("Parsed deck:", parsedDeck);
+      channel.push("set_deck", { player_id: playerId, deck: parsedDeck })
+        .receive("ok", response => {
+          console.log("set_deck", response)
+        })
+        .receive("error", response => {
+          console.error("Error inserting card:", response);
+        });
     }
     setOpenSetDeck(false);
     setDeckInput("");
+  };
+
+  const handleCloseMoveCard = () => setOpenMoveCard(false);
+  const handleOpenMoveCard = () => setOpenMoveCard(true);
+  const handleSubmitMoveCard = () => {
+    if (channel && playerId) {
+      const cardObj = { [moveCardInput]: moveCardInput };
+      channel.push("move_card", { player_id: playerId, card: cardObj, source: moveSource, destination: moveDestination })
+        .receive("ok", response => {
+          console.log("move_card", response)
+        })
+        .receive("error", response => {
+          console.error("Error inserting card:", response);
+        });
+    }
+    setOpenMoveCard(false);
+    setMoveCardInput("");
+    setMoveSource("");
+    setMoveDestination("");
   };
 
   const handleOpenDrawCard = () => setOpenDrawCard(true);
@@ -368,6 +407,9 @@ const Room = () => {
           <Button variant="contained" onClick={handleOpenInsertCard}>
             Insert Card
           </Button>
+          <Button variant="contained" onClick={handleOpenMoveCard}>
+            Move Card
+          </Button>
         </Box>
 
         <Box sx={deckContainerStyle} onClick={handlePiocheClick}>
@@ -511,6 +553,41 @@ const Room = () => {
           <Box display="flex" justifyContent="flex-end" gap={2}>
             <Button onClick={handleCloseInsertCard}>Cancel</Button>
             <Button variant="contained" onClick={handleSubmitInsertCard}>
+              Submit
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
+
+      <Modal open={openMoveCard} onClose={handleCloseMoveCard}>
+        <Box sx={modalStyle}>
+          <Typography variant="h6" component="h2" gutterBottom>
+            Move Card
+          </Typography>
+          <TextField
+            fullWidth
+            label="Card Identifier"
+            value={moveCardInput}
+            onChange={(e) => setMoveCardInput(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            fullWidth
+            label="Source"
+            value={moveSource}
+            onChange={(e) => setMoveSource(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            fullWidth
+            label="Destination"
+            value={moveDestination}
+            onChange={(e) => setMoveDestination(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <Box display="flex" justifyContent="flex-end" gap={2}>
+            <Button onClick={handleCloseMoveCard}>Cancel</Button>
+            <Button variant="contained" onClick={handleSubmitMoveCard}>
               Submit
             </Button>
           </Box>

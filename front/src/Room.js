@@ -13,7 +13,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Socket } from "phoenix";
 import LinkIcon from "@mui/icons-material/Link";
-import { callSetDeck } from "./game_commands";
+import { callSetDeck, callDrawCard, callInsertCard, callMoveCard } from "./game_commands";
 
 const modalStyle = {
   position: "absolute",
@@ -106,28 +106,28 @@ const Room = () => {
   ];
 
   const testDeck = {
-      "Card X": {
-        "name": "king",
-        "properties": {
-          "attack": 15,
-          "defense": 10
-        }
-      },
-      "Card Y": {
-        "name": "queen",
-        "properties": {
-          "attack": 12,
-          "defense": 8
-        }
-      },
-      "Card Z": {
-        "name": "jack",
-        "properties": {
-          "attack": 10,
-          "defense": 5
-        }
+    "Card X": {
+      "name": "king",
+      "properties": {
+        "attack": 15,
+        "defense": 10
       }
-    };
+    },
+    "Card Y": {
+      "name": "queen",
+      "properties": {
+        "attack": 12,
+        "defense": 8
+      }
+    },
+    "Card Z": {
+      "name": "jack",
+      "properties": {
+        "attack": 10,
+        "defense": 5
+      }
+    }
+  };
 
   const [deck, setDeck] = useState(initialCards);
   const [hand, setHand] = useState([]);
@@ -231,25 +231,17 @@ const Room = () => {
   const handleOpenSetDeck = () => setOpenSetDeck(true);
   const handleCloseSetDeck = () => setOpenSetDeck(false);
   const handleSubmitSetDeck = () => {
-    if (channel && playerId) {
-      let parsedDeck;
+    let parsedDeck;
 
-      console.log("deckInput:", deckInput);
-      try {
-        parsedDeck = typeof deckInput === "string" ? JSON.parse(deckInput) : deckInput;
-      } catch (error) {
-        console.error("Invalid JSON format for deck:", error);
-        return;
-      }
-      console.log("Parsed deck:", parsedDeck);
-      channel.push("set_deck", { player_id: playerId, deck: parsedDeck })
-        .receive("ok", response => {
-          console.log("set_deck", response)
-        })
-        .receive("error", response => {
-          console.error("Error inserting card:", response);
-        });
+    console.log("deckInput:", deckInput);
+    try {
+      parsedDeck = typeof deckInput === "string" ? JSON.parse(deckInput) : deckInput;
+    } catch (error) {
+      console.error("Invalid JSON format for deck:", error);
+      return;
     }
+    console.log("Parsed deck:", parsedDeck);
+    callSetDeck(channel, playerId, parsedDeck);
     setOpenSetDeck(false);
     setDeckInput("");
   };
@@ -257,24 +249,16 @@ const Room = () => {
   const handleCloseMoveCard = () => setOpenMoveCard(false);
   const handleOpenMoveCard = () => setOpenMoveCard(true);
   const handleSubmitMoveCard = () => {
-    if (channel && playerId) {
-      let parsedCard;
+    let parsedCard;
 
-      console.log("deckInput:", moveCardInput);
-      try {
-        parsedCard = typeof moveCardInput === "string" ? JSON.parse(moveCardInput) : moveCardInput;
-      } catch (error) {
-        console.error("Invalid JSON format for deck:", error);
-        return;
-      }
-      channel.push("move_card", { player_id: playerId, card: parsedCard, source: moveSource, dest: moveDestination })
-        .receive("ok", response => {
-          console.log("move_card", response)
-        })
-        .receive("error", response => {
-          console.error("Error inserting card:", response);
-        });
+    console.log("cardInput:", moveCardInput);
+    try {
+      parsedCard = typeof moveCardInput === "string" ? JSON.parse(moveCardInput) : moveCardInput;
+    } catch (error) {
+      console.error("Invalid JSON format for card:", error);
+      return;
     }
+    callMoveCard(channel, playerId, parsedCard, moveSource, moveDestination);
     setOpenMoveCard(false);
     setMoveCardInput("");
     setMoveSource("");
@@ -284,15 +268,7 @@ const Room = () => {
   const handleOpenDrawCard = () => setOpenDrawCard(true);
   const handleCloseDrawCard = () => setOpenDrawCard(false);
   const handleSubmitDrawCard = () => {
-    if (channel && playerId) {
-      channel.push("draw_card", { player_id: playerId, amount: drawAmount })
-        .receive("ok", response => {
-          console.log("draw_card", response)
-        })
-        .receive("error", response => {
-          console.error("Error inserting card:", response);
-        });
-    }
+    callDrawCard(channel, playerId, drawAmount);
     setOpenDrawCard(false);
     setDrawAmount(1);
   };
@@ -300,16 +276,15 @@ const Room = () => {
   const handleOpenInsertCard = () => setOpenInsertCard(true);
   const handleCloseInsertCard = () => setOpenInsertCard(false);
   const handleSubmitInsertCard = () => {
-    if (channel && playerId) {
-      const cardObj = { [insertCardInput]: insertCardInput };
-      channel.push("insert_card", { player_id: playerId, card: cardObj, location: insertLocation })
-        .receive("ok", response => {
-          console.log("insert_card", response)
-        })
-        .receive("error", response => {
-          console.error("Error inserting card:", response);
-        });
+    let parsedCard;
+    console.log("cardInput:", insertCardInput);
+    try {
+      parsedCard = typeof insertCardInput === "string" ? JSON.parse(insertCardInput) : insertCardInput;
+    } catch (error) {
+      console.error("Invalid JSON format for card:", error);
+      return;
     }
+    callInsertCard(channel, playerId, parsedCard, insertLocation);
     setOpenInsertCard(false);
     setInsertCardInput("");
     setInsertLocation("");

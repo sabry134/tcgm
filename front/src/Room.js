@@ -13,6 +13,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Socket } from "phoenix";
 import LinkIcon from "@mui/icons-material/Link";
+import { callSetDeck } from "./game_commands";
 
 const modalStyle = {
   position: "absolute",
@@ -104,6 +105,30 @@ const Room = () => {
     },
   ];
 
+  const testDeck = {
+      "Card X": {
+        "name": "king",
+        "properties": {
+          "attack": 15,
+          "defense": 10
+        }
+      },
+      "Card Y": {
+        "name": "queen",
+        "properties": {
+          "attack": 12,
+          "defense": 8
+        }
+      },
+      "Card Z": {
+        "name": "jack",
+        "properties": {
+          "attack": 10,
+          "defense": 5
+        }
+      }
+    };
+
   const [deck, setDeck] = useState(initialCards);
   const [hand, setHand] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
@@ -170,6 +195,9 @@ const Room = () => {
     });
 
     setChannel(chan);
+    console.log("About to set deck", chan, playerId, testDeck);
+    let username = localStorage.getItem("playerUsername");
+    callSetDeck(chan, username, testDeck);
 
     return () => {
       chan.leave();

@@ -25,10 +25,8 @@ const Community = () => {
 
     return (
         <Box display="flex" flexDirection="column" height="100vh">
-            {/* Brown Banner with Menu */}
             <NavigationBar navigate={navigate} />
 
-            {/* Main Content Area */}
             <Box display="flex" flexGrow={1} bgcolor="#fff">
                 <LeftPanel popupCallback={openPopup} />
                 <Box

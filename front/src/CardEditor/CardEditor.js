@@ -8,14 +8,13 @@ import { RightPanel } from "./components/RightPanel";
 import defaultData from "./data/TestBack.json"
 
 const CardEditor = () => {
-    const navigate = useNavigate(); // Initialize useNavigate hook
+    const navigate = useNavigate();
 
 
 
     useEffect(() => {
         document.title = "JCCE";
 
-        // Check if localStorage already has data
         if (!localStorage.getItem("currentEditedCard")) {
             localStorage.setItem("currentEditedCard", JSON.stringify(defaultData));
         }
@@ -23,10 +22,8 @@ const CardEditor = () => {
 
     return (
         <Box display="flex" flexDirection="column" height="100vh">
-            {/* Brown Banner with Menu */}
             <NavigationBar navigate={navigate} />
 
-            {/* Main Content Area */}
             <Box display="flex" flexGrow={1} bgcolor="#fff">
                 <LeftPanel />
 

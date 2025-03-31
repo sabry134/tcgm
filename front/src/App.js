@@ -6,6 +6,10 @@ import CardEditor from './CardEditor/CardEditor'
 import Community from "./Community/Community";
 import { ThemeProvider } from '@emotion/react';
 import theme from './Theme'
+import JoinRoom from './JoinRoom';
+import Login from './Login';
+import Documentation from './Documentation';
+import Room from './Room';
 
 function App() {
   return (
@@ -16,6 +20,10 @@ function App() {
           <Route path="/templates" element={<Templates />} />
           <Route path="/card-editor" element={<CardEditor />} />
           <Route path="/" element={<Community />} />
+          <Route path="/join" element={<JoinRoom />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/documentation" element={<Documentation />} />
+          <Route path="/room" element={<Room />} />
         </Routes>
       </Router>
     </ThemeProvider>

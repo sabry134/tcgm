@@ -230,8 +230,16 @@ const Room = () => {
   const handleOpenMoveCard = () => setOpenMoveCard(true);
   const handleSubmitMoveCard = () => {
     if (channel && playerId) {
-      const cardObj = { [moveCardInput]: moveCardInput };
-      channel.push("move_card", { player_id: playerId, card: cardObj, source: moveSource, destination: moveDestination })
+      let parsedCard;
+
+      console.log("deckInput:", moveCardInput);
+      try {
+        parsedCard = typeof moveCardInput === "string" ? JSON.parse(moveCardInput) : moveCardInput;
+      } catch (error) {
+        console.error("Invalid JSON format for deck:", error);
+        return;
+      }
+      channel.push("move_card", { player_id: playerId, card: parsedCard, source: moveSource, dest: moveDestination })
         .receive("ok", response => {
           console.log("move_card", response)
         })

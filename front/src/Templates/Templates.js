@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import { NavigationBar } from "../NavigationBar";
+import { NavigationBar } from "../NavigationBar/NavigationBar";
 const Templates = () => {
     const navigate = useNavigate(); // Initialize useNavigate hook
 
@@ -17,7 +17,7 @@ const Templates = () => {
     const [cards, setCards] = useState([]);
     const [buttons, setButtons] = useState([]);
 
-    // Load scenes and their respective data (cards and buttons) from localStorage and sessionStorage
+    // Load scenes and their respective Data (cards and buttons) from localStorage and sessionStorage
     useEffect(() => {
         const savedScenes = JSON.parse(localStorage.getItem("scenes")) || [];
         if (savedScenes.length > 0) {
@@ -36,7 +36,7 @@ const Templates = () => {
         }
     }, [selectedScene]);
 
-    // Save scene data (cards and buttons) for the selected scene to sessionStorage
+    // Save scene Data (cards and buttons) for the selected scene to sessionStorage
     useEffect(() => {
         if (selectedScene) {
             sessionStorage.setItem(selectedScene, JSON.stringify({ cards, buttons }));

@@ -2,7 +2,8 @@ import React from 'react';
 import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 // import SceneEditor from './SceneEditor/SceneEditor';
 import Templates from "./Templates/Templates";
-import CardEditor from './CardEditor/CardEditor'
+import GameMainPage from "./GameMainPage/GameMainPage";
+import CardEditor from "./CardEditor/CardEditor";
 import Community from "./Community/Community";
 import { ThemeProvider } from '@emotion/react';
 import theme from './Theme'
@@ -19,6 +20,7 @@ function App() {
           {/*<Route path="/" element={<SceneEditor />} />*/}
           <Route path="/templates" element={<Templates />} />
           <Route path="/card-editor" element={<CardEditor />} />
+          <Route path="/game-main-page" element={<GameMainPage />} />
           <Route path="/" element={<Community />} />
           <Route path="/join" element={<JoinRoom />} />
           <Route path="/login" element={<Login />} />

@@ -6,7 +6,7 @@ export async function getCardTypesRequest() {
 }
 
 // Create a new card type
-// data: {
+// Data: {
 //   "name": "string",
 //   "properties": {},
 //   "game_id": 0
@@ -29,7 +29,7 @@ export async function getCardTypeRequest(id) {
 }
 
 // Update a card type by id
-// data: {
+// Data: {
 //   "name": "string",
 //   "properties": {},
 //   "game_id": 0

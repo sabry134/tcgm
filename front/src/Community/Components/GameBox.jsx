@@ -43,13 +43,14 @@ export class GameBox extends Component {
   }
 }
 
+// TODO(all): refacto game id selection
 const Deck = ({ checked, gameId }) => {
   const navigate = useNavigate()
 
   const handleEditButton = event => {
     localStorage.setItem('gameSelected', gameId)
     window.dispatchEvent(new Event('gameSelected'))
-    navigate('/card-editor')
+    navigate('/game-main-page')
   }
 
   const handleClickButton = event => {

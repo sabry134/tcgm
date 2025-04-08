@@ -1,16 +1,14 @@
 import React, { useEffect } from "react";
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { TCGMCard } from "./components/TCGMCard";
-import { NavigationBar } from "./../NavigationBar";
-import { LeftPanel } from "./components/LeftPanel";
-import { RightPanel } from "./components/RightPanel";
-import defaultData from "./data/TestBack.json"
+import { TCGMCard } from "./Components/TCGMCard";
+import { NavigationBar } from "../NavigationBar/NavigationBar";
+import { LeftPanel } from "./Components/LeftPanel";
+import { RightPanel } from "./Components/RightPanel";
+import defaultData from "./Data/TestBack.json"
 
 const CardEditor = () => {
     const navigate = useNavigate();
-
-
 
     useEffect(() => {
         document.title = "JCCE";

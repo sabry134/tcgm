@@ -15,7 +15,9 @@ defmodule TcgmWebApp.Game.GameLogicTest do
           "field" => %{},
           "graveyard" => %{}
         }
-      }
+      },
+      turn: "player1",
+      turnCount: 0,
     }
 
     {:ok, initial_state: initial_state}
@@ -341,5 +343,30 @@ defmodule TcgmWebApp.Game.GameLogicTest do
     assert Map.has_key?(state_with_card_in_deck.players["player1"]["deck"], "Card B") == true
     assert Map.has_key?(state_with_card_in_deck.players["player1"]["deck"], "Card C") == true
     assert Map.has_key?(state_with_card_in_deck.players["player1"]["deck"], "Card Y") == true
+  end
+
+  test "set_turn set the turn state", %{initial_state: state} do
+    card1 = %{"card1" => %{
+      "name" => "Dragon",
+      "properties" => %{"attack" => 10, "defense" => 5}
+    }}
+    insert_args = %{"location" => "graveyard", "card" => card1}
+    state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", insert_args)
+    state_pass_turn = GameLogic.set_turn(state, "player1", insert_args)
+
+    assert state_pass_turn.turn == "player1"
+  end
+
+  test "pass_turn pass the turn to another player", %{initial_state: state} do
+    card1 = %{"card1" => %{
+      "name" => "Dragon",
+      "properties" => %{"attack" => 10, "defense" => 5}
+    }}
+    insert_args = %{"location" => "graveyard", "card" => card1}
+    state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", insert_args)
+    state_pass_turn = GameLogic.pass_turn_logic(state, "player2", insert_args)
+
+    assert state_pass_turn.turn == "player2"
+    assert state_pass_turn.turnCount == 1
   end
 end

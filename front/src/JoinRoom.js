@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Button, Typography, Box, Tabs, Tab, TextField } from "@mui/material";
+import { 
+  Button, 
+  Typography, 
+  Box, 
+  Tabs, 
+  Tab, 
+  TextField, 
+  Stack, 
+  Snackbar, 
+  Alert 
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { createRoomRequest, joinRoomRequest } from "./Api/roomRequest";
 
 const JoinRoom = () => {
   const navigate = useNavigate();
@@ -10,6 +21,10 @@ const JoinRoom = () => {
   const [tabIndex, setTabIndex] = useState(0);
   const [cards, setCards] = useState([]);
   const [buttons, setButtons] = useState([]);
+  const [roomId, setRoomId] = useState("");
+  const [playerUsername, setPlayerUsername] = useState("");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
     const savedScenes = JSON.parse(localStorage.getItem("scenes")) || [];
@@ -21,9 +36,8 @@ const JoinRoom = () => {
 
   useEffect(() => {
     if (selectedScene) {
-      const savedSceneData = JSON.parse(
-        sessionStorage.getItem(selectedScene)
-      ) || { cards: [], buttons: [] };
+      const savedSceneData =
+        JSON.parse(sessionStorage.getItem(selectedScene)) || { cards: [], buttons: [] };
       setCards(savedSceneData.cards);
       setButtons(savedSceneData.buttons);
     }
@@ -47,18 +61,66 @@ const JoinRoom = () => {
 
   const joinRoom = async (navigate) => {
     try {
-      const response = await fetch("http://localhost:4000/join", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      if (!roomId.trim()) {
+        throw new Error("Room ID is required");
+      }
+  
+      let username = playerUsername.trim();
+      if (!username) {
+        const counter = parseInt(localStorage.getItem("playerCounter") || "1", 10);
+        username = `Player ${counter}`;
+        localStorage.setItem("playerUsername", username);
+      }
+  
+      const joinRoomFetch = async (username) => {
+        try {
+          const response = await joinRoomRequest(roomId, { player_id: username });
+          console.log("response to join room:", response);
+          return response;
+        } catch (error) {
+          console.error("Error joining room:", error);
+          throw error;
+        }
+      };
+      
+      try {
+        const data = await joinRoomFetch(username);
+        localStorage.setItem("player_id", username);
+        localStorage.setItem("playerUsername", username);
+        localStorage.setItem("room_id", roomId);
+        navigate("/room");
+      } catch (error) {
+        console.error("Join room failed with username", username, error);
+        const currentCounter = parseInt(localStorage.getItem("playerCounter") || "1", 10);
+        const newCounter = currentCounter + 1;
+        const newUsername = `Player ${newCounter}`;
+        localStorage.setItem("playerCounter", newCounter.toString());
+        localStorage.setItem("playerUsername", newUsername);
+        try {
+          const data = await joinRoomFetch(newUsername);
+          localStorage.setItem("player_id", data.player_id);
+          localStorage.setItem("room_id", roomId);
+          navigate("/room");
+        } catch (err) {
+          console.error("Retry join room failed with username", newUsername, err);
+          throw err;
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      setSnackbarMessage("Room ID not found");
+      setSnackbarOpen(true);
+    }
+  };
+  
 
-      if (!response.ok) throw new Error("Failed to join room");
-
-      const data = await response.json();
-      localStorage.setItem("player_id", data.player_id);
-      localStorage.setItem("room_id", data.room_id);
+  const createRoom = async (navigate) => {
+    try {
+      const response = await createRoomRequest();
+      
+      console.log("response to create room:", response);
+      localStorage.setItem("player_id", response.player_id);
+      localStorage.setItem("room_id", response.room_id);
 
       navigate("/room");
     } catch (error) {
@@ -66,25 +128,8 @@ const JoinRoom = () => {
     }
   };
 
-  const createRoom = async (navigate) => {
-    try {
-      const response = await fetch("http://localhost:4000/rooms", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) throw new Error("Failed to create room");
-
-      const data = await response.json();
-      localStorage.setItem("player_id", data.player_id);
-      localStorage.setItem("room_id", data.room_id);
-
-      navigate("/room");
-    } catch (error) {
-      console.error(error);
-    }
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
   return (
@@ -129,12 +174,24 @@ const JoinRoom = () => {
           </Tabs>
           {tabIndex === 0 ? (
             <Box sx={styles.formBox}>
-              <TextField
-                fullWidth
-                label="Enter room username"
-                variant="outlined"
-                sx={styles.textField}
-              />
+              <Stack spacing={2}>
+                <TextField
+                  fullWidth
+                  label="Enter Room ID"
+                  variant="outlined"
+                  sx={styles.textField}
+                  value={roomId}
+                  onChange={(e) => setRoomId(e.target.value)}
+                />
+                <TextField
+                  fullWidth
+                  label="Enter player username (optional)"
+                  variant="outlined"
+                  sx={styles.textField}
+                  value={playerUsername}
+                  onChange={(e) => setPlayerUsername(e.target.value)}
+                />
+              </Stack>
               <Button
                 fullWidth
                 variant="contained"
@@ -164,6 +221,16 @@ const JoinRoom = () => {
           )}
         </Box>
       </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert onClose={handleSnackbarClose} severity="error" sx={{ width: "100%" }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

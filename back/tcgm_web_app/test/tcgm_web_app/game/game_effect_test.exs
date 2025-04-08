@@ -23,22 +23,23 @@ defmodule TcgmWebApp.Game.GameEffectTest do
     {:ok, initial_state: initial_state}
   end
 
-  test "apply_effect will not success to affect by cond with cond number_of_cards_in_hand and draw_card", %{initial_state: state} do
+  test "apply_effect will not success to affect by cond with cond count_cards and draw_card", %{initial_state: state} do
     card1 = %{"Card Y" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
     card2 = %{"Card 2" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
     card3 = %{"Card 3" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
     card4 = %{"Card 4" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
 
     action = %{
-      "func" => &GameLogic.draw_card/3,
+      "func" => "draw_card",
       "args" => %{
         "amount" => 2
       }
     }
     condition = %{
-      "func" => &GameCondition.number_of_cards_in_hand/3,
+      "type" => "predicate",
+      "condition_name" => "count_cards",
       "args" => %{
-        "fonc" => &Kernel.<=/2,
+        "fonc" => "<=",
         "number" => 3
       }
     }
@@ -51,39 +52,43 @@ defmodule TcgmWebApp.Game.GameEffectTest do
     assert match?({:error, _}, result)
   end
 
-  test "apply_effect will not success to affect by action with cond number_of_cards_in_hand and draw_card", %{initial_state: state} do
-  action = %{
-      "func" => &GameLogic.draw_card/3,
+  test "apply_effect will not success to affect by action with cond count_cards and draw_card", %{initial_state: state} do
+    action = %{
+      "func" => "draw_card",
       "args" => %{
         "amount" => 2
       }
     }
     condition = %{
-      "func" => &GameCondition.number_of_cards_in_hand/3,
+      "type" => "predicate",
+      "condition_name" => "count_cards",
       "args" => %{
-        "fonc" => &Kernel.<=/2,
+        "fonc" => "<=",
         "number" => 3
       }
     }
+
     updated_state = update_in(state[:players]["player1"]["deck"], fn _deck -> %{} end)
     result = GameEffect.apply_effect(updated_state, "player1", action, condition)
     assert match?({:error, _}, result)
   end
 
-  test "apply_effect will apply and affect with cond number_of_cards_in_hand and draw_card", %{initial_state: state} do
+  test "apply_effect will apply and affect with cond count_cards and draw_card", %{initial_state: state} do
     action = %{
-      "func" => &GameLogic.draw_card/3,
+      "func" => "draw_card",
       "args" => %{
         "amount" => 2
       }
     }
     condition = %{
-      "func" => &GameCondition.number_of_cards_in_hand/3,
+      "type" => "predicate",
+      "condition_name" => "count_cards",
       "args" => %{
-        "fonc" => &Kernel.<=/2,
+        "fonc" => "<=",
         "number" => 3
       }
     }
+
     result = GameEffect.apply_effect(state, "player1", action, condition)
     assert not match?({:error, _}, result)
   end
@@ -91,19 +96,17 @@ defmodule TcgmWebApp.Game.GameEffectTest do
   test "apply_effect will not affect with cond action_condition (insert_card with error) and draw_card", %{initial_state: state} do
     card1 = %{"Card Y" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
     action = %{
-      "func" => &GameLogic.draw_card/3,
+      "func" => "draw_card",
       "args" => %{
         "amount" => 2
       }
     }
     condition = %{
-      "func" => &GameCondition.action_condition/3,
-      "args" =>  %{
-        "fonc" => &GameLogic.insert_card/3,
-        "args" => %{
-          "location" => "cemetery",
-          "card" => card1
-        }
+      "type" => "action_condition",
+      "action_name" => "insert_card",
+      "args" => %{
+        "location" => "cemetery",
+        "card" => card1
       }
     }
     result = GameEffect.apply_effect(state, "player1", action, condition)
@@ -113,19 +116,17 @@ defmodule TcgmWebApp.Game.GameEffectTest do
   test "apply_effect will apply and affect with cond action_condition (insert_card) and draw_card", %{initial_state: state} do
     card1 = %{"Card Y" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
     action = %{
-      "func" => &GameLogic.draw_card/3,
+      "func" => "draw_card",
       "args" => %{
         "amount" => 2
       }
     }
     condition = %{
-      "func" => &GameCondition.action_condition/3,
-      "args" =>  %{
-        "fonc" => &GameLogic.insert_card/3,
-        "args" => %{
-          "location" => "graveyard",
-          "card" => card1
-        }
+      "type" => "action_condition",
+      "action_name" => "insert_card",
+      "args" => %{
+        "location" => "graveyard",
+        "card" => card1
       }
     }
     result = GameEffect.apply_effect(state, "player1", action, condition)
@@ -135,19 +136,17 @@ defmodule TcgmWebApp.Game.GameEffectTest do
   test "apply_effect will not apply and affect with cond action_condition (insert_card) and draw_card with error", %{initial_state: state} do
     card1 = %{"Card Y" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
     action = %{
-      "func" => &GameLogic.draw_card/3,
+      "func" => "draw_card",
       "args" => %{
         "amount" => 2
       }
     }
     condition = %{
-      "func" => &GameCondition.action_condition/3,
-      "args" =>  %{
-        "fonc" => &GameLogic.insert_card/3,
-        "args" => %{
-          "location" => "graveyard",
-          "card" => card1
-        }
+      "type" => "action_condition",
+      "action_name" => "insert_card",
+      "args" => %{
+        "location" => "graveyard",
+        "card" => card1
       }
     }
     updated_state = update_in(state[:players]["player1"]["deck"], fn _deck -> %{} end)

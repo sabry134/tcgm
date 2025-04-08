@@ -52,4 +52,28 @@ defmodule TcgmWebAppWeb.GameChannel do
     broadcast!(socket, "game_update", %{state: TcgmWebApp.Game.GameServer.get_state(socket.assigns.room_id)})
     {:noreply, socket}
   end
+
+  def handle_in("move_card", %{"player_id" => player_id, "source" => source, "dest" => dest, "card" => card}, socket) do
+    TcgmWebApp.Game.GameServer.move_card(socket.assigns.room_id, player_id, source, dest, card)
+    broadcast!(socket, "game_update", %{state: TcgmWebApp.Game.GameServer.get_state(socket.assigns.room_id)})
+    {:noreply, socket}
+  end
+
+  def handle_in("update_card", %{"player_id" => player_id, "location" => location, "card" => card, "key" => key, "value" => value}, socket) do
+    TcgmWebApp.Game.GameServer.update_card(socket.assigns.room_id, player_id, location, card, key, value)
+    broadcast!(socket, "game_update", %{state: TcgmWebApp.Game.GameServer.get_state(socket.assigns.room_id)})
+    {:noreply, socket}
+  end
+
+  def handle_in("set_turn", %{"player_id" => player_id}, socket) do
+    TcgmWebApp.Game.GameServer.set_turn(socket.assigns.room_id, player_id)
+    broadcast!(socket, "game_update", %{state: TcgmWebApp.Game.GameServer.get_state(socket.assigns.room_id)})
+    {:noreply, socket}
+  end
+
+  def handle_in("pass_turn", %{"player_id" => player_id}, socket) do
+    TcgmWebApp.Game.GameServer.pass_turn(socket.assigns.room_id, player_id)
+    broadcast!(socket, "game_update", %{state: TcgmWebApp.Game.GameServer.get_state(socket.assigns.room_id)})
+    {:noreply, socket}
+  end
 end

@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { NavigationBar } from "../NavigationBar/NavigationBar";
+import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
 
 const SceneEditor = () => {
   const navigate = useNavigate();
@@ -167,7 +167,7 @@ const SceneEditor = () => {
   return (
     <Box display="flex" flexDirection="column" height="100vh">
 
-      <NavigationBar navigate={navigate}></NavigationBar>
+      <MainNavigationBar navigate={navigate}></MainNavigationBar>
 
 
       <Box display="flex" flexGrow={1} bgcolor="#fff">

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { 
   Button, 
-  Typography, 
-  Box, 
+  Box,
   Tabs, 
   Tab, 
   TextField, 
@@ -11,7 +10,8 @@ import {
   Alert 
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { createRoomRequest, joinRoomRequest } from "./Api/roomRequest";
+import { createRoomRequest, joinRoomRequest } from "../Api/roomRequest";
+import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
 
 const JoinRoom = () => {
   const navigate = useNavigate();
@@ -134,33 +134,9 @@ const JoinRoom = () => {
 
   return (
     <Box display="flex" flexDirection="column" height="100vh">
-      <Box sx={styles.navbar}>
-        <Button onClick={() => navigate("/scene")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🌟 Scene
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/templates")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            📜 Templates
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/editor")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🖼️ Card Editor
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/community")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🌍 Community
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/join")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🚪 Join Room
-          </Typography>
-        </Button>
-      </Box>
+
+      <RoomNavigationBar />
+
       <Box sx={styles.container}>
         <Box sx={styles.contentBox}>
           <Tabs

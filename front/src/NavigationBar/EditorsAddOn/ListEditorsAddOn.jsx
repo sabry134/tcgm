@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowBack } from "@mui/icons-material";
-import { NavbarButton, NavbarSmallButton } from "./Components/navbarButton";
+import { NavbarButton, NavbarSmallButton } from "../Components/navbarButton";
 
 export const ListEditorsAddOn = ({ toggleDisplay }) => {
   const navigate = useNavigate();

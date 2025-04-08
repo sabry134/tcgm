@@ -13,7 +13,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Socket } from "phoenix";
 import LinkIcon from "@mui/icons-material/Link";
-import { callSetDeck, callDrawCard, callInsertCard, callMoveCard } from "./game_commands";
+import { callSetDeck, callDrawCard, callInsertCard, callMoveCard } from "../game_commands";
 
 const modalStyle = {
   position: "absolute",

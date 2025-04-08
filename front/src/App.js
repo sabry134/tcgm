@@ -7,10 +7,10 @@ import CardEditor from "./CardEditor/CardEditor";
 import Community from "./Community/Community";
 import { ThemeProvider } from '@emotion/react';
 import theme from './Theme'
-import JoinRoom from './JoinRoom';
-import Login from './Login';
-import Documentation from './Documentation';
-import Room from './Room';
+import JoinRoom from './JoinRoom/JoinRoom';
+import Login from './Login/Login';
+import Documentation from './Documentation/Documentation';
+import Room from './Room/Room';
 
 function App() {
   return (

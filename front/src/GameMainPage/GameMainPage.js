@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import { NavigationBar } from "../NavigationBar/NavigationBar";
+import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { LeftPanel } from "./component/LeftPanel";
@@ -11,7 +11,7 @@ const GameMainPage = () => {
   return (
     <Box display="flex" flexDirection="column" height="100vh">
       {/* Brown Banner with Menu */}
-      <NavigationBar navigate={navigate} />
+      <MainNavigationBar navigate={navigate} />
 
       {/* Main Content Area */}
       <Box display="flex" flexGrow={1} bgcolor="#fff">

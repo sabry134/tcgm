@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { TCGMCard } from "./Components/TCGMCard";
-import { NavigationBar } from "../NavigationBar/NavigationBar";
+import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
 import { LeftPanel } from "./Components/LeftPanel";
 import { RightPanel } from "./Components/RightPanel";
 import defaultData from "./Data/TestBack.json"
@@ -20,7 +20,7 @@ const CardEditor = () => {
 
     return (
         <Box display="flex" flexDirection="column" height="100vh">
-            <NavigationBar navigate={navigate} />
+            <MainNavigationBar navigate={navigate} />
 
             <Box display="flex" flexGrow={1} bgcolor="#fff">
                 <LeftPanel />

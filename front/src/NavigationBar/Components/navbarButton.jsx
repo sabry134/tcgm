@@ -2,12 +2,13 @@ import { Button, SvgIcon, Typography } from "@mui/material";
 import { navbarButtonStyle } from "./navbarButtonStyle";
 import React from "react";
 
-export const NavbarButton = ({ event, altText, buttonText }) => {
+export const NavbarButton = ({ event, altText, buttonText, disabled = false }) => {
   return (
     <Button
       onClick={ event }
       title={ altText }
-      sx={{ ...navbarButtonStyle.navbarButton }}
+      sx={{ ...navbarButtonStyle.navbarButton(disabled) }}
+      disabled={ disabled }
     >
       <Typography variant='h6' sx={{ color: 'white' }}>
         { buttonText }

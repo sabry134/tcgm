@@ -35,6 +35,7 @@ export const GameSelectedAddOn = ({ toggleDisplay }) => {
         event={() => console.log('game settings')}
         altText={ 'Edit the game settings' }
         buttonText={ "Game Settings" }
+        disabled={ true }
       >
       </NavbarButton>
     </>

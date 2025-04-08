@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { Socket } from "phoenix";
 import LinkIcon from "@mui/icons-material/Link";
 import { callSetDeck, callDrawCard, callInsertCard, callMoveCard } from "../game_commands";
+import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
 
 const modalStyle = {
   position: "absolute",
@@ -331,28 +332,7 @@ const Room = () => {
 
   return (
     <Box display="flex" flexDirection="column" height="100vh" position="relative">
-      <Box sx={styles.navbar}>
-        <Button onClick={() => navigate("/")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🌟 Home
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/documentation")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            📜 Documentation
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/forum")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🖼️ Forum
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/community")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🌍 Community
-          </Typography>
-        </Button>
-      </Box>
+      <RoomNavigationBar />
 
       <Box sx={styles.linkIconBox}>
         <Button onClick={handleIconClick} sx={styles.linkIconButton}>

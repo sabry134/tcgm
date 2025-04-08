@@ -4,11 +4,10 @@ import { Home } from "@mui/icons-material";
 import { NavbarButton, NavbarSmallButton } from "./Components/navbarButton";
 import { Box } from "@mui/material";
 
-export const RoomNavigationBar = () => {
+export const JoinRoomNavigationBar = () => {
   const navigate = useNavigate()
 
   const returnHome = () => {
-    localStorage.removeItem('room_id')
     navigate('/')
   }
 
@@ -28,9 +27,9 @@ export const RoomNavigationBar = () => {
         svgComponent={ Home }
       />
       <NavbarButton
-        event={() => navigate('/documentation')}
-        altText={ 'Help game' }
-        buttonText={ 'Help' }
+        event={() => navigate('/join')}
+        altText={ 'Join a game' }
+        buttonText={ 'Join room' }
       />
     </Box>
   )

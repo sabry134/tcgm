@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { createRoomRequest, joinRoomRequest } from "../Api/roomRequest";
-import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
+import { JoinRoomNavigationBar } from "../NavigationBar/JoinRoomNavigationBar";
 
 const JoinRoom = () => {
   const navigate = useNavigate();
@@ -135,7 +135,7 @@ const JoinRoom = () => {
   return (
     <Box display="flex" flexDirection="column" height="100vh">
 
-      <RoomNavigationBar />
+      <JoinRoomNavigationBar />
 
       <Box sx={styles.container}>
         <Box sx={styles.contentBox}>

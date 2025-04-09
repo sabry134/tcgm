@@ -1,9 +1,9 @@
 import { Box, Typography } from '@mui/material'
 import React, { Component } from 'react'
-import { GameSelectedAddOn } from "./GameSelectedAddOn";
-import { ListEditorsAddOn } from "./ListEditorsAddOn";
+import { GameSelectedAddOn } from "./EditorsAddOn/GameSelectedAddOn";
+import { ListEditorsAddOn } from "./EditorsAddOn/ListEditorsAddOn";
 
-export class NavigationBar extends Component {
+export class MainNavigationBar extends Component {
   constructor (props) {
     super(props)
 

@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import { NavigationBar } from "../NavigationBar/NavigationBar";
+import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
 const Templates = () => {
     const navigate = useNavigate(); // Initialize useNavigate hook
 
@@ -131,7 +131,7 @@ const Templates = () => {
 
     return (
         <Box display="flex" flexDirection="column" height="100vh">
-            <NavigationBar navigate={navigate}></NavigationBar>
+            <MainNavigationBar navigate={navigate}></MainNavigationBar>
 
 
             <Box display="flex" flexGrow={1} bgcolor="#fff">

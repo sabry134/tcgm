@@ -7,10 +7,10 @@ import CardEditor from "./CardEditor/CardEditor";
 import Community from "./Community/Community";
 import { ThemeProvider } from '@emotion/react';
 import theme from './Theme'
-import JoinRoom from './JoinRoom';
-import Login from './Login';
-import Documentation from './Documentation';
-import Room from './Room';
+import JoinRoom from './JoinRoom/JoinRoom';
+import Login from './Login/Login';
+import HelpGame from './HelpGame/HelpGame';
+import Room from './Room/Room';
 
 function App() {
   return (
@@ -24,7 +24,7 @@ function App() {
           <Route path="/" element={<Community />} />
           <Route path="/join" element={<JoinRoom />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/documentation" element={<Documentation />} />
+          <Route path="/help-game" element={<HelpGame />} />
           <Route path="/room" element={<Room />} />
         </Routes>
       </Router>

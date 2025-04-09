@@ -7,13 +7,12 @@ import {
   CardContent,
   CardMedia,
   TextField,
-  Popover,
   Modal,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Socket } from "phoenix";
-import LinkIcon from "@mui/icons-material/Link";
-import { callSetDeck, callDrawCard, callInsertCard, callMoveCard } from "./game_commands";
+import { callSetDeck, callDrawCard, callInsertCard, callMoveCard } from "../game_commands";
+import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
 
 const modalStyle = {
   position: "absolute",
@@ -132,12 +131,9 @@ const Room = () => {
   const [deck, setDeck] = useState(initialCards);
   const [hand, setHand] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
-
   const [roomId, setRoomId] = useState("");
   const [playerId, setPlayerId] = useState("");
   const [channel, setChannel] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [copyButtonText, setCopyButtonText] = useState("Copy");
   const [openSetDeck, setOpenSetDeck] = useState(false);
   const [deckInput, setDeckInput] = useState("");
   const [openDrawCard, setOpenDrawCard] = useState(false);
@@ -204,29 +200,6 @@ const Room = () => {
       socket.disconnect();
     };
   }, [roomId]);
-
-  const handleIconClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-    setCopyButtonText("Copy");
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard
-      .writeText(roomId)
-      .then(() => {
-        setCopyButtonText("Copied");
-        setTimeout(() => {
-          setCopyButtonText("Copy");
-        }, 2000);
-      })
-      .catch((err) => {
-        console.error("Failed to copy room id: ", err);
-      });
-  };
 
   const handleOpenSetDeck = () => setOpenSetDeck(true);
   const handleCloseSetDeck = () => setOpenSetDeck(false);
@@ -306,9 +279,6 @@ const Room = () => {
     }
   };
 
-  const open = Boolean(anchorEl);
-  const popoverId = open ? "room-id-popover" : undefined;
-
   const handContainerStyle = {
     position: "relative",
     height: "300px",
@@ -325,84 +295,13 @@ const Room = () => {
   };
 
   const cardWidth = 180;
-
   const handFanAngle = 10;
   const deckFanAngle = 5;
 
   return (
     <Box display="flex" flexDirection="column" height="100vh" position="relative">
-      <Box sx={styles.navbar}>
-        <Button onClick={() => navigate("/")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🌟 Home
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/documentation")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            📜 Documentation
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/forum")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🖼️ Forum
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/community")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🌍 Community
-          </Typography>
-        </Button>
-      </Box>
 
-      <Box sx={styles.linkIconBox}>
-        <Button onClick={handleIconClick} sx={styles.linkIconButton}>
-          <LinkIcon sx={{ color: "white" }} />
-        </Button>
-        <Popover
-          id={popoverId}
-          open={open}
-          anchorEl={anchorEl}
-          onClose={handleClose}
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "right",
-          }}
-          transformOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-          PaperProps={{
-            sx: {
-              padding: "10px",
-              backgroundColor: "#5d3a00",
-              color: "white",
-              maxWidth: "250px",
-            },
-          }}
-        >
-          <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-            Room ID
-          </Typography>
-          <Typography variant="body2" sx={{ marginBottom: "8px" }}>
-            This is the room ID. Share it with others to invite them.
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <TextField
-              value={roomId}
-              variant="standard"
-              InputProps={{
-                readOnly: true,
-                disableUnderline: true,
-                style: { color: "white", fontWeight: 500 },
-              }}
-              sx={{ width: "auto", marginRight: 1 }}
-            />
-            <Button variant="text" onClick={handleCopy} sx={{ color: "white" }}>
-              {copyButtonText}
-            </Button>
-          </Box>
-        </Popover>
-      </Box>
+      <RoomNavigationBar roomId={roomId} />
 
       <Box sx={styles.container}>
         <Typography variant="h4" gutterBottom>

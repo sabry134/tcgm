@@ -1,11 +1,9 @@
 import { baseRequest } from "./baseRequest";
 
-// Get all games
 export async function getGamesRequest() {
   return await baseRequest('games', 'GET');
 }
 
-// Create a new game
 // game: {
 //   "name": "string",
 //   "description": "string"
@@ -16,12 +14,10 @@ export async function createGameRequest(data) {
   });
 }
 
-// Get a game by id
 export async function getGameRequest(id) {
   return await baseRequest(`games/${id}`, 'GET');
 }
 
-// Update a game by id
 // data: {
 //   "name": "string",
 //   "description": "string"

@@ -1,12 +1,9 @@
 import { baseRequest } from "./baseRequest";
 
-// Get all cards
 export async function getCardRequest() {
   return await baseRequest('cards', 'GET', null, {});
 }
 
-// If no storedId or storedId is 0, create a new card
-// Otherwise, update the card with the storedId
 // data: {
 //   "name": "string",
 //   "text": "string",
@@ -33,12 +30,10 @@ export async function saveCardRequest(storedId, data) {
   }
 }
 
-// Get a card by game id
 export async function getCardsByGameRequest(gameId) {
   return await baseRequest(`cards/game/${gameId}`, 'GET');
 }
 
-// Get a card by id
 export async function getCardByIdRequest(id) {
   return await baseRequest(`cards/${id}`, 'GET');
 }

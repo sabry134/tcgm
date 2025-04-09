@@ -1,11 +1,9 @@
 import { baseRequest } from "./baseRequest";
 
-// Get all card types
 export async function getCardTypesRequest() {
   return await baseRequest('cardTypes', 'GET');
 }
 
-// Create a new card type
 // data: {
 //   "name": "string",
 //   "properties": {},
@@ -17,18 +15,15 @@ export async function createCardTypeRequest(data) {
   });
 }
 
-// Get a card type by game id
 export async function getCardTypesByGameRequest(gameId) {
   return await baseRequest(`cardTypes/game/${gameId}`, 'GET');
 }
 
 
-// Get a card type by id
 export async function getCardTypeRequest(id) {
   return await baseRequest(`cardTypes/${id}`, 'GET');
 }
 
-// Update a card type by id
 // data: {
 //   "name": "string",
 //   "properties": {},

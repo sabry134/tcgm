@@ -59,14 +59,14 @@ const mainContainer = {
   justifyContent: "center",
   alignItems: "center",
 
-  width: "clamp(250px, 30%, 400px)", // Responsive width
-  maxWidth: "90vw", // Responsive width
+  width: "clamp(250px, 30%, 400px)",
+  maxWidth: "90vw",
 
-  height: "auto", // Responsive height
-  minHeight: "150px", // Minimum height
-  maxHeight: "500px", // Maximum height
+  height: "auto",
+  minHeight: "150px",
+  maxHeight: "500px",
 
-  margin: "auto", // Center the container
+  margin: "auto",
   position: "absolute",
   top: "0",
   bottom: "0",
@@ -76,35 +76,35 @@ const mainContainer = {
 
 const mainCardBorder = {
   display: "flex",
-  flexDirection: "column", // Ensure column direction
-  backgroundColor: "#FFF", // White background
-  width: "100%", // Portrait rectangle width
-  height: "100%", // Portrait rectangle height
-  borderRadius: "10px", // Rounded corners
-  boxShadow: "0 0 10px 0 rgba(0,0,0,0.5)" // Drop shadow
+  flexDirection: "column",
+  backgroundColor: "#FFF",
+  width: "100%",
+  height: "100%",
+  borderRadius: "10px",
+  boxShadow: "0 0 10px 0 rgba(0,0,0,0.5)"
 }
 
 const cardNameContainer = {
-  width: "100%", // Portrait rectangle width
-  height: "10%", // Portrait rectangle height
-  justifyContent: "center", // Center horizontally
-  alignItems: "center", // Center vertically
-  backgroundColor: "#000", // Black background
-  borderRadius: "10px 10px 0 0" // Rounded top corners
+  width: "100%",
+  height: "10%",
+  justifyContent: "center",
+  alignItems: "center",
+  backgroundColor: "#000",
+  borderRadius: "10px 10px 0 0"
 }
 
 const cardName = {
-  color: "#FFF", // White text
-  paddingLeft: "10%", // Add padding
-  fontWeight: "bold", // Bold text
-  fontSize: "1.1em", // Larger text
+  color: "#FFF",
+  paddingLeft: "10%",
+  fontWeight: "bold",
+  fontSize: "1.1em",
 }
 
 const cardImageContainer = {
-  width: "100%", // Portrait rectangle width
-  height: "50%", // Portrait rectangle height
-  justifyContent: "center", // Center horizontally
-  alignItems: "center", // Center vertically
+  width: "100%",
+  height: "50%",
+  justifyContent: "center",
+  alignItems: "center",
 }
 
 const cardImage = {
@@ -113,17 +113,17 @@ const cardImage = {
 }
 
 const cardTextContainer = {
-  width: "100%", // Portrait rectangle width
-  height: "40%", // Portrait rectangle height
-  justifyContent: "center", // Center horizontally
-  alignItems: "center", // Center vertically
-  backgroundColor: "#000", // Black background
-  borderRadius: "0 0 10px 10px", // Rounded bottom corners
+  width: "100%",
+  height: "40%",
+  justifyContent: "center",
+  alignItems: "center",
+  backgroundColor: "#000",
+  borderRadius: "0 0 10px 10px",
 }
 
 const cardText = {
-  color: "#FFF", // White text
-  margin: "0", // Remove default margin
-  paddingLeft: "5%", // Add padding
-  paddingTop: "5%", // Add padding
+  color: "#FFF",
+  margin: "0",
+  paddingLeft: "5%",
+  paddingTop: "5%",
 }

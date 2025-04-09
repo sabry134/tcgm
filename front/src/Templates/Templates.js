@@ -7,22 +7,21 @@ import {
     IconButton,
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useNavigate } from "react-router-dom";
 import { NavigationBar } from "../NavigationBar";
 const Templates = () => {
-    const navigate = useNavigate(); // Initialize useNavigate hook
+    const navigate = useNavigate();
 
     const [scenes, setScenes] = useState([]);
     const [selectedScene, setSelectedScene] = useState("");
     const [cards, setCards] = useState([]);
     const [buttons, setButtons] = useState([]);
 
-    // Load scenes and their respective data (cards and buttons) from localStorage and sessionStorage
     useEffect(() => {
         const savedScenes = JSON.parse(localStorage.getItem("scenes")) || [];
         if (savedScenes.length > 0) {
             setScenes(savedScenes);
-            setSelectedScene(savedScenes[0]); // Default to the first scene
+            setSelectedScene(savedScenes[0]);
         }
     }, []);
 
@@ -36,14 +35,12 @@ const Templates = () => {
         }
     }, [selectedScene]);
 
-    // Save scene data (cards and buttons) for the selected scene to sessionStorage
     useEffect(() => {
         if (selectedScene) {
             sessionStorage.setItem(selectedScene, JSON.stringify({ cards, buttons }));
         }
     }, [cards, buttons, selectedScene]);
 
-    // Save scenes to localStorage whenever they change
     useEffect(() => {
         if (scenes.length > 0) {
             localStorage.setItem("scenes", JSON.stringify(scenes));
@@ -200,7 +197,7 @@ const Templates = () => {
                                     marginBottom: 2,
                                     borderRadius: 0,
                                 }}
-                                onMouseDown={(e) => handleButtonMouseDown(e, button.id)} // Enable dragging for buttons
+                                onMouseDown={(e) => handleButtonMouseDown(e, button.id)}
                             >
                                 {button.label}
                             </Button>

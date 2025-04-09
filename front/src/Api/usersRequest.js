@@ -1,6 +1,5 @@
 import { baseRequest } from "./baseRequest";
 
-// Login user
 // data: {
 //   "username": "string"
 // }

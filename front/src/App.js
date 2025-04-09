@@ -9,7 +9,7 @@ import { ThemeProvider } from '@emotion/react';
 import theme from './Theme'
 import JoinRoom from './JoinRoom/JoinRoom';
 import Login from './Login/Login';
-import Documentation from './Documentation/Documentation';
+import HelpGame from './HelpGame/HelpGame';
 import Room from './Room/Room';
 
 function App() {
@@ -24,7 +24,7 @@ function App() {
           <Route path="/" element={<Community />} />
           <Route path="/join" element={<JoinRoom />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/documentation" element={<Documentation />} />
+          <Route path="/help-game" element={<HelpGame />} />
           <Route path="/room" element={<Room />} />
         </Routes>
       </Router>

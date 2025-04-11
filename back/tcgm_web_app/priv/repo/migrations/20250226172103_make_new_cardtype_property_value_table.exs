@@ -6,6 +6,9 @@ defmodule TcgmWebApp.Repo.Migrations.MakeNewCardtypeProperty do
       add :property_name, :string, null: false
       add :cardtype_id, references(:types, on_delete: :delete_all), null: false
       add :type, :string, null: false
+      add :value, :string, null: false
+      add :variant, :string, null: false
+      add :mutable, :boolean, null: false
       add :font, :string, null: true
       add :font_size, :integer, null: true
       add :font_color, :string, null: true
@@ -14,6 +17,10 @@ defmodule TcgmWebApp.Repo.Migrations.MakeNewCardtypeProperty do
       add :rotation, :integer, null: false
       add :scale_x, :integer, null: false
       add :scale_y, :integer, null: false
+      add :border_width, :integer, null: false
+      add :border_color, :string, null: false
+      add :border_radius, :string, null: false
+      add :opacity, :int, null: false
       add :image, :string, null: true
       add :image_width, :integer, null: true
       add :image_height, :integer, null: true
@@ -25,7 +32,5 @@ defmodule TcgmWebApp.Repo.Migrations.MakeNewCardtypeProperty do
       add :image_opacity, :integer, null: true
       timestamps()
     end
-
-    create unique_index(:cardtype_property, [:property_name])
   end
 end

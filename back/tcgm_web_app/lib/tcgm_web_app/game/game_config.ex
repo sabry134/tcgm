@@ -32,7 +32,15 @@ defmodule TcgmWebApp.Game.GameConfig do
     {:ok, card_list} = load_json_card()
     updated_state =
       Enum.reduce(cards, state, fn {card_name, quantity}, acc_state ->
-        put_in(acc_state, [:players, player_id, "deck", card_name], card_list["cards"][card_name])
+        Enum.reduce(1..quantity, acc_state, fn i, inner_state ->
+          key =
+            if i > 1 do
+              "#{card_name} ##{i}"
+            else
+              card_name
+          end
+          put_in(inner_state, [:players, player_id, "deck", key], card_list["cards"][card_name])
+        end)
       end)
   end
 

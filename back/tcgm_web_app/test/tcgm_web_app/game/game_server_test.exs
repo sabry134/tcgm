@@ -168,27 +168,28 @@ defmodule TcgmWebApp.Game.GameServerTest do
     GameServer.join_room(room_id, "player1")
     GameServer.join_room(room_id, "player2")
 
-    card1 = %{"Card X" => %{
-      "name" => "king",
-      "properties" => %{"attack" => 15, "defense" => 10}
-    }}
-    card2 = %{"Card Y" => %{
-      "name" => "queen",
-      "properties" => %{"attack" => 10, "defense" => 15}
-    }}
-    card3 = %{"Card Z" => %{
-      "name" => "pawn",
-      "properties" => %{"attack" => 5, "defense" => 5}
-    }}
-    deck = %{"card1" => card1, "card2" => card2, "card3" => card3}
-    :ok = GameServer.set_deck(room_id, "player1", deck)
-    :ok = GameServer.set_deck(room_id, "player2", deck)
+    :ok = GameServer.start_game(room_id)
+
+    state = GameServer.get_state(room_id)
+
+    assert map_size(state.players["player1"]["deck"]) == 1
+    assert map_size(state.players["player2"]["deck"]) == 0
+    assert map_size(state.players["player1"]["hand"]) == 2
+    assert map_size(state.players["player2"]["hand"]) == 2
+  end
+
+  test "game start with player 3", %{room_id: room_id} do
+    GameServer.join_room(room_id, "player2")
+    GameServer.join_room(room_id, "player3")
 
     :ok = GameServer.start_game(room_id)
 
     state = GameServer.get_state(room_id)
 
-    assert map_size(state.players["player1"]["hand"]) == 2
+    assert map_size(state.players["player3"]["deck"]) == 4
+    assert map_size(state.players["player2"]["deck"]) == 0
+    assert map_size(state.players["player3"]["hand"]) == 2
     assert map_size(state.players["player2"]["hand"]) == 2
   end
+
 end

@@ -2,6 +2,7 @@ defmodule TcgmWebApp.Game.GameServer do
   use GenServer
 
   alias TcgmWebApp.Game.GameLogic
+  alias TcgmWebApp.Game.GameConfig
 
   @moduledoc """
     This module is responsible for handling game servers.
@@ -183,8 +184,11 @@ defmodule TcgmWebApp.Game.GameServer do
         starting_hand_size = config["starting_hand_size"]
 
         new_state = Enum.reduce(state.players, state, fn {player_id, _player_data}, acc_state ->
-          GameLogic.draw_card(acc_state, player_id, %{"amount" => starting_hand_size})
+          update_state = GameConfig.load_deck_config(acc_state, game_id, player_id)
+          GameLogic.draw_card(update_state, player_id, %{"amount" => starting_hand_size})
         end)
+
+        #new state = load_deck_config(game_id)
 
         {:noreply, new_state}
 

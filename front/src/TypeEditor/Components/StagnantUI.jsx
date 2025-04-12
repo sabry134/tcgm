@@ -12,7 +12,7 @@ import {
   getCardTypesPropertiesbyTypeRequest,
   editCardTypesPropertyByIdRequest
 } from '../../Api/cardTypesPropertiesRequest'
-const StagnantUI = ({ addTextField }) => {
+const StagnantUI = ({ createNewComponnent }) => {
   const [open, setOpen] = useState(false)
   const [tool, setTool] = useState(0)
   const anchorRef = useRef(null)
@@ -22,8 +22,14 @@ const StagnantUI = ({ addTextField }) => {
   }
   const addText = event => {
     setOpen(!open)
-    addTextField()
+    createNewComponnent('text')
   }
+
+  const addBox = event => {
+    setOpen(!open)
+    createNewComponnent('box')
+  }
+
   const selectButton = event => {
     localStorage.setItem('editTool', 'select')
     setTool(0)
@@ -31,6 +37,12 @@ const StagnantUI = ({ addTextField }) => {
   const panButton = event => {
     localStorage.setItem('editTool', 'pan')
     setTool(1)
+  }
+
+  const deleteButton = event => {
+    const property = localStorage.getItem('propertySelected')
+    if (!property) return
+    window.dispatchEvent(new Event('delete'))
   }
 
   // saves the properties changed to do so:
@@ -43,10 +55,10 @@ const StagnantUI = ({ addTextField }) => {
     try {
       getCardTypesPropertiesbyTypeRequest(typeId).then(data => {
         for (let i = 0; i < tmpProperties.length; i++) {
-          if (i >= data.length) {
+          if (!data || i >= data.length) {
             saveNewCardTypesPropertiesRequest(tmpProperties[i])
           }
-          if (!shallowEqual(tmpProperties[i], data[i])) {
+          if (data && !shallowEqual(tmpProperties[i], data[i])) {
             editCardTypesPropertyByIdRequest(
               tmpProperties[i],
               tmpProperties[i].id
@@ -82,11 +94,10 @@ const StagnantUI = ({ addTextField }) => {
           <div className='subAddMenu'>
             {/* We need to add icon to menu item */}
             <MenuItem onClick={addText}> Text Field </MenuItem>
-            <MenuItem> Image </MenuItem>
-            <MenuItem> Icon </MenuItem>
+            <MenuItem onClick={addBox}> Box </MenuItem>
           </div>
         </Popper>
-        <div className='roundButton'>
+        <div className='roundButton' onClick={deleteButton}>
           <DeleteIcon />
         </div>
         <div className='roundButton' onClick={saveButton}>

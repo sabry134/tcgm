@@ -51,18 +51,27 @@ export class LeftPanel extends Component {
   selectType (typeId, index) {
     try {
       getCardTypesPropertiesbyTypeRequest(typeId).then(data => {
-        if (!data) {
-          return []
+        if (data) {
+          localStorage.setItem('currentTypeProperties', JSON.stringify(data))
+        } else {
+          localStorage.setItem('currentTypeProperties', JSON.stringify([]))
         }
-        localStorage.setItem('currentTypeProperties', JSON.stringify(data))
         localStorage.setItem('currentTypeSelected', typeId)
+        localStorage.removeItem('propertySelected')
         window.dispatchEvent(new Event('storeProperties'))
+        window.dispatchEvent(new Event('ComponnentSelected'))
         this.setState({ selected: index })
-        return data
       })
     } catch (error) {
+      localStorage.setItem('currentTypeProperties', JSON.stringify([]))
+      localStorage.setItem('currentTypeSelected', typeId)
+      localStorage.removeItem('propertySelected')
+
+      window.dispatchEvent(new Event('storeProperties'))
+      window.dispatchEvent(new Event('ComponnentSelected'))
       console.log(error)
     }
+    this.setState({ selected: index })
   }
 
   render () {

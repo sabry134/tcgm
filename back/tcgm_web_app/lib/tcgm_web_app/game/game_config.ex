@@ -27,21 +27,45 @@ defmodule TcgmWebApp.Game.GameConfig do
     end
   end
 
-  def load_deck(state, player_id, active_deck) do
+  def casters(state, player_id, active_deck) do
+    cards = active_deck["casters"]
+    {:ok, card_list} = load_json_card()
+    update_state =
+      Enum.reduce(cards, state, fn {card_name, active}, acc_state ->
+        case Map.has_key?(card_list["cards"], card_name) do
+          false -> state
+          true ->
+            card = %{card_name => card_list["cards"][card_name]}
+            if active == true do
+              #IO.inspect(card)
+              put_in(acc_state, [:players, player_id, "caster", "active"], card)
+            else
+              #IO.inspect(card)
+              put_in(acc_state, [:players, player_id, "caster", "inactive"], card)
+            end
+        end
+      end)
+    end
+
+  def decks(state, player_id, active_deck) do
     cards = active_deck["cards"]
     {:ok, card_list} = load_json_card()
-    updated_state =
-      Enum.reduce(cards, state, fn {card_name, quantity}, acc_state ->
-        Enum.reduce(1..quantity, acc_state, fn i, inner_state ->
-          key =
-            if i > 1 do
-              "#{card_name} ##{i}"
-            else
-              card_name
-          end
-          put_in(inner_state, [:players, player_id, "deck", key], card_list["cards"][card_name])
-        end)
+    Enum.reduce(cards, state, fn {card_name, quantity}, acc_state ->
+      Enum.reduce(1..quantity, acc_state, fn i, inner_state ->
+        key =
+          if i > 1 do
+            "#{card_name} ##{i}"
+          else
+            card_name
+        end
+        put_in(inner_state, [:players, player_id, "deck", key], card_list["cards"][card_name])
       end)
+    end)
+  end
+
+  def load_deck(state, player_id, active_deck) do
+    updated_state = decks(state, player_id, active_deck)
+    updated_state = casters(updated_state, player_id, active_deck)
   end
 
   def load_deck_config(state, game_id, player_id) do

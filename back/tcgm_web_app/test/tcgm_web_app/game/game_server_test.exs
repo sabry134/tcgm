@@ -178,6 +178,25 @@ defmodule TcgmWebApp.Game.GameServerTest do
     assert map_size(state.players["player2"]["hand"]) == 2
   end
 
+  test "game start with casters", %{room_id: room_id} do
+    GameServer.join_room(room_id, "player4")
+    GameServer.join_room(room_id, "player2")
+
+    :ok = GameServer.start_game(room_id)
+
+    state = GameServer.get_state(room_id)
+
+    assert Map.has_key?(state.players["player4"]["caster"], "active") == true
+    assert Map.has_key?(state.players["player4"]["caster"], "inactive") == true
+    assert map_size(state.players["player4"]["caster"]["active"]) == 1
+    assert map_size(state.players["player4"]["caster"]["inactive"]) == 1
+    assert Map.has_key?(state.players["player2"]["caster"], "active") == false
+    assert Map.has_key?(state.players["player2"]["caster"], "inactive") == false
+    assert map_size(state.players["player2"]["caster"]) == 0
+    assert map_size(state.players["player4"]["hand"]) == 2
+    assert map_size(state.players["player2"]["hand"]) == 2
+  end
+
   test "game start with player 3", %{room_id: room_id} do
     GameServer.join_room(room_id, "player2")
     GameServer.join_room(room_id, "player3")

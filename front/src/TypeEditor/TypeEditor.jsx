@@ -1,11 +1,11 @@
 import { Box, Popper } from '@mui/material'
 import { React, useRef, useState } from 'react'
-import { NavigationBar } from '../NavigationBar'
 import { LeftPanel } from './Components/LeftPanel'
 import { RightPanel } from './Components/RightPanel'
 import { Editor } from './Components/Editor'
 import { useNavigate } from 'react-router-dom'
 import { CreateTypePopup } from './Components/CreateTypePopup'
+import { MainNavigationBar } from '../NavigationBar/MainNavigationBar'
 
 // Pour le json des carte faudrais mettre l'image, le nom et le text dans properties pour faciliter le front je pense pas que sa devrais changer grand chose (1 sa permetrais plus de custom et 2 le front n'aurais plus qu'a regarder dans properties pour les editor ce qui facilitrais la tâche)
 
@@ -31,7 +31,7 @@ const TypeEditor = () => {
   return (
     <Box display='flex' flexDirection='column' height='100vh'>
       {/* Brown Banner with Menu */}
-      <NavigationBar navigate={navigate} />
+      <MainNavigationBar navigate={navigate} />
 
       {/* Main Content Area */}
       <Box display='flex' flexGrow={1} bgcolor='#fff'>

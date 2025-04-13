@@ -4,6 +4,7 @@ import { TCGMTextField } from './Properties/PropertiesTextField'
 import { Box } from '@mui/material'
 import './Editor.css'
 import { TCGMBox } from './Properties/TCGMBox'
+import { CardTypeDisplay } from './CardTypeDisplay'
 
 const defaultProperties = {
   property_name: 'Property',
@@ -153,7 +154,7 @@ export class Editor extends Component {
       case 'text': {
         return (
           <TCGMTextField
-            data={value}
+            data={data}
             selected={selected}
             positionX={selected ? this.state.position_x : value.position_x}
             positionY={selected ? this.state.position_y : value.position_y}
@@ -163,7 +164,7 @@ export class Editor extends Component {
       case 'box': {
         return (
           <TCGMBox
-            data={value}
+            data={data}
             selected={selected}
             positionX={selected ? this.state.position_x : value.position_x}
             positionY={selected ? this.state.position_y : value.position_y}
@@ -209,19 +210,20 @@ export class Editor extends Component {
         className='editor'
       >
         <StagnantUI createNewComponnent={this.createNewComponnent} />
-        {this.state.properties.map((value, index) => (
-          <div
-            key={index}
-            onClick={event => this.handleSelectedOnClick(event, index)}
-          >
-            {this.switchProperties(
-              value,
-              index,
-              this.state.idSelected === index
-            )}
-          </div>
-        ))}
+        <CardTypeDisplay
+          properties={this.state.properties}
+          handleSelectedOnClick={this.handleSelectedOnClick}
+          idSelected={this.state.idSelected}
+          position_x={this.state.position_x}
+          position_y={this.state.position_y}
+        />
       </Box>
     )
   }
 }
+// props:
+// position_x
+// position_y
+// id_selected
+// handleSelectedOnClick
+// properties *required

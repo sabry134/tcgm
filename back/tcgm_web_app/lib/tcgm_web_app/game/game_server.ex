@@ -188,8 +188,6 @@ defmodule TcgmWebApp.Game.GameServer do
           GameLogic.draw_card(update_state, player_id, %{"amount" => starting_hand_size})
         end)
 
-        #new state = load_deck_config(game_id)
-
         {:noreply, new_state}
 
       {:error, reason} ->

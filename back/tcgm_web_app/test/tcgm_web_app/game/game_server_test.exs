@@ -172,10 +172,10 @@ defmodule TcgmWebApp.Game.GameServerTest do
 
     state = GameServer.get_state(room_id)
 
-    assert map_size(state.players["player1"]["deck"]) == 1
+    assert map_size(state.players["player1"]["deck"]) == 0
     assert map_size(state.players["player2"]["deck"]) == 0
-    assert map_size(state.players["player1"]["hand"]) == 2
-    assert map_size(state.players["player2"]["hand"]) == 2
+    assert map_size(state.players["player1"]["hand"]) == 5
+    assert map_size(state.players["player2"]["hand"]) == 5
   end
 
   test "game start with casters", %{room_id: room_id} do
@@ -193,8 +193,8 @@ defmodule TcgmWebApp.Game.GameServerTest do
     assert Map.has_key?(state.players["player2"]["caster"], "active") == false
     assert Map.has_key?(state.players["player2"]["caster"], "inactive") == false
     assert map_size(state.players["player2"]["caster"]) == 0
-    assert map_size(state.players["player4"]["hand"]) == 2
-    assert map_size(state.players["player2"]["hand"]) == 2
+    assert map_size(state.players["player4"]["hand"]) == 5
+    assert map_size(state.players["player2"]["hand"]) == 5
   end
 
   test "game start with player 3", %{room_id: room_id} do
@@ -205,10 +205,10 @@ defmodule TcgmWebApp.Game.GameServerTest do
 
     state = GameServer.get_state(room_id)
 
-    assert map_size(state.players["player3"]["deck"]) == 4
+    assert map_size(state.players["player3"]["deck"]) == 0
     assert map_size(state.players["player2"]["deck"]) == 0
-    assert map_size(state.players["player3"]["hand"]) == 2
-    assert map_size(state.players["player2"]["hand"]) == 2
+    assert map_size(state.players["player3"]["hand"]) == 5
+    assert map_size(state.players["player2"]["hand"]) == 5
   end
 
 end

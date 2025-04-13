@@ -14,7 +14,7 @@ defmodule TcgmWebApp.Game.GameConfig do
     end
   end
 
-  def load_json_card() do
+  defp load_json_card() do
     config_path = "assets/game_config/cards.json"
 
     case File.read(config_path) do
@@ -27,7 +27,7 @@ defmodule TcgmWebApp.Game.GameConfig do
     end
   end
 
-  def casters(state, player_id, active_deck) do
+  defp casters(state, player_id, active_deck) do
     cards = active_deck["casters"]
     {:ok, card_list} = load_json_card()
     Enum.reduce(cards, state, fn {card_name, active}, acc_state ->
@@ -36,17 +36,15 @@ defmodule TcgmWebApp.Game.GameConfig do
         true ->
           card = %{card_name => card_list["cards"][card_name]}
           if active == true do
-            #IO.inspect(card)
             put_in(acc_state, [:players, player_id, "caster", "active"], card)
           else
-            #IO.inspect(card)
             put_in(acc_state, [:players, player_id, "caster", "inactive"], card)
           end
       end
     end)
   end
 
-  def decks(state, player_id, active_deck) do
+  defp decks(state, player_id, active_deck) do
     cards = active_deck["cards"]
     {:ok, card_list} = load_json_card()
     Enum.reduce(cards, state, fn {card_name, quantity}, acc_state ->
@@ -62,7 +60,7 @@ defmodule TcgmWebApp.Game.GameConfig do
     end)
   end
 
-  def load_deck(state, player_id, active_deck) do
+  defp load_deck(state, player_id, active_deck) do
     updated_state = decks(state, player_id, active_deck)
     casters(updated_state, player_id, active_deck)
   end

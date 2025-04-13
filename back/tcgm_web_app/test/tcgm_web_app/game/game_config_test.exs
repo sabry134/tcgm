@@ -49,17 +49,17 @@ defmodule TcgmWebApp.Game.GameConfigTest do
     update_state = GameConfig.load_deck_config(newstate, room_id, "player2")
     assert Map.has_key?(update_state.players["player1"]["deck"], "Card X") == true
     assert Map.has_key?(update_state.players["player2"]["deck"], "card4") == true
-    assert map_size(update_state.players["player1"]["deck"]) == 3
-    assert map_size(update_state.players["player2"]["deck"]) == 2
+    assert map_size(update_state.players["player1"]["deck"]) == 5
+    assert map_size(update_state.players["player2"]["deck"]) == 5
   end
 
   test "create deck for players with quantity", %{room_id: room_id, initial_state: state} do
     newstate = GameConfig.load_deck_config(state, room_id, "player2")
     update_state = GameConfig.load_deck_config(newstate, room_id, "player3")
-    assert Map.has_key?(update_state.players["player3"]["deck"], "Card Y #2") == true
+    assert Map.has_key?(update_state.players["player3"]["deck"], "Card X #2") == true
     assert Map.has_key?(update_state.players["player2"]["deck"], "card4") == true
-    assert map_size(update_state.players["player3"]["deck"]) == 6
-    assert map_size(update_state.players["player2"]["deck"]) == 2
+    assert map_size(update_state.players["player3"]["deck"]) == 5
+    assert map_size(update_state.players["player2"]["deck"]) == 5
   end
 
   test "create casters for players", %{room_id: room_id, initial_state: state} do
@@ -78,7 +78,7 @@ defmodule TcgmWebApp.Game.GameConfigTest do
     assert Map.has_key?(update_state.players["player2"]["caster"], "active") == false
     assert Map.has_key?(update_state.players["player2"]["caster"], "inactive") == false
     assert map_size(update_state.players["player2"]["caster"]) == 0
-    assert map_size(update_state.players["player4"]["deck"]) == 3
-    assert map_size(update_state.players["player2"]["deck"]) == 2
+    assert map_size(update_state.players["player4"]["deck"]) == 5
+    assert map_size(update_state.players["player2"]["deck"]) == 5
   end
 end

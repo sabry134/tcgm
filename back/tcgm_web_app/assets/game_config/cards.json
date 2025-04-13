@@ -1,0 +1,54 @@
+{
+    "cards": {
+      "Card X": {
+        "name": "king",
+        "properties": {
+          "attack": 15,
+          "defense": 10
+        }
+      },
+      "Card Y": {
+        "name": "zombi",
+        "properties": {
+          "attack": 3,
+          "defense": 9
+        }
+      },
+      "card3": {
+        "name": "monster",
+        "properties": {
+          "attack": 4,
+          "defense": 90
+        }
+      },
+      "card4": {
+        "name": "bird",
+        "properties": {
+          "attack": 89,
+          "defense": 8
+        }
+      },
+      "card5": {
+        "name": "dragon",
+        "properties": {
+          "attack": 8,
+          "defense": 8
+        }
+      },
+      "Caster1": {
+        "name": "wolf",
+        "properties": {
+          "attack": 120,
+          "defense": 100
+        }
+      },
+      "Caster2": {
+        "name": "snake",
+        "properties": {
+          "attack": 100,
+          "defense": 120
+        }
+      }
+    }
+  }
+  

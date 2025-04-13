@@ -18,14 +18,14 @@ export class GameBox extends Component {
     this.game = props.game
   }
 
-  handleMouseEnter = event => {
+  handleMouseEnter = () => {
     this.setState({ checked: false })
   }
-  handleMouseLeave = event => {
+  handleMouseLeave = () => {
     this.setState({ checked: true })
   }
 
-  handleGameClick = event => {}
+  // handleGameClick = event => {}
 
   render () {
     return (
@@ -43,17 +43,18 @@ export class GameBox extends Component {
   }
 }
 
+// TODO(all): refacto game id selection
 const Deck = ({ checked, gameId }) => {
   const navigate = useNavigate()
 
-  const handleEditButton = event => {
+  const handleEditButton = () => {
     localStorage.setItem('gameSelected', gameId)
     window.dispatchEvent(new Event('gameSelected'))
-    navigate('/card-editor')
+    navigate('/game-main-page')
   }
 
-  const handleClickButton = event => {
-    // make a callback that open the rooms page
+  const handleClickButton = () => {
+    navigate('/room')
   }
 
   return (

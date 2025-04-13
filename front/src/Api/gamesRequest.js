@@ -22,7 +22,7 @@ export async function getGameRequest(id) {
 }
 
 // Update a game by id
-// data: {
+// Data: {
 //   "name": "string",
 //   "description": "string"
 // }

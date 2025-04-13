@@ -1,7 +1,7 @@
 import { baseRequest } from "./baseRequest";
 
 // Login user
-// data: {
+// Data: {
 //   "username": "string"
 // }
 export async function loginUserRequest(data) {
@@ -16,7 +16,7 @@ export async function getUsersRequest() {
 }
 
 // Create a new user
-// data: {
+// Data: {
 //   "username": "string"
 // }
 export async function createUserRequest(data) {
@@ -31,7 +31,7 @@ export async function getUserRequest(id) {
 }
 
 // Update a user by id
-// data: {
+// Data: {
 //   "username": "string"
 // }
 export async function updateUserRequest(id, data) {

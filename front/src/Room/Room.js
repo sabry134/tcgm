@@ -251,8 +251,8 @@ const Room = () => {
   const handFanAngle = 10;
   const opponentHandFanAngle = -10;
 
-  const openPopover = Boolean(anchorEl);
-  const popoverId = openPopover ? "room-id-popover" : undefined;
+  // const openPopover = Boolean(anchorEl);
+  // const popoverId = openPopover ? "room-id-popover" : undefined;
 
   return (
     <Box display="flex" flexDirection="column" height="100vh" position="relative">

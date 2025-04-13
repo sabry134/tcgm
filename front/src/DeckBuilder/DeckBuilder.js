@@ -4,6 +4,7 @@ import CardPreview from './CardPreview';
 import CardList from './CardList';
 import DeckPreview from './DeckPreview';
 import { mockCards } from './mockData';
+import { JoinRoomNavigationBar } from "../NavigationBar/JoinRoomNavigationBar";
 import './styles.css';
 
 const MAX_CASTER_CARDS = 2;
@@ -98,29 +99,31 @@ const Deckbuilder = () => {
   
 
   return (
-  <div className="deck-builder">
-    <CardFilter cards={mockCards} onFilter={setFilteredCards} />
-    <CardPreview card={hoveredCard} />
-    
-    <div className="deck-content">
-      <CardList cards={filteredCards} addCardToDeck={addCardToDeck} setHoveredCard={setHoveredCard} />
-      <DeckPreview deck={deck} removeSingleCard={removeSingleCard} setHoveredCard={setHoveredCard} />
+  <div className="deck-builder-container">
+    <JoinRoomNavigationBar />
+    <div className="deck-builder">
+      <CardFilter cards={mockCards} onFilter={setFilteredCards} />
+      <CardPreview card={hoveredCard} />
+      
+      <div className="deck-content">
+        <CardList cards={filteredCards} addCardToDeck={addCardToDeck} setHoveredCard={setHoveredCard} />
+        <DeckPreview deck={deck} removeSingleCard={removeSingleCard} setHoveredCard={setHoveredCard} />
+      </div>
+      <div className="deck-save">
+        <input
+          className='deck-name-input'
+          type="text"
+          value={deckName}
+          onChange={(e) => setDeckName(e.target.value)}
+          placeholder="Enter deck name"
+        />
+        <button 
+          onClick={saveDeck}
+        >
+          💾 Save Deck
+        </button>
+      </div>
     </div>
-    <div className="deck-save">
-      <input
-        className='deck-name-input'
-        type="text"
-        value={deckName}
-        onChange={(e) => setDeckName(e.target.value)}
-        placeholder="Enter deck name"
-      />
-      <button 
-        onClick={saveDeck}
-      >
-        💾 Save Deck
-      </button>
-    </div>
-
   </div>
 );
 

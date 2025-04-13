@@ -1,19 +1,19 @@
-import { FormComponnent } from "../FormComponnent";
-import { FormControl, InputLabel, Select, MenuItem } from "@mui/material";
-import { createGameRequest } from "../../Api/gamesRequest";
+import { FormComponnent } from '../FormComponnent'
+import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
+import { createGameRequest } from '../../Api/gamesRequest'
 
 export class GamePicker extends FormComponnent {
-  constructor(props) {
-    super(props);
+  constructor (props) {
+    super(props)
     this.state = {
-      inputValue: "",
-      cardTypes: [],
-    };
+      inputValue: '',
+      cardTypes: [] // Store fetched Data
+    }
   }
 
-  componentDidMount() {
+  componentDidMount () {
     this.fetchType()
-    const currentCard = localStorage.getItem("currentEditedCard")
+    const currentCard = localStorage.getItem('currentEditedCard')
     if (currentCard) {
       this.setState({ inputValue: JSON.parse(currentCard).card.game_id })
     }
@@ -21,31 +21,31 @@ export class GamePicker extends FormComponnent {
 
   fetchType = () => {
     try {
-      createGameRequest().then((data) => {
-        this.setState({ cardTypes: data });
+      createGameRequest().then(data => {
+        this.setState({ cardTypes: data })
       })
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   }
 
-  handleChange = (event) => {
-    const newValue = event.target.value;
+  handleChange = event => {
+    const newValue = event.target.value
 
-    this.setState({ inputValue: newValue });
-    this.updateJsonFile(newValue.toString());
-  };
+    this.setState({ inputValue: newValue })
+    this.updateJsonFile(newValue.toString())
+  }
 
-  render() {
+  render () {
     return (
       <FormControl fullWidth>
-        <InputLabel id="card-type-picke-label"></InputLabel>
+        <InputLabel id='card-type-picke-label'></InputLabel>
         <Select
           style={{ backgroundColor: 'white' }}
-          labelId="card-type-picke-label"
-          id="card-type-picker"
+          labelId='card-type-picke-label'
+          id='card-type-picker'
           value={this.state.inputValue}
-          label="Type"
+          label='Type'
           onChange={this.handleChange}
           onOpen={this.fetchType}
         >
@@ -60,6 +60,6 @@ export class GamePicker extends FormComponnent {
           )}
         </Select>
       </FormControl>
-    );
+    )
   }
 }

@@ -4,6 +4,8 @@ export async function getCardRequest() {
   return await baseRequest('cards', 'GET', null, {});
 }
 
+// If no storedId or storedId is 0, create a new card
+// Otherwise, update the card with the storedId
 // data: {
 //   "name": "string",
 //   "text": "string",
@@ -16,8 +18,7 @@ export async function getCardRequest() {
 //   "card_type_id": 0
 // }
 export async function saveCardRequest(storedId, data) {
-  const gameSelected = localStorage.getItem('gameSelected')
-  data.card.game_id = gameSelected
+  data.card.game_id = localStorage.getItem('gameSelected')
 
   if (!storedId || storedId === "0") {
     return await baseRequest('cards', 'POST', data, {

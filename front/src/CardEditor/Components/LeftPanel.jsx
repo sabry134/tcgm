@@ -137,20 +137,7 @@ export class LeftPanel extends Component {
         >
           Save Card
         </Button>
-        <TextField
-          style={{ backgroundColor: 'white' }}
-          id='type-name'
-          variant='standard'
-          label='Type name'
-          value={this.state.createTypeInput.name}
-          onChange={event => this.handleCreateTypeInput(event, 'name')}
-        />
-        <Button
-          onClick={event => this.createCardType()}
-          sx={{ color: 'white' }}
-        >
-          Create Type
-        </Button>
+
         <div style={{ marginTop: 20 }}>
           <h3>Cards List:</h3>
           {this.state.cardList.length > 0 ? (

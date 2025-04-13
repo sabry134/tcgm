@@ -18,6 +18,7 @@ export async function getGameRequest(id) {
   return await baseRequest(`games/${id}`, 'GET');
 }
 
+// Update a game by id
 // data: {
 //   "name": "string",
 //   "description": "string"

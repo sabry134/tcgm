@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Button, Typography, Box } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Box } from "@mui/material";
+import { HelpGameNavigationBar } from "../NavigationBar/HelpGameNavigationBar";
 
-const Documentation = () => {
-  const navigate = useNavigate();
-
+const HelpGame = () => {
   const [scenes, setScenes] = useState([]);
   const [selectedScene, setSelectedScene] = useState("");
   const [cards, setCards] = useState([]);
@@ -46,31 +44,9 @@ const Documentation = () => {
 
   return (
     <Box display="flex" flexDirection="column" height="100vh">
-      <Box sx={styles.navbar}>
-        <Button onClick={() => navigate("/")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🌟 Home
-          </Typography>
-        </Button>
-        <Button
-          onClick={() => navigate("/documentation")}
-          sx={styles.navButton}
-        >
-          <Typography variant="h6" sx={styles.navText}>
-            📜 Documentation
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/forum")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🖼️ Forum
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/community")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🌍 Community
-          </Typography>
-        </Button>
-      </Box>
+
+      <HelpGameNavigationBar/>
+
       <Box sx={styles.container}></Box>
     </Box>
   );
@@ -126,4 +102,4 @@ const styles = {
   },
 };
 
-export default Documentation;
+export default HelpGame;

@@ -7,7 +7,6 @@ import {
   CardContent,
   CardMedia,
   TextField,
-  Popover,
   Modal,
   IconButton,
 } from "@mui/material";
@@ -15,6 +14,8 @@ import { useNavigate } from "react-router-dom";
 import { Socket } from "phoenix";
 import LinkIcon from "@mui/icons-material/Link";
 import SendIcon from "@mui/icons-material/Send";
+import { callSetDeck, callDrawCard, callInsertCard, callMoveCard } from "../game_commands";
+import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
 
 const modalStyle = {
   position: "absolute",
@@ -49,18 +50,38 @@ const Room = () => {
     },
   ];
 
-  const [discardPile, setDiscardPile] = useState([]);
+
+
+  const testDeck = {
+    "Card X": {
+      "name": "king",
+      "properties": {
+        "attack": 15,
+        "defense": 10
+      }
+    },
+    "Card Y": {
+      "name": "queen",
+      "properties": {
+        "attack": 12,
+        "defense": 8
+      }
+    },
+    "Card Z": {
+      "name": "jack",
+      "properties": {
+        "attack": 10,
+        "defense": 5
+      }
+    }
+  };
+
   const [deck, setDeck] = useState(initialCards);
   const [hand, setHand] = useState([]);
   const [selectedCard, setSelectedCard] = useState(null);
-  const [chatMessages, setChatMessages] = useState([]);
-  const [chatInput, setChatInput] = useState("");
-
   const [roomId, setRoomId] = useState("");
   const [playerId, setPlayerId] = useState("");
   const [channel, setChannel] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [copyButtonText, setCopyButtonText] = useState("Copy");
   const [openSetDeck, setOpenSetDeck] = useState(false);
   const [deckInput, setDeckInput] = useState("");
   const [openDrawCard, setOpenDrawCard] = useState(false);
@@ -68,6 +89,13 @@ const Room = () => {
   const [openInsertCard, setOpenInsertCard] = useState(false);
   const [insertCardInput, setInsertCardInput] = useState("");
   const [insertLocation, setInsertLocation] = useState("");
+  const [moveCardInput, setMoveCardInput] = useState("");
+  const [moveSource, setMoveSource] = useState("");
+  const [moveDestination, setMoveDestination] = useState("");
+  const [openMoveCard, setOpenMoveCard] = useState(false);
+  const [discardPile, setDiscardPile] = useState([]);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatInput, setChatInput] = useState("");
 
   const cardBackImage =
     "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Card_back_06.svg/1200px-Card_back_06.svg.png";
@@ -92,7 +120,11 @@ const Room = () => {
 
   useEffect(() => {
     if (!roomId) return;
-    const socket = new Socket("ws://79.137.11.227:4000/socket");
+    let socketURL = process.env.REACT_WS_URL;
+    if (!socketURL) {
+      socketURL = "ws://localhost:4000/socket"
+    }
+    const socket = new Socket(socketURL);
     socket.connect();
 
     const chan = socket.channel(`room:${roomId}`, {});
@@ -110,57 +142,57 @@ const Room = () => {
     });
 
     setChannel(chan);
+    console.log("About to set deck", chan, playerId, testDeck);
+    let username = localStorage.getItem("playerUsername");
+    callSetDeck(chan, username, testDeck);
+
     return () => {
       chan.leave();
       socket.disconnect();
     };
   }, [roomId]);
 
-  const handleIconClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setAnchorEl(null);
-    setCopyButtonText("Copy");
-  };
-
-  const handleCopy = () => {
-    navigator.clipboard
-      .writeText(roomId)
-      .then(() => {
-        setCopyButtonText("Copied");
-        setTimeout(() => {
-          setCopyButtonText("Copy");
-        }, 2000);
-      })
-      .catch((err) => {
-        console.error("Failed to copy room id: ", err);
-      });
-  };
-
   const handleOpenSetDeck = () => setOpenSetDeck(true);
   const handleCloseSetDeck = () => setOpenSetDeck(false);
   const handleSubmitSetDeck = () => {
-    if (channel && playerId) {
-      channel.push("set_deck", { player_id: playerId, deck: deckInput });
+    let parsedDeck;
+
+    console.log("deckInput:", deckInput);
+    try {
+      parsedDeck = typeof deckInput === "string" ? JSON.parse(deckInput) : deckInput;
+    } catch (error) {
+      console.error("Invalid JSON format for deck:", error);
+      return;
     }
+    console.log("Parsed deck:", parsedDeck);
+    callSetDeck(channel, playerId, parsedDeck);
     setOpenSetDeck(false);
     setDeckInput("");
   };
 
+  const handleCloseMoveCard = () => setOpenMoveCard(false);
+  const handleOpenMoveCard = () => setOpenMoveCard(true);
+  const handleSubmitMoveCard = () => {
+    let parsedCard;
+
+    console.log("cardInput:", moveCardInput);
+    try {
+      parsedCard = typeof moveCardInput === "string" ? JSON.parse(moveCardInput) : moveCardInput;
+    } catch (error) {
+      console.error("Invalid JSON format for card:", error);
+      return;
+    }
+    callMoveCard(channel, playerId, parsedCard, moveSource, moveDestination);
+    setOpenMoveCard(false);
+    setMoveCardInput("");
+    setMoveSource("");
+    setMoveDestination("");
+  };
+
+  const handleOpenDrawCard = () => setOpenDrawCard(true);
   const handleCloseDrawCard = () => setOpenDrawCard(false);
   const handleSubmitDrawCard = () => {
-    if (channel && playerId) {
-      channel
-        .push("draw_card", { player_id: playerId, amount: drawAmount })
-        .receive("ok", (response) => {
-          console.log("Draw card response:", response);
-        })
-        .receive("error", (error) => {
-          console.error("Error drawing card:", error);
-        });
-    }
+    callDrawCard(channel, playerId, drawAmount);
     setOpenDrawCard(false);
     setDrawAmount(1);
   };
@@ -168,14 +200,15 @@ const Room = () => {
   const handleOpenInsertCard = () => setOpenInsertCard(true);
   const handleCloseInsertCard = () => setOpenInsertCard(false);
   const handleSubmitInsertCard = () => {
-    if (channel && playerId) {
-      const cardObj = { [insertCardInput]: insertCardInput };
-      channel.push("insert_card", {
-        player_id: playerId,
-        card: cardObj,
-        location: insertLocation,
-      });
+    let parsedCard;
+    console.log("cardInput:", insertCardInput);
+    try {
+      parsedCard = typeof insertCardInput === "string" ? JSON.parse(insertCardInput) : insertCardInput;
+    } catch (error) {
+      console.error("Invalid JSON format for card:", error);
+      return;
     }
+    callInsertCard(channel, playerId, parsedCard, insertLocation);
     setOpenInsertCard(false);
     setInsertCardInput("");
     setInsertLocation("");
@@ -222,80 +255,9 @@ const Room = () => {
   const popoverId = openPopover ? "room-id-popover" : undefined;
 
   return (
-    <Box
-      sx={{
-        position: "relative",
-        width: "100vw",
-        height: "100vh",
-        overflow: "hidden",
-      }}
-    >
-      <Box sx={styles.navbar}>
-        <Button onClick={() => navigate("/")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🌟 Home
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/documentation")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            📜 Documentation
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/forum")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🖼️ Forum
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/community")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🌍 Community
-          </Typography>
-        </Button>
-      </Box>
+    <Box display="flex" flexDirection="column" height="100vh" position="relative">
 
-      <Box sx={styles.linkIconBox}>
-        <Button onClick={handleIconClick} sx={styles.linkIconButton}>
-          <LinkIcon sx={{ color: "white" }} />
-        </Button>
-        <Popover
-          id={popoverId}
-          open={openPopover}
-          anchorEl={anchorEl}
-          onClose={handleClose}
-          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-          transformOrigin={{ vertical: "top", horizontal: "right" }}
-          PaperProps={{
-            sx: {
-              padding: "10px",
-              backgroundColor: "#5d3a00",
-              color: "white",
-              maxWidth: "250px",
-            },
-          }}
-        >
-          <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-            Room ID
-          </Typography>
-          <Typography variant="body2" sx={{ marginBottom: "8px" }}>
-            This is the room ID. Share it with others to invite them.
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <TextField
-              value={roomId}
-              variant="standard"
-              InputProps={{
-                readOnly: true,
-                disableUnderline: true,
-                style: { color: "white", fontWeight: 500 },
-              }}
-              sx={{ width: "auto", marginRight: 1 }}
-            />
-            <Button variant="text" onClick={handleCopy} sx={{ color: "white" }}>
-              {copyButtonText}
-            </Button>
-          </Box>
-        </Popover>
-      </Box>
+      <RoomNavigationBar roomId={roomId} />
 
       <Box sx={styles.selectedCardZone}>
         {selectedCard !== null && hand[selectedCard] && (
@@ -318,8 +280,11 @@ const Room = () => {
           <Button variant="contained" onClick={handleDiscardTop}>
             Discard Top
           </Button>
+          <Button variant="contained" onClick={handleOpenMoveCard}>
+            Move Card
+          </Button>
         </Box>
-      </Box>
+      </Box >
 
       <Box sx={styles.casterZoneContainer}>
       </Box>
@@ -551,7 +516,42 @@ const Room = () => {
           </Box>
         </Box>
       </Modal>
-    </Box>
+
+      <Modal open={openMoveCard} onClose={handleCloseMoveCard}>
+        <Box sx={modalStyle}>
+          <Typography variant="h6" component="h2" gutterBottom>
+            Move Card
+          </Typography>
+          <TextField
+            fullWidth
+            label="Card Identifier"
+            value={moveCardInput}
+            onChange={(e) => setMoveCardInput(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            fullWidth
+            label="Source"
+            value={moveSource}
+            onChange={(e) => setMoveSource(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            fullWidth
+            label="Destination"
+            value={moveDestination}
+            onChange={(e) => setMoveDestination(e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <Box display="flex" justifyContent="flex-end" gap={2}>
+            <Button onClick={handleCloseMoveCard}>Cancel</Button>
+            <Button variant="contained" onClick={handleSubmitMoveCard}>
+              Submit
+            </Button>
+          </Box>
+        </Box>
+      </Modal>
+    </Box >
   );
 };
 

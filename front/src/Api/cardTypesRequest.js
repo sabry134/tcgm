@@ -4,6 +4,7 @@ export async function getCardTypesRequest() {
   return await baseRequest('cardTypes', 'GET');
 }
 
+// Create a new card type
 // data: {
 //   "name": "string",
 //   "properties": {},
@@ -24,6 +25,7 @@ export async function getCardTypeRequest(id) {
   return await baseRequest(`cardTypes/${id}`, 'GET');
 }
 
+// Update a card type by id
 // data: {
 //   "name": "string",
 //   "properties": {},

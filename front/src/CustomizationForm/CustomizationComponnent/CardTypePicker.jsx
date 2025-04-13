@@ -7,7 +7,7 @@ export class CardTypePicker extends FormComponnent {
     super(props)
     this.state = {
       inputValue: '',
-      cardTypes: []
+      cardTypes: [] // Store fetched Data
     }
   }
 

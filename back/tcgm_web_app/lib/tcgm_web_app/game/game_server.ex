@@ -20,7 +20,8 @@ defmodule TcgmWebApp.Game.GameServer do
     state = %{
       id: room_id,
       players: %{},
-      turn: nil,
+      turn: "",
+      turnCount: 0,
       phase: :waiting
     }
     {:ok, state}
@@ -52,10 +53,25 @@ defmodule TcgmWebApp.Game.GameServer do
     GenServer.cast(via_tuple(room_id), {:insert_card, player_id, card, location})
   end
 
+  def move_card(room_id, player_id, source, dest, card) do
+    GenServer.cast(via_tuple(room_id), {:move_card, player_id, source, dest, card})
+  end
+
+  def update_card(room_id, player_id, location, card, key, value) do
+    GenServer.cast(via_tuple(room_id), {:update_card, player_id, location, card, key, value})
+  end
+
   def start_game(room_id) do
     GenServer.cast(via_tuple(room_id), {:start_game})
   end
 
+  def set_turn(room_id, player_id) do
+    GenServer.cast(via_tuple(room_id), {:set_turn, player_id})
+  end
+
+  def pass_turn(room_id, player_id) do
+    GenServer.cast(via_tuple(room_id), {:pass_turn, player_id})
+  end
   # Server interaction functions
 
   defp load_game_config(game_id) do
@@ -136,6 +152,26 @@ defmodule TcgmWebApp.Game.GameServer do
 
   def handle_cast({:insert_card, player_id, card, location}, state) do
     new_state = GameLogic.insert_card(state, player_id, %{"card" => card, "location" => location})
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:move_card, player_id, source, dest, card}, state) do
+    new_state = GameLogic.move_card_logic(state, player_id, %{"source" => source, "dest" => dest, "card" => card})
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:update_card, player_id, location, card, key, value}, state) do
+    new_state = GameLogic.update_values_logic(state, player_id, %{"location" => location, "card" => card, "key" => key, "value" => value})
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:set_turn, player_id}, state) do
+    new_state = GameLogic.set_turn(state, player_id, %{})
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:pass_turn, player_id}, state) do
+    new_state = GameLogic.pass_turn_logic(state, player_id, %{})
     {:noreply, new_state}
   end
 

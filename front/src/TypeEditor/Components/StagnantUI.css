@@ -1,0 +1,60 @@
+.stagnantCanva {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.toolBar {
+  position: relative;
+  display: flex;
+  padding: 10px;
+  width: 50%;
+  justify-content: space-evenly;
+  gap: 5px;
+  border-radius: 20px;
+  margin-top: 10px;
+  background-color: #582f0e;
+  left: 25%;
+  box-shadow: 2px 2px 2px 2px rgba(0, 0, 0, 0.4);
+}
+
+.roundButton {
+  position: relative;
+  background-color: #a68a64;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  padding: 4px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100%;
+  border-color: #936639;
+  cursor: pointer;
+}
+
+.roundButton.selected {
+  background-color: #656d4a;
+}
+
+.roundButton:hover {
+  background: #b6ad90;
+}
+
+.verticalSeparator {
+  display: flex;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  width: 1px;
+  height: 30px;
+  box-shadow: 0px 0px 2px 2px #b6ad90bb;
+  background-color: #b6ad90;
+}
+
+.subAddMenu {
+  display: flex;
+  flex-direction: column;
+  background-color: #a68a64;
+  margin-top: 15px;
+  border-radius: 20px;
+  margin-left: 10px;
+}

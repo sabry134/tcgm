@@ -31,6 +31,11 @@ export const JoinRoomNavigationBar = () => {
         altText={ 'Join a game' }
         buttonText={ 'Join room' }
       />
+      <NavbarButton
+        event={() => navigate('/edit-deck')}
+        altText={ 'Edit your deck' }
+        buttonText={ 'Edit deck' }
+      />
     </Box>
   )
 }

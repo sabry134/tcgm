@@ -7,11 +7,14 @@ export class VisualProperties extends Component {
     return (
       <div
         style={{
-          left: this.props.x,
-          top: this.props.y,
+          left: this.props.x - (this.props.selected ? 1 : 0),
+          top: this.props.y - (this.props.selected ? 1 : 0),
           position: 'absolute',
           cursor: 'grab',
-          userSelect: 'none'
+          userSelect: 'none',
+          padding: '5px',
+          border: this.props.selected ? '1px solid #656d4a' : 'none',
+          zIndex: this.props.zIndex
         }}
       >
         {this.props.children}

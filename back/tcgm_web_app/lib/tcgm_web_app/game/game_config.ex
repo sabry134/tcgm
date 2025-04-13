@@ -30,22 +30,21 @@ defmodule TcgmWebApp.Game.GameConfig do
   def casters(state, player_id, active_deck) do
     cards = active_deck["casters"]
     {:ok, card_list} = load_json_card()
-    update_state =
-      Enum.reduce(cards, state, fn {card_name, active}, acc_state ->
-        case Map.has_key?(card_list["cards"], card_name) do
-          false -> state
-          true ->
-            card = %{card_name => card_list["cards"][card_name]}
-            if active == true do
-              #IO.inspect(card)
-              put_in(acc_state, [:players, player_id, "caster", "active"], card)
-            else
-              #IO.inspect(card)
-              put_in(acc_state, [:players, player_id, "caster", "inactive"], card)
-            end
-        end
-      end)
-    end
+    Enum.reduce(cards, state, fn {card_name, active}, acc_state ->
+      case Map.has_key?(card_list["cards"], card_name) do
+        false -> state
+        true ->
+          card = %{card_name => card_list["cards"][card_name]}
+          if active == true do
+            #IO.inspect(card)
+            put_in(acc_state, [:players, player_id, "caster", "active"], card)
+          else
+            #IO.inspect(card)
+            put_in(acc_state, [:players, player_id, "caster", "inactive"], card)
+          end
+      end
+    end)
+  end
 
   def decks(state, player_id, active_deck) do
     cards = active_deck["cards"]
@@ -65,7 +64,7 @@ defmodule TcgmWebApp.Game.GameConfig do
 
   def load_deck(state, player_id, active_deck) do
     updated_state = decks(state, player_id, active_deck)
-    updated_state = casters(updated_state, player_id, active_deck)
+    casters(updated_state, player_id, active_deck)
   end
 
   def load_deck_config(state, game_id, player_id) do
@@ -75,7 +74,7 @@ defmodule TcgmWebApp.Game.GameConfig do
           Enum.find(config, fn config ->
             config["active"] == true and config["type"] == "deck"
           end)
-        new_state = load_deck(state, player_id, active_deck)
+        load_deck(state, player_id, active_deck)
     end
   end
 

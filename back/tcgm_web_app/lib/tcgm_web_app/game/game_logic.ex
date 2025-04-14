@@ -208,15 +208,15 @@ defmodule TcgmWebApp.Game.GameLogic do
     end
   end
 
-  def set_turn(state, player_id, args) do
+  def set_turn(state, player_id, _args) do
     update_state =
       state
       |> put_in([:turn], player_id)
 
     update_state
   end
-  
-  def pass_turn_logic(state, player_id, args) do
+
+  def pass_turn_logic(state, player_id, _args) do
     count = state.turnCount + 1
 
     update_state =

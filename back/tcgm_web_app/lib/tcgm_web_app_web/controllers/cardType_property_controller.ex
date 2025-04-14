@@ -109,10 +109,6 @@ defmodule TcgmWebAppWeb.CardTypePropertyController do
         conn
         |> put_status(:ok)
         |> json(card_type_properties)
-      _ ->
-      conn
-      |> put_status(:unprocessable_entity)
-      |> json(%{error: "Could not retrieve card type properties"})
     end
   end
 
@@ -135,10 +131,6 @@ defmodule TcgmWebAppWeb.CardTypePropertyController do
         conn
         |> put_status(:ok)
         |> json(card_type_properties)
-      _ ->
-      conn
-      |> put_status(:unprocessable_entity)
-      |> json(%{error: "Could not retrieve card type properties"})
     end
   end
 end

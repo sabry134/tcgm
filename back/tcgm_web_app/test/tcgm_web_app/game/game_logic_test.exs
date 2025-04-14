@@ -351,7 +351,7 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "properties" => %{"attack" => 10, "defense" => 5}
     }}
     insert_args = %{"location" => "graveyard", "card" => card1}
-    state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", insert_args)
+    #state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", insert_args)
     state_pass_turn = GameLogic.set_turn(state, "player1", insert_args)
 
     assert state_pass_turn.turn == "player1"
@@ -363,7 +363,7 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       "properties" => %{"attack" => 10, "defense" => 5}
     }}
     insert_args = %{"location" => "graveyard", "card" => card1}
-    state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", insert_args)
+    _state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", insert_args)
     state_pass_turn = GameLogic.pass_turn_logic(state, "player2", insert_args)
 
     assert state_pass_turn.turn == "player2"

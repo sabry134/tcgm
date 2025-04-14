@@ -3,14 +3,15 @@
         "deck": "deck",
         "hand": "hand",
         "graveyard": "graveyard",
-        "field": "field"
+        "field": "field",
+        "caster":"caster"
     },
-    "starting_hand_size": 2,
+    "starting_hand_size": 5,
     "player_properties": {
         "health": 20
     },
     "custom_rules": {
-        "max_deck_size": 40,
+        "max_deck_size": 5,
         "max_hand_size": 7,
         "draw_per_turn": 1
     }

@@ -227,16 +227,13 @@ const Room = () => {
   };
 
   const cardWidth = 180;
-  const opponentHandFanAngle = -10;
 
   // const openPopover = Boolean(anchorEl);
   // const popoverId = openPopover ? "room-id-popover" : undefined;
-  const playerHand = playerId ? Object.entries(gameState.players[playerId].hand) : []
-  const deck = playerId ? Object.entries(gameState?.players[playerId]?.deck) : []
-  const discardPile = playerId ? Object.entries(gameState?.players[playerId]?.graveyard) : []
-
+  const playerHand = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].hand) : []
+  const deck = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].deck) : []
+  const discardPile = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].graveyard) : []
   return (
-
     <Box display="flex" flexDirection="column" height="100vh" position="relative">
 
       <RoomNavigationBar roomId={gameState.id} />
@@ -256,38 +253,10 @@ const Room = () => {
 
       <Box sx={styles.innateCardsContainer}>
       </Box>
+      {Object.entries(gameState.players).map(([key, value], index) => {
+        return <PlayerHand key={index} playerHand={Object.entries(value.hand)} cardWidth={cardWidth} handleCardClick={handleCardClick} selectedCard={selectedCard} rotatation={0} left={"35vw"} bottom={key === playerId ? 10 : null} top={key === playerId ? null : 10} />
+      })}
 
-      <Box sx={styles.opponentHandContainer}>
-        <Box sx={styles.opponentHandInner}>
-          {[...Array(5)].map((_, index) => {
-            const midIndex = (5 - 1) / 2;
-            const rotation = (index - midIndex) * opponentHandFanAngle;
-            const offsetX = (index - midIndex) * (cardWidth / 3);
-            return (
-              <Box
-                key={index}
-                sx={{
-                  position: "absolute",
-                  left: "50%",
-                  top: 0,
-                  width: `${cardWidth}px`,
-                  transform: `translateX(${offsetX}px) rotate(${rotation}deg)`,
-                  transformOrigin: "top center",
-                }}
-              >
-                <Card sx={styles.card}>
-                  <CardMedia
-                    component="img"
-                    height="140"
-                    image={cardBackImage}
-                    alt="Opponent hidden card"
-                  />
-                </Card>
-              </Box>
-            );
-          })}
-        </Box>
-      </Box>
 
       <Box sx={styles.chatContainer}>
         <Box sx={{ height: "70%", overflowY: "auto", padding: "8px" }}>
@@ -327,7 +296,6 @@ const Room = () => {
       <Box sx={styles.playAreaContainer}>
       </Box>
 
-      <PlayerHand playerHand={playerHand} cardWidth={cardWidth} handleCardClick={handleCardClick} selectedCard={selectedCard} rotatation={0} />
 
       <Box sx={styles.deckDiscardContainer}>
         <Box sx={styles.deckContainer} onClick={handlePiocheClick}>

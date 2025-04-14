@@ -1,6 +1,6 @@
 import { Box, Card, CardContent, CardMedia, Typography } from "@mui/material";
 
-const PlayerHand = ({ playerHand, cardWidth, handleCardClick, selectedCard, rotatation }) => {
+const PlayerHand = ({ playerHand, cardWidth, handleCardClick, selectedCard, rotatation, bottom, top, left, right }) => {
     const handFanAngle = 10;
 
     return <Box sx={{
@@ -9,8 +9,10 @@ const PlayerHand = ({ playerHand, cardWidth, handleCardClick, selectedCard, rota
         alignItems: "center",
         alignContent: "center",
         justifyContent: "center",
-        bottom: 10,
-        left: "35vw",
+        top: top,
+        right: right,
+        bottom: bottom,
+        left: left,
         rotate: `${rotatation ?? 0}deg`,
         width: "30vw",
         height: 180,

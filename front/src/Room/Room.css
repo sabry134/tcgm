@@ -1,0 +1,7 @@
+.card {
+  max-width: 345;
+  margin: 'auto';
+  box-shadow: '0 8px 16px rgba(0,0,0,0.3)';
+  border-radius: '10px';
+  width: 180;
+}

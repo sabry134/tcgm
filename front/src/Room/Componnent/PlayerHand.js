@@ -1,4 +1,6 @@
 import { Box, Card, CardContent, CardMedia, Typography } from "@mui/material";
+import '../Room.css'
+
 
 const PlayerHand = ({ playerHand, cardWidth, handleCardClick, selectedCard, rotatation, bottom, top, left, right }) => {
     const handFanAngle = 10;
@@ -41,12 +43,7 @@ const PlayerHand = ({ playerHand, cardWidth, handleCardClick, selectedCard, rota
                         zIndex: selectedCard === index ? 10 : 1,
                     }}
                 >
-                    <Card sx={{
-                        maxWidth: 345,
-                        margin: "auto",
-                        boxShadow: "0 8px 16px rgba(0,0,0,0.3)",
-                        borderRadius: "10px",
-                    }}>
+                    <Card className="card">
                         <CardMedia
                             component="img"
                             height="140"

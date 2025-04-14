@@ -13,25 +13,14 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Socket } from "phoenix";
 import LinkIcon from "@mui/icons-material/Link";
-import SendIcon from "@mui/icons-material/Send";
 import { callSetDeck, callDrawCard, callInsertCard, callMoveCard } from "../game_commands";
 import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
 import defaultGameState from "./Data/GameState.json"
 import PlayerHand from "./Componnent/PlayerHand";
-
-
-const modalStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
-
+import CardInfo from "./Componnent/CardInfo";
+import GameChat from "./Componnent/GameChat";
+import DiscardPile from "./Componnent/DiscardPile";
+import DeckPile from "./Componnent/DeckPile";
 
 const Room = () => {
   const navigate = useNavigate();
@@ -96,8 +85,6 @@ const Room = () => {
   const [playerId, setPlayerId] = useState("");
   const [channel, setChannel] = useState(null);
 
-  const [chatMessages, setChatMessages] = useState([]);
-  const [chatInput, setChatInput] = useState("");
 
   const cardBackImage =
     "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Card_back_06.svg/1200px-Card_back_06.svg.png";
@@ -205,25 +192,8 @@ const Room = () => {
     callDrawCard(channel, playerId, 1)
   };
 
-  const handleDiscardTop = () => {
-
-  };
-
-  const handleCardClick = (index) => {
-    setSelectedCard((prev) => (prev === index ? null : index));
-  };
-
-  const handleSendMessage = () => {
-    if (chatInput.trim() !== "") {
-      setChatMessages([...chatMessages, { sender: playerId, text: chatInput }]);
-      setChatInput("");
-    }
-  };
-
-  const handleChatKeyDown = (e) => {
-    if (e.key === "Enter") {
-      handleSendMessage();
-    }
+  const handleCardClick = (card) => {
+    setSelectedCard((prev) => (prev === card ? null : card));
   };
 
   const cardWidth = 180;
@@ -238,15 +208,7 @@ const Room = () => {
 
       <RoomNavigationBar roomId={gameState.id} />
 
-      <Box sx={styles.selectedCardZone}>
-        {selectedCard !== null && playerHand && playerHand[selectedCard] && (
-          <Box sx={styles.selectedCardDetails}>
-            <Typography variant="h6">
-              {playerHand[selectedCard][1].name}
-            </Typography>
-          </Box>
-        )}
-      </Box >
+
 
       <Box sx={styles.casterZoneContainer}>
       </Box>
@@ -257,123 +219,22 @@ const Room = () => {
         return <PlayerHand key={index} playerHand={Object.entries(value.hand)} cardWidth={cardWidth} handleCardClick={handleCardClick} selectedCard={selectedCard} rotatation={0} left={"35vw"} bottom={key === playerId ? 10 : null} top={key === playerId ? null : 10} />
       })}
 
+      <CardInfo selectedCard={selectedCard} playerHand={playerHand} />
 
-      <Box sx={styles.chatContainer}>
-        <Box sx={{ height: "70%", overflowY: "auto", padding: "8px" }}>
-          {chatMessages.map((msg, index) => (
-            <Box key={index} sx={{ mb: 1 }}>
-              <Typography variant="caption" color="textSecondary">
-                {msg.sender}:
-              </Typography>
-              <Typography variant="body2">{msg.text}</Typography>
-            </Box>
-          ))}
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            borderTop: "1px solid #ccc",
-            padding: "4px 8px",
-            marginTop: "auto",
-          }}
-        >
-          <TextField
-            fullWidth
-            placeholder="Enter your message..."
-            value={chatInput}
-            onChange={(e) => setChatInput(e.target.value)}
-            onKeyDown={handleChatKeyDown}
-            size="small"
-            variant="outlined"
-          />
-          <IconButton onClick={handleSendMessage} color="primary">
-            <SendIcon />
-          </IconButton>
-        </Box>
-      </Box>
-
+      <GameChat playerId={playerId} />
       <Box sx={styles.playAreaContainer}>
       </Box>
 
 
       <Box sx={styles.deckDiscardContainer}>
-        <Box sx={styles.deckContainer} onClick={handlePiocheClick}>
-          {deck && (deck).length > 0 && (
-            <Card sx={{ ...styles.card, width: `${cardWidth}px` }}>
-              <CardMedia
-                component="img"
-                height="140"
-                image={cardBackImage}
-                alt="Card Back"
-              />
-            </Card>
-          )}
-        </Box>
-        <Box sx={styles.discardContainer}>
-          {discardPile && discardPile.map(([key, card], index) => {
-            const offset = index * 2;
-            return (
-              <Box
-                key={index}
-                sx={{
-                  position: "absolute",
-                  top: `${offset}px`,
-                  left: `${offset}px`,
-                }}
-              >
-                <Card sx={{ ...styles.card, width: 100 }}>
-                  <CardMedia
-                    component="img"
-                    height="140"
-                    image={card.card_image}
-                    alt="Discarded card"
-                  />
-                </Card>
-              </Box>
-            );
-          })}
-        </Box>
+        <DeckPile deck={deck} handlePiocheClick={handlePiocheClick} cardBackImage={cardBackImage} />
+        <DiscardPile discardPile={discardPile} />
       </Box>
     </Box >
   );
 };
 
 const styles = {
-  navbar: {
-    backgroundColor: "#5d3a00",
-    color: "white",
-    padding: "10px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-around",
-  },
-  navButton: {
-    borderRadius: 0,
-    marginRight: "10px",
-  },
-  navText: {
-    color: "white",
-  },
-  linkIconBox: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-  },
-  linkIconButton: {
-    minWidth: "auto",
-    padding: 0,
-  },
-  selectedCardZone: {
-    position: "absolute",
-    top: 70,
-    left: 10,
-    width: 300,
-    padding: "8px",
-    border: "1px solid gray",
-    borderRadius: "4px",
-    backgroundColor: "#fff",
-  },
   casterZoneContainer: {
     position: "absolute",
     marginTop: "15%",
@@ -394,35 +255,7 @@ const styles = {
     borderRadius: "4px",
     backgroundColor: "#fff",
   },
-  opponentHandContainer: {
-    position: "absolute",
-    top: 70,
-    left: "50%",
-    transform: "translateX(-50%)",
-    width: 380,
-    height: 120,
-    border: "1px solid gray",
-    borderRadius: "4px",
-    backgroundColor: "#fff",
-    overflow: "hidden",
-  },
-  opponentHandInner: {
-    position: "relative",
-    width: "100%",
-    height: "100%",
-  },
-  chatContainer: {
-    position: "absolute",
-    top: 70,
-    right: 10,
-    width: 300,
-    height: 500,
-    border: "1px solid gray",
-    borderRadius: "4px",
-    backgroundColor: "#fff",
-    display: "flex",
-    flexDirection: "column",
-  },
+
   playAreaContainer: {
     position: "absolute",
     top: 200,
@@ -432,18 +265,6 @@ const styles = {
     border: "2px dashed #999",
     borderRadius: "4px",
     backgroundColor: "#fff",
-  },
-  yourHandContainer: {
-    position: "absolute",
-    bottom: 10,
-    left: "50%",
-    transform: "translateX(-50%)",
-    width: 800,
-    height: 180,
-    border: "1px solid gray",
-    borderRadius: "4px",
-    backgroundColor: "#fff",
-    overflow: "visible",
   },
   deckDiscardContainer: {
     position: "absolute",
@@ -455,30 +276,7 @@ const styles = {
     borderRadius: "4px",
     backgroundColor: "#fff",
   },
-  deckContainer: {
-    position: "absolute",
-    top: 10,
-    left: 10,
-    width: 180,
-    height: 140,
-    cursor: "pointer",
-  },
-  discardContainer: {
-    position: "absolute",
-    bottom: 10,
-    right: 10,
-    width: 120,
-    height: 120,
-  },
-  card: {
-    maxWidth: 345,
-    margin: "auto",
-    boxShadow: "0 8px 16px rgba(0,0,0,0.3)",
-    borderRadius: "10px",
-  },
+
 };
 
 export default Room;
-
-
-//TODO: When gamestate change / is sent by back enven when not triggered we need to update it

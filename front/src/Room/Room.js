@@ -1,108 +1,21 @@
 import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Typography,
-  Box,
-  Card,
-  CardContent,
-  CardMedia,
-  TextField,
-  Modal,
-} from "@mui/material";
+
 import { useNavigate } from "react-router-dom";
 import { Socket } from "phoenix";
 import { callSetDeck, callDrawCard, callInsertCard, callMoveCard } from "../game_commands";
 import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
+import defaultGameState from "./Data/GameState.json"
+import PlayerHand from "./Componnent/PlayerHand";
+import CardInfo from "./Componnent/CardInfo";
+import GameChat from "./Componnent/GameChat";
+import DiscardPile from "./Componnent/DiscardPile";
+import DeckPile from "./Componnent/DeckPile";
+import "./Room.css"
 
-const modalStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-};
 
 const Room = () => {
   const navigate = useNavigate();
 
-  const initialCards = [
-    {
-      card_name: "Ace of Spades",
-      card_description: "The highest card in the deck.",
-      card_image:
-        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
-    },
-    {
-      card_name: "Queen of Hearts",
-      card_description: "Represents love and compassion.",
-      card_image:
-        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
-    },
-    {
-      card_name: "Joker",
-      card_description: "The wild card, unpredictable and fun.",
-      card_image:
-        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
-    },
-    {
-      card_name: "Ace of Spades",
-      card_description: "The highest card in the deck.",
-      card_image:
-        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
-    },
-    {
-      card_name: "Queen of Hearts",
-      card_description: "Represents love and compassion.",
-      card_image:
-        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
-    },
-    {
-      card_name: "Joker",
-      card_description: "The wild card, unpredictable and fun.",
-      card_image:
-        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
-    },
-    {
-      card_name: "Ace of Spades",
-      card_description: "The highest card in the deck.",
-      card_image:
-        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
-    },
-    {
-      card_name: "Queen of Hearts",
-      card_description: "Represents love and compassion.",
-      card_image:
-        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
-    },
-    {
-      card_name: "Joker",
-      card_description: "The wild card, unpredictable and fun.",
-      card_image:
-        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
-    },
-    {
-      card_name: "Ace of Spades",
-      card_description: "The highest card in the deck.",
-      card_image:
-        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
-    },
-    {
-      card_name: "Queen of Hearts",
-      card_description: "Represents love and compassion.",
-      card_image:
-        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
-    },
-    {
-      card_name: "Joker",
-      card_description: "The wild card, unpredictable and fun.",
-      card_image:
-        "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
-    },
-  ];
 
   const testDeck = {
     "Card X": {
@@ -125,59 +38,84 @@ const Room = () => {
         "attack": 10,
         "defense": 5
       }
+    },
+    "Card A": {
+      "name": "jack",
+      "properties": {
+        "attack": 10,
+        "defense": 5
+      }
+    },
+    "Card B": {
+      "name": "jack",
+      "properties": {
+        "attack": 10,
+        "defense": 5
+      }
+    },
+    "Card C": {
+      "name": "jack",
+      "properties": {
+        "attack": 10,
+        "defense": 5
+      }
+    },
+    "Card D": {
+      "name": "jack",
+      "properties": {
+        "attack": 10,
+        "defense": 5
+      }
     }
   };
 
-  const [deck, setDeck] = useState(initialCards);
-  const [hand, setHand] = useState([]);
+
+  const [gameState, setGameState] = useState(defaultGameState);
   const [selectedCard, setSelectedCard] = useState(null);
-  const [roomId, setRoomId] = useState("");
+
   const [playerId, setPlayerId] = useState("");
   const [channel, setChannel] = useState(null);
-  const [openSetDeck, setOpenSetDeck] = useState(false);
-  const [deckInput, setDeckInput] = useState("");
-  const [openDrawCard, setOpenDrawCard] = useState(false);
-  const [drawAmount, setDrawAmount] = useState(1);
-  const [openInsertCard, setOpenInsertCard] = useState(false);
-  const [insertCardInput, setInsertCardInput] = useState("");
-  const [insertLocation, setInsertLocation] = useState("");
-  const [moveCardInput, setMoveCardInput] = useState("");
-  const [moveSource, setMoveSource] = useState("");
-  const [moveDestination, setMoveDestination] = useState("");
-  const [openMoveCard, setOpenMoveCard] = useState(false);
+
 
   const cardBackImage =
     "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Card_back_06.svg/1200px-Card_back_06.svg.png";
+  const hasEffectRun = React.useRef(false);
+  const connectionRef = React.useRef({
+    socket: null,
+    channel: null
+  });
 
   useEffect(() => {
-    const room_id = localStorage.getItem("room_id");
-    if (!room_id) {
+    // Early return if the effect has already run
+    if (hasEffectRun.current) return;
+
+    let username = localStorage.getItem("playerUsername");
+    const roomId = localStorage.getItem("room_id");
+
+    if (!roomId) {
       console.error("No room_id found in localStorage");
       navigate("/join");
       return;
     }
-    setRoomId(room_id);
 
-    let username = localStorage.getItem("playerUsername");
     if (!username) {
-      const counter = parseInt(
-        localStorage.getItem("playerCounter") || "1",
-        10
-      );
+      const counter = parseInt(localStorage.getItem("playerCounter") || "1", 10);
       username = `Player ${counter}`;
       localStorage.setItem("playerUsername", username);
     }
     setPlayerId(username);
-  }, [navigate]);
 
-  useEffect(() => {
-    if (!roomId) return;
-    const socket = new Socket("ws://localhost:4000/socket");
-    socket.connect();
+    let socketURL = process.env.REACT_WS_URL;
+    if (!socketURL) {
+      socketURL = "ws://localhost:4000/socket";
+    }
 
-    const chan = socket.channel(`room:${roomId}`, {});
+    // Store socket and channel in refs rather than component state
+    connectionRef.current.socket = new Socket(socketURL);
+    connectionRef.current.socket.connect();
 
-    chan
+    connectionRef.current.channel = connectionRef.current.socket.channel(`room:${roomId}`, {});
+    connectionRef.current.channel
       .join()
       .receive("ok", (resp) => {
         console.log("WebSocket connection established", resp);
@@ -186,364 +124,103 @@ const Room = () => {
         console.error("WebSocket connection failed", resp);
       });
 
-    chan.on("game_update", (payload) => {
-      console.log("Game update received", payload);
+    connectionRef.current.channel.on("game_update", (payload) => {
+      console.log("Received game update:", payload);
+      setGameState(payload.state);
     });
 
-    setChannel(chan);
-    console.log("About to set deck", chan, playerId, testDeck);
-    let username = localStorage.getItem("playerUsername");
-    callSetDeck(chan, username, testDeck);
+    // Set channel state for component to use
+    setChannel(connectionRef.current.channel);
+    console.log("About to set deck", connectionRef.current.channel, username, testDeck);
+    callSetDeck(connectionRef.current.channel, username, testDeck);
+
+    // Mark that the effect has run
+    hasEffectRun.current = true;
+
+    // This cleanup should only run on true component unmount
+    // by using window.addEventListener, we ensure this only runs when the page is actually unloaded
+    const handleUnload = () => {
+      if (connectionRef.current.channel) {
+        localStorage.removeItem("playerUsername");
+        localStorage.removeItem("room_id");
+        connectionRef.current.channel.leave();
+        connectionRef.current.socket.disconnect();
+      }
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
 
     return () => {
-      chan.leave();
-      socket.disconnect();
+      // This cleanup won't do the socket cleanup on StrictMode remounts
+      window.removeEventListener('beforeunload', handleUnload);
+
+      // We can check if this is a true unmount (navigation away) vs a StrictMode remount
+      // by not cleaning up connections in the useEffect cleanup 
     };
-  }, [roomId]);
+  }, []);
 
-  const handleOpenSetDeck = () => setOpenSetDeck(true);
-  const handleCloseSetDeck = () => setOpenSetDeck(false);
-  const handleSubmitSetDeck = () => {
-    let parsedDeck;
+  // Add a separate useEffect for component unmount that runs on true unmount using a ref
+  useEffect(() => {
+    return () => {
+      // This will only run when the component is truly unmounted (navigating away from page)
+      // and not during React StrictMode's development checks
+      if (!hasEffectRun.current) return;
 
-    console.log("deckInput:", deckInput);
-    try {
-      parsedDeck = typeof deckInput === "string" ? JSON.parse(deckInput) : deckInput;
-    } catch (error) {
-      console.error("Invalid JSON format for deck:", error);
-      return;
-    }
-    console.log("Parsed deck:", parsedDeck);
-    callSetDeck(channel, playerId, parsedDeck);
-    setOpenSetDeck(false);
-    setDeckInput("");
-  };
+      // Check if we're truly unmounting and not just in a development mode remount
+      const isDevModeRemount = process.env.NODE_ENV === 'development' && document.hidden === false;
 
-  const handleCloseMoveCard = () => setOpenMoveCard(false);
-  const handleOpenMoveCard = () => setOpenMoveCard(true);
-  const handleSubmitMoveCard = () => {
-    let parsedCard;
-
-    console.log("cardInput:", moveCardInput);
-    try {
-      parsedCard = typeof moveCardInput === "string" ? JSON.parse(moveCardInput) : moveCardInput;
-    } catch (error) {
-      console.error("Invalid JSON format for card:", error);
-      return;
-    }
-    callMoveCard(channel, playerId, parsedCard, moveSource, moveDestination);
-    setOpenMoveCard(false);
-    setMoveCardInput("");
-    setMoveSource("");
-    setMoveDestination("");
-  };
-
-  const handleOpenDrawCard = () => setOpenDrawCard(true);
-  const handleCloseDrawCard = () => setOpenDrawCard(false);
-  const handleSubmitDrawCard = () => {
-    callDrawCard(channel, playerId, drawAmount);
-    setOpenDrawCard(false);
-    setDrawAmount(1);
-  };
-
-  const handleOpenInsertCard = () => setOpenInsertCard(true);
-  const handleCloseInsertCard = () => setOpenInsertCard(false);
-  const handleSubmitInsertCard = () => {
-    let parsedCard;
-    console.log("cardInput:", insertCardInput);
-    try {
-      parsedCard = typeof insertCardInput === "string" ? JSON.parse(insertCardInput) : insertCardInput;
-    } catch (error) {
-      console.error("Invalid JSON format for card:", error);
-      return;
-    }
-    callInsertCard(channel, playerId, parsedCard, insertLocation);
-    setOpenInsertCard(false);
-    setInsertCardInput("");
-    setInsertLocation("");
-  };
+      if (!isDevModeRemount && connectionRef.current.channel) {
+        console.log("True component unmount - cleaning up connections");
+        localStorage.removeItem("playerUsername");
+        localStorage.removeItem("room_id");
+        connectionRef.current.channel.leave();
+        connectionRef.current.socket.disconnect();
+      }
+    };
+  }, []);
 
   const handlePiocheClick = () => {
-    if (deck.length > 0) {
-      const drawnCard = deck[0];
-      setDeck(deck.slice(1));
-      setHand([...hand, drawnCard]);
-    }
+    callDrawCard(channel, playerId, 1)
   };
 
-  const handleCardClick = (index) => {
-    if (selectedCard === index) {
-      setSelectedCard(null);
-    } else {
-      setSelectedCard(index);
-    }
-  };
-
-  const handContainerStyle = {
-    position: "relative",
-    height: "300px",
-    width: "100%",
-    margin: "auto",
-  };
-
-  const deckContainerStyle = {
-    position: "relative",
-    height: "200px",
-    width: "100%",
-    margin: "auto",
-    cursor: "pointer",
+  const handleCardClick = (card) => {
+    setSelectedCard((prev) => (prev === card ? null : card));
   };
 
   const cardWidth = 180;
-  const handFanAngle = 10;
-  const deckFanAngle = 5;
 
+  // const openPopover = Boolean(anchorEl);
+  // const popoverId = openPopover ? "room-id-popover" : undefined;
+  const playerHand = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].hand) : []
+  const deck = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].deck) : []
+  const discardPile = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].graveyard) : []
   return (
-    <Box display="flex" flexDirection="column" height="100vh" position="relative">
+    <div display="flex" flexDirection="column" height="100vh" position="relative">
 
-      <RoomNavigationBar roomId={roomId} />
+      <RoomNavigationBar roomId={gameState.id} />
 
-      <Box sx={styles.container}>
-        <Typography variant="h4" gutterBottom>
-          Your Cards
-        </Typography>
-        <Box sx={{ mb: 2, display: "flex", gap: 2 }}>
-          <Button variant="contained" onClick={handleOpenSetDeck}>
-            Set Deck
-          </Button>
-          <Button variant="contained" onClick={handleOpenDrawCard}>
-            Draw Card
-          </Button>
-          <Button variant="contained" onClick={handleOpenInsertCard}>
-            Insert Card
-          </Button>
-          <Button variant="contained" onClick={handleOpenMoveCard}>
-            Move Card
-          </Button>
-        </Box>
+      <div className={"casterZoneContainer"}>
+      </div>
 
-        <Box sx={deckContainerStyle} onClick={handlePiocheClick}>
-          {deck.map((_, index) => {
-            const midIndex = (deck.length - 1) / 2;
-            const rotation = (index - midIndex) * deckFanAngle;
-            const offsetX = (index - midIndex) * (cardWidth / 4);
-            return (
-              <Box
-                key={index}
-                sx={{
-                  position: "absolute",
-                  left: "50%",
-                  top: 0,
-                  width: `${cardWidth}px`,
-                  transform: `translateX(${offsetX}px) rotate(${rotation}deg)`,
-                  transformOrigin: "center center",
-                }}
-              >
-                <Card sx={{ ...styles.card, width: `${cardWidth}px` }}>
-                  <CardMedia
-                    component="img"
-                    height="140"
-                    image={cardBackImage}
-                    alt="Card Back"
-                  />
-                </Card>
-              </Box>
-            );
-          })}
-        </Box>
+      <div className={"innateCardsContainer"}>
+      </div>
+      {Object.entries(gameState.players).map(([key, value], index) => {
+        return <PlayerHand key={index} playerHand={Object.entries(value.hand)} cardWidth={cardWidth} handleCardClick={handleCardClick} selectedCard={selectedCard} rotatation={0} left={"35vw"} bottom={key === playerId ? 10 : null} top={key === playerId ? null : 10} />
+      })}
 
-        <Box sx={handContainerStyle}>
-          {hand.map((card, index) => {
-            const midIndex = (hand.length - 1) / 2;
-            const rotation = (index - midIndex) * handFanAngle;
-            const offsetX = (index - midIndex) * (cardWidth / 3);
-            const extraY = selectedCard === index ? -100 : 0;
-            return (
-              <Box
-                key={index}
-                onClick={() => handleCardClick(index)}
-                sx={{
-                  position: "absolute",
-                  left: "50%",
-                  bottom: 0,
-                  width: `${cardWidth}px`,
-                  transform: `translateX(${offsetX}px) translateY(${extraY}px) rotate(${rotation}deg)`,
-                  transformOrigin: "bottom center",
-                  transition: "transform 0.3s",
-                  cursor: "pointer",
-                  zIndex: selectedCard === index ? 10 : 1,
-                }}
-              >
-                <Card sx={styles.card}>
-                  <CardMedia
-                    component="img"
-                    height="140"
-                    image={card.card_image}
-                    alt={card.card_name}
-                  />
-                  <CardContent>
-                    <Typography gutterBottom variant="h5">
-                      {card.card_name}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {selectedCard === index
-                        ? card.card_description
-                        : card.card_description.substring(0, 30) + '...'}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Box>
-            );
-          })}
-        </Box>
-      </Box>
+      <CardInfo selectedCard={selectedCard} playerHand={playerHand} />
 
-      <Modal open={openSetDeck} onClose={handleCloseSetDeck}>
-        <Box sx={modalStyle}>
-          <Typography variant="h6" component="h2" gutterBottom>
-            Set Deck
-          </Typography>
-          <TextField
-            fullWidth
-            label="Deck (JSON or comma separated)"
-            value={deckInput}
-            onChange={(e) => setDeckInput(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <Box display="flex" justifyContent="flex-end" gap={2}>
-            <Button onClick={handleCloseSetDeck}>Cancel</Button>
-            <Button variant="contained" onClick={handleSubmitSetDeck}>
-              Submit
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
+      <GameChat playerId={playerId} />
+      <div className={"playAreaContainer"}>
+      </div>
 
-      <Modal open={openDrawCard} onClose={handleCloseDrawCard}>
-        <Box sx={modalStyle}>
-          <Typography variant="h6" component="h2" gutterBottom>
-            Draw Card
-          </Typography>
-          <TextField
-            fullWidth
-            label="Amount"
-            type="number"
-            value={drawAmount}
-            onChange={(e) => setDrawAmount(parseInt(e.target.value, 10))}
-            sx={{ mb: 2 }}
-          />
-          <Box display="flex" justifyContent="flex-end" gap={2}>
-            <Button onClick={handleCloseDrawCard}>Cancel</Button>
-            <Button variant="contained" onClick={handleSubmitDrawCard}>
-              Submit
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
 
-      <Modal open={openInsertCard} onClose={handleCloseInsertCard}>
-        <Box sx={modalStyle}>
-          <Typography variant="h6" component="h2" gutterBottom>
-            Insert Card
-          </Typography>
-          <TextField
-            fullWidth
-            label="Card Identifier"
-            value={insertCardInput}
-            onChange={(e) => setInsertCardInput(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            fullWidth
-            label="Location"
-            value={insertLocation}
-            onChange={(e) => setInsertLocation(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <Box display="flex" justifyContent="flex-end" gap={2}>
-            <Button onClick={handleCloseInsertCard}>Cancel</Button>
-            <Button variant="contained" onClick={handleSubmitInsertCard}>
-              Submit
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
-
-      <Modal open={openMoveCard} onClose={handleCloseMoveCard}>
-        <Box sx={modalStyle}>
-          <Typography variant="h6" component="h2" gutterBottom>
-            Move Card
-          </Typography>
-          <TextField
-            fullWidth
-            label="Card Identifier"
-            value={moveCardInput}
-            onChange={(e) => setMoveCardInput(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            fullWidth
-            label="Source"
-            value={moveSource}
-            onChange={(e) => setMoveSource(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            fullWidth
-            label="Destination"
-            value={moveDestination}
-            onChange={(e) => setMoveDestination(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <Box display="flex" justifyContent="flex-end" gap={2}>
-            <Button onClick={handleCloseMoveCard}>Cancel</Button>
-            <Button variant="contained" onClick={handleSubmitMoveCard}>
-              Submit
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
-    </Box>
+      <div className={"deckDiscardContainer"}>
+        <DeckPile deck={deck} handlePiocheClick={handlePiocheClick} cardBackImage={cardBackImage} />
+        <DiscardPile discardPile={discardPile} />
+      </div>
+    </div >
   );
-};
-
-const styles = {
-  navbar: {
-    backgroundColor: "#5d3a00",
-    color: "white",
-    padding: "10px",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-around",
-  },
-  navButton: {
-    borderRadius: 0,
-    marginRight: "10px",
-  },
-  navText: {
-    color: "white",
-  },
-  linkIconBox: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-  },
-  linkIconButton: {
-    minWidth: "auto",
-    padding: 0,
-  },
-  container: {
-    flexGrow: 1,
-    backgroundColor: "#c4c4c4",
-    color: "white",
-    padding: "20px",
-  },
-  card: {
-    maxWidth: 345,
-    margin: "auto",
-    boxShadow: "0 8px 16px rgba(0,0,0,0.3)",
-    borderRadius: "10px",
-  },
 };
 
 export default Room;

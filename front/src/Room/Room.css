@@ -1,0 +1,51 @@
+.card {
+  max-width: 345px;
+  margin: auto;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  width: 180px;
+}
+
+.casterZoneContainer {
+  position: absolute;
+  margin-top: 15%;
+  left: 10px;
+  height: 200px;
+  width: 150px;
+  border: 1px solid gray;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.innateCardsContainer {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 150px;
+  height: 200px;
+  border: 1px solid gray;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.playAreaContainer {
+  position: absolute;
+  top: 200px;
+  left: 25%;
+  width: 50%;
+  height: 400px;
+  border: 2px dashed #999;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.deckDiscardContainer {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 200px;
+  height: 200px;
+  border: 1px solid gray;
+  border-radius: 4px;
+  background-color: #fff;
+}

@@ -10,7 +10,7 @@ import { Close as CloseIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
 const Templates = () => {
-    const navigate = useNavigate(); // Initialize useNavigate hook
+    const navigate = useNavigate();
 
     const [scenes, setScenes] = useState([]);
     const [selectedScene, setSelectedScene] = useState("");
@@ -22,7 +22,7 @@ const Templates = () => {
         const savedScenes = JSON.parse(localStorage.getItem("scenes")) || [];
         if (savedScenes.length > 0) {
             setScenes(savedScenes);
-            setSelectedScene(savedScenes[0]); // Default to the first scene
+            setSelectedScene(savedScenes[0]);
         }
     }, []);
 
@@ -43,7 +43,6 @@ const Templates = () => {
         }
     }, [cards, buttons, selectedScene]);
 
-    // Save scenes to localStorage whenever they change
     useEffect(() => {
         if (scenes.length > 0) {
             localStorage.setItem("scenes", JSON.stringify(scenes));
@@ -200,7 +199,7 @@ const Templates = () => {
                                     marginBottom: 2,
                                     borderRadius: 0,
                                 }}
-                                onMouseDown={(e) => handleButtonMouseDown(e, button.id)} // Enable dragging for buttons
+                                onMouseDown={(e) => handleButtonMouseDown(e, button.id)}
                             >
                                 {button.label}
                             </Button>

@@ -54,7 +54,7 @@ const Deck = ({ checked, gameId }) => {
   }
 
   const handleClickButton = () => {
-    navigate('/room')
+    navigate('/join')
   }
 
   return (

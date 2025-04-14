@@ -1,7 +1,7 @@
 import { baseRequest } from "./baseRequest";
 
 // Login user
-// Data: {
+// data: {
 //   "username": "string"
 // }
 export async function loginUserRequest(data) {

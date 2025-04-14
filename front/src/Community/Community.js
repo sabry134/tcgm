@@ -8,7 +8,7 @@ import { CommunityGamePicker } from "./Components/CommunityGamePicker";
 import { CreateGamePopupBody } from "./Components/CreateGamePopupBody";
 
 const Community = () => {
-    const navigate = useNavigate(); // Initialize useNavigate hook
+    const navigate = useNavigate();
     const [anchor, setAnchor] = useState(null);
     const spanRef = useRef()
 

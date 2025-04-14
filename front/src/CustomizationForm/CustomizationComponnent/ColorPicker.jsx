@@ -5,7 +5,6 @@ export class ColorPicker extends FormComponnent {
   handleChange = (event, index) => {
     this.state.inputValue[index] = parseInt(event.target.value)
     this.setState({ inputValue: this.state.inputValue });
-    // Send update to backend (or localStorage for temporary saving)
     this.updateJsonFile(this.state.inputValue);
   };
 

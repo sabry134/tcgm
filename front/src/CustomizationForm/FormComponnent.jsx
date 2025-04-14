@@ -39,7 +39,7 @@ export class FormComponnent extends Component {
     this.updateJsonFile(newValue)
   }
 
-  // Simulating JSON file update (this should be an API request)
+  // Simulating JSON file update
   updateJsonFile = newValue => {
     const storedCard = localStorage.getItem(
       this.props.localStorageName ?? 'currentEditedCard'

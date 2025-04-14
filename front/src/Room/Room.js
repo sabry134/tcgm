@@ -1,18 +1,7 @@
 import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Typography,
-  Box,
-  Card,
-  CardContent,
-  CardMedia,
-  TextField,
-  Modal,
-  IconButton,
-} from "@mui/material";
+
 import { useNavigate } from "react-router-dom";
 import { Socket } from "phoenix";
-import LinkIcon from "@mui/icons-material/Link";
 import { callSetDeck, callDrawCard, callInsertCard, callMoveCard } from "../game_commands";
 import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
 import defaultGameState from "./Data/GameState.json"
@@ -21,6 +10,8 @@ import CardInfo from "./Componnent/CardInfo";
 import GameChat from "./Componnent/GameChat";
 import DiscardPile from "./Componnent/DiscardPile";
 import DeckPile from "./Componnent/DeckPile";
+import "./Room.css"
+
 
 const Room = () => {
   const navigate = useNavigate();
@@ -204,17 +195,15 @@ const Room = () => {
   const deck = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].deck) : []
   const discardPile = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].graveyard) : []
   return (
-    <Box display="flex" flexDirection="column" height="100vh" position="relative">
+    <div display="flex" flexDirection="column" height="100vh" position="relative">
 
       <RoomNavigationBar roomId={gameState.id} />
 
+      <div className={"casterZoneContainer"}>
+      </div>
 
-
-      <Box sx={styles.casterZoneContainer}>
-      </Box>
-
-      <Box sx={styles.innateCardsContainer}>
-      </Box>
+      <div className={"innateCardsContainer"}>
+      </div>
       {Object.entries(gameState.players).map(([key, value], index) => {
         return <PlayerHand key={index} playerHand={Object.entries(value.hand)} cardWidth={cardWidth} handleCardClick={handleCardClick} selectedCard={selectedCard} rotatation={0} left={"35vw"} bottom={key === playerId ? 10 : null} top={key === playerId ? null : 10} />
       })}
@@ -222,61 +211,16 @@ const Room = () => {
       <CardInfo selectedCard={selectedCard} playerHand={playerHand} />
 
       <GameChat playerId={playerId} />
-      <Box sx={styles.playAreaContainer}>
-      </Box>
+      <div className={"playAreaContainer"}>
+      </div>
 
 
-      <Box sx={styles.deckDiscardContainer}>
+      <div className={"deckDiscardContainer"}>
         <DeckPile deck={deck} handlePiocheClick={handlePiocheClick} cardBackImage={cardBackImage} />
         <DiscardPile discardPile={discardPile} />
-      </Box>
-    </Box >
+      </div>
+    </div >
   );
-};
-
-const styles = {
-  casterZoneContainer: {
-    position: "absolute",
-    marginTop: "15%",
-    left: 10,
-    height: 200,
-    width: 150,
-    border: "1px solid gray",
-    borderRadius: "4px",
-    backgroundColor: "#fff",
-  },
-  innateCardsContainer: {
-    position: "absolute",
-    bottom: 10,
-    left: 10,
-    width: 150,
-    height: 200,
-    border: "1px solid gray",
-    borderRadius: "4px",
-    backgroundColor: "#fff",
-  },
-
-  playAreaContainer: {
-    position: "absolute",
-    top: 200,
-    left: "25%",
-    width: "50%",
-    height: 400,
-    border: "2px dashed #999",
-    borderRadius: "4px",
-    backgroundColor: "#fff",
-  },
-  deckDiscardContainer: {
-    position: "absolute",
-    bottom: 10,
-    right: 10,
-    width: 200,
-    height: 200,
-    border: "1px solid gray",
-    borderRadius: "4px",
-    backgroundColor: "#fff",
-  },
-
 };
 
 export default Room;

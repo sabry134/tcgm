@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { 
-  Button, 
+import {
+  Button,
   Box,
-  Tabs, 
-  Tab, 
-  TextField, 
-  Stack, 
-  Snackbar, 
-  Alert 
+  Tabs,
+  Tab,
+  TextField,
+  Stack,
+  Snackbar,
+  Alert
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { createRoomRequest, joinRoomRequest } from "../Api/roomRequest";
@@ -61,18 +61,19 @@ const JoinRoom = () => {
 
   const joinRoom = async (navigate) => {
     try {
-      if (!roomId.trim()) {
+
+      const room_id = localStorage.getItem("room_id", roomId)
+      if (!room_id && !roomId.trim()) {
         throw new Error("Room ID is required");
       }
-  
       let username = playerUsername.trim();
       if (!username) {
         const counter = parseInt(localStorage.getItem("playerCounter") || "1", 10);
         username = `Player ${counter}`;
         localStorage.setItem("playerUsername", username);
       }
-  
-      const joinRoomFetch = async (username) => {
+
+      const joinRoomFetch = async (username, roomId) => {
         try {
           const response = await joinRoomRequest(roomId, { player_id: username });
           console.log("response to join room:", response);
@@ -82,12 +83,14 @@ const JoinRoom = () => {
           throw error;
         }
       };
-      
+
       try {
-        const data = await joinRoomFetch(username);
+
+        const data = await joinRoomFetch(username, room_id);
+        if (!room_id)
+          localStorage.setItem("room_id", roomId);
         localStorage.setItem("player_id", username);
         localStorage.setItem("playerUsername", username);
-        localStorage.setItem("room_id", roomId);
         navigate("/room");
       } catch (error) {
         console.error("Join room failed with username", username, error);
@@ -97,7 +100,7 @@ const JoinRoom = () => {
         localStorage.setItem("playerCounter", newCounter.toString());
         localStorage.setItem("playerUsername", newUsername);
         try {
-          const data = await joinRoomFetch(newUsername);
+          const data = await joinRoomFetch(newUsername, room_id);
           localStorage.setItem("player_id", data.player_id);
           localStorage.setItem("room_id", roomId);
           navigate("/room");
@@ -112,17 +115,14 @@ const JoinRoom = () => {
       setSnackbarOpen(true);
     }
   };
-  
+
 
   const createRoom = async (navigate) => {
     try {
       const response = await createRoomRequest();
-      
       console.log("response to create room:", response);
-      localStorage.setItem("player_id", response.player_id);
       localStorage.setItem("room_id", response.room_id);
-
-      navigate("/room");
+      joinRoom(navigate)
     } catch (error) {
       console.error(error);
     }

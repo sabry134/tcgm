@@ -16,6 +16,9 @@ import LinkIcon from "@mui/icons-material/Link";
 import SendIcon from "@mui/icons-material/Send";
 import { callSetDeck, callDrawCard, callInsertCard, callMoveCard } from "../game_commands";
 import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
+import defaultGameState from "./Data/GameState.json"
+import PlayerHand from "./Componnent/PlayerHand";
+
 
 const modalStyle = {
   position: "absolute",
@@ -29,27 +32,9 @@ const modalStyle = {
   p: 4,
 };
 
+
 const Room = () => {
   const navigate = useNavigate();
-
-  const initialCards = [
-    {
-      card_name: "Ace of Spades",
-      card_description: "The highest card in the deck.",
-      card_image: "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
-    },
-    {
-      card_name: "Queen of Hearts",
-      card_description: "Represents love and compassion.",
-      card_image: "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
-    },
-    {
-      card_name: "Joker",
-      card_description: "The wild card, unpredictable and fun.",
-      card_image: "https://cdn-icons-png.flaticon.com/512/6963/6963703.png",
-    },
-  ];
-
 
 
   const testDeck = {
@@ -73,62 +58,86 @@ const Room = () => {
         "attack": 10,
         "defense": 5
       }
+    },
+    "Card A": {
+      "name": "jack",
+      "properties": {
+        "attack": 10,
+        "defense": 5
+      }
+    },
+    "Card B": {
+      "name": "jack",
+      "properties": {
+        "attack": 10,
+        "defense": 5
+      }
+    },
+    "Card C": {
+      "name": "jack",
+      "properties": {
+        "attack": 10,
+        "defense": 5
+      }
+    },
+    "Card D": {
+      "name": "jack",
+      "properties": {
+        "attack": 10,
+        "defense": 5
+      }
     }
   };
 
-  const [deck, setDeck] = useState(initialCards);
-  const [hand, setHand] = useState([]);
+
+  const [gameState, setGameState] = useState(defaultGameState);
   const [selectedCard, setSelectedCard] = useState(null);
-  const [roomId, setRoomId] = useState("");
+
   const [playerId, setPlayerId] = useState("");
   const [channel, setChannel] = useState(null);
-  const [openSetDeck, setOpenSetDeck] = useState(false);
-  const [deckInput, setDeckInput] = useState("");
-  const [openDrawCard, setOpenDrawCard] = useState(false);
-  const [drawAmount, setDrawAmount] = useState(1);
-  const [openInsertCard, setOpenInsertCard] = useState(false);
-  const [insertCardInput, setInsertCardInput] = useState("");
-  const [insertLocation, setInsertLocation] = useState("");
-  const [moveCardInput, setMoveCardInput] = useState("");
-  const [moveSource, setMoveSource] = useState("");
-  const [moveDestination, setMoveDestination] = useState("");
-  const [openMoveCard, setOpenMoveCard] = useState(false);
-  const [discardPile, setDiscardPile] = useState([]);
+
   const [chatMessages, setChatMessages] = useState([]);
   const [chatInput, setChatInput] = useState("");
 
   const cardBackImage =
     "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Card_back_06.svg/1200px-Card_back_06.svg.png";
+  const hasEffectRun = React.useRef(false);
+  const connectionRef = React.useRef({
+    socket: null,
+    channel: null
+  });
 
   useEffect(() => {
-    const room_id = localStorage.getItem("room_id");
-    if (!room_id) {
+    // Early return if the effect has already run
+    if (hasEffectRun.current) return;
+
+    let username = localStorage.getItem("playerUsername");
+    const roomId = localStorage.getItem("room_id");
+
+    if (!roomId) {
       console.error("No room_id found in localStorage");
       navigate("/join");
       return;
     }
-    setRoomId(room_id);
 
-    let username = localStorage.getItem("playerUsername");
     if (!username) {
       const counter = parseInt(localStorage.getItem("playerCounter") || "1", 10);
       username = `Player ${counter}`;
       localStorage.setItem("playerUsername", username);
     }
     setPlayerId(username);
-  }, [navigate]);
 
-  useEffect(() => {
-    if (!roomId) return;
     let socketURL = process.env.REACT_WS_URL;
     if (!socketURL) {
-      socketURL = "ws://localhost:4000/socket"
+      socketURL = "ws://localhost:4000/socket";
     }
-    const socket = new Socket(socketURL);
-    socket.connect();
 
-    const chan = socket.channel(`room:${roomId}`, {});
-    chan
+    // Store socket and channel in refs rather than component state
+    connectionRef.current.socket = new Socket(socketURL);
+    connectionRef.current.socket.connect();
+
+    connectionRef.current.channel = connectionRef.current.socket.channel(`room:${roomId}`, {});
+    connectionRef.current.channel
       .join()
       .receive("ok", (resp) => {
         console.log("WebSocket connection established", resp);
@@ -137,97 +146,67 @@ const Room = () => {
         console.error("WebSocket connection failed", resp);
       });
 
-    chan.on("game_update", (payload) => {
-      console.log("Game update received", payload);
+    connectionRef.current.channel.on("game_update", (payload) => {
+      console.log("Received game update:", payload);
+      setGameState(payload.state);
     });
 
-    setChannel(chan);
-    console.log("About to set deck", chan, playerId, testDeck);
-    let username = localStorage.getItem("playerUsername");
-    callSetDeck(chan, username, testDeck);
+    // Set channel state for component to use
+    setChannel(connectionRef.current.channel);
+    console.log("About to set deck", connectionRef.current.channel, username, testDeck);
+    callSetDeck(connectionRef.current.channel, username, testDeck);
+
+    // Mark that the effect has run
+    hasEffectRun.current = true;
+
+    // This cleanup should only run on true component unmount
+    // by using window.addEventListener, we ensure this only runs when the page is actually unloaded
+    const handleUnload = () => {
+      if (connectionRef.current.channel) {
+        localStorage.removeItem("playerUsername");
+        localStorage.removeItem("room_id");
+        connectionRef.current.channel.leave();
+        connectionRef.current.socket.disconnect();
+      }
+    };
+
+    window.addEventListener('beforeunload', handleUnload);
 
     return () => {
-      chan.leave();
-      socket.disconnect();
+      // This cleanup won't do the socket cleanup on StrictMode remounts
+      window.removeEventListener('beforeunload', handleUnload);
+
+      // We can check if this is a true unmount (navigation away) vs a StrictMode remount
+      // by not cleaning up connections in the useEffect cleanup 
     };
-  }, [roomId]);
+  }, []);
 
-  const handleOpenSetDeck = () => setOpenSetDeck(true);
-  const handleCloseSetDeck = () => setOpenSetDeck(false);
-  const handleSubmitSetDeck = () => {
-    let parsedDeck;
+  // Add a separate useEffect for component unmount that runs on true unmount using a ref
+  useEffect(() => {
+    return () => {
+      // This will only run when the component is truly unmounted (navigating away from page)
+      // and not during React StrictMode's development checks
+      if (!hasEffectRun.current) return;
 
-    console.log("deckInput:", deckInput);
-    try {
-      parsedDeck = typeof deckInput === "string" ? JSON.parse(deckInput) : deckInput;
-    } catch (error) {
-      console.error("Invalid JSON format for deck:", error);
-      return;
-    }
-    console.log("Parsed deck:", parsedDeck);
-    callSetDeck(channel, playerId, parsedDeck);
-    setOpenSetDeck(false);
-    setDeckInput("");
-  };
+      // Check if we're truly unmounting and not just in a development mode remount
+      const isDevModeRemount = process.env.NODE_ENV === 'development' && document.hidden === false;
 
-  const handleCloseMoveCard = () => setOpenMoveCard(false);
-  const handleOpenMoveCard = () => setOpenMoveCard(true);
-  const handleSubmitMoveCard = () => {
-    let parsedCard;
-
-    console.log("cardInput:", moveCardInput);
-    try {
-      parsedCard = typeof moveCardInput === "string" ? JSON.parse(moveCardInput) : moveCardInput;
-    } catch (error) {
-      console.error("Invalid JSON format for card:", error);
-      return;
-    }
-    callMoveCard(channel, playerId, parsedCard, moveSource, moveDestination);
-    setOpenMoveCard(false);
-    setMoveCardInput("");
-    setMoveSource("");
-    setMoveDestination("");
-  };
-
-  const handleOpenDrawCard = () => setOpenDrawCard(true);
-  const handleCloseDrawCard = () => setOpenDrawCard(false);
-  const handleSubmitDrawCard = () => {
-    callDrawCard(channel, playerId, drawAmount);
-    setOpenDrawCard(false);
-    setDrawAmount(1);
-  };
-
-  const handleOpenInsertCard = () => setOpenInsertCard(true);
-  const handleCloseInsertCard = () => setOpenInsertCard(false);
-  const handleSubmitInsertCard = () => {
-    let parsedCard;
-    console.log("cardInput:", insertCardInput);
-    try {
-      parsedCard = typeof insertCardInput === "string" ? JSON.parse(insertCardInput) : insertCardInput;
-    } catch (error) {
-      console.error("Invalid JSON format for card:", error);
-      return;
-    }
-    callInsertCard(channel, playerId, parsedCard, insertLocation);
-    setOpenInsertCard(false);
-    setInsertCardInput("");
-    setInsertLocation("");
-  };
+      if (!isDevModeRemount && connectionRef.current.channel) {
+        console.log("True component unmount - cleaning up connections");
+        localStorage.removeItem("playerUsername");
+        localStorage.removeItem("room_id");
+        connectionRef.current.channel.leave();
+        connectionRef.current.socket.disconnect();
+      }
+    };
+  }, []);
 
   const handlePiocheClick = () => {
-    if (deck.length > 0) {
-      const drawnCard = deck[0];
-      setDeck(deck.slice(1));
-      setHand([...hand, drawnCard]);
-    }
+    callDrawCard(channel, playerId, 1)
   };
 
   const handleDiscardTop = () => {
-    if (hand.length > 0) {
-      const cardToDiscard = hand[hand.length - 1];
-      setHand(hand.slice(0, hand.length - 1));
-      setDiscardPile([...discardPile, cardToDiscard]);
-    }
+
   };
 
   const handleCardClick = (index) => {
@@ -248,42 +227,28 @@ const Room = () => {
   };
 
   const cardWidth = 180;
-  const handFanAngle = 10;
   const opponentHandFanAngle = -10;
 
   // const openPopover = Boolean(anchorEl);
   // const popoverId = openPopover ? "room-id-popover" : undefined;
+  const playerHand = playerId ? Object.entries(gameState.players[playerId].hand) : []
+  const deck = playerId ? Object.entries(gameState?.players[playerId]?.deck) : []
+  const discardPile = playerId ? Object.entries(gameState?.players[playerId]?.graveyard) : []
 
   return (
+
     <Box display="flex" flexDirection="column" height="100vh" position="relative">
 
-      <RoomNavigationBar roomId={roomId} />
+      <RoomNavigationBar roomId={gameState.id} />
 
       <Box sx={styles.selectedCardZone}>
-        {selectedCard !== null && hand[selectedCard] && (
+        {selectedCard !== null && playerHand && playerHand[selectedCard] && (
           <Box sx={styles.selectedCardDetails}>
             <Typography variant="h6">
-              {hand[selectedCard].card_name}
-            </Typography>
-            <Typography variant="body1">
-              {hand[selectedCard].card_description}
+              {playerHand[selectedCard][1].name}
             </Typography>
           </Box>
         )}
-        <Box sx={{ mt: 2, display: "flex", gap: 4, flexWrap: "wrap" }}>
-          <Button variant="contained" onClick={handleOpenSetDeck}>
-            Set Deck
-          </Button>
-          <Button variant="contained" onClick={handleOpenInsertCard}>
-            Insert Card
-          </Button>
-          <Button variant="contained" onClick={handleDiscardTop}>
-            Discard Top
-          </Button>
-          <Button variant="contained" onClick={handleOpenMoveCard}>
-            Move Card
-          </Button>
-        </Box>
       </Box >
 
       <Box sx={styles.casterZoneContainer}>
@@ -362,54 +327,11 @@ const Room = () => {
       <Box sx={styles.playAreaContainer}>
       </Box>
 
-      <Box sx={styles.yourHandContainer}>
-        {hand.map((card, index) => {
-          const midIndex = (hand.length - 1) / 2;
-          const rotation = (index - midIndex) * handFanAngle;
-          const offsetX = (index - midIndex) * (cardWidth / 3);
-          const extraY = selectedCard === index ? -30 : 0;
-          return (
-            <Box
-              key={index}
-              onClick={() => handleCardClick(index)}
-              sx={{
-                position: "absolute",
-                left: "50%",
-                bottom: 0,
-                width: `${cardWidth}px`,
-                transform: `translateX(${offsetX}px) translateY(${extraY}px) rotate(${rotation}deg)`,
-                transformOrigin: "bottom center",
-                transition: "transform 0.3s",
-                cursor: "pointer",
-                zIndex: selectedCard === index ? 10 : 1,
-              }}
-            >
-              <Card sx={styles.card}>
-                <CardMedia
-                  component="img"
-                  height="140"
-                  image={card.card_image}
-                  alt={card.card_name}
-                />
-                <CardContent>
-                  <Typography gutterBottom variant="h5">
-                    {card.card_name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {selectedCard === index
-                      ? card.card_description
-                      : card.card_description.substring(0, 30) + "..."}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Box>
-          );
-        })}
-      </Box>
+      <PlayerHand playerHand={playerHand} cardWidth={cardWidth} handleCardClick={handleCardClick} selectedCard={selectedCard} rotatation={0} />
 
       <Box sx={styles.deckDiscardContainer}>
         <Box sx={styles.deckContainer} onClick={handlePiocheClick}>
-          {deck.length > 0 && (
+          {deck && (deck).length > 0 && (
             <Card sx={{ ...styles.card, width: `${cardWidth}px` }}>
               <CardMedia
                 component="img"
@@ -421,7 +343,7 @@ const Room = () => {
           )}
         </Box>
         <Box sx={styles.discardContainer}>
-          {discardPile.map((card, index) => {
+          {discardPile && discardPile.map(([key, card], index) => {
             const offset = index * 2;
             return (
               <Box
@@ -445,112 +367,6 @@ const Room = () => {
           })}
         </Box>
       </Box>
-
-      <Modal open={openSetDeck} onClose={handleCloseSetDeck}>
-        <Box sx={modalStyle}>
-          <Typography variant="h6" component="h2" gutterBottom>
-            Set Deck
-          </Typography>
-          <TextField
-            fullWidth
-            label="Deck (JSON or comma separated)"
-            value={deckInput}
-            onChange={(e) => setDeckInput(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <Box display="flex" justifyContent="flex-end" gap={2}>
-            <Button onClick={handleCloseSetDeck}>Cancel</Button>
-            <Button variant="contained" onClick={handleSubmitSetDeck}>
-              Submit
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
-
-      <Modal open={openDrawCard} onClose={handleCloseDrawCard}>
-        <Box sx={modalStyle}>
-          <Typography variant="h6" component="h2" gutterBottom>
-            Draw Card
-          </Typography>
-          <TextField
-            fullWidth
-            label="Amount"
-            type="number"
-            value={drawAmount}
-            onChange={(e) => setDrawAmount(parseInt(e.target.value, 10))}
-            sx={{ mb: 2 }}
-          />
-          <Box display="flex" justifyContent="flex-end" gap={2}>
-            <Button onClick={handleCloseDrawCard}>Cancel</Button>
-            <Button variant="contained" onClick={handleSubmitDrawCard}>
-              Submit
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
-
-      <Modal open={openInsertCard} onClose={handleCloseInsertCard}>
-        <Box sx={modalStyle}>
-          <Typography variant="h6" component="h2" gutterBottom>
-            Insert Card
-          </Typography>
-          <TextField
-            fullWidth
-            label="Card Identifier"
-            value={insertCardInput}
-            onChange={(e) => setInsertCardInput(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            fullWidth
-            label="Location"
-            value={insertLocation}
-            onChange={(e) => setInsertLocation(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <Box display="flex" justifyContent="flex-end" gap={2}>
-            <Button onClick={handleCloseInsertCard}>Cancel</Button>
-            <Button variant="contained" onClick={handleSubmitInsertCard}>
-              Submit
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
-
-      <Modal open={openMoveCard} onClose={handleCloseMoveCard}>
-        <Box sx={modalStyle}>
-          <Typography variant="h6" component="h2" gutterBottom>
-            Move Card
-          </Typography>
-          <TextField
-            fullWidth
-            label="Card Identifier"
-            value={moveCardInput}
-            onChange={(e) => setMoveCardInput(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            fullWidth
-            label="Source"
-            value={moveSource}
-            onChange={(e) => setMoveSource(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            fullWidth
-            label="Destination"
-            value={moveDestination}
-            onChange={(e) => setMoveDestination(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <Box display="flex" justifyContent="flex-end" gap={2}>
-            <Button onClick={handleCloseMoveCard}>Cancel</Button>
-            <Button variant="contained" onClick={handleSubmitMoveCard}>
-              Submit
-            </Button>
-          </Box>
-        </Box>
-      </Modal>
     </Box >
   );
 };
@@ -695,3 +511,6 @@ const styles = {
 };
 
 export default Room;
+
+
+//TODO: When gamestate change / is sent by back enven when not triggered we need to update it

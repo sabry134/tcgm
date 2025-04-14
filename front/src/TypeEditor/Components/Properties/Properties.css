@@ -1,0 +1,9 @@
+.generalProperties {
+  position: absolute;
+  cursor: grab;
+}
+
+.generalProperties.selected {
+  border: 1px;
+  border-color: #656d4a;
+}

@@ -1,0 +1,30 @@
+[
+    {
+        "cards":{
+        "card3":1,
+        "card4":3,
+        "Card X":1
+        },
+        "casters":{
+        "card_name":true,
+        "card_name2":false
+        },
+        "id":43,
+        "name":"deck1",
+        "quantity":2,
+        "type":"deck",
+        "active":true
+    },
+    {
+        "cards":{
+        "Test card":1
+        },
+        "active_caster":"card_name",
+        "inactive_caster":"card_name",
+        "id":42,
+        "name":"test_aha",
+        "quantity":2,
+        "type":"Test_type",
+        "active":false
+    }
+]

@@ -1,0 +1,29 @@
+.selector {
+  display: flex;
+  cursor: pointer;
+  flex-grow: 1;
+  justify-items: stretch;
+  justify-content: space-between;
+}
+
+.title {
+  background-color: #7f4f24;
+  padding: 10px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  margin-top: 10px;
+}
+
+.itemList {
+  display: flex;
+  flex-direction: column;
+}
+
+.typeList {
+  background-color: #936639;
+  border-radius: 20px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  padding: 10px;
+  margin: 0;
+}

@@ -1,0 +1,20 @@
+[
+    {
+        "cards":{
+        "Card X":1,
+        "Card Y":1,
+        "card3":1,
+        "card4":1,
+        "card5":1
+        },
+        "casters":{
+        "card_name":true,
+        "card_name2":false
+        },
+        "id":43,
+        "name":"deck1",
+        "quantity":2,
+        "type":"deck",
+        "active":true
+    }
+]

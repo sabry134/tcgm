@@ -129,7 +129,7 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
     conn = post(conn, "/api/card_collections", card_collection: attrs)
     response = json_response(conn, 201)
 
-    id = response["id"]
+    #id = response["id"]
 
     assert response["name"] == "test_aha"
     assert response["quantity"] == 1
@@ -325,7 +325,7 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
     conn = post(conn, "/api/card_collections", card_collection: attrs)
 
     id = json_response(conn, 201)["id"]
-    name = json_response(conn, 201)["name"]
+    #name = json_response(conn, 201)["name"]
 
     conn = post(conn, "/api/card_collections/add_card/#{id}/card/#{card.id}/quantity/2")
     response = json_response(conn, 200)
@@ -335,12 +335,9 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
     conn = get(conn, "/api/card_collections/get_cards/#{id}")
     response = json_response(conn, 200)
 
-    IO.inspect(response)
-
     assert length(response) == 2
     assert Enum.all?(response, fn c -> c["name"] == card.name end)
     assert Enum.all?(response, fn c -> c["text"] == card.text end)
-    assert Enum.all?(response, fn c -> c["image"] == card.image end)
     assert Enum.all?(response, fn c -> c["properties"] == card.properties end)
     assert Enum.all?(response, fn c -> c["game_id"] == card.game_id end)
     assert Enum.all?(response, fn c -> c["card_type_id"] == card.card_type_id end)

@@ -1,7 +1,7 @@
 import '../Room.css'
 
 const InnateCardsContainer = () => {
-    return <div className={"innateCardsContainer"}>
+    return <div className={"container innateCard"}>
     </div>
 }
 

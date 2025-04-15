@@ -10,14 +10,9 @@ const DeckPile = ({ deck, handlePiocheClick, cardBackImage }) => {
 
     return <Box
         ref={setNodeRef}
+        className={"container deck"}
         sx={{
-            position: "absolute",
-            top: 10,
-            left: 10,
-            width: 180,
-            height: 140,
-            cursor: "pointer",
-            backgroundColor: isOver ? "#a4ac86" : "#fff",
+            backgroundColor: isOver ? "#a4ac86" : "#b6ad90;",
         }} onClick={handlePiocheClick}>
         {deck && deck.length > 0 && (
             <GameCard card={null} hidden={true} cardBackside={cardBackImage} draggable={false} />

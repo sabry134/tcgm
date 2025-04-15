@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material"
 
-const CardInfo = ({ selectedCard, playerHand }) => {
+const CardInfo = ({ selectedCard, cardList }) => {
     return <Box sx={{
         position: "absolute",
         top: 70,
@@ -11,10 +11,10 @@ const CardInfo = ({ selectedCard, playerHand }) => {
         borderRadius: "4px",
         backgroundColor: "#fff",
     }}>
-        {selectedCard !== null && playerHand && playerHand[selectedCard] && (
+        {selectedCard !== null && cardList && cardList[selectedCard] && (
             <Box>
                 <Typography variant="h6">
-                    {playerHand[selectedCard][1].name}
+                    {cardList[selectedCard].name}
                 </Typography>
             </Box>
         )}

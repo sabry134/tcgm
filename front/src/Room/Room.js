@@ -119,7 +119,6 @@ const Room = () => {
     // Store socket and channel in refs rather than component state
     connectionRef.current.socket = new Socket(socketURL);
     connectionRef.current.socket.connect();
-
     connectionRef.current.channel = connectionRef.current.socket.channel(`room:${roomId}`, {});
     connectionRef.current.channel
       .join()
@@ -188,20 +187,23 @@ const Room = () => {
   const playerHand = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].hand) : []
   const deck = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].deck) : []
   const discardPile = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].graveyard) : []
+  const field = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].field) : []
+  const caster = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].caster) : []
 
   const handlePiocheClick = () => {
     callDrawCard(channel, playerId, 1)
   };
 
-  const handleCardClick = (event, card) => {
+  const handleCardClick = (event, card, location) => {
     event.preventDefault()
-    setSelectedCard((prev) => (prev === card ? null : card));
+    setSelectedCard((prev) => (prev && prev[0] === card ? null : [card, location]));
   };
 
   // when making a new drag & drop the id of the droppable need to contain the source
   const handleDragEnd = (event) => {
     const [source, id] = event.active.id.split("/")
-    const cardDragged = Object.entries(gameState.players[playerId][source])[id][1]
+    const cardDraggedArray = Object.entries(gameState.players[playerId][source])[id]
+    const cardDragged = { [cardDraggedArray[0]]: { ...cardDraggedArray[1] } }
     if (event.over) {
       callMoveCard(channel, playerId, cardDragged, source, event.over.id)
     }
@@ -215,17 +217,16 @@ const Room = () => {
       <div display="flex" height="100vh" position="relative" className="roomContainer">
 
         <RoomNavigationBar roomId={gameState.id} />
-        <PlayArea />
-        <div className={"deckDiscardContainer"}>
-          <DeckPile deck={deck} handlePiocheClick={handlePiocheClick} cardBackImage={cardBackImage} />
-          <DiscardPile discardPile={discardPile} />
-        </div>
-        <CasterZone />
+        <DiscardPile discardPile={discardPile} handleCardClick={handleCardClick} selectedCard={selectedCard} />
+
+        <PlayArea cards={field} handleCardClick={handleCardClick} selectedCard={selectedCard} />
+        <DeckPile deck={deck} handlePiocheClick={handlePiocheClick} cardBackImage={cardBackImage} />
+        <CasterZone cards={caster} handleCardClick={handleCardClick} selectedCard={selectedCard} />
 
         {Object.entries(gameState.players).map(([key, value], index) => {
           return <PlayerHand key={index} playerHand={Object.entries(value.hand)} handleCardClick={handleCardClick} selectedCard={selectedCard} rotatation={0} left={"35vw"} bottom={key === playerId ? 10 : null} top={key === playerId ? null : 10} hidden={key !== playerId} cardBackside={cardBackImage} />
         })}
-        <CardInfo selectedCard={selectedCard} playerHand={playerHand} />
+        <CardInfo selectedCard={selectedCard ? selectedCard[0] : null} cardList={selectedCard ? gameState.players[playerId][selectedCard[1]] : null} />
         <GameChat playerId={playerId} />
       </div >
     </DndContext>

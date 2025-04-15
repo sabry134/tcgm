@@ -1,11 +1,10 @@
 import { Box, Card, CardContent, CardMedia, Typography } from "@mui/material"
 import "./../Room.css"
 import { useDraggable } from "@dnd-kit/core";
-import zIndex from "@mui/material/styles/zIndex";
 
 
 
-const GameCard = ({ card, hidden = false, cardBackside, index, draggable, handleCardClick, offsetX = 0, extraY = 0, rotation = 0, selectedCard, src }) => {
+const GameCard = ({ card, hidden = false, cardBackside, index, draggable, handleCardClick, offsetX = 0, rotation = 0, selectedCard, src, cardName }) => {
     const { attributes, listeners, setNodeRef, transform } = useDraggable({
         id: src + "/" + index?.toString(),
     });
@@ -20,19 +19,16 @@ const GameCard = ({ card, hidden = false, cardBackside, index, draggable, handle
 
     return <div ref={draggable ? setNodeRef : undefined} style={draggable ? style : undefined} {...(draggable ? listeners : undefined)} {...(draggable ? attributes : undefined)}>
         <Box
-
             style={{
                 position: "relative",
-                bottom: 5,
-                width: `${cardWidth}px`,
                 cursor: "pointer",
-                transform: `translateX(${offsetX}px) translateY(${extraY}px) rotate(${rotation}deg)`,
+                transform: `translateX(${offsetX}px) translateY(${selectedCard && (selectedCard[0] === cardName) ? -30 : 0}px) rotate(${rotation}deg)`,
                 transformOrigin: "bottom center",
                 transition: "transform 0.3s",
-                zIndex: selectedCard === index ? 10 : 1,
+                zIndex: selectedCard && (selectedCard[0] === cardName) ? 10 : 1,
             }}
 
-            onContextMenu={(event) => handleCardClick(event, index)}
+            onContextMenu={(event) => handleCardClick(event, cardName, src)}
         > <Card className="card" >
                 {!hidden ?
                     <>    <CardMedia

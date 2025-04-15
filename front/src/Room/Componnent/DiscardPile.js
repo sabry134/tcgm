@@ -3,11 +3,11 @@ import '../Room.css'
 import { useDroppable } from "@dnd-kit/core";
 import GameCard from "./GameCard";
 
-const DiscardPile = ({ discardPile, handleCardClick, selectedCard }) => {
+const DiscardPile = ({ opponent, discardPile, handleCardClick, selectedCard }) => {
     const { isOver, setNodeRef } = useDroppable({
         id: 'graveyard',
     });
-    return <Box ref={setNodeRef} className={"container discard"} sx={{
+    return <Box ref={setNodeRef} className={"container discard" + (opponent ? " opponent" : "")} sx={{
         backgroundColor: isOver ? "#a4ac86" : "#b6ad90"
     }}>
         {discardPile && discardPile.map(([key, card], index) => {

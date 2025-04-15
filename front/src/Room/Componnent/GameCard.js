@@ -29,11 +29,11 @@ const GameCard = ({ card, hidden = false, cardBackside, index, draggable, handle
             }}
 
             onContextMenu={(event) => handleCardClick(event, cardName, src)}
-        > <Card className="card" >
+        >
+            <Card className="card" >
                 {!hidden ?
                     <>    <CardMedia
                         component="img"
-                        height="140"
                         image={card.image}
                         alt={card.name}
                     />
@@ -44,8 +44,8 @@ const GameCard = ({ card, hidden = false, cardBackside, index, draggable, handle
                         </CardContent></> :
                     <CardMedia
                         component="img"
-                        height="140"
                         image={cardBackside}
+                        sx={{ objectFit: "cover" }}
                         alt="Backside"
                     />}
             </Card>

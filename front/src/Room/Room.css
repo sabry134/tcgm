@@ -1,5 +1,13 @@
+:root {
+  --card-width: 140px;
+  --card-height: 180px;
+  --background: #c2c5aa;
+  --background-highlight: #b6ad90;
+  --navigator-bar-heigth: 70px;
+}
+
 .roomContainer {
-  background-color: #c2c5aa;
+  background-color: var(--background);
   width: 100vw;
   height: 100vh;
   overflow: hidden;
@@ -9,23 +17,33 @@
   position: absolute;
   border: 1px solid gray;
   border-radius: 4px;
-  background-color: #b6ad90;
+  background-color: var(--background-highlight);
   padding: 10px;
 }
 
 .container.deck {
   bottom: 10px;
   right: 10px;
-  width: 180px;
-  height: 140px;
+  width: var(--card-width);
+  height: var(--card-height);
   cursor: 'pointer';
 }
 
+.container.deck.opponent {
+  top: calc(10px + var(--navigator-bar-heigth));
+  bottom: unset;
+}
+
 .container.discard {
-  bottom: 10px;
-  right: 225px;
-  width: 180px;
-  height: 140px;
+  bottom: calc(var(--card-height) + 40px);
+  right: 10px;
+  width: var(--card-width);
+  height: var(--card-height);
+}
+
+.container.discard.opponent {
+  top: calc(var(--card-height) + var(--navigator-bar-heigth) + 40px);
+  bottom: unset;
 }
 
 .container.playerHand {
@@ -34,37 +52,60 @@
   align-content: center;
   justify-content: center;
   width: 30vw;
-  height: 180px;
+  left: 35vw;
+  height: var(--card-height);
   overflow: visible;
+  bottom: 10px;
+}
+
+.container.playerHand.opponent {
+  top: var(--navigator-bar-heigth);
 }
 
 .container.casterZone {
-  top: 15%;
+  bottom: calc(var(--card-height) + 40px);
   left: 10px;
-  height: 200px;
-  width: 150px;
+  height: var(--card-height);
+  width: var(--card-width);
+}
+
+.container.casterZone.opponent {
+  top: calc(var(--card-height) + var(--navigator-bar-heigth) + 40px);
+  left: 10px;
+  bottom: unset;
 }
 
 .container.innateCard {
   bottom: 10px;
   left: 10px;
-  width: 150px;
-  height: 200px;
+  width: var(--card-width);
+  height: var(--card-height);
+}
+
+.container.innateCard.opponent {
+  top: calc(10px + var(--navigator-bar-heigth));
+  left: 10px;
+  bottom: unset;
 }
 
 .container.playArea {
-  top: 200px;
-  left: 25%;
-  width: 50%;
-  height: 400px;
+  bottom: 300px;
+  left: 20%;
+  width: 60%;
+  height: 200px;
+}
+
+.container.playArea.opponent {
+  top: 300px;
+  height: 200px;
 }
 
 .card {
-  max-width: 345px;
   margin: auto;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
   border-radius: 10px;
-  width: 180px;
+  width: var(--card-width);
+  height: var(--card-height);
 }
 
 .droppable {

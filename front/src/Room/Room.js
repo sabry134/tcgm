@@ -209,26 +209,36 @@ const Room = () => {
     }
   }
 
+  const checkOpponent = (player) => {
+    if (!playerId) {
+      return false
+    }
+    return playerId !== player;
+  }
+
   // const openPopover = Boolean(anchorEl);
   // const popoverId = openPopover ? "room-id-popover" : undefined;
 
   return (
     <DndContext onDragEnd={handleDragEnd}>
       <div display="flex" height="100vh" position="relative" className="roomContainer">
-
         <RoomNavigationBar roomId={gameState.id} />
-        <DiscardPile discardPile={discardPile} handleCardClick={handleCardClick} selectedCard={selectedCard} />
-
-        <PlayArea cards={field} handleCardClick={handleCardClick} selectedCard={selectedCard} />
-        <DeckPile deck={deck} handlePiocheClick={handlePiocheClick} cardBackImage={cardBackImage} />
-        <CasterZone cards={caster} handleCardClick={handleCardClick} selectedCard={selectedCard} />
 
         {Object.entries(gameState.players).map(([key, value], index) => {
-          return <PlayerHand key={index} playerHand={Object.entries(value.hand)} handleCardClick={handleCardClick} selectedCard={selectedCard} rotatation={0} left={"35vw"} bottom={key === playerId ? 10 : null} top={key === playerId ? null : 10} hidden={key !== playerId} cardBackside={cardBackImage} />
+          return <>
+            <DiscardPile key={"discard" + index} discardPile={discardPile} handleCardClick={handleCardClick} selectedCard={selectedCard} opponent={checkOpponent(key)} />
+            <PlayArea key={"playArea" + index} cards={field} handleCardClick={handleCardClick} selectedCard={selectedCard} opponent={checkOpponent(key)} />
+            <DeckPile key={"deckPile" + index} deck={deck} handlePiocheClick={handlePiocheClick} cardBackImage={cardBackImage} opponent={checkOpponent(key)} />
+            <CasterZone key={"casterZone" + index} cards={caster} handleCardClick={handleCardClick} selectedCard={selectedCard} opponent={checkOpponent(key)} />
+            <InnateCardsContainer key={"innateCard" + index} opponent={checkOpponent(key)} />
+
+            <PlayerHand opponent={checkOpponent(key)} key={"playerHand" + index} playerHand={Object.entries(value.hand)} handleCardClick={handleCardClick} selectedCard={selectedCard} hidden={key !== playerId} cardBackside={cardBackImage} />
+            {/* <GameChat playerId={playerId} /> */
+            }</>
         })}
-        <CardInfo selectedCard={selectedCard ? selectedCard[0] : null} cardList={selectedCard ? gameState.players[playerId][selectedCard[1]] : null} />
-        <GameChat playerId={playerId} />
+        {selectedCard && <CardInfo selectedCard={selectedCard[0]} cardList={gameState.players[playerId][selectedCard[1]]} />}
       </div >
+
     </DndContext>
 
   );

@@ -3,14 +3,14 @@ import "../Room.css"
 import GameCard from "./GameCard"
 import { useDroppable } from "@dnd-kit/core";
 
-const DeckPile = ({ deck, handlePiocheClick, cardBackImage }) => {
+const DeckPile = ({ opponent, deck, handlePiocheClick, cardBackImage }) => {
     const { isOver, setNodeRef } = useDroppable({
         id: 'deck',
     });
 
     return <Box
         ref={setNodeRef}
-        className={"container deck"}
+        className={"container deck" + (opponent ? " opponent" : "")}
         sx={{
             backgroundColor: isOver ? "#a4ac86" : "#b6ad90;",
         }} onClick={handlePiocheClick}>

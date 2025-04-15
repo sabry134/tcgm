@@ -26,7 +26,7 @@ defmodule TcgmWebAppWeb.CardControllerTest do
     |> Repo.insert!()
 
     card = %Card{}
-    |> Card.changeset(%{ name: "Test card", text: "Test text", game_id: game.id, card_type_id: cardType.id, effect_ids: [effect.id] })
+    |> Card.changeset(%{ name: "Test card", text: "Test text", image: "image", game_id: game.id, card_type_id: cardType.id, effect_ids: [effect.id] })
     |> Repo.insert!()
 
     {:ok, card: card, game: game, cardType: cardType, action: action, effect: effect}
@@ -69,7 +69,7 @@ defmodule TcgmWebAppWeb.CardControllerTest do
   end
 
   test "POST /api/cards creates a new card", %{conn: conn, game: game, cardType: cardType, effect: effect} do
-    attrs = %{ name: "Test card 2", text: "Test text 2", properties: ["properties"], game_id: game.id, card_type_id: cardType.id, effect_ids: [effect.id] }
+    attrs = %{ name: "Test card 2", text: "Test text 2", image: "image", properties: ["properties"], game_id: game.id, card_type_id: cardType.id, effect_ids: [effect.id] }
     conn = post(conn, "/api/cards", card: attrs)
     response = json_response(conn, 201)
 

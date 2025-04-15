@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import './GameBox.css'
 import { useNavigate } from 'react-router-dom'
 import logo from './../../assets/TCGMlogo.png'
+import { createUserRequest } from '../../Api/userRequest'
 
 const height = '120px'
 const width = '140px'
@@ -43,6 +44,18 @@ export class GameBox extends Component {
   }
 }
 
+// Temporary function to create a user
+async function createUser () {
+  try {
+    const data = await createUserRequest({
+      user: { username: 'TestUser' }
+    })
+    localStorage.setItem('userId', data.id)
+  } catch (error) {
+    console.error('Error creating user:', error)
+  }
+}
+
 // TODO(all): refacto game id selection
 const Deck = ({ checked, gameId }) => {
   const navigate = useNavigate()
@@ -54,6 +67,10 @@ const Deck = ({ checked, gameId }) => {
   }
 
   const handleClickButton = () => {
+    localStorage.setItem('gameSelected', gameId)
+    if (!localStorage.getItem('userId')) {
+      createUser()
+    }
     navigate('/join')
   }
 

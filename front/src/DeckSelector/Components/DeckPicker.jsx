@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Grid2, Box } from '@mui/material'
-import { GameBox } from './GameBox'
+import { DeckBox } from './DeckBox'
 import { getCollectionsByUserAndGameRequest, getGamesRequest } from '../../Api/collectionsRequest'
 
 export class DeckPicker extends Component {
@@ -17,10 +17,8 @@ export class DeckPicker extends Component {
 
   async getDecks () {
     try {
-      //const userId = localStorage.getItem('userId')
-      //const gameId = localStorage.getItem('gameId')
-      const gameId = 105 // Replace with actual game ID
-      const userId = 37 // Replace with actual user ID
+      const userId = localStorage.getItem('userId')
+      const gameId = localStorage.getItem('gameSelected')
       const data = await getCollectionsByUserAndGameRequest(userId, gameId)
       console.log('Decks:', data)
       this.setState({ deckList: data })
@@ -39,7 +37,7 @@ export class DeckPicker extends Component {
           alignItems={'center'}
           columns={{ md: 16 }}
         >
-          {this.state.gameList ? (
+          {this.state.deckList ? (
             this.state.deckList.map((deck, index) => (
               <Grid2
                 key={index}
@@ -48,7 +46,7 @@ export class DeckPicker extends Component {
                 justifyContent='center'
                 alignItems='center'
               >
-                <GameBox game={deck} />
+                <DeckBox deck={deck} />
               </Grid2>
             ))
           ) : (

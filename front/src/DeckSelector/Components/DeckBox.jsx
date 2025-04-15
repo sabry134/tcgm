@@ -7,7 +7,7 @@ import logo from './../../assets/TCGMlogo.png'
 const height = '120px'
 const width = '140px'
 
-export class GameBox extends Component {
+export class DeckBox extends Component {
   constructor (props) {
     super(props)
 
@@ -15,7 +15,7 @@ export class GameBox extends Component {
       checked: true
     }
 
-    this.game = props.game
+    this.deck = props.deck
   }
 
   handleMouseEnter = () => {
@@ -34,9 +34,9 @@ export class GameBox extends Component {
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
       >
-        <Deck checked={this.state.checked} gameId={this.game.id} />
+        <Deck checked={this.state.checked} deckId={this.deck.id} />
         <Typography variant='h5' gutterBottom>
-          {this.game.name}
+          {this.deck.name}
         </Typography>
       </div>
     )
@@ -44,17 +44,17 @@ export class GameBox extends Component {
 }
 
 // TODO(all): refacto game id selection
-const Deck = ({ checked, gameId }) => {
+const Deck = ({ checked, deckId }) => {
   const navigate = useNavigate()
 
   const handleEditButton = () => {
-    localStorage.setItem('gameSelected', gameId)
-    window.dispatchEvent(new Event('gameSelected'))
-    navigate('/game-main-page')
+    localStorage.setItem('deckSelected', deckId)
+    //window.dispatchEvent(new Event('deckSelected'))
+    navigate('/edit-deck')
   }
 
   const handleClickButton = () => {
-    navigate('/join')
+    //navigate('/join')
   }
 
   return (

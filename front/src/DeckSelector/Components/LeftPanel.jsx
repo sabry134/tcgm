@@ -26,8 +26,8 @@ export class LeftPanel extends Component {
         card_cpllection: {
           name: this.state.createDeckInput.name,
           quantity: 0,
-          game_id: 105, // Replace with actual game ID
-          user_id: 37, // Replace with actual user ID
+          game_id: localStorage.getItem("gameSelected"),
+          user_id: localStorage.getItem("userId"),
           type: 'deck'
         }
       })

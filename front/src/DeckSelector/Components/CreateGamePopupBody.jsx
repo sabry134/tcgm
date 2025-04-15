@@ -27,7 +27,7 @@ export class CreateGamePopupBody extends Component {
   onClickCreate = event => {
     this.setState({ clicked: true })
     createCollectionRequest({
-      card_collection: { name: this.name, quantity: 0, game_id: 105, user_id: 37, type: 'deck' }
+      card_collection: { name: this.name, quantity: 0, game_id: localStorage.getItem("gameSelected"), user_id: localStorage.getItem("userId"), type: 'deck' }
     })
     this.closeCallback()
   }

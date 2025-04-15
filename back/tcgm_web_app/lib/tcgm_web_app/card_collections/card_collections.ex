@@ -80,4 +80,11 @@ defmodule TcgmWebApp.CardCollections.CardCollections do
   def get_card_collections_by_user_id_and_game_id(user_id, game_id) do
     Repo.all(from c in CardCollection, where: c.user_id == ^user_id and c.game_id == ^game_id)
   end
+
+  @doc """
+    Retrieves a card collection by it's user id, game and type.
+  """
+  def get_card_collections_by_user_id_and_game_id_and_type(user_id, game_id, type) do
+    Repo.all(from c in CardCollection, where: c.user_id == ^user_id and c.game_id == ^game_id and c.type == ^type)
+  end
 end

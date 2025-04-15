@@ -36,11 +36,11 @@ defmodule TcgmWebAppWeb.CardPropertyControllerTest do
     |> Repo.insert!()
 
     card = %Card{}
-    |> Card.changeset(%{ name: "Test card", text: "Test text", game_id: game.id, card_type_id: cardType.id, effect_ids: [effect.id] })
+    |> Card.changeset(%{ name: "Test card", text: "Test text", image: "image", game_id: game.id, card_type_id: cardType.id, effect_ids: [effect.id] })
     |> Repo.insert!()
 
     card2 = %Card{}
-    |> Card.changeset(%{ name: "Test card 2", text: "Test text 2", game_id: game.id, card_type_id: cardType.id, effect_ids: [effect.id] })
+    |> Card.changeset(%{ name: "Test card 2", text: "Test text 2", image: "image", game_id: game.id, card_type_id: cardType.id, effect_ids: [effect.id] })
     |> Repo.insert!()
 
     cardProperty = %CardProperty{}

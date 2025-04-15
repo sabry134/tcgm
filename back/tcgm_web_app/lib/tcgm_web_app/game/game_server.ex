@@ -184,6 +184,7 @@ defmodule TcgmWebApp.Game.GameServer do
         enriched_card = %{
           "name" => base_card.name,
           "text" => base_card.text,
+          "image" => base_card.image,
           "properties" => enriched_properties
         }
 

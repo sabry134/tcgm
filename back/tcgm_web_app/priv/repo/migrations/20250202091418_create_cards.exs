@@ -5,6 +5,7 @@ defmodule TcgmWebApp.Repo.Migrations.CreateCards do
     create table(:cards) do
       add :name, :string, null: false
       add :text, :string, null: false
+      add :image, :string, null: false
 
       add :effect_ids, {:array, :integer}, null: false
 

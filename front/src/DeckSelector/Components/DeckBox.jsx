@@ -3,12 +3,11 @@ import React, { Component } from 'react'
 import './GameBox.css'
 import { useNavigate } from 'react-router-dom'
 import logo from './../../assets/TCGMlogo.png'
-import { createUserRequest } from '../../Api/userRequest'
 
 const height = '120px'
 const width = '140px'
 
-export class GameBox extends Component {
+export class DeckBox extends Component {
   constructor (props) {
     super(props)
 
@@ -16,7 +15,7 @@ export class GameBox extends Component {
       checked: true
     }
 
-    this.game = props.game
+    this.deck = props.deck
   }
 
   handleMouseEnter = () => {
@@ -35,43 +34,27 @@ export class GameBox extends Component {
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
       >
-        <Deck checked={this.state.checked} gameId={this.game.id} />
+        <Deck checked={this.state.checked} deckId={this.deck.id} />
         <Typography variant='h5' gutterBottom>
-          {this.game.name}
+          {this.deck.name}
         </Typography>
       </div>
     )
   }
 }
 
-// Temporary function to create a user
-async function createUser () {
-  try {
-    const data = await createUserRequest({
-      user: { username: 'TestUser' }
-    })
-    localStorage.setItem('userId', data.id)
-  } catch (error) {
-    console.error('Error creating user:', error)
-  }
-}
-
 // TODO(all): refacto game id selection
-const Deck = ({ checked, gameId }) => {
+const Deck = ({ checked, deckId }) => {
   const navigate = useNavigate()
 
   const handleEditButton = () => {
-    localStorage.setItem('gameSelected', gameId)
-    window.dispatchEvent(new Event('gameSelected'))
-    navigate('/game-main-page')
+    localStorage.setItem('deckSelected', deckId)
+    //window.dispatchEvent(new Event('deckSelected'))
+    navigate('/edit-deck')
   }
 
   const handleClickButton = () => {
-    localStorage.setItem('gameSelected', gameId)
-    if (!localStorage.getItem('userId')) {
-      createUser()
-    }
-    navigate('/join')
+    //navigate('/join')
   }
 
   return (

@@ -13,6 +13,7 @@ import Login from './Login/Login';
 import HelpGame from './HelpGame/HelpGame';
 import Room from './Room/Room';
 import DeckBuilder from './DeckBuilder/DeckBuilder';
+import DeckSelector from './DeckSelector/DeckSelector';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/help-game" element={<HelpGame />} />
           <Route path="/room" element={<Room />} />
+          <Route path="/select-deck" element={<DeckSelector />} />
           <Route path="/edit-deck" element={<DeckBuilder />} />
         </Routes>
       </Router>

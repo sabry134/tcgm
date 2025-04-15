@@ -95,7 +95,7 @@ defmodule TcgmWebAppWeb.CardCollectionController do
   end
 
   swagger_path :get_cards do
-    get("/card_collections/{id}/cards")
+    get("/card_collections/{card_collection_id}/cards")
     description("Get all cards in a card collection by ID")
     parameter("id", :path, :integer, "Card Collection ID", required: true)
     response(code(:ok), "Success")

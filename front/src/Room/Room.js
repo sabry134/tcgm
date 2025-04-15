@@ -11,6 +11,11 @@ import GameChat from "./Componnent/GameChat";
 import DiscardPile from "./Componnent/DiscardPile";
 import DeckPile from "./Componnent/DeckPile";
 import "./Room.css"
+import { DndContext } from '@dnd-kit/core';
+import PlayArea from "./Componnent/PlayArea";
+import InnateCardsContainer from "./Componnent/InnateCardContainer";
+import CasterZone from "./Componnent/CasterZone";
+
 
 
 const Room = () => {
@@ -89,6 +94,7 @@ const Room = () => {
     // Early return if the effect has already run
     if (hasEffectRun.current) return;
 
+
     let username = localStorage.getItem("playerUsername");
     const roomId = localStorage.getItem("room_id");
 
@@ -113,7 +119,6 @@ const Room = () => {
     // Store socket and channel in refs rather than component state
     connectionRef.current.socket = new Socket(socketURL);
     connectionRef.current.socket.connect();
-
     connectionRef.current.channel = connectionRef.current.socket.channel(`room:${roomId}`, {});
     connectionRef.current.channel
       .join()
@@ -137,7 +142,6 @@ const Room = () => {
     // Mark that the effect has run
     hasEffectRun.current = true;
 
-    // This cleanup should only run on true component unmount
     // by using window.addEventListener, we ensure this only runs when the page is actually unloaded
     const handleUnload = () => {
       if (connectionRef.current.channel) {
@@ -150,6 +154,8 @@ const Room = () => {
 
     window.addEventListener('beforeunload', handleUnload);
 
+
+
     return () => {
       // This cleanup won't do the socket cleanup on StrictMode remounts
       window.removeEventListener('beforeunload', handleUnload);
@@ -157,7 +163,7 @@ const Room = () => {
       // We can check if this is a true unmount (navigation away) vs a StrictMode remount
       // by not cleaning up connections in the useEffect cleanup 
     };
-  }, []);
+  },);
 
   // Add a separate useEffect for component unmount that runs on true unmount using a ref
   useEffect(() => {
@@ -178,48 +184,53 @@ const Room = () => {
       }
     };
   }, []);
+  const playerHand = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].hand) : []
+  const deck = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].deck) : []
+  const discardPile = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].graveyard) : []
+  const field = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].field) : []
+  const caster = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].caster) : []
 
   const handlePiocheClick = () => {
     callDrawCard(channel, playerId, 1)
   };
 
-  const handleCardClick = (card) => {
-    setSelectedCard((prev) => (prev === card ? null : card));
+  const handleCardClick = (event, card, location) => {
+    event.preventDefault()
+    setSelectedCard((prev) => (prev && prev[0] === card ? null : [card, location]));
   };
 
-  const cardWidth = 180;
+  // when making a new drag & drop the id of the droppable need to contain the source
+  const handleDragEnd = (event) => {
+    const [source, id] = event.active.id.split("/")
+    const cardDraggedArray = Object.entries(gameState.players[playerId][source])[id]
+    const cardDragged = { [cardDraggedArray[0]]: { ...cardDraggedArray[1] } }
+    if (event.over) {
+      callMoveCard(channel, playerId, cardDragged, source, event.over.id)
+    }
+  }
 
   // const openPopover = Boolean(anchorEl);
   // const popoverId = openPopover ? "room-id-popover" : undefined;
-  const playerHand = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].hand) : []
-  const deck = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].deck) : []
-  const discardPile = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].graveyard) : []
+
   return (
-    <div display="flex" flexDirection="column" height="100vh" position="relative">
+    <DndContext onDragEnd={handleDragEnd}>
+      <div display="flex" height="100vh" position="relative" className="roomContainer">
 
-      <RoomNavigationBar roomId={gameState.id} />
+        <RoomNavigationBar roomId={gameState.id} />
+        <DiscardPile discardPile={discardPile} handleCardClick={handleCardClick} selectedCard={selectedCard} />
 
-      <div className={"casterZoneContainer"}>
-      </div>
-
-      <div className={"innateCardsContainer"}>
-      </div>
-      {Object.entries(gameState.players).map(([key, value], index) => {
-        return <PlayerHand key={index} playerHand={Object.entries(value.hand)} cardWidth={cardWidth} handleCardClick={handleCardClick} selectedCard={selectedCard} rotatation={0} left={"35vw"} bottom={key === playerId ? 10 : null} top={key === playerId ? null : 10} />
-      })}
-
-      <CardInfo selectedCard={selectedCard} playerHand={playerHand} />
-
-      <GameChat playerId={playerId} />
-      <div className={"playAreaContainer"}>
-      </div>
-
-
-      <div className={"deckDiscardContainer"}>
+        <PlayArea cards={field} handleCardClick={handleCardClick} selectedCard={selectedCard} />
         <DeckPile deck={deck} handlePiocheClick={handlePiocheClick} cardBackImage={cardBackImage} />
-        <DiscardPile discardPile={discardPile} />
-      </div>
-    </div >
+        <CasterZone cards={caster} handleCardClick={handleCardClick} selectedCard={selectedCard} />
+
+        {Object.entries(gameState.players).map(([key, value], index) => {
+          return <PlayerHand key={index} playerHand={Object.entries(value.hand)} handleCardClick={handleCardClick} selectedCard={selectedCard} rotatation={0} left={"35vw"} bottom={key === playerId ? 10 : null} top={key === playerId ? null : 10} hidden={key !== playerId} cardBackside={cardBackImage} />
+        })}
+        <CardInfo selectedCard={selectedCard ? selectedCard[0] : null} cardList={selectedCard ? gameState.players[playerId][selectedCard[1]] : null} />
+        <GameChat playerId={playerId} />
+      </div >
+    </DndContext>
+
   );
 };
 

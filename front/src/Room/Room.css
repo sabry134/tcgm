@@ -1,3 +1,64 @@
+.roomContainer {
+  background-color: #c2c5aa;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.container {
+  position: absolute;
+  border: 1px solid gray;
+  border-radius: 4px;
+  background-color: #b6ad90;
+  padding: 10px;
+}
+
+.container.deck {
+  bottom: 10px;
+  right: 10px;
+  width: 180px;
+  height: 140px;
+  cursor: 'pointer';
+}
+
+.container.discard {
+  bottom: 10px;
+  right: 225px;
+  width: 180px;
+  height: 140px;
+}
+
+.container.playerHand {
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+  width: 30vw;
+  height: 180px;
+  overflow: visible;
+}
+
+.container.casterZone {
+  top: 15%;
+  left: 10px;
+  height: 200px;
+  width: 150px;
+}
+
+.container.innateCard {
+  bottom: 10px;
+  left: 10px;
+  width: 150px;
+  height: 200px;
+}
+
+.container.playArea {
+  top: 200px;
+  left: 25%;
+  width: 50%;
+  height: 400px;
+}
+
 .card {
   max-width: 345px;
   margin: auto;
@@ -6,46 +67,6 @@
   width: 180px;
 }
 
-.casterZoneContainer {
-  position: absolute;
-  margin-top: 15%;
-  left: 10px;
-  height: 200px;
-  width: 150px;
-  border: 1px solid gray;
-  border-radius: 4px;
-  background-color: #fff;
-}
-
-.innateCardsContainer {
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  width: 150px;
-  height: 200px;
-  border: 1px solid gray;
-  border-radius: 4px;
-  background-color: #fff;
-}
-
-.playAreaContainer {
-  position: absolute;
-  top: 200px;
-  left: 25%;
-  width: 50%;
-  height: 400px;
-  border: 2px dashed #999;
-  border-radius: 4px;
-  background-color: #fff;
-}
-
-.deckDiscardContainer {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  width: 200px;
-  height: 200px;
-  border: 1px solid gray;
-  border-radius: 4px;
-  background-color: #fff;
+.droppable {
+  background-color: #a4ac86;
 }

@@ -3,6 +3,7 @@
   "phase": "",
   "players": {
     "Player 1": {
+      "caster": {},
       "deck": {},
       "field": {},
       "graveyard": {},

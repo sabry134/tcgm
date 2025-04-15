@@ -1,36 +1,18 @@
 import { Box, Card, CardMedia } from "@mui/material";
 import '../Room.css'
+import { useDroppable } from "@dnd-kit/core";
+import GameCard from "./GameCard";
 
-const DiscardPile = ({ discardPile }) => {
-    return <Box sx={{
-        position: "absolute",
-        bottom: 10,
-        right: 10,
-        width: 120,
-        height: 120,
-
+const DiscardPile = ({ discardPile, handleCardClick, selectedCard }) => {
+    const { isOver, setNodeRef } = useDroppable({
+        id: 'graveyard',
+    });
+    return <Box ref={setNodeRef} className={"container discard"} sx={{
+        backgroundColor: isOver ? "#a4ac86" : "#b6ad90"
     }}>
         {discardPile && discardPile.map(([key, card], index) => {
             const offset = index * 2;
-            return (
-                <Box
-                    key={index}
-                    sx={{
-                        position: "absolute",
-                        top: `${offset}px`,
-                        left: `${offset}px`,
-                    }}
-                >
-                    <Card className="card" sx={{ width: 100 }}>
-                        <CardMedia
-                            component="img"
-                            height="140"
-                            image={card.card_image}
-                            alt="Discarded card"
-                        />
-                    </Card>
-                </Box>
-            );
+            return <GameCard key={index} card={card} hidden={false} index={index} draggable={true} handleCardClick={handleCardClick} selectedCard={selectedCard} src={"graveyard"} cardName={key} />
         })}
     </Box>
 }

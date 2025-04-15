@@ -47,6 +47,9 @@ export const callInsertCard = (channel, playerId, card, location) => {
 };
 
 export const callMoveCard = (channel, playerId, card, source, dest) => {
+  if (source === dest)
+    return false
+
   console.log("moveCard called with channel:", channel, "playerId:", playerId, "card:", card, "source:", source, "dest:", dest);
   if (channel && playerId) {
     channel.push("move_card", { player_id: playerId, card: card, source: source, dest: dest })

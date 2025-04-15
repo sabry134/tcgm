@@ -1,24 +1,26 @@
-import { Box, Card, CardMedia } from "@mui/material"
+import { Box, } from "@mui/material"
 import "../Room.css"
+import GameCard from "./GameCard"
+import { useDroppable } from "@dnd-kit/core";
 
 const DeckPile = ({ deck, handlePiocheClick, cardBackImage }) => {
-    return <Box sx={{
-        position: "absolute",
-        top: 10,
-        left: 10,
-        width: 180,
-        height: 140,
-        cursor: "pointer",
-    }} onClick={handlePiocheClick}>
+    const { isOver, setNodeRef } = useDroppable({
+        id: 'deck',
+    });
+
+    return <Box
+        ref={setNodeRef}
+        sx={{
+            position: "absolute",
+            top: 10,
+            left: 10,
+            width: 180,
+            height: 140,
+            cursor: "pointer",
+            backgroundColor: isOver ? "#a4ac86" : "#fff",
+        }} onClick={handlePiocheClick}>
         {deck && deck.length > 0 && (
-            <Card className="card">
-                <CardMedia
-                    component="img"
-                    height="140"
-                    image={cardBackImage}
-                    alt="Card Back"
-                />
-            </Card>
+            <GameCard card={null} hidden={true} cardBackside={cardBackImage} draggable={false} />
         )}
     </Box>
 }

@@ -1,14 +1,18 @@
 import { Box, Card, CardMedia } from "@mui/material";
 import '../Room.css'
+import { useDroppable } from "@dnd-kit/core";
 
 const DiscardPile = ({ discardPile }) => {
-    return <Box sx={{
+    const { isOver, setNodeRef } = useDroppable({
+        id: 'graveyard',
+    });
+    return <Box ref={setNodeRef} sx={{
         position: "absolute",
         bottom: 10,
         right: 10,
         width: 120,
         height: 120,
-
+        backgroundColor: isOver ? "#a4ac86" : "#fff"
     }}>
         {discardPile && discardPile.map(([key, card], index) => {
             const offset = index * 2;

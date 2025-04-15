@@ -6,6 +6,12 @@
   width: 180px;
 }
 
+.roomContainer {
+  background-color: #c2c5aa;
+  width: 100vw;
+  height: 100vh;
+}
+
 .casterZoneContainer {
   position: absolute;
   margin-top: 15%;
@@ -14,7 +20,7 @@
   width: 150px;
   border: 1px solid gray;
   border-radius: 4px;
-  background-color: #fff;
+  background-color: #b6ad90;
 }
 
 .innateCardsContainer {
@@ -25,7 +31,7 @@
   height: 200px;
   border: 1px solid gray;
   border-radius: 4px;
-  background-color: #fff;
+  background-color: #b6ad90;
 }
 
 .playAreaContainer {
@@ -36,7 +42,11 @@
   height: 400px;
   border: 2px dashed #999;
   border-radius: 4px;
-  background-color: #fff;
+  background-color: #b6ad90;
+}
+
+.droppable {
+  background-color: #a4ac86;
 }
 
 .deckDiscardContainer {
@@ -47,5 +57,5 @@
   height: 200px;
   border: 1px solid gray;
   border-radius: 4px;
-  background-color: #fff;
+  background-color: #b6ad90;
 }

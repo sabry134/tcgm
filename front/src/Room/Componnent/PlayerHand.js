@@ -1,62 +1,42 @@
-import { Box, Card, CardContent, CardMedia, Typography } from "@mui/material";
+import { Box, } from "@mui/material";
 import '../Room.css'
+import GameCard from "./GameCard";
+import { useDroppable } from "@dnd-kit/core";
 
 
-const PlayerHand = ({ playerHand, cardWidth, handleCardClick, selectedCard, rotatation, bottom, top, left, right }) => {
+const PlayerHand = ({ playerHand, cardWidth, handleCardClick, selectedCard, rotation, bottom, top, left, right, hidden, cardBackside }) => {
     const handFanAngle = 10;
+    const { isOver, setNodeRef } = useDroppable({
+        id: 'hand',
+    });
 
-    return <Box sx={{
-        position: "absolute",
-        display: "flex",
-        alignItems: "center",
-        alignContent: "center",
-        justifyContent: "center",
-        top: top,
-        right: right,
-        bottom: bottom,
-        left: left,
-        rotate: `${rotatation ?? 0}deg`,
-        width: "30vw",
-        height: 180,
-        border: "1px solid gray",
-        borderRadius: "4px",
-        backgroundColor: "#fff",
-        overflow: "visible",
-    }}>
+    return <Box
+        ref={setNodeRef}
+        sx={{
+            position: "absolute",
+            display: "flex",
+            alignItems: "center",
+            alignContent: "center",
+            justifyContent: "center",
+            top: top,
+            right: right,
+            bottom: bottom,
+            left: left,
+            rotate: `${rotation ?? 0}deg`,
+            width: "30vw",
+            height: 180,
+            border: "1px solid gray",
+            borderRadius: "4px",
+            backgroundColor: isOver ? "#a4ac86" : "#fff",
+            overflow: "visible",
+        }}>
         {playerHand && playerHand.map(([key, card], index) => {
             const midIndex = (playerHand.length - 1) / 2;
             const rotation = (index - midIndex) * handFanAngle;
-            const offsetX = - ((index - midIndex) * (cardWidth / 3));
+            const offsetX = - ((index - midIndex) * (180 / 3));
             const extraY = selectedCard === index ? -30 : 0;
             return (
-                <Box
-                    key={index}
-                    onClick={() => handleCardClick(index)}
-                    sx={{
-                        position: "relative",
-                        bottom: 5,
-                        width: `${cardWidth}px`,
-                        transform: `translateX(${offsetX}px) translateY(${extraY}px) rotate(${rotation}deg)`,
-                        transformOrigin: "bottom center",
-                        transition: "transform 0.3s",
-                        cursor: "pointer",
-                        zIndex: selectedCard === index ? 10 : 1,
-                    }}
-                >
-                    <Card className="card">
-                        <CardMedia
-                            component="img"
-                            height="140"
-                            image={"https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Card_back_06.svg/1200px-Card_back_06.svg.png"}
-                            alt={card.name}
-                        />
-                        <CardContent>
-                            <Typography gutterBottom variant="h5">
-                                {card.name}
-                            </Typography>
-                        </CardContent>
-                    </Card>
-                </Box>
+                <GameCard src={"hand"} key={index} card={card} hidden={hidden} cardBackside={cardBackside} draggable={!hidden} index={index} handleCardClick={handleCardClick} rotation={rotation} offsetX={offsetX} extraY={extraY} />
             );
         })}
     </Box>

@@ -4,6 +4,11 @@ defmodule TcgmWebApp.Game.GameServer do
   alias TcgmWebApp.Game.GameLogic
   alias TcgmWebApp.Game.GameConfig
 
+  alias TcgmWebApp.CardCollectionCards.CardCollectionCards
+  alias TcgmWebApp.CardTypeProperties.CardTypeProperties
+  alias TcgmWebApp.CardProperties.CardProperties
+  alias TcgmWebApp.Cards.Cards
+
   @moduledoc """
     This module is responsible for handling game servers.
   """
@@ -40,6 +45,10 @@ defmodule TcgmWebApp.Game.GameServer do
 
   def set_deck(room_id, player_id, deck) do
     GenServer.cast(via_tuple(room_id), {:set_deck, player_id, deck})
+  end
+
+  def set_deck_by_id(room_id, player_id, deck_id) do
+    GenServer.cast(via_tuple(room_id), {:set_deck_by_id, player_id, deck_id})
   end
 
   def play_card(room_id, player_id, card) do
@@ -136,8 +145,60 @@ defmodule TcgmWebApp.Game.GameServer do
     - `{:insert_card, player_id, card, location}` - Inserts the card for the player with player_id.
     - `{:start_game}` - Starts the game with initial game state.
   """
+  def setCardProperty(card_type_property, property) do
+    property_value =
+      case card_type_property.type do
+        "text" -> property.value_string
+        "number" -> property.value_number
+        "boolean" -> property.value_boolean
+        _ -> nil
+      end
+    property_value
+  end
+
   def handle_cast({:set_deck, player_id, deck}, state) do
     new_state = %{state | players: Map.update!(state.players, player_id, fn player -> %{player | "deck" => deck} end)}
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:set_deck_by_id, player_id, deck_id}, state) do
+    card_collection_cards = CardCollectionCards.get_card_collection_cards_by_card_collection_id(deck_id)
+
+    grouped_cards = Enum.group_by(card_collection_cards, & &1.group, fn card ->
+      %{
+        id: card.card_id,
+        quantity: card.quantity
+      }
+    end)
+
+    enriched_groups = Enum.map(grouped_cards, fn {group, cards} ->
+      enriched_cards = Enum.reduce(cards, %{}, fn card, acc ->
+        base_card = Cards.get_card!(card.id)
+        card_properties = CardProperties.get_card_properties_by_card_id(card.id)
+
+        enriched_properties = Enum.reduce(card_properties, %{}, fn property, prop_acc ->
+          card_type_property = CardTypeProperties.get_card_type_property(property.cardtype_property_id)
+          Map.put(prop_acc, card_type_property.property_name, setCardProperty(card_type_property, property))
+        end)
+
+        enriched_card = %{
+          "name" => base_card.name,
+          "text" => base_card.text,
+          "properties" => enriched_properties
+        }
+
+        Map.put(acc, "#{card.id}", enriched_card)
+      end)
+
+      {group, enriched_cards}
+    end)
+
+    new_state = Enum.reduce(enriched_groups, state, fn {group, cards}, acc_state ->
+      update_in(acc_state, [:players, player_id, group], fn _existing_cards ->
+        cards
+      end)
+    end)
+
     {:noreply, new_state}
   end
 

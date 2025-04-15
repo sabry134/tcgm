@@ -21,7 +21,7 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
     |> Repo.insert!()
 
     cardType = %CardType{}
-    |> CardType.changeset(%{ name: "Test cardType", properties: ["property1", "property2"], game_id: game.id }) # 🔥 Use game.id
+    |> CardType.changeset(%{ name: "Test cardType", properties: ["property1", "property2"], game_id: game.id })
     |> Repo.insert!()
 
     action = %Action{}
@@ -33,11 +33,11 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
     |> Repo.insert!()
 
     card = %Card{}
-    |> Card.changeset(%{ name: "Test card", text: "Test text", image: "image", properties: ["Test property"], game_id: game.id, card_type_id: cardType.id, effect_ids: [effect.id] })
+    |> Card.changeset(%{ name: "Test card", text: "Test text", image: "image", game_id: game.id, card_type_id: cardType.id, effect_ids: [effect.id] })
     |> Repo.insert!()
 
     card2 = %Card{}
-    |> Card.changeset(%{ name: "Test card 2", text: "Test text 2", image: "image", properties: ["Test property"], game_id: game.id, card_type_id: cardType.id, effect_ids: [effect.id] })
+    |> Card.changeset(%{ name: "Test card 2", text: "Test text 2", image: "image", game_id: game.id, card_type_id: cardType.id, effect_ids: [effect.id] })
     |> Repo.insert!()
 
     card_collection = %CardCollection{}

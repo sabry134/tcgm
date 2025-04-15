@@ -53,6 +53,13 @@ defmodule TcgmWebApp.Cards.Cards do
     |> Repo.update()
   end
 
+  @doc"""
+    Retrieves cards by card ids.
+  """
+  def get_cards_by_ids(card_ids) do
+    Repo.all(from c in Card, where: c.id in ^card_ids)
+  end
+
   @doc """
     Retrieves a card by it's game id.
   """

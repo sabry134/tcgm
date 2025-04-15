@@ -1,8 +1,6 @@
 defmodule TcgmWebApp.Game.GameEffectTest do
   use ExUnit.Case, async: true
   alias TcgmWebApp.Game.GameEffect
-  alias TcgmWebApp.Game.GameCondition
-  alias TcgmWebApp.Game.GameLogic
 
   setup do
     initial_state = %{

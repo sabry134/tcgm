@@ -3,8 +3,9 @@ defmodule TcgmWebAppWeb.CardCollectionController do
   import Plug.Conn.Status, only: [code: 1]
   use PhoenixSwagger
 
-  alias TcgmWebApp.CardCollections.CardCollections
   alias TcgmWebApp.Cards.Cards
+  alias TcgmWebApp.CardCollections.CardCollections
+  alias TcgmWebApp.CardCollectionCards.CardCollectionCards
   alias TcgmWebAppWeb.Schemas
 
   def swagger_definitions, do: Schemas.swagger_definitions()
@@ -23,9 +24,9 @@ defmodule TcgmWebAppWeb.CardCollectionController do
   swagger_path :show do
     get("/card_collections/{id}")
     description("Get a card collection by ID")
-    parameter("id", :path, :integer, "Card collection ID", required: true)
+    parameter("id", :path, :integer, "Card Collection ID", required: true)
     response(code(:ok), "Success")
-    response(code(:not_found), "Card collection not found")
+    response(code(:not_found), "Card Collection not found")
   end
 
   def show(conn, %{"id" => id}) do
@@ -33,41 +34,17 @@ defmodule TcgmWebAppWeb.CardCollectionController do
     json(conn, card_collection)
   end
 
-  defp create_collection_file(card_collection, user_id, game_id) do
-    file_name = if user_id do
-      "#{game_id}_#{user_id}.json"
-    else
-      "#{game_id}.json"
-    end
-
-    file_path = "./data/card_collections/#{file_name}"
-    file_content = if File.exists?(file_path) do
-      {:ok, content} = File.read(file_path)
-      collections = Jason.decode!(content)
-      collections ++ [%{id: card_collection.id, name: card_collection.name, quantity: card_collection.quantity, type: card_collection.type, cards: %{}}]
-    else
-      [%{id: card_collection.id, name: card_collection.name, quantity: card_collection.quantity, type: card_collection.type, cards: %{}}]
-    end
-
-    File.write!(file_path, Jason.encode!(file_content))
-  end
-
   swagger_path :create do
     post("/card_collections")
     description("Create a new card collection")
-    parameter(:body, :body, Schema.ref(:CardCollectionRequest), "Card collection request payload", required: true)
-    response(code(:created), "Card collection created")
+    parameter(:body, :body, Schema.ref(:CardCollectionRequest), "Card Collection request payload", required: true)
+    response(code(:created), "Card Collection created")
     response(code(:unprocessable_entity), "Invalid parameters")
   end
 
   def create(conn, %{"card_collection" => card_collection_params}) do
     case CardCollections.create_card_collection(card_collection_params) do
       {:ok, card_collection} ->
-        game_id = card_collection_params["game_id"]
-        user_id = card_collection_params["user_id"]
-
-        create_collection_file(card_collection, user_id, game_id)
-
         conn
         |> put_status(:created)
         |> json(card_collection)
@@ -81,17 +58,20 @@ defmodule TcgmWebAppWeb.CardCollectionController do
   swagger_path :update do
     put("/card_collections/{id}")
     description("Update a card collection by ID")
-    parameter("id", :path, :integer, "Card collection ID", required: true)
-    parameter(:body, :body, Schema.ref(:CardCollectionRequest), "Card collection request payload", required: true)
+    parameter("id", :path, :string, "Card Collection ID", required: true)
+    parameter(:body, :body, Schema.ref(:CardCollectionRequest), "Card Collection request payload", required: true)
+    response(code(:ok), "Card Collection updated")
+    response(code(:not_found), "Card Collection not found")
+    response(code(:unprocessable_entity), "Invalid parameters")
   end
 
   def update(conn, %{"id" => id, "card_collection" => card_collection_params}) do
     card_collection = CardCollections.get_card_collection!(id)
+
     case CardCollections.update_card_collection(card_collection, card_collection_params) do
       {:ok, card_collection} ->
-        conn
-        |> put_status(:ok)
-        |> json(card_collection)
+        json(conn, card_collection)
+
       {:error, %Ecto.Changeset{} = changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -100,275 +80,116 @@ defmodule TcgmWebAppWeb.CardCollectionController do
   end
 
   swagger_path :delete do
-    delete("/card_collections/{id}")
+    delete("/card_collections/delete/{card_collection_id}")
     description("Delete a card collection by ID")
-    parameter("id", :path, :integer, "Card collection ID", required: true)
-    response(code(:ok), "Card collection deleted")
-    response(code(:not_found), "Card collection not found")
+    parameter("id", :path, :integer, "Card Collection ID", required: true)
+    response(code(:no_content), "Card Collection deleted")
+    response(code(:not_found), "Card Collection not found")
   end
 
   def delete_card_collection(conn, %{"card_collection_id" => id}) do
     card_collection = CardCollections.get_card_collection!(id)
 
-
     CardCollections.delete_card_collection!(card_collection)
     send_resp(conn, :no_content, "")
   end
 
-  swagger_path :get_card_collections_by_game_id do
-    get("/card_collections/game/{game_id}")
-    description("Get card collections by game ID")
-    parameter("game_id", :path, :integer, "Game ID", required: true)
+  swagger_path :get_cards do
+    get("/card_collections/{id}/cards")
+    description("Get all cards in a card collection by ID")
+    parameter("id", :path, :integer, "Card Collection ID", required: true)
     response(code(:ok), "Success")
-    response(code(:not_found), "Card collections not found")
+    response(code(:not_found), "Card Collection not found")
   end
 
-  def get_card_collections_by_game_id(conn, %{"game_id" => game_id}) do
-    case CardCollections.get_card_collections_by_game_id(game_id) do
-      [] ->
-        conn
-        |> put_status(:not_found)
-        |> json(%{})
-      card_collections when is_list(card_collections) ->
-        conn
-        |> put_status(:ok)
-        |> json(card_collections)
-      _ ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(%{error: "Could not retrieve card collections by game ID"})
+  def get_cards_in_card_collection(conn, %{"card_collection_id" => id}) do
+    card_collection = CardCollections.get_card_collection!(id)
+    card_collection_cards = CardCollectionCards.get_card_collection_cards_by_card_collection_id(card_collection.id)
+
+    card_quantities = Enum.reduce(card_collection_cards, %{}, fn card, acc ->
+      Map.put(acc, card.card_id, card.quantity)
+    end)
+
+    card_ids = Map.keys(card_quantities)
+    cards = Cards.get_cards_by_ids(card_ids)
+
+    cards_with_quantities = Enum.map(cards, fn card ->
+      Map.put(card, :quantity, card_quantities[card.id])
+    end)
+
+    json(conn, cards_with_quantities)
+  end
+
+  swagger_path :update_card_collection do
+    put("/card_collections/{card_collection_id}/cards")
+    description("Update a card collection by ID with a list of cards, their quantities, and groups")
+    parameter("id", :path, :integer, "Card Collection ID", required: true)
+    parameter(:body, :body, Schema.ref(:UpdateCardCollectionRequest), "Card Collection update request payload", required: true)
+    response(code(:ok), "Card Collection updated successfully")
+    response(code(:not_found), "Card Collection not found")
+    response(code(:unprocessable_entity), "Invalid parameters")
+  end
+
+  def update_card_collection(conn, %{"card_collection_id" => id, "cards" => cards_payload}) do
+    card_collection = CardCollections.get_card_collection!(id)
+    payload_card_ids = Enum.map(cards_payload, fn %{"card_id" => card_id} -> card_id end)
+    existing_cards = CardCollectionCards.get_card_collection_cards_by_card_collection_id(card_collection.id)
+
+    cards_to_delete =
+      Enum.filter(existing_cards, fn existing_card ->
+        not Enum.member?(payload_card_ids, existing_card.card_id)
+      end)
+
+    Enum.each(cards_to_delete, fn card_to_delete ->
+      CardCollectionCards.delete_card_collection_card!(card_to_delete)
+    end)
+
+    Enum.each(cards_payload, fn %{"card_id" => card_id, "quantity" => quantity, "group" => group} ->
+      case CardCollectionCards.get_card_collection_cards_by_card_collection_id_and_card_id(card_collection.id, card_id) do
+        nil ->
+          CardCollectionCards.create_card_collection_card(%{
+            card_collection_id: card_collection.id,
+            card_id: card_id,
+            quantity: quantity,
+            group: group
+          })
+        existing_card ->
+          CardCollectionCards.update_card_collection_card(existing_card, %{
+            quantity: quantity,
+            group: group
+          })
       end
-  end
+    end)
 
-  swagger_path :get_card_collections_by_game_id_and_type do
-    get("/card_collections/game/{game_id}/{type}")
-    description("Get card collections by game ID and type")
-    parameter("game_id", :path, :integer, "Game ID", required: true)
-    parameter("type", :path, :string, "Type", required: true)
-    response(code(:ok), "Success")
-    response(code(:not_found), "Card collections not found")
-  end
+    updated_cards = CardCollectionCards.get_card_collection_cards_by_card_collection_id(card_collection.id)
 
-  def get_card_collections_by_game_id_and_type(conn, %{"game_id" => game_id, "type" => type}) do
-    case CardCollections.get_card_collections_by_game_id_and_type(game_id, type) do
-      [] ->
-        conn
-        |> put_status(:not_found)
-        |> json(%{})
-      card_collections when is_list(card_collections) ->
-        conn
-        |> put_status(:ok)
-        |> json(card_collections)
-      _ ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(%{error: "Could not retrieve card collections by game ID and type"})
-      end
+    json(conn, %{card_collection: card_collection, cards: updated_cards})
   end
 
   swagger_path :get_card_collections_by_user_id do
     get("/card_collections/user/{user_id}")
-    description("Get card collections by user ID")
+    description("Get all card collections by user ID")
     parameter("user_id", :path, :integer, "User ID", required: true)
     response(code(:ok), "Success")
-    response(code(:not_found), "Card collections not found")
+    response(code(:not_found), "Card Collection not found")
   end
 
   def get_card_collections_by_user_id(conn, %{"user_id" => user_id}) do
-    case CardCollections.get_card_collections_by_user_id(user_id) do
-      [] ->
-        conn
-        |> put_status(:not_found)
-        |> json(%{})
-      card_collections when is_list(card_collections) ->
-        conn
-        |> put_status(:ok)
-        |> json(card_collections)
-      _ ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(%{error: "Could not retrieve card collections by user ID"})
-      end
+    card_collections = CardCollections.get_card_collections_by_user_id(user_id)
+    json(conn, card_collections)
   end
 
-  swagger_path :get_card_collections_by_game_id_and_user_id do
-    get("/card_collections/game/{game_id}/user/{user_id}")
-    description("Get card collections by game ID and user ID")
-    parameter("game_id", :path, :integer, "Game ID", required: true)
+  swagger_path :get_card_collections_by_user_id_and_game_id do
+    get("/card_collections/user/{user_id}/game/{game_id}")
+    description("Get all card collections by user ID and game ID")
     parameter("user_id", :path, :integer, "User ID", required: true)
+    parameter("game_id", :path, :integer, "Game ID", required: true)
     response(code(:ok), "Success")
-    response(code(:not_found), "Card collections not found")
+    response(code(:not_found), "Card Collection not found")
   end
 
-  def get_card_collections_by_user_id_and_game_id(conn, %{"game_id" => game_id, "user_id" => user_id}) do
-    case CardCollections.get_card_collections_by_user_id_and_game_id(user_id, game_id) do
-      [] ->
-        conn
-        |> put_status(:not_found)
-        |> json(%{})
-      card_collections when is_list(card_collections) ->
-        conn
-        |> put_status(:ok)
-        |> json(card_collections)
-      _ ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(%{error: "Could not retrieve card collections by game ID and user ID"})
-      end
-  end
-
-  swagger_path :add_card_to_collection do
-    post("/card_collections/add_card")
-    description("Add a card to a collection")
-    parameter(:body, :body, Schema.ref(:AddCardToCollectionRequest), "Add card to collection request payload", required: true)
-    response(code(:ok), "Card added to collection")
-    response(code(:not_found), "Card collection not found")
-  end
-
-  def add_card_to_collection(conn, %{"card_collection_id" => card_collection_id, "card_id" => card_id, "quantity" => quantity}) do
-    card_collection = CardCollections.get_card_collection!(card_collection_id)
-    card = Cards.get_card!(card_id)
-
-    file_path = get_file_path(card_collection)
-
-    file_content = read_file_content(file_path)
-
-    quantity = String.to_integer(quantity)
-    updated_collections = update_collections(file_content, card_collection_id, card.name, quantity)
-
-    write_file_content(file_path, updated_collections)
-
-    update_db_quantity(card_collection, quantity)
-
-    conn
-    |> put_status(:ok)
-    |> json(%{message: "Card added to collection"})
-  end
-
-  defp get_file_path(card_collection) do
-    if card_collection.user_id do
-      "./data/card_collections/#{card_collection.game_id}_#{card_collection.user_id}.json"
-    else
-      "./data/card_collections/#{card_collection.game_id}.json"
-    end
-  end
-
-  defp read_file_content(file_path) do
-    if File.exists?(file_path) do
-      {:ok, content} = File.read(file_path)
-      Jason.decode!(content)
-    else
-      []
-    end
-  end
-
-  defp update_collections(file_content, card_collection_id, card_name, quantity) do
-    Enum.map(file_content, fn collection ->
-      if to_string(collection["id"]) == to_string(card_collection_id) do
-        updated_cards = Map.update(collection["cards"], card_name, quantity, fn existing_quantity ->
-          existing_quantity + quantity
-        end)
-        updated_quantity = collection["quantity"] + quantity
-        collection
-        |> Map.put("quantity", updated_quantity)
-        |> Map.put("cards", updated_cards)
-      else
-        collection
-      end
-    end)
-  end
-
-  defp write_file_content(file_path, updated_collections) do
-    File.write!(file_path, Jason.encode!(updated_collections))
-  end
-
-  defp update_db_quantity(card_collection, quantity) do
-    quantity = quantity
-    new_quantity = card_collection.quantity + quantity
-    {:ok, _updated_card_collection} = CardCollections.update_card_collection(card_collection, %{quantity: new_quantity})
-  end
-
-  swagger_path :remove_card_from_collection do
-    post("/card_collections/remove_card")
-    description("Remove a card from a collection")
-    parameter(:body, :body, Schema.ref(:RemoveCardFromCollectionRequest), "Remove card from collection request payload", required: true)
-    response(code(:ok), "Card removed from collection")
-    response(code(:unprocessable_entity), "Invalid parameters")
-  end
-
-  def remove_card_from_collection(conn, %{"card_collection_id" => card_collection_id, "card_id" => card_id, "quantity" => quantity}) do
-    card_collection = CardCollections.get_card_collection!(card_collection_id)
-    card = Cards.get_card!(card_id)
-
-    file_path = get_file_path(card_collection)
-
-    file_content = read_file_content(file_path)
-
-    quantity = String.to_integer(quantity)
-    updated_collections = update_collections_for_removal(file_content, card_collection_id, card.name, quantity)
-
-    case updated_collections do
-      {:error, message} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(%{error: message})
-      updated_collections ->
-        write_file_content(file_path, updated_collections)
-        update_db_quantity(card_collection, -quantity)
-        conn
-        |> put_status(:ok)
-        |> json(%{message: "Card removed from collection"})
-    end
-  end
-
-  defp update_collections_for_removal(file_content, card_collection_id, card_name, quantity) do
-    Enum.map(file_content, fn collection ->
-      if to_string(collection["id"]) == to_string(card_collection_id) do
-        updated_cards = Map.update(collection["cards"], card_name, 0, fn existing_quantity ->
-          if existing_quantity < quantity do
-            {:error, "Cannot remove more cards than are in the collection"}
-          else
-            new_quantity = existing_quantity - quantity
-            if new_quantity == 0 do
-              Map.delete(collection["cards"], card_name)
-            else
-              new_quantity
-            end
-          end
-        end)
-
-        case updated_cards do
-          {:error, _} = error -> error
-          _ ->
-            updated_quantity = collection["quantity"] - quantity
-            collection
-            |> Map.put("quantity", updated_quantity)
-            |> Map.put("cards", updated_cards)
-        end
-      else
-        collection
-      end
-    end)
-  end
-
-  def get_cards_in_collection(conn, %{"card_collection_id" => card_collection_id}) do
-    card_collection = CardCollections.get_card_collection!(card_collection_id)
-    file_path = get_file_path(card_collection)
-    file_content = read_file_content(file_path)
-
-    collection = Enum.find(file_content, fn c -> to_string(c["id"]) == to_string(card_collection_id) end)
-    card_quantities = collection["cards"]
-
-    card_names = Map.keys(card_quantities)
-    cards = Cards.get_cards_by_names(card_names)
-
-    cards_with_quantities = Enum.flat_map(cards, fn card ->
-      quantity = card_quantities[card.name]
-      Enum.map(1..quantity, fn _ -> Map.put(card, :quantity, quantity) end)
-    end)
-
-    conn
-    |> put_status(:ok)
-    |> json(cards_with_quantities)
+  def get_card_collections_by_user_id_and_game_id(conn, %{"user_id" => user_id, "game_id" => game_id}) do
+    card_collections = CardCollections.get_card_collections_by_user_id_and_game_id(user_id, game_id)
+    json(conn, card_collections)
   end
 end

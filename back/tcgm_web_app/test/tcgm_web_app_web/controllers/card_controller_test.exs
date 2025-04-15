@@ -26,7 +26,7 @@ defmodule TcgmWebAppWeb.CardControllerTest do
     |> Repo.insert!()
 
     card = %Card{}
-    |> Card.changeset(%{ name: "Test card", text: "Test text", properties: ["Test property"], game_id: game.id, card_type_id: cardType.id, effect_ids: [effect.id] })
+    |> Card.changeset(%{ name: "Test card", text: "Test text", game_id: game.id, card_type_id: cardType.id, effect_ids: [effect.id] })
     |> Repo.insert!()
 
     {:ok, card: card, game: game, cardType: cardType, action: action, effect: effect}
@@ -39,7 +39,6 @@ defmodule TcgmWebAppWeb.CardControllerTest do
     assert length(response) > 0
     assert Enum.any?(response, fn c -> c["name"] == card.name end)
     assert Enum.any?(response, fn c -> c["text"] == card.text end)
-    assert Enum.any?(response, fn c -> c["properties"] == card.properties end)
     assert Enum.any?(response, fn c -> c["game_id"] == card.game_id end)
     assert Enum.any?(response, fn c -> c["card_type_id"] == card.card_type_id end)
     assert Enum.any?(response, fn c -> c["effect_ids"] == card.effect_ids end)
@@ -52,7 +51,6 @@ defmodule TcgmWebAppWeb.CardControllerTest do
     assert response["id"] == card.id
     assert response["name"] == card.name
     assert response["text"] == card.text
-    assert response["properties"] == card.properties
     assert response["game_id"] == card.game_id
     assert response["card_type_id"] == card.card_type_id
     assert response["effect_ids"] == card.effect_ids
@@ -65,7 +63,6 @@ defmodule TcgmWebAppWeb.CardControllerTest do
     assert length(response) > 0
     assert Enum.any?(response, fn c -> c["name"] == card.name end)
     assert Enum.any?(response, fn c -> c["text"] == card.text end)
-    assert Enum.any?(response, fn c -> c["properties"] == card.properties end)
     assert Enum.any?(response, fn c -> c["game_id"] == card.game_id end)
     assert Enum.any?(response, fn c -> c["card_type_id"] == card.card_type_id end)
     assert Enum.any?(response, fn c -> c["effect_ids"] == card.effect_ids end)
@@ -79,7 +76,6 @@ defmodule TcgmWebAppWeb.CardControllerTest do
     assert response["id"]
     assert response["name"] == "Test card 2"
     assert response["text"] == "Test text 2"
-    assert response["properties"] == ["properties"]
     assert response["game_id"] == game.id
     assert response["card_type_id"] == cardType.id
     assert response["effect_ids"] == [effect.id]
@@ -93,7 +89,6 @@ defmodule TcgmWebAppWeb.CardControllerTest do
     assert response["id"] == card.id
     assert response["name"] == "Test card 2"
     assert response["text"] == "Test text 2"
-    assert response["properties"] == ["properties"]
     assert response["game_id"] == card.game_id
     assert response["card_type_id"] == card.card_type_id
     assert response["effect_ids"] == card.effect_ids

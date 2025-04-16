@@ -9,6 +9,12 @@ export class TCGMBox extends Component {
   }
 
   render () {
+    //TODO(): when back is done changing properties remove those props values
+    const backgroundColor =
+      this.props.data.backgroundColor ?? this.props.data.font_color
+    const width = this.props.data.width ?? this.props.data.image_width
+    const height = this.props.data.height ?? this.props.data.image_height
+
     return (
       <VisualProperties
         selected={this.props.selected}
@@ -18,15 +24,15 @@ export class TCGMBox extends Component {
       >
         <Box
           sx={{
-            backgroundColor: this.props.data.backgroundColor,
+            backgroundColor: backgroundColor,
             rotate: this.props.data.rotation,
             borderWidth: this.props.data.border_width,
             borderColor: `rgba(${this.props.data.border_color[0]}, ${this.props.data.border_color[1]}, ${this.props.data.border_color[2]}, ${this.props.data.border_color[3]})`,
             borderRadius: this.props.data.borderRadius,
-            width: this.props.data.width * this.props.data.scale_x,
-            height: this.props.data.height * this.props.data.scale_y,
+            width: width * this.props.data.scale_x,
+            height: height * this.props.data.scale_y,
             borderStyle: 'solid',
-            bgcolor: `rgba(${this.props.data.background_color[0]}, ${this.props.data.background_color[1]}, ${this.props.data.background_color[2]}, ${this.props.data.background_color[3]})`
+            bgcolor: `rgba(${backgroundColor[0]}, ${backgroundColor[1]}, ${backgroundColor[2]}, ${backgroundColor[3]})`
           }}
         >
           <img

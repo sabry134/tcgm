@@ -31,10 +31,13 @@ defmodule TcgmWebAppWeb.Router do
     resources "/cards", CardController, only: [:index, :show, :create, :update]
     delete "/cards/delete/:card_id", CardController, :delete_card
     get "/cards/game/:game_id", CardController, :get_cards_by_game_id
+    post "/cards/with_properties", CardController, :create_card_with_properties
+    get "/cards/game/:game_id/with_properties", CardController, :get_cards_with_properties_by_game_id
 
     resources "/cardTypes", CardTypeController, only: [:index, :show, :create, :update]
     delete "/cardTypes/delete/:cardType_id", CardTypeController, :delete_cardType
     get "/cardTypes/game/:game_id", CardTypeController, :get_cardTypes_by_game_id
+    post "/cardTypes/with_properties", CardTypeController, :create_cardType_with_properties
 
     resources "/effects", EffectController, only: [:index, :show, :create, :update]
     delete "/effects/delete/:effect_id", EffectController, :delete_effect

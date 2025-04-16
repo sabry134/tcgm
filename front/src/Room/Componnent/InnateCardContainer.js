@@ -1,7 +1,7 @@
 import '../Room.css'
 
-const InnateCardsContainer = () => {
-    return <div className={"container innateCard"}>
+const InnateCardsContainer = ({ opponent }) => {
+    return <div className={"container innateCard" + (opponent ? " opponent" : "")}>
     </div>
 }
 

@@ -51,9 +51,10 @@ export class LeftPanel extends Component {
   saveCard () {
     const card = localStorage.getItem('currentEditedCard')
     const storedId = localStorage.getItem('editIdPick')
+    const gameId = localStorage.getItem('gameSelected')
 
     try {
-      saveCardRequest(storedId, JSON.parse(card)).then(data => {
+      saveCardRequest(storedId, gameId, JSON.parse(card), ).then(data => {
         console.log(data)
       })
       this.getCard()

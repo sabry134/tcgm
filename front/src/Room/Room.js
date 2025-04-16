@@ -184,11 +184,6 @@ const Room = () => {
       }
     };
   }, []);
-  const playerHand = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].hand) : []
-  const deck = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].deck) : []
-  const discardPile = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].graveyard) : []
-  const field = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].field) : []
-  const caster = playerId && gameState.players[playerId] ? Object.entries(gameState.players[playerId].caster) : []
 
   const handlePiocheClick = () => {
     callDrawCard(channel, playerId, 1)
@@ -201,12 +196,14 @@ const Room = () => {
 
   // when making a new drag & drop the id of the droppable need to contain the source
   const handleDragEnd = (event) => {
-    const [source, id] = event.active.id.split("/")
+    if (!event.over || !event.active) {
+      return
+    }
+    const [source, id, opponent] = event.active.id.split("/", 3)
+    const [dest, op] = event.over.id.split("/")
     const cardDraggedArray = Object.entries(gameState.players[playerId][source])[id]
     const cardDragged = { [cardDraggedArray[0]]: { ...cardDraggedArray[1] } }
-    if (event.over) {
-      callMoveCard(channel, playerId, cardDragged, source, event.over.id)
-    }
+    callMoveCard(channel, playerId, cardDragged, source, dest)
   }
 
   const checkOpponent = (player) => {
@@ -225,14 +222,20 @@ const Room = () => {
         <RoomNavigationBar roomId={gameState.id} />
 
         {Object.entries(gameState.players).map(([key, value], index) => {
-          return <>
-            <DiscardPile key={"discard" + index} discardPile={discardPile} handleCardClick={handleCardClick} selectedCard={selectedCard} opponent={checkOpponent(key)} />
-            <PlayArea key={"playArea" + index} cards={field} handleCardClick={handleCardClick} selectedCard={selectedCard} opponent={checkOpponent(key)} />
-            <DeckPile key={"deckPile" + index} deck={deck} handlePiocheClick={handlePiocheClick} cardBackImage={cardBackImage} opponent={checkOpponent(key)} />
-            <CasterZone key={"casterZone" + index} cards={caster} handleCardClick={handleCardClick} selectedCard={selectedCard} opponent={checkOpponent(key)} />
-            <InnateCardsContainer key={"innateCard" + index} opponent={checkOpponent(key)} />
+          const playerHand = Object.entries(value.hand)
+          const deck = Object.entries(value.deck)
+          const discardPile = Object.entries(value.graveyard)
+          const field = Object.entries(value.field)
+          const caster = Object.entries(value.caster)
 
-            <PlayerHand opponent={checkOpponent(key)} key={"playerHand" + index} playerHand={Object.entries(value.hand)} handleCardClick={handleCardClick} selectedCard={selectedCard} hidden={key !== playerId} cardBackside={cardBackImage} />
+          return <>
+            <DiscardPile key={"discard" + index.toString()} discardPile={discardPile} handleCardClick={handleCardClick} selectedCard={selectedCard} opponent={checkOpponent(key)} />
+            <PlayArea key={"playArea" + index.toString()} cards={field} handleCardClick={handleCardClick} selectedCard={selectedCard} opponent={checkOpponent(key)} />
+            <DeckPile key={"deckPile" + index.toString()} deck={deck} handlePiocheClick={handlePiocheClick} cardBackImage={cardBackImage} opponent={checkOpponent(key)} />
+            <CasterZone key={"casterZone" + index.toString()} cards={caster} handleCardClick={handleCardClick} selectedCard={selectedCard} opponent={checkOpponent(key)} />
+            <InnateCardsContainer key={"innateCard" + index.toString()} opponent={checkOpponent(key)} />
+
+            <PlayerHand opponent={checkOpponent(key)} key={"playerHand" + index.toString()} playerHand={playerHand} handleCardClick={handleCardClick} selectedCard={selectedCard} hidden={key !== playerId} cardBackside={cardBackImage} />
             {/* <GameChat playerId={playerId} /> */
             }</>
         })}

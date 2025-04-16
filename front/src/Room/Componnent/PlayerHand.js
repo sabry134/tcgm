@@ -7,7 +7,7 @@ import { useDroppable } from "@dnd-kit/core";
 const PlayerHand = ({ playerHand, handleCardClick, selectedCard, hidden, cardBackside, opponent }) => {
     const handFanAngle = 10;
     const { isOver, setNodeRef } = useDroppable({
-        id: 'hand',
+        id: 'hand' + '/' + opponent.toString(),
     });
 
     return <Box
@@ -22,7 +22,7 @@ const PlayerHand = ({ playerHand, handleCardClick, selectedCard, hidden, cardBac
             const offsetX = - ((index - midIndex) * (180 / 3));
 
             return (
-                <GameCard src={"hand"} key={index} cardName={key} card={card} hidden={hidden} cardBackside={cardBackside} draggable={true} index={index} handleCardClick={handleCardClick} rotation={rotation} offsetX={offsetX} selectedCard={selectedCard} />
+                <GameCard src={"hand"} key={index} opponent={opponent} cardName={key} card={card} hidden={hidden} cardBackside={cardBackside} draggable={true} index={index} handleCardClick={handleCardClick} rotation={rotation} offsetX={offsetX} selectedCard={selectedCard} />
             );
         })}
     </Box>

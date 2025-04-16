@@ -4,7 +4,7 @@ import GameCard from './GameCard';
 
 const CasterZone = ({ opponent, cards, handleCardClick, selectedCard }) => {
     const { isOver, setNodeRef } = useDroppable({
-        id: 'caster',
+        id: 'caster' + '/' + opponent.toString(),
     });
     return <div style={{ backgroundColor: isOver ? "#a4ac86" : "#b6ad90" }} ref={setNodeRef} className={"container casterZone" + (opponent ? " opponent" : "")}>
         {cards && cards.map(([key, card], index) => {

@@ -56,7 +56,14 @@ const StagnantUI = ({ createNewComponnent }) => {
       getCardTypesPropertiesbyTypeRequest(typeId).then(data => {
         for (let i = 0; i < tmpProperties.length; i++) {
           if (!data || i >= data.length) {
-            saveNewCardTypesPropertiesRequest(tmpProperties[i])
+            const updateProperties = {
+              ...tmpProperties[i],
+              font_color: tmpProperties[i].font_color.toString(),
+              border_color: tmpProperties[i].border_color.toString()
+            }
+            saveNewCardTypesPropertiesRequest({
+              cardTypeProperty: updateProperties
+            })
           }
           if (data && !shallowEqual(tmpProperties[i], data[i])) {
             editCardTypesPropertyByIdRequest(

@@ -52,7 +52,19 @@ export class LeftPanel extends Component {
     try {
       getCardTypesPropertiesbyTypeRequest(typeId).then(data => {
         if (data) {
-          localStorage.setItem('currentTypeProperties', JSON.stringify(data))
+          console.log(data)
+          localStorage.setItem(
+            'currentTypeProperties',
+            JSON.stringify(
+              data.map((property, index) => {
+                return {
+                  ...property,
+                  border_color: property.border_color.split(','),
+                  font_color: property.font_color.split(',')
+                }
+              })
+            )
+          )
         } else {
           localStorage.setItem('currentTypeProperties', JSON.stringify([]))
         }

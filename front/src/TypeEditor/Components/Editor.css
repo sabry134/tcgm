@@ -1,0 +1,8 @@
+.editorElement {
+  cursor: pointer;
+}
+
+.editorElement.selected {
+  cursor: grab;
+  border: 1px solid #656d4a;
+}

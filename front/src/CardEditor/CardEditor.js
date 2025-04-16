@@ -1,21 +1,18 @@
 import React, { useEffect } from "react";
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { TCGMCard } from "./components/TCGMCard";
-import { NavigationBar } from "./../NavigationBar";
-import { LeftPanel } from "./components/LeftPanel";
-import { RightPanel } from "./components/RightPanel";
-import defaultData from "./data/TestBack.json"
+import { TCGMCard } from "./Components/TCGMCard";
+import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
+import { LeftPanel } from "./Components/LeftPanel";
+import { RightPanel } from "./Components/RightPanel";
+import defaultData from "./Data/TestBack.json"
 
 const CardEditor = () => {
-    const navigate = useNavigate(); // Initialize useNavigate hook
-
-
+    const navigate = useNavigate();
 
     useEffect(() => {
         document.title = "JCCE";
 
-        // Check if localStorage already has data
         if (!localStorage.getItem("currentEditedCard")) {
             localStorage.setItem("currentEditedCard", JSON.stringify(defaultData));
         }
@@ -23,10 +20,8 @@ const CardEditor = () => {
 
     return (
         <Box display="flex" flexDirection="column" height="100vh">
-            {/* Brown Banner with Menu */}
-            <NavigationBar navigate={navigate} />
+            <MainNavigationBar navigate={navigate} />
 
-            {/* Main Content Area */}
             <Box display="flex" flexGrow={1} bgcolor="#fff">
                 <LeftPanel />
 

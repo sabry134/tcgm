@@ -1,0 +1,10 @@
+{
+  "card": {
+    "name": "Test card 2",
+    "text": "Test text 2",
+    "image": "../images/iminyourwalls.png",
+    "game_id": "0",
+    "card_type_id": "0",
+    "effect_ids": []
+  }
+}

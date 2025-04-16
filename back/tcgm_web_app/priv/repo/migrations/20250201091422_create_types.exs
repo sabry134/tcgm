@@ -4,7 +4,6 @@ defmodule TcgmWebApp.Repo.Migrations.CreateTypes do
   def change do
     create table(:types) do
       add :name, :string, null: false
-      add :properties, {:array, :string}, null: false
 
       add :game_id, references(:games, on_delete: :delete_all), null: false
 

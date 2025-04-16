@@ -16,5 +16,8 @@ defmodule TcgmWebApp.Repo.Migrations.CreateCards do
     end
 
     create unique_index(:cards, [:name])
+    create index(:cards, [:game_id])
+    create index(:cards, [:card_type_id])
+    create index(:cards, [:card_type_id, :game_id])
   end
 end

@@ -8,17 +8,18 @@ import { ColorPicker } from "./CustomizationComponnent/ColorPicker";
 import { CardTypePicker } from "./CustomizationComponnent/CardTypePicker";
 import { GamePicker } from "./CustomizationComponnent/GamePicker";
 
-const JsonToForm = ({ data = {}, predecessor = "" }) => {
+const JsonToForm = ({ data = {}, predecessor = "", localStorageName = "currentEditedCard" }) => {
   const keys = Object.keys(data)
-
   return (
-    <div style={{ paddingLeft: '8px' }}>
+    <div style={{
+      paddingLeft: '8px', overflowY: 'scroll',
+      maxHeight: '80vh'
+    }}>
       {keys.map((item, index) => {
         return (
           <div key={index} className="shadow-md p-4 rounded-lg">
-
             <div>
-              <DropDown item={item} predecessor={predecessor} data={data} />
+              <DropDown item={item} predecessor={predecessor} data={data} localStorageName={localStorageName} />
             </div>
           </div>
         )
@@ -27,19 +28,19 @@ const JsonToForm = ({ data = {}, predecessor = "" }) => {
   );
 };
 
-const switchForm = (value, key, predecessor) => {
+const switchForm = (value, key, predecessor, localStorageName) => {
   const path = predecessor === "" ? key : predecessor + "." + key
   switch (value) {
     case "text":
-      return <CustomInput name={path} />
+      return <CustomInput name={path} localStorageName={localStorageName} />
     case "number":
-      return <NumberInput name={path} />
+      return <NumberInput name={path} localStorageName={localStorageName} />
     case "color":
-      return <ColorPicker name={path} />
+      return <ColorPicker name={path} localStorageName={localStorageName} />
     case "cardType":
-      return <CardTypePicker name={path} />;
+      return <CardTypePicker name={path} localStorageName={localStorageName} />;
     case "game":
-      return <GamePicker name={path} />
+      return <GamePicker name={path} localStorageName={localStorageName} />
     case "action":
       break;
     case "params":
@@ -51,7 +52,7 @@ const switchForm = (value, key, predecessor) => {
   }
 }
 
-const DropDown = ({ item, data, predecessor }) => {
+const DropDown = ({ item, data, predecessor, localStorageName }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const switchTitle = (value) => {
@@ -68,14 +69,14 @@ const DropDown = ({ item, data, predecessor }) => {
   }
 
   return (
-    <div className="display: flex">
+    <div className="display: flex" hidden={data[item] === 'none'}>
       <h2 style={{ cursor: 'pointer' }} onClick={() => setIsOpen(!isOpen)} className="text-lg font-bold cursor:pointer">
         {switchTitle(item)}
         {isOpen ? <ExpandLess /> : <ExpandMore />}
       </h2>
       {isOpen && typeof data[item] !== "object" &&
         <div style={{ paddingLeft: '8px' }}>
-          {switchForm(data[item], item, predecessor)}
+          {switchForm(data[item], item, predecessor, localStorageName)}
         </div>
       }
       {
@@ -90,9 +91,5 @@ const DropDown = ({ item, data, predecessor }) => {
     </div>
   );
 }
-
-
-// ajouter chaque custom widget
-// connecter au back (envoie carte, recup carte)
 
 export default JsonToForm;

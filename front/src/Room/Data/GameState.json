@@ -1,0 +1,16 @@
+{
+  "id": "",
+  "phase": "",
+  "players": {
+    "Player 1": {
+      "caster": {},
+      "deck": {},
+      "field": {},
+      "graveyard": {},
+      "hand": {},
+      "health": 0
+    }
+  },
+  "turn": "",
+  "turnCount": 0
+}

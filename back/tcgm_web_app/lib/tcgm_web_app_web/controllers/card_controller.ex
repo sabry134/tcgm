@@ -4,6 +4,8 @@ defmodule TcgmWebAppWeb.CardController do
   use PhoenixSwagger
 
   alias TcgmWebApp.Cards.Cards
+  alias TcgmWebApp.CardProperties.CardProperties
+  alias TcgmWebApp.CardTypeProperties.CardTypeProperties
   alias TcgmWebAppWeb.Schemas
 
   def swagger_definitions, do: Schemas.swagger_definitions()
@@ -113,6 +115,125 @@ defmodule TcgmWebAppWeb.CardController do
         conn
         |> put_status(:unprocessable_entity)
         |> json(%{error: "Could not retrieve cards by game ID"})
+    end
+  end
+
+  swagger_path :create_card_with_properties do
+    post("/cards/with_properties")
+    description("Create a new card with properties")
+    parameter(:body, :body, Schema.ref(:CardWithPropertiesRequest), "Card with properties request payload", required: true)
+    response(code(:created), "Card and properties created")
+    response(code(:unprocessable_entity), "Invalid parameters")
+  end
+
+  def create_card_with_properties(conn, %{"card" => card_params, "properties" => properties}) do
+    IO.inspect(card_params, label: "Card Params")
+    IO.inspect(properties, label: "Properties")
+    case Cards.create_card(card_params) do
+      {:ok, card} ->
+        properties = Enum.map(properties, fn property ->
+          %{
+            value_string: property["value_string"],
+            value_number: property["value_number"],
+            value_boolean: property["value_boolean"],
+            cardtype_property_id: property["cardtype_property_id"],
+            card_id: card.id
+          }
+        end)
+
+        case Enum.reduce_while(properties, {:ok, []}, fn property, {:ok, acc} ->
+              IO.inspect(property, label: "Property")
+              case CardProperties.create_card_property(property) do
+                 {:ok, card_property} ->
+                   {:cont, {:ok, [card_property | acc]}}
+
+                 {:error, changeset} ->
+                   {:halt, {:error, changeset}}
+               end
+             end) do
+          {:ok, card_properties} ->
+            conn
+            |> put_status(:created)
+            |> json(%{card: card, properties: Enum.reverse(card_properties)})
+
+          {:error, %Ecto.Changeset{} = changeset} ->
+            conn
+            |> put_status(:unprocessable_entity)
+            |> json(%{error: "Failed to create one or more card properties", details: changeset})
+        end
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(%{error: "Failed to create card", details: changeset})
+    end
+  end
+
+  swagger_path :get_cards_with_properties_by_game_id do
+    get("/cards/game/{game_id}/with_properties")
+    description("Get cards with properties by game ID")
+    parameter("game_id", :path, :integer, "Game ID", required: true)
+    response(code(:ok), "Success")
+    response(code(:not_found), "No cards found for game ID")
+    response(code(:unprocessable_entity), "Could not retrieve cards by game ID")
+  end
+
+  def get_cards_with_properties_by_game_id(conn, %{"game_id" => game_id}) do
+    case Cards.get_cards_by_game_id(game_id) do
+      [] ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "No cards found for game ID #{game_id}"})
+
+      cards when is_list(cards) ->
+        cards_with_properties = Enum.map(cards, fn card ->
+          properties = CardProperties.get_card_properties_by_card_id(card.id)
+          clean_properties = Enum.map(properties, fn property ->
+            get_clean_property(property)
+          end)
+          card_map =
+            card
+            |> Map.from_struct()
+            |> Map.drop([:__meta__, :inserted_at, :updated_at])
+            |> Map.put(:properties, clean_properties)
+
+          IO.inspect(card_map, label: "Updated Card with Properties")
+          card_map
+        end)
+
+        IO.inspect(cards_with_properties, label: "Cards with Properties")
+
+        conn
+        |> put_status(:ok)
+        |> json(cards_with_properties)
+
+      _ ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(%{error: "Could not retrieve cards by game ID"})
+    end
+  end
+
+  defp get_clean_property(property) do
+    cardTypeProperty = CardTypeProperties.get_card_type_property!(property.cardtype_property_id)
+    case cardTypeProperty.type do
+      "text" ->
+        %{
+          name: cardTypeProperty.property_name,
+          value: property.value_string,
+        }
+
+      "number" ->
+        %{
+          name: cardTypeProperty.property_name,
+          value: property.value_number,
+        }
+
+      "boolean" ->
+        %{
+          name: cardTypeProperty.property_name,
+          value: property.value_boolean,
+        }
     end
   end
 end

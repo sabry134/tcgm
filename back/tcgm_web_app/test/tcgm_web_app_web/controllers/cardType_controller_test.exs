@@ -11,7 +11,7 @@ defmodule TcgmWebAppWeb.CardTypeControllerTest do
     |> Repo.insert!()
 
     cardType = %CardType{}
-    |> CardType.changeset(%{ name: "Test cardType", properties: ["property1", "property2"], game_id: game.id }) # 🔥 Use game.id
+    |> CardType.changeset(%{ name: "Test cardType", game_id: game.id })
     |> Repo.insert!()
 
     {:ok, cardType: cardType, game: game}
@@ -23,7 +23,6 @@ defmodule TcgmWebAppWeb.CardTypeControllerTest do
 
     assert length(response) > 0
     assert Enum.any?(response, fn c -> c["name"] == cardType.name end)
-    assert Enum.any?(response, fn c -> c["properties"] == cardType.properties end)
     assert Enum.any?(response, fn c -> c["game_id"] == cardType.game_id end)
 
   end
@@ -34,7 +33,6 @@ defmodule TcgmWebAppWeb.CardTypeControllerTest do
 
     assert response["id"] == cardType.id
     assert response["name"] == cardType.name
-    assert response["properties"] == cardType.properties
     assert response["game_id"] == cardType.game_id
   end
 
@@ -45,17 +43,15 @@ defmodule TcgmWebAppWeb.CardTypeControllerTest do
 
     assert length(response) > 0
     assert Enum.any?(response, fn c -> c["name"] == cardType.name end)
-    assert Enum.any?(response, fn c -> c["properties"] == cardType.properties end)
     assert Enum.any?(response, fn c -> c["game_id"] == cardType.game_id end)
   end
 
   test "POST /api/cardTypes creates a new cardType", %{conn: conn, game: game} do
-    attrs = %{ name: "Test cardType 2", properties: ["property1", "property2"], game_id: game.id }
+    attrs = %{ name: "Test cardType 2", game_id: game.id }
     conn = post(conn, "/api/cardTypes", cardType: attrs)
     response = json_response(conn, 201)
 
     assert response["name"] == attrs.name
-    assert response["properties"] == attrs.properties
     assert Repo.get_by(CardType, name: attrs[:name])
   end
 
@@ -66,12 +62,11 @@ defmodule TcgmWebAppWeb.CardTypeControllerTest do
   end
 
   test "PUT /api/cardTypes/:id updates an existing cardType", %{conn: conn, cardType: cardType, game: game} do
-    attrs = %{ name: "Test cardType 2", properties: ["property1", "property2"], game_id: game.id }
+    attrs = %{ name: "Test cardType 2", game_id: game.id }
     conn = put(conn, "/api/cardTypes/#{cardType.id}", cardType: attrs)
     response = json_response(conn, 200)
 
     assert response["name"] == attrs.name
-    assert response["properties"] == attrs.properties
   end
 
   test "DELETE /api/cardTypes/:id deletes an existing cardType", %{conn: conn, cardType: cardType} do
@@ -79,6 +74,22 @@ defmodule TcgmWebAppWeb.CardTypeControllerTest do
     assert response(conn, 204) == ""
 
     assert Repo.get(CardType, cardType.id) == nil
+  end
+
+  test "POST /api/cardTypes/with_properties creates a new cardType with properties", %{conn: conn, game: game} do
+    cardtype_property = %{ property_name: "property1", type: "text", value: "test", variant: "test", mutable: true, font: "Arial", font_size: 12, font_color: "black", position_x: 0, position_y: 0, rotation: 0, scale_x: 1, scale_y: 1, border_width: 1, border_color: "red", border_radius: "130", opacity: 2, image: "image", image_width: 100, image_height: 100, image_position_x: 0, image_position_y: 0, image_rotation: 0, image_scale_x: 1, image_scale_y: 1, image_opacity: 100 }
+    cardtype_property2 = %{ property_name: "property2", type: "number", value: "10", variant: "test", mutable: true, font: "Arial", font_size: 12, font_color: "black", position_x: 0, position_y: 0, rotation: 0, scale_x: 1, scale_y: 1, border_width: 1, border_color: "red", border_radius: "130", opacity: 2, image: "image", image_width: 100, image_height: 100, image_position_x: 0, image_position_y: 0, image_rotation: 0, image_scale_x: 1, image_scale_y: 1, image_opacity: 100 }
+    attrs = %{ name: "Test cardType 2", game_id: game.id }
+    properties = [cardtype_property, cardtype_property2]
+    conn = post(conn, "/api/cardTypes/with_properties", cardType: attrs, properties: properties)
+    response = json_response(conn, 201)
+
+    assert response["cardType"]["name"] == attrs.name
+    assert response["cardType"]["game_id"] == game.id
+    assert response["cardType_properties"] |> Enum.any?(fn p -> p["property_name"] == cardtype_property[:property_name] end)
+    assert response["cardType_properties"] |> Enum.any?(fn p -> p["property_name"] == cardtype_property2[:property_name] end)
+
+    assert Repo.get_by(CardType, name: attrs[:name])
   end
 
 end

@@ -1,0 +1,9 @@
+{
+  "card": {
+    "name": "text",
+    "text": "text",
+    "image": "text",
+    "card_type_id": "cardType",
+    "effect_ids": []
+  }
+}

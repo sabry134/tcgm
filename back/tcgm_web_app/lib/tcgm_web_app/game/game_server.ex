@@ -2,6 +2,12 @@ defmodule TcgmWebApp.Game.GameServer do
   use GenServer
 
   alias TcgmWebApp.Game.GameLogic
+  alias TcgmWebApp.Game.GameConfig
+
+  alias TcgmWebApp.CardCollectionCards.CardCollectionCards
+  alias TcgmWebApp.CardTypeProperties.CardTypeProperties
+  alias TcgmWebApp.CardProperties.CardProperties
+  alias TcgmWebApp.Cards.Cards
 
   @moduledoc """
     This module is responsible for handling game servers.
@@ -20,7 +26,8 @@ defmodule TcgmWebApp.Game.GameServer do
     state = %{
       id: room_id,
       players: %{},
-      turn: nil,
+      turn: "",
+      turnCount: 0,
       phase: :waiting
     }
     {:ok, state}
@@ -40,6 +47,10 @@ defmodule TcgmWebApp.Game.GameServer do
     GenServer.cast(via_tuple(room_id), {:set_deck, player_id, deck})
   end
 
+  def set_deck_by_id(room_id, player_id, deck_id) do
+    GenServer.cast(via_tuple(room_id), {:set_deck_by_id, player_id, deck_id})
+  end
+
   def play_card(room_id, player_id, card) do
     GenServer.cast(via_tuple(room_id), {:play_card, player_id, card})
   end
@@ -52,10 +63,25 @@ defmodule TcgmWebApp.Game.GameServer do
     GenServer.cast(via_tuple(room_id), {:insert_card, player_id, card, location})
   end
 
+  def move_card(room_id, player_id, source, dest, card) do
+    GenServer.cast(via_tuple(room_id), {:move_card, player_id, source, dest, card})
+  end
+
+  def update_card(room_id, player_id, location, card, key, value) do
+    GenServer.cast(via_tuple(room_id), {:update_card, player_id, location, card, key, value})
+  end
+
   def start_game(room_id) do
     GenServer.cast(via_tuple(room_id), {:start_game})
   end
 
+  def set_turn(room_id, player_id) do
+    GenServer.cast(via_tuple(room_id), {:set_turn, player_id})
+  end
+
+  def pass_turn(room_id, player_id) do
+    GenServer.cast(via_tuple(room_id), {:pass_turn, player_id})
+  end
   # Server interaction functions
 
   defp load_game_config(game_id) do
@@ -119,8 +145,61 @@ defmodule TcgmWebApp.Game.GameServer do
     - `{:insert_card, player_id, card, location}` - Inserts the card for the player with player_id.
     - `{:start_game}` - Starts the game with initial game state.
   """
+  def setCardProperty(card_type_property, property) do
+    property_value =
+      case card_type_property.type do
+        "text" -> property.value_string
+        "number" -> property.value_number
+        "boolean" -> property.value_boolean
+        _ -> nil
+      end
+    property_value
+  end
+
   def handle_cast({:set_deck, player_id, deck}, state) do
     new_state = %{state | players: Map.update!(state.players, player_id, fn player -> %{player | "deck" => deck} end)}
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:set_deck_by_id, player_id, deck_id}, state) do
+    card_collection_cards = CardCollectionCards.get_card_collection_cards_by_card_collection_id(deck_id)
+
+    grouped_cards = Enum.group_by(card_collection_cards, & &1.group, fn card ->
+      %{
+        id: card.card_id,
+        quantity: card.quantity
+      }
+    end)
+
+    enriched_groups = Enum.map(grouped_cards, fn {group, cards} ->
+      enriched_cards = Enum.reduce(cards, %{}, fn card, acc ->
+        base_card = Cards.get_card!(card.id)
+        card_properties = CardProperties.get_card_properties_by_card_id(card.id)
+
+        enriched_properties = Enum.reduce(card_properties, %{}, fn property, prop_acc ->
+          card_type_property = CardTypeProperties.get_card_type_property(property.cardtype_property_id)
+          Map.put(prop_acc, card_type_property.property_name, setCardProperty(card_type_property, property))
+        end)
+
+        enriched_card = %{
+          "name" => base_card.name,
+          "text" => base_card.text,
+          "image" => base_card.image,
+          "properties" => enriched_properties
+        }
+
+        Map.put(acc, "#{card.id}", enriched_card)
+      end)
+
+      {group, enriched_cards}
+    end)
+
+    new_state = Enum.reduce(enriched_groups, state, fn {group, cards}, acc_state ->
+      update_in(acc_state, [:players, player_id, group], fn _existing_cards ->
+        cards
+      end)
+    end)
+
     {:noreply, new_state}
   end
 
@@ -139,6 +218,26 @@ defmodule TcgmWebApp.Game.GameServer do
     {:noreply, new_state}
   end
 
+  def handle_cast({:move_card, player_id, source, dest, card}, state) do
+    new_state = GameLogic.move_card_logic(state, player_id, %{"source" => source, "dest" => dest, "card" => card})
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:update_card, player_id, location, card, key, value}, state) do
+    new_state = GameLogic.update_values_logic(state, player_id, %{"location" => location, "card" => card, "key" => key, "value" => value})
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:set_turn, player_id}, state) do
+    new_state = GameLogic.set_turn(state, player_id, %{})
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:pass_turn, player_id}, state) do
+    new_state = GameLogic.pass_turn_logic(state, player_id, %{})
+    {:noreply, new_state}
+  end
+
   def handle_cast({:start_game}, state) do
     game_id = 1
 
@@ -147,7 +246,8 @@ defmodule TcgmWebApp.Game.GameServer do
         starting_hand_size = config["starting_hand_size"]
 
         new_state = Enum.reduce(state.players, state, fn {player_id, _player_data}, acc_state ->
-          GameLogic.draw_card(acc_state, player_id, %{"amount" => starting_hand_size})
+          update_state = GameConfig.load_deck_config(acc_state, game_id, player_id)
+          GameLogic.draw_card(update_state, player_id, %{"amount" => starting_hand_size})
         end)
 
         {:noreply, new_state}

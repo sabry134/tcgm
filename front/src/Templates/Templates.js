@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
     Button,
-    Typography,
     Box,
     Paper,
     Card,
@@ -9,23 +8,21 @@ import {
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import { NavigationBar } from "../NavigationBar";
+import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
 const Templates = () => {
-    const navigate = useNavigate(); // Initialize useNavigate hook
+    const navigate = useNavigate();
 
     const [scenes, setScenes] = useState([]);
     const [selectedScene, setSelectedScene] = useState("");
-    const [trueFalseProperty, setTrueFalseProperty] = useState(true);
-    const [sliderValue, setSliderValue] = useState(50);
     const [cards, setCards] = useState([]);
     const [buttons, setButtons] = useState([]);
 
-    // Load scenes and their respective data (cards and buttons) from localStorage and sessionStorage
+    // Load scenes and their respective Data (cards and buttons) from localStorage and sessionStorage
     useEffect(() => {
         const savedScenes = JSON.parse(localStorage.getItem("scenes")) || [];
         if (savedScenes.length > 0) {
             setScenes(savedScenes);
-            setSelectedScene(savedScenes[0]); // Default to the first scene
+            setSelectedScene(savedScenes[0]);
         }
     }, []);
 
@@ -39,14 +36,13 @@ const Templates = () => {
         }
     }, [selectedScene]);
 
-    // Save scene data (cards and buttons) for the selected scene to sessionStorage
+    // Save scene Data (cards and buttons) for the selected scene to sessionStorage
     useEffect(() => {
         if (selectedScene) {
             sessionStorage.setItem(selectedScene, JSON.stringify({ cards, buttons }));
         }
     }, [cards, buttons, selectedScene]);
 
-    // Save scenes to localStorage whenever they change
     useEffect(() => {
         if (scenes.length > 0) {
             localStorage.setItem("scenes", JSON.stringify(scenes));
@@ -56,33 +52,6 @@ const Templates = () => {
     useEffect(() => {
         document.title = "JCCE";
     }, []);
-
-    const addScene = () => {
-        const newScene = `Scene ${scenes.length + 1}`;
-        setScenes([...scenes, newScene]);
-        setSelectedScene(newScene);
-    };
-
-    const deleteScene = () => {
-        const updatedScenes = scenes.filter((scene) => scene !== selectedScene);
-        setScenes(updatedScenes);
-        setSelectedScene(updatedScenes[0] || "");
-    };
-
-    const addCard = () => {
-        const newCard = { id: Date.now(), x: 100, y: 100, height: 400 };
-        setCards([...cards, newCard]);
-    };
-
-    const addButton = () => {
-        const newButton = {
-            id: Date.now(),
-            label: `Button ${buttons.length + 1}`,
-            x: 100,
-            y: 200,
-        };
-        setButtons([...buttons, newButton]);
-    };
 
     const handleCardMouseDown = (event, id) => {
         const card = cards.find((c) => c.id === id);
@@ -161,11 +130,9 @@ const Templates = () => {
 
     return (
         <Box display="flex" flexDirection="column" height="100vh">
-            {/* Brown Banner with Menu */}
-            <NavigationBar navigate={navigate}></NavigationBar>
+            <MainNavigationBar navigate={navigate}></MainNavigationBar>
 
 
-            {/* Main Content Area */}
             <Box display="flex" flexGrow={1} bgcolor="#fff">
                 <Paper
                     className="sidebar"
@@ -232,7 +199,7 @@ const Templates = () => {
                                     marginBottom: 2,
                                     borderRadius: 0,
                                 }}
-                                onMouseDown={(e) => handleButtonMouseDown(e, button.id)} // Enable dragging for buttons
+                                onMouseDown={(e) => handleButtonMouseDown(e, button.id)}
                             >
                                 {button.label}
                             </Button>

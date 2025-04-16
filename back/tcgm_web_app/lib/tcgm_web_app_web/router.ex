@@ -31,14 +31,34 @@ defmodule TcgmWebAppWeb.Router do
     resources "/cards", CardController, only: [:index, :show, :create, :update]
     delete "/cards/delete/:card_id", CardController, :delete_card
     get "/cards/game/:game_id", CardController, :get_cards_by_game_id
+    post "/cards/with_properties", CardController, :create_card_with_properties
+    get "/cards/game/:game_id/with_properties", CardController, :get_cards_with_properties_by_game_id
 
     resources "/cardTypes", CardTypeController, only: [:index, :show, :create, :update]
     delete "/cardTypes/delete/:cardType_id", CardTypeController, :delete_cardType
     get "/cardTypes/game/:game_id", CardTypeController, :get_cardTypes_by_game_id
+    post "/cardTypes/with_properties", CardTypeController, :create_cardType_with_properties
 
     resources "/effects", EffectController, only: [:index, :show, :create, :update]
     delete "/effects/delete/:effect_id", EffectController, :delete_effect
     get "/effects/game/:game_id", EffectController, :get_effects_by_game_id
+
+    resources "/cardTypeProperties", CardTypePropertyController, only: [:index, :show, :create, :update]
+    delete "/cardTypeProperties/delete/:cardTypeProperty_id", CardTypePropertyController, :delete_cardType_property
+    get "/cardTypeProperties/cardType/:cardType_id", CardTypePropertyController, :get_card_type_properties_by_card_type_id
+    get "/cardTypeProperties/cardType/:cardType_id/property/:property_name", CardTypePropertyController, :get_card_type_properties_by_card_type_id_and_property_name
+
+    resources "/cardProperties", CardPropertyController, only: [:index, :show, :create, :update]
+    delete "/cardProperties/delete/:cardProperty_id", CardPropertyController, :delete_card_property
+    get "/cardProperties/card/:card_id", CardPropertyController, :get_card_properties_by_card_id
+    get "/cardProperties/card/:card_id/property/:cardtype_property_id", CardPropertyController, :get_card_properties_by_card_id_and_cardtype_property_id
+
+    resources "/card_collections", CardCollectionController, only: [:index, :show, :create, :update]
+    delete "/card_collections/delete/:card_collection_id", CardCollectionController, :delete_card_collection
+    get "/card_collections/:card_collection_id/cards", CardCollectionController, :get_cards_in_card_collection
+    put "/card_collections/:card_collection_id/cards", CardCollectionController, :update_card_collection
+    get "/card_collections/user/:user_id", CardCollectionController, :get_card_collections_by_user_id
+    get "/card_collections/user/:user_id/game/:game_id", CardCollectionController, :get_card_collections_by_user_id_and_game_id
 
     post "/rooms", RoomController, :create
     get "/rooms/:room_id", RoomController, :state

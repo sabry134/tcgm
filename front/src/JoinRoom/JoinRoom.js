@@ -62,7 +62,7 @@ const JoinRoom = () => {
   const joinRoom = async (navigate) => {
     try {
 
-      const room_id = localStorage.getItem("room_id", roomId)
+      const room_id = localStorage.getItem("room_id") ?? roomId
       if (!room_id && !roomId.trim()) {
         throw new Error("Room ID is required");
       }
@@ -75,6 +75,7 @@ const JoinRoom = () => {
 
       const joinRoomFetch = async (username, roomId) => {
         try {
+          console.log(roomId, username)
           const response = await joinRoomRequest(roomId, { player_id: username });
           console.log("response to join room:", response);
           return response;
@@ -87,8 +88,7 @@ const JoinRoom = () => {
       try {
 
         const data = await joinRoomFetch(username, room_id);
-        if (!room_id)
-          localStorage.setItem("room_id", roomId);
+        localStorage.setItem("room_id", room_id);
         localStorage.setItem("player_id", username);
         localStorage.setItem("playerUsername", username);
         navigate("/room");

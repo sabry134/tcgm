@@ -6,6 +6,8 @@ defmodule TcgmWebAppWeb.CardControllerTest do
   alias TcgmWebApp.Actions.Action
   alias TcgmWebApp.Effects.Effect
   alias TcgmWebApp.CardTypes.CardType
+  alias TcgmWebApp.CardTypeProperties.CardTypeProperty
+  alias TcgmWebApp.CardProperties.CardProperty
   alias TcgmWebApp.Repo
 
   setup do
@@ -15,6 +17,14 @@ defmodule TcgmWebAppWeb.CardControllerTest do
 
     cardType = %CardType{}
     |> CardType.changeset(%{ name: "Test cardType", properties: ["property1", "property2"], game_id: game.id }) # 🔥 Use game.id
+    |> Repo.insert!()
+
+    cardTypeProperty = %CardTypeProperty{}
+    |> CardTypeProperty.changeset(%{ property_name: "property1", cardtype_id: cardType.id, type: "text", value: "test", variant: "test", mutable: true, font: "Arial", font_size: 12, font_color: "black", position_x: 0, position_y: 0, rotation: 0, scale_x: 1, scale_y: 1, border_width: 1, border_color: "red", border_radius: "130", opacity: 2, image: "image", image_width: 100, image_height: 100, image_position_x: 0, image_position_y: 0, image_rotation: 0, image_scale_x: 1, image_scale_y: 1, image_opacity: 100 })
+    |> Repo.insert!()
+
+    cardTypeProperty2 = %CardTypeProperty{}
+    |> CardTypeProperty.changeset(%{ property_name: "property2", cardtype_id: cardType.id, type: "number", value: "42", variant: "test", mutable: true, font: "Arial", font_size: 12, font_color: "black", position_x: 0, position_y: 0, rotation: 0, scale_x: 1, scale_y: 1, border_width: 1, border_color: "red", border_radius: "130", opacity: 2, image: "image", image_width: 100, image_height: 100, image_position_x: 0, image_position_y: 0, image_rotation: 0, image_scale_x: 1, image_scale_y: 1, image_opacity: 100 })
     |> Repo.insert!()
 
     action = %Action{}
@@ -29,7 +39,15 @@ defmodule TcgmWebAppWeb.CardControllerTest do
     |> Card.changeset(%{ name: "Test card", text: "Test text", image: "image", game_id: game.id, card_type_id: cardType.id, effect_ids: [effect.id] })
     |> Repo.insert!()
 
-    {:ok, card: card, game: game, cardType: cardType, action: action, effect: effect}
+    cardProperty = %CardProperty{}
+    |> CardProperty.changeset(%{ value_string: "value1", cardtype_property_id: cardTypeProperty.id, card_id: card.id })
+    |> Repo.insert!()
+
+    cardProperty2 = %CardProperty{}
+    |> CardProperty.changeset(%{ value_number: 43, cardtype_property_id: cardTypeProperty2.id, card_id: card.id })
+    |> Repo.insert!()
+
+    {:ok, card: card, game: game, cardType: cardType, action: action, effect: effect, cardTypeProperty: cardTypeProperty, cardTypeProperty2: cardTypeProperty2}
   end
 
   test "GET /api/cards returns a list of cards", %{conn: conn, card: card} do
@@ -99,6 +117,34 @@ defmodule TcgmWebAppWeb.CardControllerTest do
     assert response(conn, 204) == ""
 
     assert Repo.get(Card, card.id) == nil
+  end
+
+  test "POST /api/cards/:id/properties creates a new card with properties", %{conn: conn, game: game, cardType: cardType, effect: effect, cardTypeProperty: cardTypeProperty, cardTypeProperty2: cardTypeProperty2} do
+    attrs = %{ name: "Test card 2", text: "Test text 2", image: "image", game_id: game.id, card_type_id: cardType.id, effect_ids: [effect.id] }
+    properties = [%{ name: "property1", value_string: "value1", cardtype_property_id: cardTypeProperty.id }, %{ name: "property2", value_number: 42, cardtype_property_id: cardTypeProperty2.id }]
+
+    conn = post(conn, "/api/cards/with_properties", card: attrs, properties: properties)
+    response = json_response(conn, 201)
+
+    assert response["card"]["name"] == "Test card 2"
+    assert response["card"]["text"] == "Test text 2"
+    assert response["card"]["game_id"] == game.id
+    assert response["card"]["card_type_id"] == cardType.id
+    assert response["card"]["effect_ids"] == [effect.id]
+    assert response["properties"] |> Enum.any?(fn p -> p["cardtype_property_id"] == cardTypeProperty.id and p["value_string"] == "value1" end)
+    assert response["properties"] |> Enum.any?(fn p -> p["cardtype_property_id"] == cardTypeProperty2.id and p["value_number"] == 42 end)
+  end
+
+  test "GET /api/cards/game/:game_id/with_properties returns a list of cards with properties by game_id", %{conn: conn, card: card, game: game} do
+    conn = get(conn, "/api/cards/game/#{game.id}/with_properties")
+    response = json_response(conn, 200)
+
+    assert length(response) > 0
+    assert Enum.any?(response, fn c -> c["name"] == card.name end)
+    assert Enum.any?(response, fn c -> c["text"] == card.text end)
+    assert Enum.any?(response, fn c -> c["game_id"] == card.game_id end)
+    assert Enum.any?(response, fn c -> c["card_type_id"] == card.card_type_id end)
+    assert Enum.any?(response, fn c -> c["effect_ids"] == card.effect_ids end)
   end
 
 end

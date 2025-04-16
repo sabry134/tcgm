@@ -4,6 +4,7 @@ defmodule TcgmWebAppWeb.CardTypeController do
   use PhoenixSwagger
 
   alias TcgmWebApp.CardTypes.CardTypes
+  alias TcgmWebApp.CardTypeProperties.CardTypeProperties
   alias TcgmWebAppWeb.Helpers
   alias TcgmWebAppWeb.Schemas
 
@@ -117,4 +118,43 @@ defmodule TcgmWebAppWeb.CardTypeController do
     end
   end
 
+  swagger_path :create_cardType_with_properties do
+    post("/cardTypes/with_properties")
+    description("Create a new cardType with properties")
+    parameter(:body, :body, Schema.ref(:CardTypeWithPropertiesRequest), "CardType with properties request payload", required: true)
+    response(code(:created), "CardType with properties created")
+    response(code(:unprocessable_entity), "Invalid parameters")
+  end
+
+  def create_cardType_with_properties(conn, %{"cardType" => cardType_params, "properties" => properties}) do
+    case CardTypes.create_cardType(cardType_params) do
+      {:ok, cardType} ->
+        properties = Enum.map(properties, fn property ->
+          Map.merge(property, %{"cardtype_id" => cardType.id})
+        end)
+
+        case Enum.reduce_while(properties, {:ok, []}, fn property, {:ok, acc} ->
+          case CardTypeProperties.create_card_type_property(property) do
+            {:ok, cardTypeProperty} ->
+              {:cont, {:ok, [cardTypeProperty | acc]}}
+            {:error, %Ecto.Changeset{} = changeset} ->
+              {:halt, {:error, %{errors: Helpers.translate_errors(changeset)}}}
+          end
+        end) do
+          {:ok, cardType_properties} ->
+            conn
+            |> put_status(:created)
+            |> json(%{cardType: cardType, cardType_properties: cardType_properties})
+          {:error, changeset} ->
+            conn
+            |> put_status(:unprocessable_entity)
+            |> json(changeset)
+        end
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(%{errors: Helpers.translate_errors(changeset)})
+    end
+  end
 end

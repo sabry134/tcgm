@@ -7,7 +7,6 @@ import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
 import defaultGameState from "./Data/GameState.json"
 import PlayerHand from "./Componnent/PlayerHand";
 import CardInfo from "./Componnent/CardInfo";
-import GameChat from "./Componnent/GameChat";
 import DiscardPile from "./Componnent/DiscardPile";
 import DeckPile from "./Componnent/DeckPile";
 import "./Room.css"
@@ -91,7 +90,6 @@ const Room = () => {
   });
 
   useEffect(() => {
-    // Early return if the effect has already run
     if (hasEffectRun.current) return;
 
 
@@ -116,7 +114,6 @@ const Room = () => {
       socketURL = "ws://localhost:4000/socket";
     }
 
-    // Store socket and channel in refs rather than component state
     connectionRef.current.socket = new Socket(socketURL);
     connectionRef.current.socket.connect();
     connectionRef.current.channel = connectionRef.current.socket.channel(`room:${roomId}`, {});
@@ -134,15 +131,12 @@ const Room = () => {
       setGameState(payload.state);
     });
 
-    // Set channel state for component to use
     setChannel(connectionRef.current.channel);
     console.log("About to set deck", connectionRef.current.channel, username, testDeck);
     callSetDeck(connectionRef.current.channel, username, testDeck);
 
-    // Mark that the effect has run
     hasEffectRun.current = true;
 
-    // by using window.addEventListener, we ensure this only runs when the page is actually unloaded
     const handleUnload = () => {
       if (connectionRef.current.channel) {
         localStorage.removeItem("playerUsername");
@@ -157,22 +151,15 @@ const Room = () => {
 
 
     return () => {
-      // This cleanup won't do the socket cleanup on StrictMode remounts
       window.removeEventListener('beforeunload', handleUnload);
 
-      // We can check if this is a true unmount (navigation away) vs a StrictMode remount
-      // by not cleaning up connections in the useEffect cleanup 
     };
   },);
 
-  // Add a separate useEffect for component unmount that runs on true unmount using a ref
   useEffect(() => {
     return () => {
-      // This will only run when the component is truly unmounted (navigating away from page)
-      // and not during React StrictMode's development checks
       if (!hasEffectRun.current) return;
 
-      // Check if we're truly unmounting and not just in a development mode remount
       const isDevModeRemount = process.env.NODE_ENV === 'development' && document.hidden === false;
 
       if (!isDevModeRemount && connectionRef.current.channel) {
@@ -194,7 +181,6 @@ const Room = () => {
     setSelectedCard((prev) => (prev && prev[0] === card ? null : [card, location]));
   };
 
-  // when making a new drag & drop the id of the droppable need to contain the source
   const handleDragEnd = (event) => {
     if (!event.over || !event.active) {
       return
@@ -213,8 +199,6 @@ const Room = () => {
     return playerId !== player;
   }
 
-  // const openPopover = Boolean(anchorEl);
-  // const popoverId = openPopover ? "room-id-popover" : undefined;
 
   return (
     <DndContext onDragEnd={handleDragEnd}>
@@ -236,8 +220,7 @@ const Room = () => {
             <InnateCardsContainer key={"innateCard" + index.toString()} opponent={checkOpponent(key)} />
 
             <PlayerHand opponent={checkOpponent(key)} key={"playerHand" + index.toString()} playerHand={playerHand} handleCardClick={handleCardClick} selectedCard={selectedCard} hidden={key !== playerId} cardBackside={cardBackImage} />
-            {/* <GameChat playerId={playerId} /> */
-            }</>
+            </>
         })}
         {selectedCard && <CardInfo selectedCard={selectedCard[0]} cardList={gameState.players[playerId][selectedCard[1]]} />}
       </div >

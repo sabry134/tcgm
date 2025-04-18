@@ -12,6 +12,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { createRoomRequest, joinRoomRequest } from "../Api/roomRequest";
 import { JoinRoomNavigationBar } from "../NavigationBar/JoinRoomNavigationBar";
+import { useChannel } from "../ChannelContext";
 
 const JoinRoom = () => {
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ const JoinRoom = () => {
   const [playerUsername, setPlayerUsername] = useState("");
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const { setGameState } = useChannel()
 
   useEffect(() => {
     const savedScenes = JSON.parse(localStorage.getItem("scenes")) || [];
@@ -77,6 +79,7 @@ const JoinRoom = () => {
         try {
           console.log(roomId, username)
           const response = await joinRoomRequest(roomId, { player_id: username });
+          setGameState(response)
           console.log("response to join room:", response);
           return response;
         } catch (error) {
@@ -91,7 +94,7 @@ const JoinRoom = () => {
         localStorage.setItem("room_id", room_id);
         localStorage.setItem("player_id", username);
         localStorage.setItem("playerUsername", username);
-        navigate("/room");
+        navigate("/lobby");
       } catch (error) {
         console.error("Join room failed with username", username, error);
         const currentCounter = parseInt(localStorage.getItem("playerCounter") || "1", 10);
@@ -103,7 +106,7 @@ const JoinRoom = () => {
           const data = await joinRoomFetch(newUsername, room_id);
           localStorage.setItem("player_id", data.player_id);
           localStorage.setItem("room_id", roomId);
-          navigate("/room");
+          navigate("/lobby");
         } catch (err) {
           console.error("Retry join room failed with username", newUsername, err);
           throw err;

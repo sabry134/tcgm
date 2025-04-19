@@ -6,6 +6,8 @@ import DeckPreview from './DeckPreview';
 import { mockCards } from './mockData';
 import { JoinRoomNavigationBar } from "../NavigationBar/JoinRoomNavigationBar";
 import './styles.css';
+import { getCardsByGameWithPropertiesRequest } from '../Api/cardsRequest';
+import { saveCollectionWithCardsRequest } from '../Api/collectionsRequest';
 
 const MAX_CASTER_CARDS = 2;
 const MAX_NORMAL_CARDS = 30;
@@ -15,15 +17,30 @@ const REQUIRED_CASTER_CARDS = 2;
 const Deckbuilder = () => {
   const [deck, setDeck] = useState({
     casters: [],
-    normal: []
+    deck: []
   });
-  const [deckName, setDeckName] = useState('');
-  
+  const [allCards, setAllCards] = useState([]);
   const [filteredCards, setFilteredCards] = useState(mockCards);
   const [hoveredCard, setHoveredCard] = useState(null);
 
+  async function getCardsWithProperties() {
+    try {
+      const gameId = localStorage.getItem('gameSelected');
+      const response = await getCardsByGameWithPropertiesRequest(gameId);
+      setAllCards(response);
+      console.log('Cards with properties:', response);
+    } catch (error) {
+      console.error('Error fetching cards:', error);
+    }
+  }
+
+  useEffect(() => {
+    getCardsWithProperties();
+  }, []);
+
   const addCardToDeck = (card) => {
-    if (card.type === 'Caster') {
+    cardtype = 
+    if (card.type === 'caster') {
       const copies = deck.casters.filter(c => c.id === card.id).length;
       if (copies < 1 && deck.casters.length < MAX_CASTER_CARDS) {
         setDeck(prev => ({
@@ -32,11 +49,11 @@ const Deckbuilder = () => {
         }));
       }
     } else {
-      const copies = deck.normal.filter(c => c.id === card.id).length;
-      if (copies < MAX_NORMAL_COPIES && deck.normal.length < MAX_NORMAL_CARDS) {
+      const copies = deck.deck.filter(c => c.id === card.id).length;
+      if (copies < MAX_NORMAL_COPIES && deck.deck.length < MAX_NORMAL_CARDS) {
         setDeck(prev => ({
           ...prev,
-          normal: [...prev.normal, card]
+          deck: [...prev.deck, card]
         }));
       }
     }
@@ -51,50 +68,63 @@ const Deckbuilder = () => {
         setDeck(prev => ({ ...prev, casters: newCasters }));
       }
     } else {
-      const index = deck.normal.findIndex(c => c.id === cardToRemove.id);
+      const index = deck.deck.findIndex(c => c.id === cardToRemove.id);
       if (index !== -1) {
-        const newNormal = [...deck.normal];
+        const newNormal = [...deck.deck];
         newNormal.splice(index, 1);
-        setDeck(prev => ({ ...prev, normal: newNormal }));
+        setDeck(prev => ({ ...prev, deck: newNormal }));
       }
     }
   };
 
   const saveDeck = () => {
-    if (deck.normal.length === 0) {
+    if (deck.deck.length === 0) {
       alert('Your deck is empty!');
       return;
     }
-
+  
     if (deck.casters.length !== REQUIRED_CASTER_CARDS) {
       alert('You must have exactly 2 casters!');
       return;
     }
   
-    const cardCount = deck.normal.reduce((acc, card) => {
+    // Format the cards for the API request
+    const formattedCards = [];
+  
+    // Add normal cards
+    const normalCardCount = deck.deck.reduce((acc, card) => {
       acc[card.id] = (acc[card.id] || 0) + 1;
       return acc;
     }, {});
   
-    const casterStatus = {};
-    deck.casters.forEach((card, index) => {
-      casterStatus[card.id] = index === 0;
+    for (const [id, quantity] of Object.entries(normalCardCount)) {
+      formattedCards.push({
+        card_id: parseInt(id, 10),
+        quantity,
+        group: 'deck'
+      });
+    }
+  
+    // Add caster cards
+    deck.casters.forEach((card) => {
+      formattedCards.push({
+        card_id: card.id,
+        quantity: 1, // Casters always have a quantity of 1
+        group: 'casters'
+      });
     });
   
-    const deckData = [
-      {
-        cards: cardCount,
-        casters: casterStatus,
-        id: Math.floor(Math.random() * 100000), // Placeholder deck ID
-        name: deckName,
-        quantity: deck.normal.length,
-        type: "deck",
-        active: true
-      }
-    ];
-  
-    console.log("Deck saved:", JSON.stringify(deckData, null, 2));
-    alert("Deck saved to console in correct format!");
+    // Send the formatted cards to the API
+    /*saveCollectionWithCardsRequest({ cards: formattedCards })
+      .then((response) => {
+        console.log('Deck saved:', response);
+        alert('Deck saved successfully!');
+      })
+      .catch((error) => {
+        console.error('Error saving deck:', error);
+        alert('Error saving deck!');
+      });*/
+    console.log('Deck to save:', formattedCards);
   };
   
 
@@ -102,7 +132,7 @@ const Deckbuilder = () => {
   <div className="deck-builder-container">
     <JoinRoomNavigationBar />
     <div className="deck-builder">
-      <CardFilter cards={mockCards} onFilter={setFilteredCards} />
+      <CardFilter cards={allCards} onFilter={setFilteredCards} />
       <CardPreview card={hoveredCard} />
       
       <div className="deck-content">
@@ -110,13 +140,6 @@ const Deckbuilder = () => {
         <DeckPreview deck={deck} removeSingleCard={removeSingleCard} setHoveredCard={setHoveredCard} />
       </div>
       <div className="deck-save">
-        <input
-          className='deck-name-input'
-          type="text"
-          value={deckName}
-          onChange={(e) => setDeckName(e.target.value)}
-          placeholder="Enter deck name"
-        />
         <button 
           onClick={saveDeck}
         >

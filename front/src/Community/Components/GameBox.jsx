@@ -48,7 +48,7 @@ export class GameBox extends Component {
 async function createUser () {
   try {
     const data = await createUserRequest({
-      user: { username: 'TestUser' }
+      user: { username: 'TestUser2' }
     })
     localStorage.setItem('userId', data.id)
   } catch (error) {
@@ -69,6 +69,7 @@ const Deck = ({ checked, gameId }) => {
   const handleClickButton = () => {
     localStorage.setItem('gameSelected', gameId)
     if (!localStorage.getItem('userId')) {
+      console.log('User not found, creating a new user...')
       createUser()
     }
     navigate('/join')

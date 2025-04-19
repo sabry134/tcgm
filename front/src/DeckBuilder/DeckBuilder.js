@@ -8,11 +8,12 @@ import { JoinRoomNavigationBar } from "../NavigationBar/JoinRoomNavigationBar";
 import './styles.css';
 import { getCardsByGameWithPropertiesRequest } from '../Api/cardsRequest';
 import { saveCollectionWithCardsRequest } from '../Api/collectionsRequest';
+import { getCardCardType } from '../Api/cardsRequest';
 
 const MAX_CASTER_CARDS = 2;
 const MAX_NORMAL_CARDS = 30;
 const MAX_NORMAL_COPIES = 3;
-const REQUIRED_CASTER_CARDS = 2;
+const REQUIRED_CASTER_CARDS = 1;
 
 const Deckbuilder = () => {
   const [deck, setDeck] = useState({
@@ -39,24 +40,26 @@ const Deckbuilder = () => {
   }, []);
 
   const addCardToDeck = (card) => {
-    cardtype = 
-    if (card.type === 'caster') {
-      const copies = deck.casters.filter(c => c.id === card.id).length;
-      if (copies < 1 && deck.casters.length < MAX_CASTER_CARDS) {
-        setDeck(prev => ({
-          ...prev,
-          casters: [...prev.casters, card]
-        }));
+    getCardCardType(card.id).then((cardType) => {
+      console.log('Card type:', cardType);
+      if (cardType.name === 'caster') {
+        const copies = deck.casters.filter(c => c.id === card.id).length;
+        if (copies < 1 && deck.casters.length < MAX_CASTER_CARDS) {
+          setDeck(prev => ({
+            ...prev,
+            casters: [...prev.casters, card]
+          }));
+        }
+      } else {
+        const copies = deck.deck.filter(c => c.id === card.id).length;
+        if (copies < MAX_NORMAL_COPIES && deck.deck.length < MAX_NORMAL_CARDS) {
+          setDeck(prev => ({
+            ...prev,
+            deck: [...prev.deck, card]
+          }));
+        }
       }
-    } else {
-      const copies = deck.deck.filter(c => c.id === card.id).length;
-      if (copies < MAX_NORMAL_COPIES && deck.deck.length < MAX_NORMAL_CARDS) {
-        setDeck(prev => ({
-          ...prev,
-          deck: [...prev.deck, card]
-        }));
-      }
-    }
+    });
   };
   
   const removeSingleCard = (cardToRemove) => {
@@ -105,17 +108,15 @@ const Deckbuilder = () => {
       });
     }
   
-    // Add caster cards
     deck.casters.forEach((card) => {
       formattedCards.push({
         card_id: card.id,
-        quantity: 1, // Casters always have a quantity of 1
+        quantity: 1,
         group: 'casters'
       });
     });
   
-    // Send the formatted cards to the API
-    /*saveCollectionWithCardsRequest({ cards: formattedCards })
+    saveCollectionWithCardsRequest( localStorage.getItem("deckSelected"), { cards: formattedCards })
       .then((response) => {
         console.log('Deck saved:', response);
         alert('Deck saved successfully!');
@@ -123,8 +124,7 @@ const Deckbuilder = () => {
       .catch((error) => {
         console.error('Error saving deck:', error);
         alert('Error saving deck!');
-      });*/
-    console.log('Deck to save:', formattedCards);
+      });
   };
   
 

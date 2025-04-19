@@ -86,6 +86,13 @@ defmodule TcgmWebAppWeb.CardControllerTest do
     assert Enum.any?(response, fn c -> c["effect_ids"] == card.effect_ids end)
   end
 
+  test "GET /api/cards/:card_id/cardtype returns the card's cardtype", %{conn: conn, card: card} do
+    conn = get(conn, "/api/cards/#{card.id}/cardtype")
+    response = json_response(conn, 200)
+
+    assert response["id"] == card.card_type_id
+  end
+
   test "POST /api/cards creates a new card", %{conn: conn, game: game, cardType: cardType, effect: effect} do
     attrs = %{ name: "Test card 2", text: "Test text 2", image: "image", properties: ["properties"], game_id: game.id, card_type_id: cardType.id, effect_ids: [effect.id] }
     conn = post(conn, "/api/cards", card: attrs)

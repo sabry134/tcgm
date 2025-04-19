@@ -134,7 +134,6 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
 
   test "PUT /api/card_collections/:id/cards updates a card collection with cards", %{conn: conn, card_collection: card_collection, card: card} do
     payload = %{
-      "card_ids" => [card.id],
       "cards" => [
         %{"card_id" => card.id, "quantity" => 2, "group" => "deck"}
       ]
@@ -149,7 +148,6 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
 
   test "PUT /api/card_collections/:id/cards updates a card collection with cards and deletes old cards", %{conn: conn, card_collection: card_collection, card_collection_card: card_collection_card, card: card, card2: card2} do
     payload = %{
-      "card_ids" => [card.id],
       "cards" => [
         %{"card_id" => card2.id, "quantity" => 2, "group" => "deck"},
       ]

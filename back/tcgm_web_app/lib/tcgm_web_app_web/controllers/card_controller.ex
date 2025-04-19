@@ -4,6 +4,7 @@ defmodule TcgmWebAppWeb.CardController do
   use PhoenixSwagger
 
   alias TcgmWebApp.Cards.Cards
+  alias TcgmWebApp.CardTypes.CardTypes
   alias TcgmWebApp.CardProperties.CardProperties
   alias TcgmWebApp.CardTypeProperties.CardTypeProperties
   alias TcgmWebAppWeb.Schemas
@@ -115,6 +116,29 @@ defmodule TcgmWebAppWeb.CardController do
         conn
         |> put_status(:unprocessable_entity)
         |> json(%{error: "Could not retrieve cards by game ID"})
+    end
+  end
+
+  swagger_path :get_card_cardtype do
+    get("/cards/{card_id}/cardtype")
+    description("Get card type by card ID")
+    parameter("card_id", :path, :integer, "Card ID", required: true)
+    response(code(:ok), "Success")
+    response(code(:not_found), "Card not found")
+  end
+
+  def get_card_cardtype(conn, %{"card_id" => card_id}) do
+    card = Cards.get_card!(card_id)
+    card_type = CardTypes.get_cardType!(card.card_type_id)
+
+    if card_type do
+      conn
+      |> put_status(:ok)
+      |> json(card_type)
+    else
+      conn
+      |> put_status(:not_found)
+      |> json(%{error: "Card type not found for card ID #{card_id}"})
     end
   end
 

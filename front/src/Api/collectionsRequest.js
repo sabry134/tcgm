@@ -52,3 +52,9 @@ export async function getCollectionsByUserRequest(userId) {
 export async function getCollectionsByUserAndGameRequest(userId, gameId) {
     return await baseRequest(`card_collections/user/${userId}/game/${gameId}`, 'GET');
 }
+
+export async function saveCollectionWithCardsRequest(id, cards) {
+    return await baseRequest(`card_collections/${id}/cards`, 'PUT', cards, {
+        'Content-Type': 'application/json'
+    });
+}

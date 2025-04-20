@@ -106,18 +106,25 @@ defmodule TcgmWebAppWeb.CardCollectionController do
     card_collection = CardCollections.get_card_collection!(id)
     card_collection_cards = CardCollectionCards.get_card_collection_cards_by_card_collection_id(card_collection.id)
 
-    card_quantities = Enum.reduce(card_collection_cards, %{}, fn card, acc ->
-      Map.put(acc, card.card_id, card.quantity)
+    card_data = Enum.reduce(card_collection_cards, %{}, fn card, acc ->
+      Map.put(acc, card.card_id, %{quantity: card.quantity, group: card.group})
     end)
 
-    card_ids = Map.keys(card_quantities)
+    card_ids = Map.keys(card_data)
     cards = Cards.get_cards_by_ids(card_ids)
 
-    cards_with_quantities = Enum.map(cards, fn card ->
-      Map.put(card, :quantity, card_quantities[card.id])
+    cards_with_details = Enum.map(cards, fn card ->
+      card_info = card_data[card.id]
+
+      card
+      |> Map.from_struct()
+      |> Map.drop([:__meta__, :inserted_at, :updated_at])
+      |> Map.put(:quantity, card_info.quantity)
+      |> Map.put(:group, card_info.group)
     end)
 
-    json(conn, cards_with_quantities)
+    IO.inspect(cards_with_details, label: "Cards with Quantities and Groups")
+    json(conn, cards_with_details)
   end
 
   swagger_path :update_card_collection do

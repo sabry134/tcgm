@@ -151,8 +151,6 @@ defmodule TcgmWebAppWeb.CardController do
   end
 
   def create_card_with_properties(conn, %{"card" => card_params, "properties" => properties}) do
-    IO.inspect(card_params, label: "Card Params")
-    IO.inspect(properties, label: "Properties")
     case Cards.create_card(card_params) do
       {:ok, card} ->
         properties = Enum.map(properties, fn property ->
@@ -166,7 +164,6 @@ defmodule TcgmWebAppWeb.CardController do
         end)
 
         case Enum.reduce_while(properties, {:ok, []}, fn property, {:ok, acc} ->
-              IO.inspect(property, label: "Property")
               case CardProperties.create_card_property(property) do
                  {:ok, card_property} ->
                    {:cont, {:ok, [card_property | acc]}}
@@ -221,11 +218,8 @@ defmodule TcgmWebAppWeb.CardController do
             |> Map.drop([:__meta__, :inserted_at, :updated_at])
             |> Map.put(:properties, clean_properties)
 
-          IO.inspect(card_map, label: "Updated Card with Properties")
           card_map
         end)
-
-        IO.inspect(cards_with_properties, label: "Cards with Properties")
 
         conn
         |> put_status(:ok)

@@ -165,6 +165,7 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
     conn = get(conn, "/api/card_collections/#{card_collection.id}/cards")
     response = json_response(conn, 200)
 
+    IO.inspect(response, label: "Response")
     assert length(response) > 0
     assert Enum.any?(response, fn cc -> cc["id"] == card.id end)
   end

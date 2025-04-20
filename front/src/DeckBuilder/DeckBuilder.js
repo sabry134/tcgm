@@ -48,9 +48,13 @@ const Deckbuilder = () => {
       };
       response.forEach(card => {
         if (card.group === 'casters') {
-          deckData.casters.push(card);
+          for (let i = 0; i < card.quantity; i++) {
+            deckData.casters.push(card);
+          }
         } else {
-          deckData.deck.push(card);
+          for (let i = 0; i < card.quantity; i++) {
+            deckData.deck.push(card);
+          }
         }
       });
       setDeck(deckData);

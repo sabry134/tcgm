@@ -11,7 +11,6 @@ const PlayerHand = ({ playerHand, handleCardClick, selectedCard, hidden, cardBac
   });
 
   const [hoveredCard, setHoveredCard] = useState(null);
-
   return (
     <>
       {hoveredCard && (

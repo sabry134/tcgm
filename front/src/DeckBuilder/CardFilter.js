@@ -2,19 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { getCardTypesByGameRequest } from '../Api/cardTypesRequest';
 import { getCardTypesPropertiesbyTypeRequest } from '../Api/cardTypesPropertiesRequest';
 
-
 const CardFilter = ({ cards, onFilter }) => {
   const [filter, setFilter] = useState({
     name: '',
     selectedProperty: '',
-    propertyValue: ''
+    propertyValue: '',
+    cardType: ''
   });
 
   const [possibleProperties, setPossibleProperties] = useState([]);
+  const [possibleCardTypes, setPossibleCardTypes] = useState([]);
   const [selectedPropertyType, setSelectedPropertyType] = useState('text');
 
   useEffect(() => {
-    async function fetchPossibleProperties() {
+    async function fetchPossiblePropertiesAndTypes() {
       try {
         const gameId = localStorage.getItem('gameSelected');
         const types = await getCardTypesByGameRequest(gameId);
@@ -26,13 +27,15 @@ const CardFilter = ({ cards, onFilter }) => {
         }
 
         setPossibleProperties(properties);
+        setPossibleCardTypes(types);
       } catch (error) {
-        console.error('Error fetching possible properties:', error);
+        console.error('Error fetching possible properties or card types:', error);
         setPossibleProperties([]);
+        setPossibleCardTypes([]);
       }
     }
 
-    fetchPossibleProperties();
+    fetchPossiblePropertiesAndTypes();
   }, []);
 
   const handleChange = (e) => {
@@ -54,6 +57,7 @@ const CardFilter = ({ cards, onFilter }) => {
   useEffect(() => {
     const filteredCards = cards.filter((card) => {
       const matchesName = filter.name ? card.name.toLowerCase().includes(filter.name.toLowerCase()) : true;
+      const matchesCardType = filter.cardType ? card.card_type_id === Number(filter.cardType) : true;
       const matchesProperty =
         filter.selectedProperty && filter.propertyValue
           ? card.properties.some((prop) => {
@@ -71,7 +75,7 @@ const CardFilter = ({ cards, onFilter }) => {
             })
           : true;
 
-      return matchesName && matchesProperty;
+      return matchesName && matchesCardType && matchesProperty;
     });
     onFilter(filteredCards);
   }, [filter, cards, onFilter, selectedPropertyType]);
@@ -85,6 +89,18 @@ const CardFilter = ({ cards, onFilter }) => {
         value={filter.name}
         onChange={handleChange}
       />
+      <select
+        name="cardType"
+        value={filter.cardType}
+        onChange={handleChange}
+      >
+        <option value="">Select a card type</option>
+        {possibleCardTypes.map((type) => (
+          <option key={type.id} value={type.id}>
+            {type.name.charAt(0).toUpperCase() + type.name.slice(1)}
+          </option>
+        ))}
+      </select>
       <select
         name="selectedProperty"
         value={filter.selectedProperty}

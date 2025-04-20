@@ -6,7 +6,6 @@ defmodule TcgmWebAppWeb.CardCollectionController do
   alias TcgmWebApp.Cards.Cards
   alias TcgmWebApp.CardCollections.CardCollections
   alias TcgmWebApp.CardCollectionCards.CardCollectionCards
-  alias TcgmWebApp.CardCollectionGroups.CardCollectionGroups
   alias TcgmWebAppWeb.Schemas
 
   def swagger_definitions, do: Schemas.swagger_definitions()
@@ -198,39 +197,5 @@ defmodule TcgmWebAppWeb.CardCollectionController do
   def get_card_collections_by_user_id_and_game_id(conn, %{"user_id" => user_id, "game_id" => game_id}) do
     card_collections = CardCollections.get_card_collections_by_user_id_and_game_id(user_id, game_id)
     json(conn, card_collections)
-  end
-
-  swagger_path :create_card_collection_group do
-    post("/card_collections/groups")
-    description("Create a new card collection group")
-    parameter(:body, :body, Schema.ref(:CardCollectionGroupRequest), "Card Collection group request payload", required: true)
-    response(code(:created), "Card Collection group created")
-    response(code(:unprocessable_entity), "Invalid parameters")
-  end
-
-  def create_card_collection_group(conn, %{"group" => group_params}) do
-    case CardCollectionGroups.create_card_collection_group(group_params) do
-      {:ok, card_collection_group} ->
-        conn
-        |> put_status(:created)
-        |> json(card_collection_group)
-      {:error, %Ecto.Changeset{} = changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(changeset)
-    end
-  end
-
-  swagger_path :get_card_collection_groups_by_card_collection_id do
-    get("/card_collections/{card_collection_id}/groups")
-    description("Get all card collection groups by card collection ID")
-    parameter("card_collection_id", :path, :integer, "Card Collection ID", required: true)
-    response(code(:ok), "Success")
-    response(code(:not_found), "Card Collection not found")
-  end
-
-  def get_card_collection_groups_by_card_collection_id(conn, %{"card_collection_id" => id}) do
-    card_collection_groups = CardCollectionGroups.get_card_collection_groups_by_card_collection_id(id)
-    json(conn, card_collection_groups)
   end
 end

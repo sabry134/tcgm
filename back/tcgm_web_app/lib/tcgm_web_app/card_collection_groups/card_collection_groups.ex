@@ -49,9 +49,16 @@ defmodule TcgmWebApp.CardCollectionGroups.CardCollectionGroups do
   @doc """
     Retrieves card collection groups by card collection ids.
   """
-  def get_card_collection_groups_by_card_collection_id(card_collection_id) do
+  def get_card_collection_groups_by_game_id(game_id) do
     from(ccg in CardCollectionGroup,
-      where: ccg.card_collection_id == ^card_collection_id
+      where: ccg.game_id == ^game_id
+    )
+    |> Repo.all()
+  end
+
+  def get_card_collection_id_by_game_id_and_collection_type(game_id, collection_type) do
+    from(ccg in CardCollectionGroup,
+      where: ccg.game_id == ^game_id and ccg.collection_type == ^collection_type
     )
     |> Repo.all()
   end

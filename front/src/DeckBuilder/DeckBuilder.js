@@ -7,8 +7,9 @@ import { mockCards } from './mockData';
 import { JoinRoomNavigationBar } from "../NavigationBar/JoinRoomNavigationBar";
 import './styles.css';
 import { getCardsByGameWithPropertiesRequest } from '../Api/cardsRequest';
-import { saveCollectionWithCardsRequest, getCardsInCollectionRequest, getGroupsInCardCollection } from '../Api/collectionsRequest';
+import { saveCollectionWithCardsRequest, getCardsInCollectionRequest } from '../Api/collectionsRequest';
 import { getCardCardType } from '../Api/cardsRequest';
+import { getGroupsForCollectionType } from '../Api/gamesRequest';
 
 const Deckbuilder = () => {
   const [deck, setDeck] = useState({});
@@ -55,8 +56,8 @@ const Deckbuilder = () => {
         await getCardsWithProperties();
   
         // Fetch deck groups and initialize the deck
-        const deckId = localStorage.getItem('deckSelected');
-        const groupsResponse = await getGroupsInCardCollection(deckId);
+        const gameId = localStorage.getItem('gameSelected');
+        const groupsResponse = await getGroupsForCollectionType(gameId, 'deck');
         setDeckGroups(groupsResponse);
   
         const initialDeck = {};

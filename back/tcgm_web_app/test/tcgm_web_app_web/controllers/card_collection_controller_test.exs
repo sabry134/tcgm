@@ -168,36 +168,4 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
     assert length(response) > 0
     assert Enum.any?(response, fn cc -> cc["id"] == card.id end)
   end
-
-  test "POST /api/card_collections/groups creates a new card collection group", %{conn: conn, card_collection: card_collection, cardType: cardType} do
-    attrs = %{ name: "Test group", card_collection_id: card_collection.id, max_cards: 10, min_cards: 1, max_copies: 4, share_max_copies: true, allowed_card_types: [cardType.id] }
-    conn = post(conn, "/api/card_collections/groups", group: attrs)
-    response = json_response(conn, 201)
-
-    assert response["id"]
-    assert response["name"] == "Test group"
-    assert response["card_collection_id"] == card_collection.id
-    assert response["max_cards"] == 10
-    assert response["min_cards"] == 1
-    assert response["max_copies"] == 4
-    assert response["share_max_copies"] == true
-    assert response["allowed_card_types"] == [cardType.id]
-  end
-
-  test "GET /api/card_collections/:id/groups returns a list of groups in a card collection", %{conn: conn, card_collection: card_collection, cardType: cardType} do
-    attrs = %{ name: "Test group", card_collection_id: card_collection.id, max_cards: 10, min_cards: 1, max_copies: 4, share_max_copies: true, allowed_card_types: [cardType.id] }
-    conn = post(conn, "/api/card_collections/groups", group: attrs)
-
-    conn = get(conn, "/api/card_collections/#{card_collection.id}/groups")
-    response = json_response(conn, 200)
-
-    assert length(response) > 0
-    assert Enum.any?(response, fn g -> g["card_collection_id"] == card_collection.id end)
-    assert Enum.any?(response, fn g -> g["name"] == "Test group" end)
-    assert Enum.any?(response, fn g -> g["max_cards"] == 10 end)
-    assert Enum.any?(response, fn g -> g["min_cards"] == 1 end)
-    assert Enum.any?(response, fn g -> g["max_copies"] == 4 end)
-    assert Enum.any?(response, fn g -> g["share_max_copies"] == true end)
-    assert Enum.any?(response, fn g -> g["allowed_card_types"] == [cardType.id] end)
-  end
 end

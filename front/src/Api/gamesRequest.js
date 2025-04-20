@@ -33,3 +33,8 @@ export async function updateGameRequest(id, data) {
 export async function getGameByNameRequest(name) {
   return await baseRequest(`games/${name}`, 'GET');
 }
+
+// Get list of card collection groups of a certain type in a game
+export async function getGroupsForCollectionType(id, type) {
+  return await baseRequest(`games/${id}/groups/${type}`, 'GET');
+}

@@ -7,20 +7,12 @@ import { mockCards } from './mockData';
 import { JoinRoomNavigationBar } from "../NavigationBar/JoinRoomNavigationBar";
 import './styles.css';
 import { getCardsByGameWithPropertiesRequest } from '../Api/cardsRequest';
-import { saveCollectionWithCardsRequest } from '../Api/collectionsRequest';
+import { saveCollectionWithCardsRequest, getCardsInCollectionRequest, getGroupsInCardCollection } from '../Api/collectionsRequest';
 import { getCardCardType } from '../Api/cardsRequest';
-import { getCardsInCollectionRequest } from '../Api/collectionsRequest';
-
-const MAX_CASTER_CARDS = 2;
-const MAX_NORMAL_CARDS = 30;
-const MAX_NORMAL_COPIES = 3;
-const REQUIRED_CASTER_CARDS = 1;
 
 const Deckbuilder = () => {
-  const [deck, setDeck] = useState({
-    casters: [],
-    deck: []
-  });
+  const [deck, setDeck] = useState({});
+  const [deckGroups, setDeckGroups] = useState([]);
   const [allCards, setAllCards] = useState([]);
   const [filteredCards, setFilteredCards] = useState(mockCards);
   const [hoveredCard, setHoveredCard] = useState(null);
@@ -31,26 +23,22 @@ const Deckbuilder = () => {
       const gameId = localStorage.getItem('gameSelected');
       const response = await getCardsByGameWithPropertiesRequest(gameId);
       setAllCards(response);
-      console.log('Cards with properties:', response);
     } catch (error) {
       console.error('Error fetching cards:', error);
     }
   }
 
-  async function getCardsInDeck() {
+  async function getCardsInDeck(initializedDeck) {
     try {
       const deckId = localStorage.getItem('deckSelected');
       const response = await getCardsInCollectionRequest(deckId);
-      console.log('Deck cards:', response);
-      const deckData = {
-        casters: [],
-        deck: []
-      };
-      response.forEach(card => {
-        if (card.group === 'casters') {
-          deckData.casters.push(card);
-        } else {
-          deckData.deck.push(card);
+
+      const deckData = { ...initializedDeck };
+      response.forEach((card) => {
+        if (deckData[card.group]) {
+          for (let i = 0; i < card.quantity; i++) {
+            deckData[card.group].push(card);
+          }
         }
       });
       setDeck(deckData);
@@ -61,92 +49,108 @@ const Deckbuilder = () => {
   }
 
   useEffect(() => {
-    getCardsWithProperties();
-    if (!gotCards) {
-      getCardsInDeck();
+    async function initializeDeck() {
+      try {
+        // Fetch cards with properties first (independent of deck initialization)
+        await getCardsWithProperties();
+  
+        // Fetch deck groups and initialize the deck
+        const deckId = localStorage.getItem('deckSelected');
+        const groupsResponse = await getGroupsInCardCollection(deckId);
+        setDeckGroups(groupsResponse);
+  
+        const initialDeck = {};
+        groupsResponse.forEach((group) => {
+          initialDeck[group.name] = [];
+        });
+        setDeck(initialDeck);
+  
+        // Fetch cards in the deck using the initialized deck structure
+        await getCardsInDeck(initialDeck);
+      } catch (error) {
+        console.error('Error during deck initialization:', error);
+      }
     }
+  
+    initializeDeck();
   }, []);
-
+  
   const addCardToDeck = (card) => {
     getCardCardType(card.id).then((cardType) => {
-      console.log('Card type:', cardType);
-      if (cardType.name === 'caster') {
-        const copies = deck.casters.filter(c => c.id === card.id).length;
-        if (copies < 1 && deck.casters.length < MAX_CASTER_CARDS) {
-          setDeck(prev => ({
-            ...prev,
-            casters: [...prev.casters, card]
-          }));
+      let groupName = '';
+      for (const g of deckGroups) {
+        if (g.allowed_card_types.includes(cardType.id)) {
+          groupName = g.name;
+          break;
         }
-      } else {
-        const copies = deck.deck.filter(c => c.id === card.id).length;
-        if (copies < MAX_NORMAL_COPIES && deck.deck.length < MAX_NORMAL_CARDS) {
+      }
+      const group = deckGroups.find(g => g.name === groupName);
+      if (deck[groupName]) {
+        const copies = deck[groupName].filter(c => c.id === card.id).length;
+        if (deck[groupName].length >= group.max_cards) {
+          alert(`You have too many cards in the ${group.name} group!`);
+          return;
+        }
+        if (copies < group.max_copies) {
           setDeck(prev => ({
             ...prev,
-            deck: [...prev.deck, card]
+            [groupName]: [ ...prev[groupName], card]
           }));
+        } else {
+          alert(`You already have ${copies} copies of this card in the ${group.name} group!`);
         }
       }
     });
   };
   
   const removeSingleCard = (cardToRemove) => {
-    if (cardToRemove.type === 'Caster') {
-      const index = deck.casters.findIndex(c => c.id === cardToRemove.id);
-      if (index !== -1) {
-        const newCasters = [...deck.casters];
-        newCasters.splice(index, 1);
-        setDeck(prev => ({ ...prev, casters: newCasters }));
+    getCardCardType(cardToRemove.id).then((cardType) => {
+      let groupName = '';
+      for (const g of deckGroups) {
+        if (g.allowed_card_types.includes(cardType.id)) {
+          groupName = g.name;
+          break;
+        }
       }
-    } else {
-      const index = deck.deck.findIndex(c => c.id === cardToRemove.id);
-      if (index !== -1) {
-        const newNormal = [...deck.deck];
-        newNormal.splice(index, 1);
-        setDeck(prev => ({ ...prev, deck: newNormal }));
+      const group = deckGroups.find(g => g.name === groupName);
+      if (deck[groupName]) {
+        const index = deck[groupName].findIndex(c => c.id === cardToRemove.id);
+        if (index !== -1) {
+          const newCasters = [...deck[groupName]];
+          newCasters.splice(index, 1);
+          setDeck(prev => ({ ...prev, [groupName]: newCasters }));
+        }
       }
-    }
+    });
   };
 
   const saveDeck = () => {
-    if (deck.deck.length === 0) {
-      alert('Your deck is empty!');
-      return;
+    for (const group of deckGroups) {
+      if (deck[group.name].length < group.min_cards) {
+        alert(`You need at least ${group.min_cards} cards in the ${group.name} group!`);
+        return;
+      }
     }
   
-    if (deck.casters.length !== REQUIRED_CASTER_CARDS) {
-      alert('You must have exactly 2 casters!');
-      return;
-    }
-  
-    // Format the cards for the API request
     const formattedCards = [];
-  
-    // Add normal cards
-    const normalCardCount = deck.deck.reduce((acc, card) => {
-      acc[card.id] = (acc[card.id] || 0) + 1;
-      return acc;
-    }, {});
-  
-    for (const [id, quantity] of Object.entries(normalCardCount)) {
-      formattedCards.push({
-        card_id: parseInt(id, 10),
-        quantity,
-        group: 'deck'
-      });
-    }
-  
-    deck.casters.forEach((card) => {
-      formattedCards.push({
-        card_id: card.id,
-        quantity: 1,
-        group: 'casters'
-      });
+
+    Object.entries(deck).forEach(([groupName, cards]) => {
+      const cardCount = cards.reduce((acc, card) => {
+        acc[card.id] = (acc[card.id] || 0) + 1;
+        return acc;
+      }, {});
+
+      for (const [id, quantity] of Object.entries(cardCount)) {
+        formattedCards.push({
+          card_id: parseInt(id, 10),
+          quantity,
+          group: groupName,
+        });
+      }
     });
   
     saveCollectionWithCardsRequest( localStorage.getItem("deckSelected"), { cards: formattedCards })
       .then((response) => {
-        console.log('Deck saved:', response);
         alert('Deck saved successfully!');
       })
       .catch((error) => {
@@ -165,7 +169,7 @@ const Deckbuilder = () => {
       
       <div className="deck-content">
         <CardList cards={filteredCards} addCardToDeck={addCardToDeck} setHoveredCard={setHoveredCard} />
-        <DeckPreview deck={deck} removeSingleCard={removeSingleCard} setHoveredCard={setHoveredCard} />
+        <DeckPreview deck={deck} removeSingleCard={removeSingleCard} setHoveredCard={setHoveredCard} deckGroups={deckGroups} />
       </div>
       <div className="deck-save">
         <button 

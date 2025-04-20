@@ -60,6 +60,8 @@ defmodule TcgmWebAppWeb.Router do
     put "/card_collections/:card_collection_id/cards", CardCollectionController, :update_card_collection
     get "/card_collections/user/:user_id", CardCollectionController, :get_card_collections_by_user_id
     get "/card_collections/user/:user_id/game/:game_id", CardCollectionController, :get_card_collections_by_user_id_and_game_id
+    post "/card_collections/groups", CardCollectionController, :create_card_collection_group
+    get "/card_collections/:card_collection_id/groups", CardCollectionController, :get_card_collection_groups_by_card_collection_id
 
     post "/rooms", RoomController, :create
     get "/rooms/:room_id", RoomController, :state

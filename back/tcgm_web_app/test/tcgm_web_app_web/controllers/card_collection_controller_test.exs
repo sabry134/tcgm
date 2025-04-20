@@ -52,7 +52,7 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
     |> CardCollectionCard.changeset(%{ card_collection_id: card_collection.id, card_id: card2.id, quantity: 1, group: "deck" })
     |> Repo.insert!()
 
-    {:ok, card_collection: card_collection, game: game, user: user, card: card, card2: card2, card_collection_card: card_collection_card, card_collection_card2: card_collection_card2}
+    {:ok, card_collection: card_collection, game: game, user: user, cardType: cardType, card: card, card2: card2, card_collection_card: card_collection_card, card_collection_card2: card_collection_card2}
   end
 
   test "GET /api/card_collections returns a list of card collections", %{conn: conn, card_collection: card_collection} do
@@ -165,8 +165,39 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
     conn = get(conn, "/api/card_collections/#{card_collection.id}/cards")
     response = json_response(conn, 200)
 
-    IO.inspect(response, label: "Response")
     assert length(response) > 0
     assert Enum.any?(response, fn cc -> cc["id"] == card.id end)
+  end
+
+  test "POST /api/card_collections/groups creates a new card collection group", %{conn: conn, card_collection: card_collection, cardType: cardType} do
+    attrs = %{ name: "Test group", card_collection_id: card_collection.id, max_cards: 10, min_cards: 1, max_copies: 4, share_max_copies: true, allowed_card_types: [cardType.id] }
+    conn = post(conn, "/api/card_collections/groups", group: attrs)
+    response = json_response(conn, 201)
+
+    assert response["id"]
+    assert response["name"] == "Test group"
+    assert response["card_collection_id"] == card_collection.id
+    assert response["max_cards"] == 10
+    assert response["min_cards"] == 1
+    assert response["max_copies"] == 4
+    assert response["share_max_copies"] == true
+    assert response["allowed_card_types"] == [cardType.id]
+  end
+
+  test "GET /api/card_collections/:id/groups returns a list of groups in a card collection", %{conn: conn, card_collection: card_collection, cardType: cardType} do
+    attrs = %{ name: "Test group", card_collection_id: card_collection.id, max_cards: 10, min_cards: 1, max_copies: 4, share_max_copies: true, allowed_card_types: [cardType.id] }
+    conn = post(conn, "/api/card_collections/groups", group: attrs)
+
+    conn = get(conn, "/api/card_collections/#{card_collection.id}/groups")
+    response = json_response(conn, 200)
+
+    assert length(response) > 0
+    assert Enum.any?(response, fn g -> g["card_collection_id"] == card_collection.id end)
+    assert Enum.any?(response, fn g -> g["name"] == "Test group" end)
+    assert Enum.any?(response, fn g -> g["max_cards"] == 10 end)
+    assert Enum.any?(response, fn g -> g["min_cards"] == 1 end)
+    assert Enum.any?(response, fn g -> g["max_copies"] == 4 end)
+    assert Enum.any?(response, fn g -> g["share_max_copies"] == true end)
+    assert Enum.any?(response, fn g -> g["allowed_card_types"] == [cardType.id] end)
   end
 end

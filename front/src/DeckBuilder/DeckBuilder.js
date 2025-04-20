@@ -9,6 +9,7 @@ import './styles.css';
 import { getCardsByGameWithPropertiesRequest } from '../Api/cardsRequest';
 import { saveCollectionWithCardsRequest } from '../Api/collectionsRequest';
 import { getCardCardType } from '../Api/cardsRequest';
+import { getCardsInCollectionRequest } from '../Api/collectionsRequest';
 
 const MAX_CASTER_CARDS = 2;
 const MAX_NORMAL_CARDS = 30;
@@ -23,6 +24,7 @@ const Deckbuilder = () => {
   const [allCards, setAllCards] = useState([]);
   const [filteredCards, setFilteredCards] = useState(mockCards);
   const [hoveredCard, setHoveredCard] = useState(null);
+  const [gotCards, setGotCards] = useState(false);
 
   async function getCardsWithProperties() {
     try {
@@ -35,8 +37,34 @@ const Deckbuilder = () => {
     }
   }
 
+  async function getCardsInDeck() {
+    try {
+      const deckId = localStorage.getItem('deckSelected');
+      const response = await getCardsInCollectionRequest(deckId);
+      console.log('Deck cards:', response);
+      const deckData = {
+        casters: [],
+        deck: []
+      };
+      response.forEach(card => {
+        if (card.group === 'casters') {
+          deckData.casters.push(card);
+        } else {
+          deckData.deck.push(card);
+        }
+      });
+      setDeck(deckData);
+      setGotCards(true);
+    } catch (error) {
+      console.error('Error fetching deck cards:', error);
+    }
+  }
+
   useEffect(() => {
     getCardsWithProperties();
+    if (!gotCards) {
+      getCardsInDeck();
+    }
   }, []);
 
   const addCardToDeck = (card) => {

@@ -44,11 +44,6 @@ const Room = () => {
     }
     setPlayerId(storedPlayerId);
 
-    // Listen for game updates
-    channel.on("game_update", (payload) => {
-      console.log("Received game update:", payload);
-      setGameState(payload.state);
-    });
 
     return () => {
       if (!connectionRef.current.isMounted) {

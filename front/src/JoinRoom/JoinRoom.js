@@ -16,7 +16,7 @@ import { useChannel } from "../ChannelContext";
 
 const JoinRoom = () => {
   const navigate = useNavigate();
-
+  const { weakResetConnection } = useChannel();
   const [scenes, setScenes] = useState([]);
   const [selectedScene, setSelectedScene] = useState("");
   const [tabIndex, setTabIndex] = useState(0);
@@ -63,7 +63,7 @@ const JoinRoom = () => {
 
   const joinRoom = async (navigate) => {
     try {
-
+      weakResetConnection()
       const room_id = localStorage.getItem("room_id") ?? roomId
       if (!room_id && !roomId.trim()) {
         throw new Error("Room ID is required");

@@ -9,6 +9,15 @@ export const ChannelProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
     const [gameState, setGameState] = useState(defaultGameState);
 
+    const weakResetConnection = () => {
+        if (channel) {
+            channel.leave()
+        }
+        if (socket) {
+            socket.disconnect()
+        }
+        setGameState(defaultGameState)
+    }
     const resetConnection = () => {
         if (channel) {
             channel.leave()
@@ -22,7 +31,7 @@ export const ChannelProvider = ({ children }) => {
     }
 
     return (
-        <ChannelContext.Provider value={{ channel, setChannel, socket, setSocket, gameState, setGameState, resetConnection }}>
+        <ChannelContext.Provider value={{ channel, setChannel, socket, setSocket, gameState, setGameState, resetConnection, weakResetConnection }}>
             {children}
         </ChannelContext.Provider>
     );

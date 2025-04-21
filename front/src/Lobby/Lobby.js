@@ -6,10 +6,11 @@ import defaultGameState from '../Room/Data/GameState.json'
 import { useNavigate } from "react-router-dom";
 import { useChannel } from "../ChannelContext"; // Import the context hook
 import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
+import { TCGMButton } from "../Components/TCGMButton";
 
 const Lobby = () => {
     const navigate = useNavigate();
-    const { setChannel, setSocket, gameState, setGameState, resetConnection } = useChannel(); // Use the context
+    const { channel, setChannel, setSocket, gameState, setGameState, resetConnection } = useChannel(); // Use the context
 
     const testDeck = {
         "Card X": {
@@ -65,8 +66,6 @@ const Lobby = () => {
 
 
     const connectionRef = React.useRef({
-        socket: null,
-        channel: null,
         isMounted: false,
         isLaunching: false
     });
@@ -75,6 +74,7 @@ const Lobby = () => {
     useEffect(() => {
         if (connectionRef.current.isMounted)
             return
+
         let username = localStorage.getItem("playerUsername");
         const roomId = localStorage.getItem("room_id");
 
@@ -90,35 +90,7 @@ const Lobby = () => {
             localStorage.setItem("playerUsername", username);
         }
         setPlayerId(username);
-
-        let socketURL = process.env.REACT_WS_URL;
-        if (!socketURL) {
-            socketURL = "ws://localhost:4000/socket";
-        }
-
-        // Store socket and channel in refs rather than component state
-        connectionRef.current.socket = new Socket(socketURL);
-        connectionRef.current.socket.connect();
-        connectionRef.current.channel = connectionRef.current.socket.channel(`room:${roomId}`, {});
-        connectionRef.current.channel
-            .join()
-            .receive("ok", (resp) => {
-                console.log("WebSocket connection established", resp);
-            })
-            .receive("error", (resp) => {
-                console.error("WebSocket connection failed", resp);
-            });
-
-        console.log("channel and socket = ", connectionRef.current.socket, connectionRef.current.channel)
-
-        connectionRef.current.channel.on("game_update", (payload) => {
-            console.log("Received game update:", payload);
-            setGameState(payload.state);
-        });
-
-        // Store in context for use across components
-        setSocket(connectionRef.current.socket);
-        setChannel(connectionRef.current.channel);
+        handleConnection(roomId)
 
         return () => {
             if (!connectionRef.current.isLaunching && connectionRef.current.isMounted) {
@@ -130,41 +102,79 @@ const Lobby = () => {
     }, [navigate, setChannel, setSocket]);
 
 
+    const handleConnection = async (roomId) => {
+        try {
+            let socketURL = process.env.REACT_WS_URL;
+            if (!socketURL) {
+                socketURL = "ws://localhost:4000/socket";
+            }
+            const tmpSocket = new Socket(socketURL)
+            // Store socket and channel in refs rather than component state
+            tmpSocket.connect();
+            const tmpChannel = tmpSocket.channel(`room:${roomId}`, {})
+            tmpChannel
+                .join()
+                .receive("ok", (resp) => {
+                    console.log("WebSocket connection established", resp);
+                })
+                .receive("error", (resp) => {
+                    console.error("WebSocket connection failed", resp);
+                });
+
+            console.log("channel and socket = ", tmpSocket, tmpChannel)
+
+            tmpChannel.on("game_update", (payload) => {
+                console.log("Received game update:", payload);
+                setGameState(payload.state);
+            });
+
+            setChannel(tmpChannel);
+            setSocket(tmpSocket);
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     const handleLaunch = () => {
-        connectionRef.current.channel.off("game_update");
-        connectionRef.current.isLaunching = true;
         navigate("/room");
     }
 
     const handleLeave = () => {
-        connectionRef.current.channel.off("game_update");
+        resetConnection();
         navigate("/join");
     }
 
     const handleSetDeck = () => {
-        console.log("About to set deck", connectionRef.current.channel, playerId, testDeck);
-        callSetDeck(connectionRef.current.channel, playerId, testDeck);
+        console.log("About to set deck", channel, playerId, testDeck);
+        callSetDeck(channel, playerId, testDeck);
     }
 
     return <div className="lobbyContainer">
         <RoomNavigationBar roomId={gameState.id} />
-        <div className="lobby">
-            <ul className="playerList">
-                {!gameState.players & Object.entries(gameState.players).map(
-                    (player, index) => {
-                        <div>
-                            {player[0]}
-                        </div>
-                    }
-                )}
-            </ul>
-            <div>
-                <button onClick={handleLeave}>Leave</button>
-                <button onClick={handleSetDeck}>Set Deck</button>
-                <button onClick={handleLaunch}>Launch</button>
+        <div className="center">
+            <div className="lobby">
+                <div className="playerListContainer">
+                    <div className="title" >
+                        Player List
+                    </div>
+                    <div className="playerList">
+                        {gameState.players && Object.entries(gameState.players).map(
+                            (player, index) => (
+                                <div key={index} className="playerContainer">
+                                    {player[0]}
+                                </div>
+                            ))}
+                    </div>
+                </div>
+                <div className="buttonList">
+                    <TCGMButton onClick={handleSetDeck}>Set Deck</TCGMButton>
+                    <TCGMButton onClick={handleLaunch}>Launch</TCGMButton>
+                    <TCGMButton onClick={handleLeave}>Leave</TCGMButton>
+
+                </div>
             </div>
         </div>
-    </div>
+    </div >
 }
 
 export default Lobby

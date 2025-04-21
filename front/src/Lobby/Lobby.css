@@ -1,0 +1,87 @@
+.lobbyContainer {
+  display: flex;
+  flex-direction: column;
+  background-color: #c4c4c4;
+  width: 100vw;
+  height: 100vh;
+}
+
+.lobby {
+  display: flex;
+  border-radius: 20px;
+  border-width: 10px;
+  padding: 10px;
+  border-style: solid;
+  border-color: #582f0e;
+  align-self: center;
+  background-color: #936639;
+  width: 50vw;
+  height: 50vh;
+  justify-content: center;
+  justify-items: center;
+  justify-self: center;
+  align-items: center;
+}
+
+.playerListContainer {
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+}
+
+.center {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.title {
+  width: 70%;
+  color: white;
+  font-size: 25px;
+  padding: 10px;
+  padding-left: 35px;
+  padding-right: 35px;
+  background-color: #7f4f24;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  margin-top: 10px;
+}
+
+.playerList {
+  width: 70%;
+  border-radius: 20px;
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+  padding: 10px;
+  padding-left: 35px;
+  padding-right: 35px;
+  background-color: #a68a64;
+  max-height: 300px;
+  overflow: scroll;
+  margin: 0;
+}
+
+.playerContainer {
+  padding-bottom: 5px;
+  padding-left: 15px;
+  padding-right: 15px;
+  font-size: 30px;
+  border-bottom: 1px;
+  border-left: 0px;
+  border-right: 0px;
+  border-top: 0px;
+  margin-bottom: 10px;
+  border-color: #582f0e;
+  border-style: solid;
+}
+
+.buttonList {
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+  height: 100%;
+  justify-content: space-evenly;
+}

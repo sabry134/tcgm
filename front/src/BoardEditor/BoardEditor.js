@@ -148,19 +148,34 @@ const BoardEditor = () => {
   };
 
   const updateSelectedZone = (field, value) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+  
+    const rect = canvas.getBoundingClientRect();
+  
     setZones(prev =>
-      prev.map(z =>
-        z.id === selectedZoneId
-          ? {
-              ...z,
-              [field]: ["width", "height", "x", "y", "borderRadius"].includes(field)
-                ? parseInt(value, 10)
-                : value,
-            }
-          : z
-      )
+      prev.map(z => {
+        if (z.id !== selectedZoneId) return z;
+  
+        let newValue = value;
+  
+        if (["width", "height", "x", "y", "borderRadius"].includes(field)) {
+          newValue = parseInt(value, 10);
+  
+          if (field === "x") {
+            newValue = clamp(newValue, 0, rect.width - z.width - rightMargin);
+          }
+  
+          if (field === "y") {
+            newValue = clamp(newValue, 0, rect.height - z.height - bottomMargin);
+          }
+        }
+  
+        return { ...z, [field]: newValue };
+      })
     );
   };
+  
 
   const selectedZone = zones.find(z => z.id === selectedZoneId);
 

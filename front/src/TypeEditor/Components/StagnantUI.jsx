@@ -67,7 +67,7 @@ const StagnantUI = ({ createNewComponnent }) => {
             saveNewCardTypesPropertiesRequest({
               cardTypeProperty: updateProperties
             })
-            return
+            continue
           }
           const updatedData = {
             ...data[i],

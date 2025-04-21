@@ -1,6 +1,6 @@
 import { React, useRef, useState } from 'react'
 import './StagnantUI.css'
-import shallowEqual from 'shallowequal'
+import shallowEqualObject from 'shallowequal'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import PanToolAltIcon from '@mui/icons-material/PanToolAlt'
@@ -55,20 +55,32 @@ const StagnantUI = ({ createNewComponnent }) => {
     try {
       getCardTypesPropertiesbyTypeRequest(typeId).then(data => {
         for (let i = 0; i < tmpProperties.length; i++) {
+          const updateProperties = {
+            ...tmpProperties[i],
+            font_color: tmpProperties[i].font_color.toString(),
+            border_color: tmpProperties[i].border_color.toString()
+          }
+          delete updateProperties.inserted_at
+          delete updateProperties.updated_at
+
           if (!data || i >= data.length) {
-            const updateProperties = {
-              ...tmpProperties[i],
-              font_color: tmpProperties[i].font_color.toString(),
-              border_color: tmpProperties[i].border_color.toString()
-            }
             saveNewCardTypesPropertiesRequest({
               cardTypeProperty: updateProperties
             })
+            return
           }
-          if (data && !shallowEqual(tmpProperties[i], data[i])) {
+          const updatedData = {
+            ...data[i],
+            font_color: data[i].font_color.toString(),
+            border_color: data[i].border_color.toString()
+          }
+          delete updatedData.inserted_at
+          delete updatedData.updated_at
+
+          if (data && !shallowEqualObject(updateProperties, updatedData)) {
             editCardTypesPropertyByIdRequest(
-              tmpProperties[i],
-              tmpProperties[i].id
+              updateProperties,
+              updateProperties.id
             )
           }
         }

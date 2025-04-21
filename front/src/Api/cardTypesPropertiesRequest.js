@@ -20,7 +20,20 @@ export async function saveNewCardTypesPropertiesRequest(data) {
 // Get all type Properties for one type
 // typeId: Id of the card type
 export async function getCardTypesPropertiesbyTypeRequest(typeId) {
-    return await baseRequest('cardTypeProperties/cardType/' + typeId, 'GET');
+    return await baseRequest('cardTypeProperties/cardType/' + typeId, 'GET').then((response) => {
+        try {
+            return response.map((property, index) => {
+                return {
+                    ...property,
+                    border_color: property.border_color.split(','),
+                    font_color: property.font_color.split(',')
+                }
+            })
+        } catch (error) {
+            console.log(error)
+            return []
+        }
+    });
 }
 
 // Get one property from card type

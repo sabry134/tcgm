@@ -91,12 +91,11 @@ export class Editor extends Component {
       localStorage.removeItem('propertySelected')
     window.addEventListener('storage', this.handlePropertyChange)
     window.addEventListener('delete', this.handleDelete)
-
     window.addEventListener('storeProperties', this.handlePropertiesSet)
   }
   componentWillUnmount () {
-    window.removeEventListener('storage', this.handlePropertiesSet)
-    window.removeEventListener('storeProperties', this.handlePropertyChange)
+    window.removeEventListener('storage', this.handlePropertyChange)
+    window.removeEventListener('storeProperties', this.handlePropertiesSet)
     window.removeEventListener('delete', this.handleDelete)
   }
 
@@ -252,9 +251,3 @@ export class Editor extends Component {
     )
   }
 }
-// props:
-// position_x
-// position_y
-// id_selected
-// handleSelectedOnClick
-// properties *required

@@ -44,7 +44,12 @@ export class LeftPanel extends Component {
 
   getGameTypes (gameId) {
     getCardTypesByGameRequest(gameId).then(data => {
-      if (data) this.setState({ types: data })
+      if (data) {
+        this.setState({ types: data })
+        if (data[0]) {
+          this.selectType(data[0].id, 0)
+        }
+      }
     })
   }
 
@@ -52,19 +57,7 @@ export class LeftPanel extends Component {
     try {
       getCardTypesPropertiesbyTypeRequest(typeId).then(data => {
         if (data) {
-          console.log(data)
-          localStorage.setItem(
-            'currentTypeProperties',
-            JSON.stringify(
-              data.map((property, index) => {
-                return {
-                  ...property,
-                  border_color: property.border_color.split(','),
-                  font_color: property.font_color.split(',')
-                }
-              })
-            )
-          )
+          localStorage.setItem('currentTypeProperties', JSON.stringify(data))
         } else {
           localStorage.setItem('currentTypeProperties', JSON.stringify([]))
         }

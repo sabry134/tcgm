@@ -4,6 +4,7 @@ defmodule TcgmWebAppWeb.CardController do
   use PhoenixSwagger
 
   alias TcgmWebApp.Cards.Cards
+  alias TcgmWebApp.CardTypes.CardTypes
   alias TcgmWebApp.CardProperties.CardProperties
   alias TcgmWebApp.CardTypeProperties.CardTypeProperties
   alias TcgmWebAppWeb.Schemas
@@ -118,6 +119,29 @@ defmodule TcgmWebAppWeb.CardController do
     end
   end
 
+  swagger_path :get_card_cardtype do
+    get("/cards/{card_id}/cardtype")
+    description("Get card type by card ID")
+    parameter("card_id", :path, :integer, "Card ID", required: true)
+    response(code(:ok), "Success")
+    response(code(:not_found), "Card not found")
+  end
+
+  def get_card_cardtype(conn, %{"card_id" => card_id}) do
+    card = Cards.get_card!(card_id)
+    card_type = CardTypes.get_cardType!(card.card_type_id)
+
+    if card_type do
+      conn
+      |> put_status(:ok)
+      |> json(card_type)
+    else
+      conn
+      |> put_status(:not_found)
+      |> json(%{error: "Card type not found for card ID #{card_id}"})
+    end
+  end
+
   swagger_path :create_card_with_properties do
     post("/cards/with_properties")
     description("Create a new card with properties")
@@ -127,8 +151,6 @@ defmodule TcgmWebAppWeb.CardController do
   end
 
   def create_card_with_properties(conn, %{"card" => card_params, "properties" => properties}) do
-    IO.inspect(card_params, label: "Card Params")
-    IO.inspect(properties, label: "Properties")
     case Cards.create_card(card_params) do
       {:ok, card} ->
         properties = Enum.map(properties, fn property ->
@@ -142,7 +164,6 @@ defmodule TcgmWebAppWeb.CardController do
         end)
 
         case Enum.reduce_while(properties, {:ok, []}, fn property, {:ok, acc} ->
-              IO.inspect(property, label: "Property")
               case CardProperties.create_card_property(property) do
                  {:ok, card_property} ->
                    {:cont, {:ok, [card_property | acc]}}
@@ -197,11 +218,8 @@ defmodule TcgmWebAppWeb.CardController do
             |> Map.drop([:__meta__, :inserted_at, :updated_at])
             |> Map.put(:properties, clean_properties)
 
-          IO.inspect(card_map, label: "Updated Card with Properties")
           card_map
         end)
-
-        IO.inspect(cards_with_properties, label: "Cards with Properties")
 
         conn
         |> put_status(:ok)

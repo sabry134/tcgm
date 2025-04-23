@@ -154,7 +154,7 @@ const Lobby = () => {
         <div className="center">
             <div className="lobby">
                 <div className="playerListContainer">
-                    <div className="title" >
+                    <div className="titleLobby" >
                         Player List
                     </div>
                     <div className="playerList">

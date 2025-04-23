@@ -15,7 +15,9 @@ export class LeftPanel extends Component {
 
     this.state = {
       types: [],
-      selected: 0
+      selectedType: 0,
+      selectedProperties: 0,
+      properties: []
     }
   }
 
@@ -39,7 +41,39 @@ export class LeftPanel extends Component {
 
   componentDidMount () {
     const gameId = localStorage.getItem('gameSelected')
+    window.addEventListener('componnentCreated', this.handleComponnentChange)
+    window.addEventListener('delete', this.handleComponnentChange)
+    window.addEventListener('ComponnentSelected', this.handleComponnentSelected)
+
     this.getGameTypes(gameId)
+  }
+  componentWillUnmount () {
+    window.removeEventListener(
+      'ComponnentSelected',
+      this.handleComponnentSelected
+    )
+
+    window.removeEventListener('componnentCreated', this.handleComponnentChange)
+    window.removeEventListener('delete', this.handleComponnentChange)
+  }
+
+  handleComponnentChange = () => {
+    this.setState({
+      properties: JSON.parse(localStorage.getItem('currentTypeProperties'))
+    })
+  }
+
+  handleComponnentSelected = () => {
+    const tmpProperty = JSON.parse(localStorage.getItem('propertySelected'))
+    if (!tmpProperty) {
+      this.setState({ selectedProperties: -1 })
+      return
+    }
+    this.setState({
+      selectedProperties: this.state.properties.findIndex((value, index) => {
+        return value.id === tmpProperty.id
+      })
+    })
   }
 
   getGameTypes (gameId) {
@@ -53,13 +87,25 @@ export class LeftPanel extends Component {
     })
   }
 
+  selectProperties (index) {
+    localStorage.setItem(
+      'propertySelected',
+      JSON.stringify(this.state.properties[index])
+    )
+    this.setState({ selectedProperties: index })
+    window.dispatchEvent(new Event('storage'))
+    window.dispatchEvent(new Event('ComponnentSelected'))
+  }
+
   selectType (typeId, index) {
     try {
       getCardTypesPropertiesbyTypeRequest(typeId).then(data => {
         if (data) {
           localStorage.setItem('currentTypeProperties', JSON.stringify(data))
+          this.setState({ properties: data })
         } else {
           localStorage.setItem('currentTypeProperties', JSON.stringify([]))
+          this.setState({ properties: [] })
         }
         localStorage.setItem('currentTypeSelected', typeId)
         localStorage.removeItem('propertySelected')
@@ -76,7 +122,7 @@ export class LeftPanel extends Component {
       window.dispatchEvent(new Event('ComponnentSelected'))
       console.log(error)
     }
-    this.setState({ selected: index })
+    this.setState({ selectedType: index })
   }
 
   render () {
@@ -92,7 +138,7 @@ export class LeftPanel extends Component {
         }}
       >
         <TCGMButton onClick={this.props.popupCallback}>Add Type</TCGMButton>
-        <div className='title'> Type List </div>
+        <div className='titleList'> Type List </div>
         <ul className='typeList'>
           {this.state.types.map((value, index) => (
             <div key={index} className='itemList'>
@@ -101,11 +147,38 @@ export class LeftPanel extends Component {
                 onClick={event => this.selectType(value.id, index)}
               >
                 <Typography
-                  color={this.state.selected === index ? '#FFF600' : 'white'}
+                  color={
+                    this.state.selectedType === index ? '#FFF600' : 'white'
+                  }
                 >
                   {value.name}
                 </Typography>
-                {this.state.selected === index && (
+                {this.state.selectedType === index && (
+                  <CheckIcon htmlColor='#FFF600' />
+                )}
+              </div>
+              <div className='separator'></div>
+            </div>
+          ))}
+        </ul>
+        <div className='titleList'> Properties List </div>
+        <ul className='typeList'>
+          {this.state.properties.map((value, index) => (
+            <div key={index} className='itemList'>
+              <div
+                className={'selector'}
+                onClick={event => this.selectProperties(index)}
+              >
+                <Typography
+                  color={
+                    this.state.selectedProperties === index
+                      ? '#FFF600'
+                      : 'white'
+                  }
+                >
+                  {value.property_name}
+                </Typography>
+                {this.state.selectedProperties === index && (
                   <CheckIcon htmlColor='#FFF600' />
                 )}
               </div>

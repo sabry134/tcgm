@@ -84,6 +84,7 @@ const StagnantUI = ({ createNewComponnent }) => {
             )
           }
         }
+        window.dispatchEvent(new Event('componnentCreated'))
       })
     } catch (error) {
       console.log(error)

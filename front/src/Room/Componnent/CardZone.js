@@ -17,7 +17,7 @@ const CardZone = ({ opponent, cards, cardBackImage, handleZoneClick, handleCardC
             const offsetX = offsetXHandler ? offsetXHandler(key, card, index, cards.length) : null
             const offsetY = offsetYHandler ? offsetYHandler(key, card, index, cards.length) : null
             const rotation = rotationHandler ? rotationHandler(key, card, index, cards.length) : null
-            console.log(offsetY, boardLocation)
+
             return <GameCard key={index} opponent={opponent} card={card} cardBackside={cardBackImage} cardName={key} hidden={hidden} index={index} draggable={draggable} handleCardClick={handleCardClick} selectedCard={selectedCard} src={boardLocation} offsetX={offsetX} offsetY={offsetY} rotation={rotation} />
         })) : <GameCard opponent={opponent} card={cards[cards.length - 1][1]} cardBackside={cardBackImage} cardName={cards[cards.length - 1][0]} hidden={hidden} index={cards.length - 1} draggable={draggable} handleCardClick={handleCardClick} selectedCard={selectedCard} src={boardLocation} offsetX={offsetXHandler ? offsetXHandler() : null} offsetY={offsetYHandler ? offsetYHandler() : null} rotation={rotationHandler ? rotationHandler() : null} />
         )}

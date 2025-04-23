@@ -2,17 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { callSetDeck, callDrawCard, callInsertCard, callMoveCard } from "../game_commands";
 import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
-import PlayerHand from "./Componnent/PlayerHand";
 import CardInfo from "./Componnent/CardInfo";
 import GameChat from "./Componnent/GameChat";
-import DiscardPile from "./Componnent/DiscardPile";
-import DeckPile from "./Componnent/DeckPile";
 import "./Room.css"
 import { DndContext } from '@dnd-kit/core';
-import PlayArea from "./Componnent/PlayArea";
-import InnateCardsContainer from "./Componnent/InnateCardContainer";
-import CasterZone from "./Componnent/CasterZone";
 import { useChannel } from "../ChannelContext"; // Import the context hook
+import CardZone from "./Componnent/CardZone";
 
 const Room = () => {
   const navigate = useNavigate();
@@ -91,15 +86,20 @@ const Room = () => {
           const discardPile = Object.entries(value.graveyard);
           const field = Object.entries(value.field);
           const caster = Object.entries(value.caster);
-
+          const opponent = checkOpponent(key);
           return <div key={index}>
-            <DiscardPile key={"discard" + index.toString()} discardPile={discardPile} handleCardClick={handleCardClick} selectedCard={selectedCard} opponent={checkOpponent(key)} />
-            <PlayArea key={"playArea" + index.toString()} cards={field} handleCardClick={handleCardClick} selectedCard={selectedCard} opponent={checkOpponent(key)} />
-            <DeckPile key={"deckPile" + index.toString()} deck={deck} handlePiocheClick={handlePiocheClick} cardBackImage={cardBackImage} opponent={checkOpponent(key)} />
-            <CasterZone key={"casterZone" + index.toString()} cards={caster} handleCardClick={handleCardClick} selectedCard={selectedCard} opponent={checkOpponent(key)} />
-            <InnateCardsContainer key={"innateCard" + index.toString()} opponent={checkOpponent(key)} />
-
-            <PlayerHand opponent={checkOpponent(key)} key={"playerHand" + index.toString()} playerHand={playerHand} handleCardClick={handleCardClick} selectedCard={selectedCard} hidden={key !== playerId} cardBackside={cardBackImage} />
+            {/* Discard Pile */}
+            <CardZone stackZone={true} opponent={opponent} cards={discardPile} handleCardClick={handleCardClick} selectedCard={selectedCard} boardLocation={"graveyard"} cssName={'discard'} hidden={false} draggable={!opponent} />
+            {/* PlayArea */}
+            <CardZone opponent={opponent} cards={field} handleCardClick={handleCardClick} selectedCard={selectedCard} boardLocation={"field"} cssName={'playArea'} hidden={false} draggable={!opponent} />
+            {/* Deck Pile */}
+            <CardZone stackZone={true} opponent={opponent} cards={deck} cardBackImage={cardBackImage} handleZoneClick={handlePiocheClick} selectedCard={selectedCard} boardLocation={"deck"} cssName={'deck'} hidden={true} draggable={false} />
+            {/* CasterZone */}
+            <CardZone stackZone={true} opponent={opponent} cards={caster} handleCardClick={handleCardClick} selectedCard={selectedCard} boardLocation={"caster"} cssName={'casterZone'} hidden={false} draggable={!opponent} />
+            {/* InnateCardsContainer */}
+            {/* <CardZone opponent={opponent} cards={ } handleCardClick={ } selectedCard={ } boardLocation={ } cssName={ } style={ } opponentStyle={ } hoverStyle={ } hidden={ } draggable={ } offsetXHandler={ } offsetYHandler={ } rotationHandler={ } /> */}
+            {/* PlayerHand */}
+            <CardZone opponent={opponent} cards={playerHand} handleCardClick={handleCardClick} selectedCard={selectedCard} boardLocation={"hand"} cssName={'playerHand'} hidden={opponent} draggable={!opponent} offsetXHandler={(key, card, index, length) => (-((index - ((length - 1) / 2)) * (180 / 3)))} rotationHandler={(key, card, index, length) => ((index - ((length - 1) / 2)) * 10)} />
             {/* <GameChat playerId={playerId} /> */}
           </div>;
         })}

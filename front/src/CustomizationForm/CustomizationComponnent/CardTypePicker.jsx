@@ -47,7 +47,6 @@ export class CardTypePicker extends FormComponnent {
           value={this.state.inputValue}
           label='Type'
           onChange={this.handleChange}
-          onOpen={this.fetchType}
         >
           {this.state.cardTypes.length > 0 ? (
             this.state.cardTypes.map((type, index) => (

@@ -91,12 +91,11 @@ export class Editor extends Component {
       localStorage.removeItem('propertySelected')
     window.addEventListener('storage', this.handlePropertyChange)
     window.addEventListener('delete', this.handleDelete)
-
     window.addEventListener('storeProperties', this.handlePropertiesSet)
   }
   componentWillUnmount () {
-    window.removeEventListener('storage', this.handlePropertiesSet)
-    window.removeEventListener('storeProperties', this.handlePropertyChange)
+    window.removeEventListener('storage', this.handlePropertyChange)
+    window.removeEventListener('storeProperties', this.handlePropertiesSet)
     window.removeEventListener('delete', this.handleDelete)
   }
 
@@ -106,17 +105,21 @@ export class Editor extends Component {
 
   handlePropertyChange = () => {
     const tmpProperties = this.state.properties
-
     const currentPropertySelected = JSON.parse(
       localStorage.getItem('propertySelected')
     )
 
-    tmpProperties[this.state.idSelected] = currentPropertySelected
+    const newId = this.state.properties.findIndex((value, index) => {
+      return value.id === currentPropertySelected.id
+    })
+
+    tmpProperties[newId] = currentPropertySelected
 
     this.setState({
       properties: tmpProperties,
       position_x: currentPropertySelected.position_x,
-      position_y: currentPropertySelected.position_y
+      position_y: currentPropertySelected.position_y,
+      idSelected: newId
     })
   }
 
@@ -165,6 +168,7 @@ export class Editor extends Component {
     let newProperties = defaultProperties
     newProperties.cardtype_id = typeId
     newProperties.type = type
+    window.dispatchEvent(new Event('componnentCreated'))
 
     this.setState(prevState => {
       const tmpProperties = [...prevState.properties, newProperties]
@@ -252,9 +256,3 @@ export class Editor extends Component {
     )
   }
 }
-// props:
-// position_x
-// position_y
-// id_selected
-// handleSelectedOnClick
-// properties *required

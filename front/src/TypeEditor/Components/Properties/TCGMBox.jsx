@@ -5,7 +5,6 @@ import { Box } from '@mui/material'
 export class TCGMBox extends Component {
   constructor (props) {
     super(props)
-    console.log(this.props.data)
   }
 
   render () {

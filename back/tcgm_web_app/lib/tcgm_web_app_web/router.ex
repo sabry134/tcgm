@@ -23,6 +23,9 @@ defmodule TcgmWebAppWeb.Router do
     resources "/games", GameController, only: [:index, :show, :create, :update]
     delete "/games/delete/:game_id", GameController, :delete_game
     get "/games/name/:name", GameController, :get_game_by_name
+    post "/games/groups", GameController, :create_card_collection_group
+    get "/games/:game_id/groups", GameController, :get_card_collection_groups_by_game_id
+    get "/games/:game_id/groups/:collection_type", GameController, :get_card_collection_group_by_game_id_and_collection_type
 
     resources "/actions", ActionController, only: [:index, :show, :create, :update]
     delete "/actions/delete/:action_id", ActionController, :delete_action
@@ -33,6 +36,7 @@ defmodule TcgmWebAppWeb.Router do
     get "/cards/game/:game_id", CardController, :get_cards_by_game_id
     post "/cards/with_properties", CardController, :create_card_with_properties
     get "/cards/game/:game_id/with_properties", CardController, :get_cards_with_properties_by_game_id
+    get "/cards/:card_id/cardtype", CardController, :get_card_cardtype
 
     resources "/cardTypes", CardTypeController, only: [:index, :show, :create, :update]
     delete "/cardTypes/delete/:cardType_id", CardTypeController, :delete_cardType

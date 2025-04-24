@@ -6,12 +6,15 @@
   justify-content: space-between;
 }
 
-.title {
-  background-color: #7f4f24;
+.titleList {
+  display: flex;
   padding: 10px;
+  font-size: 25px;
+  background-color: #7f4f24;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
-  margin-top: 10px;
+  margin-top: 40px;
+  justify-content: center;
 }
 
 .itemList {

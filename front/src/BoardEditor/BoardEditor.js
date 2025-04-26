@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button, Typography, Box, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import debounce from 'lodash/debounce';
 
 const styles = {
   navbar: {
@@ -18,7 +19,6 @@ const styles = {
 const clamp = (v, min, max) => Math.max(min, Math.min(v, max));
 const CANVAS_MARGIN = 10;
 const MAX_NAME_LENGTH = 30;
-
 const LIVE_FIELDS = ["name", "x", "y", "borderRadius"];
 
 const BoardEditor = () => {
@@ -30,6 +30,7 @@ const BoardEditor = () => {
   const [zones, setZones] = useState([]);
   const [selectedZoneId, setSelectedZoneId] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [tableBackground, setTableBackground] = useState(null);
   const dragOffset = useRef({ x: 0, y: 0 });
   const canvasRef = useRef(null);
 
@@ -42,6 +43,17 @@ const BoardEditor = () => {
     borderRadius: "",
   });
 
+  const persist = useRef(
+    debounce((sceneKey, data) => {
+      sessionStorage.setItem(sceneKey, JSON.stringify(data));
+    }, 500)
+  );
+
+  const frameRef = useRef(null);
+  const pendingRef = useRef({});
+
+  const selectedZone = zones.find((z) => z.id === selectedZoneId);
+
   useEffect(() => {
     const s = JSON.parse(localStorage.getItem("scenes")) || [];
     if (s.length) {
@@ -49,28 +61,31 @@ const BoardEditor = () => {
       setSelectedScene(s[0]);
     }
   }, []);
+
   useEffect(() => {
     if (!selectedScene) return;
     const saved = JSON.parse(sessionStorage.getItem(selectedScene)) || {};
     setCards(saved.cards || []);
     setButtons(saved.buttons || []);
     setZones(saved.zones || []);
+    setTableBackground(saved.tableBackground || null);
   }, [selectedScene]);
+
   useEffect(() => {
     if (!selectedScene) return;
-    sessionStorage.setItem(
-      selectedScene,
-      JSON.stringify({ cards, buttons, zones })
-    );
-  }, [cards, buttons, zones, selectedScene]);
+    persist.current(selectedScene, { cards, buttons, zones, tableBackground });
+  }, [cards, buttons, zones, tableBackground, selectedScene]);
+
   useEffect(() => {
-    if (scenes.length) localStorage.setItem("scenes", JSON.stringify(scenes));
+    if (scenes.length) {
+      localStorage.setItem("scenes", JSON.stringify(scenes));
+    }
   }, [scenes]);
+
   useEffect(() => {
     document.title = "JCCE";
   }, []);
 
-  const selectedZone = zones.find((z) => z.id === selectedZoneId);
   useEffect(() => {
     if (selectedZone) {
       setInputs({
@@ -82,7 +97,7 @@ const BoardEditor = () => {
         borderRadius: String(selectedZone.borderRadius),
       });
     }
-  }, [selectedZoneId, selectedZone]);
+  }, [selectedZone]);
 
   const handleMouseDown = (e, zone) => {
     e.stopPropagation();
@@ -96,15 +111,43 @@ const BoardEditor = () => {
     };
   };
 
+  const handleMouseMove = (e) => {
+    if (!isDragging || selectedZoneId == null) return;
+    const rect = canvasRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const origin = zones.find((z) => z.id === selectedZoneId);
+    if (!origin) return;
+
+    const rawX = e.clientX - rect.left - dragOffset.current.x;
+    const rawY = e.clientY - rect.top - dragOffset.current.y;
+    pendingRef.current = {
+      x: clamp(rawX, 0, rect.width - origin.width - CANVAS_MARGIN),
+      y: clamp(rawY, 0, rect.height - origin.height - CANVAS_MARGIN),
+    };
+    if (!frameRef.current) {
+      frameRef.current = requestAnimationFrame(() => {
+        updateSymmetric(selectedZoneId, pendingRef.current);
+        frameRef.current = null;
+      });
+    }
+  };
+  const handleMouseUp = () => setIsDragging(false);
+
+  useEffect(() => {
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [isDragging, selectedZoneId, zones]);
+
   const updateSymmetric = (id, newProps) => {
     setZones((prev) => {
       const origin = prev.find((z) => z.id === id);
       if (!origin) return prev;
-      const twin = prev.find(
-        (z) => z.pairId === origin.pairId && z.id !== id
-      );
-      const rect =
-        canvasRef.current?.getBoundingClientRect() || { width: 0, height: 0 };
+      const twin = prev.find((z) => z.pairId === origin.pairId && z.id !== id);
+      const rect = canvasRef.current?.getBoundingClientRect() || { width: 0, height: 0 };
       if (!twin) return prev;
 
       let x = clamp(
@@ -142,18 +185,10 @@ const BoardEditor = () => {
         rect.height - height - CANVAS_MARGIN
       );
 
-      const updatedOrigin = {
-        ...origin,
-        x,
-        y,
-        width,
-        height,
-        borderRadius: br,
-        name,
-      };
+      const updatedOrigin = { ...origin, x, y, width, height, borderRadius: br, name };
       const updatedTwin = {
         ...twin,
-        x,
+        x: rect.width - x - width,
         y: mirrorY,
         width,
         height,
@@ -162,95 +197,37 @@ const BoardEditor = () => {
       };
 
       return prev.map((z) =>
-        z.id === origin.id
-          ? updatedOrigin
-          : z.id === twin.id
-          ? updatedTwin
-          : z
+        z.id === updatedOrigin.id ? updatedOrigin : z.id === updatedTwin.id ? updatedTwin : z
       );
     });
   };
 
-  const handleMouseMove = (e) => {
-    if (!isDragging || selectedZoneId == null) return;
-    const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const origin = zones.find((z) => z.id === selectedZoneId);
-    if (!origin) return;
-
-    const rawX = e.clientX - rect.left - dragOffset.current.x;
-    const rawY = e.clientY - rect.top - dragOffset.current.y;
-    updateSymmetric(selectedZoneId, {
-      x: clamp(rawX, 0, rect.width - origin.width - CANVAS_MARGIN),
-      y: clamp(rawY, 0, rect.height - origin.height - CANVAS_MARGIN),
-    });
-  };
-  const handleMouseUp = () => setIsDragging(false);
-  useEffect(() => {
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [isDragging, selectedZoneId, zones]);
-
   const addZone = () => {
-    const rect =
-      canvasRef.current?.getBoundingClientRect() || { width: 0, height: 0 };
+    const rect = canvasRef.current?.getBoundingClientRect() || { width: 0, height: 0 };
     const dx = clamp(rect.width / 2 - 50, 0, rect.width - 100 - CANVAS_MARGIN);
     const half = rect.height / 2;
     const offset = 50;
-    const bottomY = clamp(
-      half + offset,
-      0,
-      rect.height - 100 - CANVAS_MARGIN
-    );
-    const topY = clamp(
-      half - offset - 100,
-      0,
-      rect.height - 100 - CANVAS_MARGIN
-    );
+    const bottomY = clamp(half + offset, 0, rect.height - 100 - CANVAS_MARGIN);
+    const topY = clamp(half - offset - 100, 0, rect.height - 100 - CANVAS_MARGIN);
     const pairId = Date.now();
     const idx = Math.floor(zones.length / 2) + 1;
 
-    const bottom = {
-      id: pairId,
-      pairId,
-      name: `Zone ${idx}`,
-      x: dx,
-      y: bottomY,
-      width: 100,
-      height: 100,
-      borderRadius: 0,
-    };
-    const top = {
-      id: pairId + 1,
-      pairId,
-      name: `[OPPONENT] Zone ${idx}`,
-      x: dx,
-      y: topY,
-      width: 100,
-      height: 100,
-      borderRadius: 0,
-    };
-
+    const bottom = { id: pairId, pairId, name: `Zone ${idx}`, x: dx, y: bottomY, width: 100, height: 100, borderRadius: 0, background: null };
+    const top = { id: pairId + 1, pairId, name: `[OPPONENT] Zone ${idx}`, x: dx, y: topY, width: 100, height: 100, borderRadius: 0, background: null };
     setZones((z) => [...z, bottom, top]);
     setSelectedZoneId(bottom.id);
   };
-
   const deleteZone = () => {
     if (!selectedZoneId) return;
-    const pairId = zones.find((z) => z.id === selectedZoneId)?.pairId;
-    if (pairId == null) return;
-    setZones((z) => z.filter((z) => z.pairId !== pairId));
+    const pid = zones.find((z) => z.id === selectedZoneId)?.pairId;
+    if (pid == null) return;
+    setZones((z) => z.filter((z) => z.pairId !== pid));
     setSelectedZoneId(null);
   };
 
   const handleFieldChange = (field, raw) => {
     setInputs((i) => ({ ...i, [field]: raw }));
     if (!selectedZone) return;
-
     if (LIVE_FIELDS.includes(field)) {
       if (field === "name") {
         const name = raw.slice(0, MAX_NAME_LENGTH);
@@ -262,50 +239,71 @@ const BoardEditor = () => {
       }
     }
   };
-
   const handleFieldBlur = (field) => {
     if (!selectedZone) return;
     if (LIVE_FIELDS.includes(field)) return;
-    const rect =
-      canvasRef.current?.getBoundingClientRect() || { width: 0, height: 0 };
+    const rect = canvasRef.current?.getBoundingClientRect() || { width: 0, height: 0 };
     let props = {};
     const v = parseInt(inputs[field], 10);
     if (isNaN(v)) {
       setInputs((i) => ({ ...i, [field]: String(selectedZone[field]) }));
       return;
     }
-    if (field === "width") {
-      props.width = clamp(
-        v,
-        100,
-        rect.width - selectedZone.x - CANVAS_MARGIN
-      );
-    } else if (field === "height") {
-      props.height = clamp(
-        v,
-        100,
-        rect.height - selectedZone.y - CANVAS_MARGIN
-      );
-    }
+    if (field === "width") props.width = clamp(v, 100, rect.width - selectedZone.x - CANVAS_MARGIN);
+    else if (field === "height") props.height = clamp(v, 100, rect.height - selectedZone.y - CANVAS_MARGIN);
     updateSymmetric(selectedZoneId, props);
+  };
+
+  const handleBackgroundUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    if (selectedZoneId) {
+      setZones((prev) => prev.map((z) => {
+        if (z.id === selectedZoneId) {
+          if (z.background) URL.revokeObjectURL(z.background);
+          return { ...z, background: url };
+        }
+        return z;
+      }));
+    } else {
+      if (tableBackground) URL.revokeObjectURL(tableBackground);
+      setTableBackground(url);
+    }
+  };
+  const handleDeleteBackground = () => {
+    if (selectedZoneId) {
+      setZones((prev) => prev.map((z) => (z.id === selectedZoneId ? { ...z, background: null } : z)));
+    } else {
+      if (tableBackground) URL.revokeObjectURL(tableBackground);
+      setTableBackground(null);
+    }
   };
 
   return (
     <Box display="flex" flexDirection="column" height="100vh" sx={{ userSelect: "none" }}>
       <Box sx={styles.navbar}>
-        {["/", "/documentation", "/forum", "/community"].map((path, i) => (
+        {['/', '/documentation', '/forum', '/community'].map((path, i) => (
           <Button key={i} onClick={() => navigate(path)} sx={styles.navButton}>
             <Typography sx={styles.navText}>
-              {["🌟 Home", "📜 Documentation", "🖼️ Forum", "🌍 Community"][i]}
+              {['🌟 Home', '📜 Documentation', '🖼️ Forum', '🌍 Community'][i]}
             </Typography>
           </Button>
         ))}
       </Box>
 
       <Box display="flex" flex={1}>
+        {/* Canvas area */}
         <Box
           ref={canvasRef}
-          sx={{ flex: 1, position: "relative", bgcolor: "#c4c4c4", touchAction: "none" }}
+          sx={{
+            flex: 1,
+            position: "relative",
+            bgcolor: tableBackground ? undefined : "#c4c4c4",
+            backgroundImage: tableBackground ? `url(${tableBackground})` : undefined,
+            backgroundSize: "cover",
+            touchAction: "none",
+          }}
           onMouseDown={() => setSelectedZoneId(null)}
         >
           {zones.map((z) => (
@@ -319,7 +317,9 @@ const BoardEditor = () => {
                 width: z.width,
                 height: z.height,
                 border: z.id === selectedZoneId ? "2px solid #ff5722" : "2px dashed #333",
-                bgcolor: "rgba(255,255,255,0.3)",
+                bgcolor: z.background ? undefined : "rgba(255,255,255,0.3)",
+                backgroundImage: z.background ? `url(${z.background})` : undefined,
+                backgroundSize: "cover",
                 borderRadius: z.borderRadius,
                 cursor: "move",
                 overflow: "hidden",
@@ -340,6 +340,7 @@ const BoardEditor = () => {
           ))}
         </Box>
 
+        {/* Sidebar editor */}
         <Box
           sx={{
             width: 300,
@@ -352,17 +353,29 @@ const BoardEditor = () => {
           }}
         >
           <Typography variant="h6">Zones Editor</Typography>
+
+          <Button variant="contained" component="label">
+            {selectedZoneId ? "Upload Zone Background" : "Upload Table Background"}
+            <input type="file" hidden onChange={handleBackgroundUpload} />
+          </Button>
+
+          <Button variant="outlined" color="secondary" onClick={handleDeleteBackground}>
+            {selectedZoneId ? "Delete Zone Background" : "Delete Table Background"}
+          </Button>
+
           <Button variant="contained" onClick={addZone}>
             Add Zone Pair
           </Button>
+
           {selectedZone && (
             <Button variant="outlined" color="error" onClick={deleteZone}>
               Delete Zone Pair
             </Button>
           )}
+
           {selectedZone ? (
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              {["name", "width", "height", "x", "y", "borderRadius"].map((field) => (
+              {['name', 'width', 'height', 'x', 'y', 'borderRadius'].map((field) => (
                 <TextField
                   key={field}
                   label={field}

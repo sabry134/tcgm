@@ -6,6 +6,7 @@ import { ColorPicker } from "./CustomizationComponnent/ColorPicker";
 import { CardTypePicker } from "./CustomizationComponnent/CardTypePicker";
 import { GamePicker } from "./CustomizationComponnent/GamePicker";
 import './JsonToForm.css'
+import { CustomCheckbox } from "./CustomizationComponnent/CustomCheckbox";
 
 
 const JsonToForm = ({ data = {}, predecessor = "", localStorageName = "currentEditedCard" }) => {
@@ -43,8 +44,8 @@ const switchForm = (value, key, predecessor, localStorageName) => {
       return <CardTypePicker name={path} localStorageName={localStorageName} />;
     case "game":
       return <GamePicker name={path} localStorageName={localStorageName} />
-    case "action":
-      break;
+    case "boolean":
+      return <CustomCheckbox name={path} localStorageName={localStorageName} />;
     case "params":
       break;
     case "path":

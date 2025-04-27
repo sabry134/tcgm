@@ -35,6 +35,7 @@ export class RightPanel extends Component {
           transition: 'width 0.3s ease-in-out',
           bgcolor: '#5d3a00',
           color: 'white',
+          height: '100%',
           borderRadius: 0
         }}
       >

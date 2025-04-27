@@ -2,24 +2,26 @@ import React from "react";
 import { CustomInput } from "./CustomizationComponnent/CustomInput";
 import { NumberInput } from "./CustomizationComponnent/NumberInput";
 import { useState } from "react";
-import { ExpandLess } from "@mui/icons-material";
-import { ExpandMore } from "@mui/icons-material";
 import { ColorPicker } from "./CustomizationComponnent/ColorPicker";
 import { CardTypePicker } from "./CustomizationComponnent/CardTypePicker";
 import { GamePicker } from "./CustomizationComponnent/GamePicker";
+import './JsonToForm.css'
+
 
 const JsonToForm = ({ data = {}, predecessor = "", localStorageName = "currentEditedCard" }) => {
   const keys = Object.keys(data)
   return (
     <div style={{
-      paddingLeft: '8px', overflowY: 'scroll',
-      maxHeight: '80vh'
+      overflowY: 'scroll',
+      margin: "10px",
+      marginTop: '15px',
+      maxHeight: '90vh'
     }}>
       {keys.map((item, index) => {
         return (
-          <div key={index} className="shadow-md p-4 rounded-lg">
+          <div key={index} >
             <div>
-              <DropDown item={item} predecessor={predecessor} data={data} localStorageName={localStorageName} />
+              <DropDown isFirst={index === 0} isLast={index === keys.length - 1} item={item} predecessor={predecessor} data={data} localStorageName={localStorageName} />
             </div>
           </div>
         )
@@ -52,35 +54,35 @@ const switchForm = (value, key, predecessor, localStorageName) => {
   }
 }
 
-const DropDown = ({ item, data, predecessor, localStorageName }) => {
-  const [isOpen, setIsOpen] = useState(false);
+const DropDown = ({ item, data, predecessor, localStorageName, isFirst, isLast }) => {
 
   const switchTitle = (value) => {
-    switch (value) {
-      case "effect_ids":
+    const newValue = value.replace(/_/g, ' ');
+
+    switch (newValue) {
+      case "effect ids":
         return "effects"
-      case "card_type_id":
+      case "card type id":
         return "card type"
-      case "game_id":
-        return "game"
+      case "property name":
+        return "Name"
       default:
-        return value;
+        return newValue.charAt(0).toUpperCase() + newValue.slice(1);
     }
   }
 
   return (
-    <div className="display: flex" hidden={data[item] === 'none'}>
-      <h2 style={{ cursor: 'pointer' }} onClick={() => setIsOpen(!isOpen)} className="text-lg font-bold cursor:pointer">
+    <div className={"customFormItem " + (isFirst ? "first" : "") + (isLast ? "last" : "")} hidden={data[item] === 'none'}>
+      <h2 className={"customFormName " + (isFirst ? "first" : "") + (isLast ? "last" : "")}>
         {switchTitle(item)}
-        {isOpen ? <ExpandLess /> : <ExpandMore />}
       </h2>
-      {isOpen && typeof data[item] !== "object" &&
-        <div style={{ paddingLeft: '8px' }}>
+      {typeof data[item] !== "object" &&
+        <div className="customFormInput">
           {switchForm(data[item], item, predecessor, localStorageName)}
         </div>
       }
       {
-        isOpen && typeof data[item] === "object" &&
+        typeof data[item] === "object" &&
         <JsonToForm
           data={data[item]}
           predecessor={predecessor === "" ?

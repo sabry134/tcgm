@@ -1,22 +1,25 @@
-import { TextField } from "@mui/material";
-import { FormComponnent } from "../FormComponnent";
+import { TextField } from '@mui/material'
+import { FormComponnent } from '../FormComponnent'
+import './CustomizationList.css'
 
 export class NumberInput extends FormComponnent {
-  render() {
+  handleChange = event => {
+    const value = event.target.value
+    if (value === '' || /^[0-9\b]+$/.test(value)) {
+      this.setState({ inputValue: value })
+    }
+    this.updateJsonFile(value)
+  }
+
+  render () {
     return (
-      <TextField
-        style={{ backgroundColor: 'white' }}
-        id="standard-number"
-        type="number"
-        variant="standard"
-        slotProps={{
-          inputLabel: {
-            shrink: true,
-          },
-        }}
+      <input
+        className='customInput'
+        id='standard-basic'
+        variant='standard'
         value={this.state.inputValue}
         onChange={this.handleChange}
       />
-    );
+    )
   }
 }

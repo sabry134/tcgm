@@ -92,11 +92,26 @@ export class Editor extends Component {
     window.addEventListener('storage', this.handlePropertyChange)
     window.addEventListener('delete', this.handleDelete)
     window.addEventListener('storeProperties', this.handlePropertiesSet)
+    window.addEventListener('idSelected', this.handleIdSelected)
   }
   componentWillUnmount () {
     window.removeEventListener('storage', this.handlePropertyChange)
     window.removeEventListener('storeProperties', this.handlePropertiesSet)
     window.removeEventListener('delete', this.handleDelete)
+    window.removeEventListener('idSelected', this.handleIdSelected)
+  }
+
+  handleIdSelected = () => {
+    const index = JSON.parse(localStorage.getItem('idSelected'))
+    localStorage.setItem(
+      'propertySelected',
+      JSON.stringify(this.state.properties[index])
+    )
+    this.setState({
+      idSelected: index,
+      position_x: this.state.properties[index].position_x,
+      position_y: this.state.properties[index].position_y
+    })
   }
 
   handleDelete = () => {
@@ -108,18 +123,14 @@ export class Editor extends Component {
     const currentPropertySelected = JSON.parse(
       localStorage.getItem('propertySelected')
     )
+    const index = localStorage.getItem('idSelected')
 
-    const newId = this.state.properties.findIndex((value, index) => {
-      return value.id === currentPropertySelected.id
-    })
-
-    tmpProperties[newId] = currentPropertySelected
+    tmpProperties[index] = currentPropertySelected
 
     this.setState({
       properties: tmpProperties,
       position_x: currentPropertySelected.position_x,
-      position_y: currentPropertySelected.position_y,
-      idSelected: newId
+      position_y: currentPropertySelected.position_y
     })
   }
 
@@ -168,7 +179,6 @@ export class Editor extends Component {
     let newProperties = defaultProperties
     newProperties.cardtype_id = typeId
     newProperties.type = type
-    window.dispatchEvent(new Event('componnentCreated'))
 
     this.setState(prevState => {
       const tmpProperties = [...prevState.properties, newProperties]
@@ -176,6 +186,7 @@ export class Editor extends Component {
         'currentTypeProperties',
         JSON.stringify(tmpProperties)
       )
+      window.dispatchEvent(new Event('componnentCreated'))
       return { properties: tmpProperties }
     })
   }
@@ -218,6 +229,7 @@ export class Editor extends Component {
       'propertySelected',
       JSON.stringify(this.state.properties[index])
     )
+    localStorage.setItem('idSelected', index)
 
     window.dispatchEvent(new Event('ComponnentSelected'))
 

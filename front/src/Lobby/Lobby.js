@@ -6,7 +6,7 @@ import defaultGameState from '../Room/Data/GameState.json'
 import { useNavigate } from "react-router-dom";
 import { useChannel } from "../ChannelContext"; // Import the context hook
 import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
-import { TCGMButton } from "../Components/TCGMButton";
+import { TCGMButton } from "../Components/TCGMButton/TCGMButton";
 
 const Lobby = () => {
     const navigate = useNavigate();

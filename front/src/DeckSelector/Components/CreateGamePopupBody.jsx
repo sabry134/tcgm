@@ -1,7 +1,7 @@
 import { Component, React } from 'react'
 import { Box, Button } from '@mui/material'
 import './CreateGamePopupBody.css'
-import { FormInput } from '../../Components/FormInput'
+import { FormInput } from '../../Components/FormInput/FormInput'
 import CloseIcon from '@mui/icons-material/Close'
 import { createCollectionRequest } from '../../Api/collectionsRequest'
 

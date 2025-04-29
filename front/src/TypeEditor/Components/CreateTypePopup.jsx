@@ -1,9 +1,9 @@
 import { Component, React } from 'react'
 import { Box, Button } from '@mui/material'
-import { FormInput } from '../../Components/FormInput'
+import { FormInput } from '../../Components/FormInput/FormInput'
 import CloseIcon from '@mui/icons-material/Close'
 import { createCardTypeRequest } from '../../Api/cardTypesRequest'
-import { TCGMButton } from '../../Components/TCGMButton'
+import { TCGMButton } from '../../Components/TCGMButton/TCGMButton'
 import './CreateTypePopup.css'
 
 export class CreateTypePopup extends Component {

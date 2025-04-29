@@ -6,7 +6,7 @@ import {
 } from '../../Api/cardTypesRequest'
 import CheckIcon from '@mui/icons-material/Check'
 import './LeftPanel.css'
-import { TCGMButton } from '../../Components/TCGMButton'
+import { TCGMButton } from '../../Components/TCGMButton/TCGMButton'
 import { getCardTypesPropertiesbyTypeRequest } from '../../Api/cardTypesPropertiesRequest'
 
 export class LeftPanel extends Component {

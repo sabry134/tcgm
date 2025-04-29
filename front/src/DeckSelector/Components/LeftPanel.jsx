@@ -1,7 +1,7 @@
 import { Paper, TextField, Button } from '@mui/material'
 import React, { Component, use } from 'react'
 import './CreateGamePopupBody.css'
-import { TCGMButton } from '../../Components/TCGMButton'
+import { TCGMButton } from '../../Components/TCGMButton/TCGMButton'
 export class LeftPanel extends Component {
   constructor (props) {
     super(props)

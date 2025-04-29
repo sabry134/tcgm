@@ -1,4 +1,4 @@
-import { React, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
@@ -41,6 +41,7 @@ const Community = () => {
                       open={open}
                       anchorEl={anchor}
                       closeCallback={closePopup}
+                      title="Create Game"
                     />
                     <CommunityGamePicker />
                 </Box>

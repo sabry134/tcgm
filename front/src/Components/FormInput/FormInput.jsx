@@ -1,5 +1,5 @@
 import { Component, React } from 'react'
-import { Input, Box } from '@mui/material'
+import { Input, Box, Typography } from '@mui/material'
 import './FormInput.css'
 
 export class FormInput extends Component {
@@ -20,7 +20,9 @@ export class FormInput extends Component {
   render () {
     return (
       <Box marginTop={'15px'} display={'flex'} flexDirection={'column'}>
-        {this.props.label}
+        <Typography>
+          {this.props.label}
+        </Typography>
         <Input
           onFocus={this.changeFocus}
           onBlur={this.closeFocus}

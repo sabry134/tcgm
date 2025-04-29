@@ -4,7 +4,7 @@ import { useDraggable } from "@dnd-kit/core";
 
 
 
-const GameCard = ({ card, hidden = false, cardBackside, index, draggable, handleCardClick, offsetX = 0, rotation = 0, selectedCard, src, cardName, opponent = true, offsetY = 0 }) => {
+const GameCard = ({ card, hidden = false, cardBackside, index, draggable = true, handleCardClick, offsetX = 0, rotation = 0, selectedCard, src, cardName, opponent = true, offsetY = 0 }) => {
     const { attributes, listeners, setNodeRef, transform } = useDraggable({
         id: src + "/" + index?.toString() + "/" + opponent.toString()
     });

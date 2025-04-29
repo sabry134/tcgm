@@ -52,7 +52,7 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
     |> CardCollectionCard.changeset(%{ card_collection_id: card_collection.id, card_id: card2.id, quantity: 1, group: "deck" })
     |> Repo.insert!()
 
-    {:ok, card_collection: card_collection, game: game, user: user, card: card, card2: card2, card_collection_card: card_collection_card, card_collection_card2: card_collection_card2}
+    {:ok, card_collection: card_collection, game: game, user: user, cardType: cardType, card: card, card2: card2, card_collection_card: card_collection_card, card_collection_card2: card_collection_card2}
   end
 
   test "GET /api/card_collections returns a list of card collections", %{conn: conn, card_collection: card_collection} do
@@ -134,7 +134,6 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
 
   test "PUT /api/card_collections/:id/cards updates a card collection with cards", %{conn: conn, card_collection: card_collection, card: card} do
     payload = %{
-      "card_ids" => [card.id],
       "cards" => [
         %{"card_id" => card.id, "quantity" => 2, "group" => "deck"}
       ]
@@ -149,7 +148,6 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
 
   test "PUT /api/card_collections/:id/cards updates a card collection with cards and deletes old cards", %{conn: conn, card_collection: card_collection, card_collection_card: card_collection_card, card: card, card2: card2} do
     payload = %{
-      "card_ids" => [card.id],
       "cards" => [
         %{"card_id" => card2.id, "quantity" => 2, "group" => "deck"},
       ]

@@ -1,9 +1,10 @@
 .tcgmButton:hover {
-  background-color: #414833;
+  background-color: #656d4a;
+  color: white;
 }
 
 .tcgmButton {
-  background-color: #656d4a;
+  background-color: #a4ac86;
   margin-top: 10px;
   display: flex;
   align-items: center;
@@ -12,6 +13,7 @@
   border-radius: 10px;
   padding: 10px;
   box-shadow: 2px 2px 1px 1px #414833;
+  font-size: 25px;
 }
 
 .tcgmButton.click {

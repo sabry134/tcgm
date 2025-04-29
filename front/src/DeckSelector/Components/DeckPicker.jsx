@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Grid2, Box } from '@mui/material'
 import { DeckBox } from './DeckBox'
-import { getCollectionsByUserAndGameRequest, getGamesRequest } from '../../Api/collectionsRequest'
+import { getCollectionsByUserAndGameRequest } from '../../Api/collectionsRequest'
 
 export class DeckPicker extends Component {
   constructor (props) {

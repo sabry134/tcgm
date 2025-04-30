@@ -2,33 +2,29 @@ import React, { Component } from 'react';
 import styles from './Popup.module.css'
 import { Box, Button, Divider, Popper, Stack, Typography } from "@mui/material";
 import { FormInput } from "../FormInput/FormInput";
-import { createGameRequest } from "../../Api/gamesRequest";
 
 export class Popup extends Component {
   constructor(props) {
     super();
     this.closeCallback = props.closeCallback;
+    this.receivedCallback = props.receivedCallback;
     this.title = props.title;
-    this.name = '';
-    this.description = '';
-    this.state = {
-      clicked: false
+    this.nameList = props.inputName;
+    this.inputFields = [];
+  }
+
+  onChangeInput = (event, index) => {
+    this.inputFields[index] = event.target.value
+  }
+
+  onSubmit = () => {
+    if (this.inputFields.length !== this.nameList.length) {
+      console.error("Input fields length does not match name list length");
+      return;
     }
-  }
-
-  onChangeName = event => {
-    this.name = event.target.value
-  }
-
-  onChangeDescription = event => {
-    this.description = event.target.value
-  }
-
-  onClickCreate = event => {
-    this.setState({ clicked: true })
-    createGameRequest({
-      game: { name: this.name, description: this.description }
-    })
+    if (this.receivedCallback) {
+      this.receivedCallback(this.inputFields)
+    }
     this.closeCallback()
   }
 
@@ -66,25 +62,20 @@ export class Popup extends Component {
               alignItems={'center'}
             >
 
-              <FormInput
-                label={'Name'}
-                onChange={this.onChangeName}
-              />
-              <FormInput
-                label={'Description'}
-                onChange={this.onChangeDescription}
-              />
+              {this.nameList.map((name, index) => (
+                <FormInput
+                  key={index}
+                  label={name}
+                  onChange={event => this.onChangeInput(event, index)}
+                />
+              ))}
 
               <Button
-                onClick={this.onClickCreate}
+                onClick={this.onSubmit}
                 sx={{
                   backgroundColor: '#656d4a',
-                  '&:hover': {
-                    backgroundColor: '#414833'
-                  },
-                  '&:clicked': {
-                    backgroundColor: '#333d29'
-                  }
+                  '&:hover': { backgroundColor: '#414833' },
+                  '&:clicked': { backgroundColor: '#333d29' }
                 }}
                 variant={'contained'}
                 size={'large'}

@@ -1,11 +1,12 @@
 import React, { useRef, useState } from "react";
-import { Box } from "@mui/material";
+import { Box, Popper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
 import { LeftPanel } from "./Components/LeftPanel";
 import { RightPanel } from "./Components/RightPanel";
 import { CommunityGamePicker } from "./Components/CommunityGamePicker";
 import { Popup } from "../Components/Popup/Popup";
+import { CreateGamePopupBody } from "./Components/CreateGamePopupBody";
 
 const Community = () => {
     const navigate = useNavigate();
@@ -36,14 +37,9 @@ const Community = () => {
                     bgcolor="#c4c4c4"
                     position="relative"
                 >
-                    <Popup
-                      id={id}
-                      open={open}
-                      anchorEl={anchor}
-                      closeCallback={closePopup}
-                      title="Create Game"
-                      inputName={["Name", "Description"]}
-                    />
+                    <Popper id={id} open={open} anchorEl={anchor}>
+                        <CreateGamePopupBody closeCallback={closePopup}/>
+                    </Popper>
                     <CommunityGamePicker />
                 </Box>
 

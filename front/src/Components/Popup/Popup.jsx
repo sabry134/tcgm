@@ -18,10 +18,6 @@ export class Popup extends Component {
   }
 
   onSubmit = () => {
-    if (this.inputFields.length !== this.nameList.length) {
-      console.error("Input fields length does not match name list length");
-      return;
-    }
     if (this.receivedCallback) {
       this.receivedCallback(this.inputFields)
     }
@@ -70,18 +66,38 @@ export class Popup extends Component {
                 />
               ))}
 
-              <Button
-                onClick={this.onSubmit}
+              <Box
                 sx={{
-                  backgroundColor: '#656d4a',
-                  '&:hover': { backgroundColor: '#414833' },
-                  '&:clicked': { backgroundColor: '#333d29' }
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                  width: '50%',
+                  paddingTop: '2vw'
                 }}
-                variant={'contained'}
-                size={'large'}
               >
-                Create
-              </Button>
+                <Button
+                  onClick={this.closeCallback}
+                  color={'error'}
+                  variant={'contained'}
+                  size={'large'}
+                >
+                  Cancel
+                </Button>
+
+                <Button
+                  onClick={this.onSubmit}
+                  sx={{
+                    backgroundColor: '#656d4a',
+                    '&:hover': { backgroundColor: '#414833' },
+                    '&:clicked': { backgroundColor: '#333d29' }
+                  }}
+                  variant={'contained'}
+                  size={'large'}
+                >
+                  Create
+                </Button>
+              </Box>
+
             </Stack>
 
           </Box>

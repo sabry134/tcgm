@@ -4,7 +4,16 @@ import { Box, Button, Divider, Popper, Stack, Typography } from "@mui/material";
 import { FormInput } from "../FormInput/FormInput";
 import { createGameRequest } from "../../Api/gamesRequest";
 
-export class Popup extends Component {
+type PopupProps = {
+  id: string,
+  open: boolean,
+  anchorEl: HTMLElement | null,
+  closeCallback: () => void,
+  title: string,
+  inputName: [string],
+}
+
+export class Popup extends Component<PopupProps> {
   constructor(props) {
     super();
     this.id = props.id;
@@ -12,28 +21,32 @@ export class Popup extends Component {
     this.anchorEl = props.anchorEl;
     this.closeCallback = props.closeCallback
     this.title = props.title;
-    this.name = ''
-    this.description = ''
+    this.inputName = props.inputName;
+    this.inputContent = props.inputName.map(() => '');
     this.state = {
       clicked: false
     }
   }
 
-  onChangeName = event => {
-    this.name = event.target.value
+  // onChangeName = event => {
+  //   this.name = event.target.value
+  // }
+  //
+  // onChangeDescription = event => {
+  //   this.description = event.target.value
+  // }
+
+  onChangeInput = (event, index) => {
+    this.inputContent[index] = event.target.value;
   }
 
-  onChangeDescription = event => {
-    this.description = event.target.value
-  }
-
-  onClickCreate = () => {
-    this.setState({ clicked: true })
-    createGameRequest({
-      game: { name: this.name, description: this.description }
-    }).then()
-    this.closeCallback()
-  }
+  // onClickCreate = () => {
+  //   this.setState({ clicked: true })
+  //   createGameRequest({
+  //     game: { name: this.name, description: this.description }
+  //   }).then()
+  //   this.closeCallback()
+  // }
 
   render() {
     return (
@@ -68,31 +81,38 @@ export class Popup extends Component {
               paddingTop={'2vw'}
               alignItems={'center'}
             >
-              <FormInput
-                label={'Name'}
-                onChange={this.onChangeName}
-              />
-              <FormInput
-                label={'Description'}
-                onChange={this.onChangeDescription}
-              />
+              {this.inputName.map((name, index) => (
+                <FormInput
+                  label={name}
+                  onChange={(event) => this.onChangeInput(event, index)}
+                />
+              ))}
 
-              <Button
-                onClick={this.onClickCreate}
-                sx={{
-                  backgroundColor: '#656d4a',
-                  '&:hover': {
-                    backgroundColor: '#414833'
-                  },
-                  '&:clicked': {
-                    backgroundColor: '#333d29'
-                  }
-                }}
-                variant={'contained'}
-                size={'large'}
-              >
-                Create
-              </Button>
+              {/*<FormInput*/}
+              {/*  label={'Name'}*/}
+              {/*  onChange={this.onChangeName}*/}
+              {/*/>*/}
+              {/*<FormInput*/}
+              {/*  label={'Description'}*/}
+              {/*  onChange={this.onChangeDescription}*/}
+              {/*/>*/}
+
+              {/*<Button*/}
+              {/*  onClick={this.onClickCreate}*/}
+              {/*  sx={{*/}
+              {/*    backgroundColor: '#656d4a',*/}
+              {/*    '&:hover': {*/}
+              {/*      backgroundColor: '#414833'*/}
+              {/*    },*/}
+              {/*    '&:clicked': {*/}
+              {/*      backgroundColor: '#333d29'*/}
+              {/*    }*/}
+              {/*  }}*/}
+              {/*  variant={'contained'}*/}
+              {/*  size={'large'}*/}
+              {/*>*/}
+              {/*  Create*/}
+              {/*</Button>*/}
             </Stack>
 
           </Box>

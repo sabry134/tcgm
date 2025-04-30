@@ -42,6 +42,7 @@ const Community = () => {
                       anchorEl={anchor}
                       closeCallback={closePopup}
                       title="Create Game"
+                      inputName={["Name", "Description"]}
                     />
                     <CommunityGamePicker />
                 </Box>

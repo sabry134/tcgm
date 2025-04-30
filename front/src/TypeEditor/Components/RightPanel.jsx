@@ -1,6 +1,6 @@
 import { Paper } from '@mui/material'
 import { Component, React } from 'react'
-import txt from '../Data/TmpProperty.json'
+import txt from '../Data/Property.json'
 //TODO(): when Back is done return those Default Properties
 import JsonToForm from '../../CustomizationForm/JsonToForm'
 

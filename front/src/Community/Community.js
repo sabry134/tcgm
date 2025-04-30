@@ -37,9 +37,13 @@ const Community = () => {
                     bgcolor="#c4c4c4"
                     position="relative"
                 >
-                    <Popper id={id} open={open} anchorEl={anchor}>
-                        <CreateGamePopupBody closeCallback={closePopup}/>
-                    </Popper>
+                    <Popup
+                      id={id}
+                      open={open}
+                      anchorEl={anchor}
+                      closeCallback={closePopup}
+                      title={"Create Game"}
+                    />
                     <CommunityGamePicker />
                 </Box>
 

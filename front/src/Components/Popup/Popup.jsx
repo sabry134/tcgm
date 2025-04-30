@@ -4,53 +4,37 @@ import { Box, Button, Divider, Popper, Stack, Typography } from "@mui/material";
 import { FormInput } from "../FormInput/FormInput";
 import { createGameRequest } from "../../Api/gamesRequest";
 
-type PopupProps = {
-  id: string,
-  open: boolean,
-  anchorEl: HTMLElement | null,
-  closeCallback: () => void,
-  title: string,
-  inputName: [string],
-}
-
-export class Popup extends Component<PopupProps> {
+export class Popup extends Component {
   constructor(props) {
     super();
-    this.id = props.id;
-    this.open = props.open;
-    this.anchorEl = props.anchorEl;
-    this.closeCallback = props.closeCallback
+    this.closeCallback = props.closeCallback;
     this.title = props.title;
-    this.inputName = props.inputName;
-    this.inputContent = props.inputName.map(() => '');
+    this.name = '';
+    this.description = '';
     this.state = {
       clicked: false
     }
   }
 
-  // onChangeName = event => {
-  //   this.name = event.target.value
-  // }
-  //
-  // onChangeDescription = event => {
-  //   this.description = event.target.value
-  // }
-
-  onChangeInput = (event, index) => {
-    this.inputContent[index] = event.target.value;
+  onChangeName = event => {
+    this.name = event.target.value
   }
 
-  // onClickCreate = () => {
-  //   this.setState({ clicked: true })
-  //   createGameRequest({
-  //     game: { name: this.name, description: this.description }
-  //   }).then()
-  //   this.closeCallback()
-  // }
+  onChangeDescription = event => {
+    this.description = event.target.value
+  }
+
+  onClickCreate = event => {
+    this.setState({ clicked: true })
+    createGameRequest({
+      game: { name: this.name, description: this.description }
+    })
+    this.closeCallback()
+  }
 
   render() {
     return (
-      <Popper id={this.id} open={this.open} anchorEl={this.anchorEl}>
+      <Popper id={this.props.id} open={this.props.open} anchorEl={this.props.anchorEl}>
         <div
           onClick={this.closeCallback}
           className={styles.backdrop}
@@ -81,38 +65,32 @@ export class Popup extends Component<PopupProps> {
               paddingTop={'2vw'}
               alignItems={'center'}
             >
-              {this.inputName.map((name, index) => (
-                <FormInput
-                  label={name}
-                  onChange={(event) => this.onChangeInput(event, index)}
-                />
-              ))}
 
-              {/*<FormInput*/}
-              {/*  label={'Name'}*/}
-              {/*  onChange={this.onChangeName}*/}
-              {/*/>*/}
-              {/*<FormInput*/}
-              {/*  label={'Description'}*/}
-              {/*  onChange={this.onChangeDescription}*/}
-              {/*/>*/}
+              <FormInput
+                label={'Name'}
+                onChange={this.onChangeName}
+              />
+              <FormInput
+                label={'Description'}
+                onChange={this.onChangeDescription}
+              />
 
-              {/*<Button*/}
-              {/*  onClick={this.onClickCreate}*/}
-              {/*  sx={{*/}
-              {/*    backgroundColor: '#656d4a',*/}
-              {/*    '&:hover': {*/}
-              {/*      backgroundColor: '#414833'*/}
-              {/*    },*/}
-              {/*    '&:clicked': {*/}
-              {/*      backgroundColor: '#333d29'*/}
-              {/*    }*/}
-              {/*  }}*/}
-              {/*  variant={'contained'}*/}
-              {/*  size={'large'}*/}
-              {/*>*/}
-              {/*  Create*/}
-              {/*</Button>*/}
+              <Button
+                onClick={this.onClickCreate}
+                sx={{
+                  backgroundColor: '#656d4a',
+                  '&:hover': {
+                    backgroundColor: '#414833'
+                  },
+                  '&:clicked': {
+                    backgroundColor: '#333d29'
+                  }
+                }}
+                variant={'contained'}
+                size={'large'}
+              >
+                Create
+              </Button>
             </Stack>
 
           </Box>

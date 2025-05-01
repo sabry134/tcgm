@@ -51,9 +51,9 @@ const Room = () => {
     callDrawCard(channel, playerId, 1);
   };
 
-  const handleCardClick = (event, card, location) => {
+  const handleCardClick = (event, index, location) => {
     event.preventDefault();
-    setSelectedCard((prev) => (prev && prev[0] === card ? null : [card, location]));
+    setSelectedCard((prev) => (prev && prev[0] === index ? null : [index, location]));
   };
 
   // when making a new drag & drop the id of the droppable need to contain the source
@@ -63,7 +63,8 @@ const Room = () => {
     }
     const [source, id, opponent] = event.active.id.split("/", 3);
     const [dest, op] = event.over.id.split("/");
-    const cardDraggedArray = Object.entries(gameState.players[playerId][source])[id];
+    const cardDraggedArray = Object.entries(gameState.players[playerId][source][id])[0];
+    console.log("cardDragged array = ", cardDraggedArray)
     const cardDragged = { [cardDraggedArray[0]]: { ...cardDraggedArray[1] } };
     callMoveCard(channel, playerId, cardDragged, source, dest);
   };
@@ -81,11 +82,11 @@ const Room = () => {
         <RoomNavigationBar roomId={gameState.id} />
 
         {Object.entries(gameState.players).map(([key, value], index) => {
-          const playerHand = Object.entries(value.hand);
-          const deck = Object.entries(value.deck);
-          const discardPile = Object.entries(value.graveyard);
-          const field = Object.entries(value.field);
-          const caster = Object.entries(value.caster);
+          const playerHand = value.hand;
+          const deck = value.deck;
+          const discardPile = value.graveyard;
+          const field = value.field;
+          const caster = value.caster;
           const opponent = checkOpponent(key);
           return <div key={index}>
             {/* Discard Pile */}
@@ -99,7 +100,7 @@ const Room = () => {
             {/* InnateCardsContainer */}
             {/* <CardZone opponent={opponent} cards={ } handleCardClick={ } selectedCard={ } boardLocation={ } cssName={ } style={ } opponentStyle={ } hoverStyle={ } hidden={ } draggable={ } offsetXHandler={ } offsetYHandler={ } rotationHandler={ } /> */}
             {/* PlayerHand */}
-            <CardZone opponent={opponent} cards={playerHand} handleCardClick={handleCardClick} selectedCard={selectedCard} boardLocation={"hand"} cssName={'playerHand'} hidden={opponent} draggable={!opponent} offsetXHandler={(key, card, index, length) => (-((index - ((length - 1) / 2)) * (180 / 3)))} rotationHandler={(key, card, index, length) => ((index - ((length - 1) / 2)) * 10)} />
+            <CardZone opponent={opponent} cards={playerHand} handleCardClick={handleCardClick} selectedCard={selectedCard} boardLocation={"hand"} cssName={'playerHand'} hidden={opponent} draggable={!opponent} offsetXHandler={(card, index, length) => (-((index - ((length - 1) / 2)) * (180 / 3)))} rotationHandler={(card, index, length) => ((index - ((length - 1) / 2)) * 10)} />
             {/* <GameChat playerId={playerId} /> */}
           </div>;
 

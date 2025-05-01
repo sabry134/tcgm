@@ -12,6 +12,8 @@ defmodule :"Elixir.TcgmWebApp.Repo.Migrations.Update card type properties table"
       remove :image_scale_x
       remove :image_scale_y
       remove :image_opacity
+      remove :border_radius
+      add :border_radius, :integer
       add :width, :integer
       add :height, :integer
       add :background_color, :string

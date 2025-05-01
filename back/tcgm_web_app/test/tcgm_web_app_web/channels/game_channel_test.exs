@@ -65,10 +65,10 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     assert_broadcast("game_update", %{state: state})
     assert Map.has_key?(state.players, "player1")
 
-    deck = %{"Card X" => %{
+    deck = [%{"Card X" => %{
       "name" => "king",
       "properties" => %{"attack" => 15, "defense" => 10}
-    }}
+    }}]
     push(socket, "set_deck", %{"player_id" => "player1", "deck" => deck})
     assert_broadcast("game_update", %{state: updated_state})
 
@@ -82,10 +82,10 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     assert_broadcast("game_update", %{state: state})
     assert Map.has_key?(state.players, "player1")
 
-    deck = %{"Card X" => %{
+    deck = [%{"Card X" => %{
       "name" => "king",
       "properties" => %{"attack" => 15, "defense" => 10}
-    }}
+    }}]
     push(socket, "set_deck", %{"player_id" => "player1", "deck" => deck})
     assert_broadcast("game_update", %{state: _updated_state})
 
@@ -101,11 +101,11 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     push(socket, "join_room", %{"player_id" => "player1"})
     assert_broadcast("game_update", %{state: state})
     assert Map.has_key?(state.players, "player1")
-
-    deck = %{"Card Y" => %{
+    tmp_card = %{"Card Y" => %{
       "name" => "magicien",
       "properties" => %{"attack" => 9, "defense" => 8}
     }}
+    deck = [tmp_card]
     source = "hand"
     dest = "field"
     push(socket, "set_deck", %{"player_id" => "player1", "deck" => deck})
@@ -114,7 +114,7 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     push(socket, "draw_card", %{"player_id" => "player1"})
     assert_broadcast("game_update", %{state: _updated_state})
 
-    push(socket, "move_card", %{"player_id" => "player1", "source" => source, "dest" => dest, "card" => deck})
+    push(socket, "move_card", %{"player_id" => "player1", "source" => source, "dest" => dest, "card" => tmp_card})
     assert_broadcast("game_update", %{state: updated_state})
 
     assert Enum.any?(updated_state.players["player1"][dest], fn card -> Map.has_key?(card, "Card Y") end) == true
@@ -127,10 +127,10 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     assert_broadcast("game_update", %{state: state})
     assert Map.has_key?(state.players, "player1")
 
-    deck = %{"Card Y" => %{
+    deck = [%{"Card Y" => %{
       "name" => "magicien",
       "properties" => %{"attack" => 9, "defense" => 8}
-    }}
+    }}]
     location = "hand"
     push(socket, "set_deck", %{"player_id" => "player1", "deck" => deck})
     assert_broadcast("game_update", %{state: _updated_state})

@@ -58,10 +58,10 @@ defmodule TcgmWebApp.Game.GameServerTest do
 
     assert length(initial_state.players["player1"]["deck"]) == 0
 
-    card = %{"Card X" => %{
+    card = [%{"Card X" => %{
       "name" => "king",
       "properties" => %{"attack" => 15, "defense" => 10}
-    }}
+    }}]
     :ok = GameServer.set_deck(room_id, "player1", card)
 
     updated_state = GameServer.get_state(room_id)
@@ -72,10 +72,10 @@ defmodule TcgmWebApp.Game.GameServerTest do
   test "players can draw a card", %{room_id: room_id} do
     GameServer.join_room(room_id, "player1")
 
-    card = %{"Card X" => %{
+    card = [%{"Card X" => %{
       "name" => "king",
       "properties" => %{"attack" => 15, "defense" => 10}
-    }}
+    }}]
     :ok = GameServer.set_deck(room_id, "player1", card)
 
     initial_state = GameServer.get_state(room_id)
@@ -95,21 +95,23 @@ defmodule TcgmWebApp.Game.GameServerTest do
   test "players can move a card", %{room_id: room_id} do
     GameServer.join_room(room_id, "player1")
 
-    card = %{"Card Y" => %{
+    tmp_card = %{"Card Y" => %{
       "name" => "magicien",
       "properties" => %{"attack" => 9, "defense" => 8}
     }}
+
+    deck = [tmp_card]
     source = "hand"
     dest = "field"
 
-    :ok = GameServer.set_deck(room_id, "player1", card)
+    :ok = GameServer.set_deck(room_id, "player1", deck)
 
     initial_state = GameServer.get_state(room_id)
 
     assert length(initial_state.players["player1"][dest]) == 0
 
     :ok = GameServer.draw_card(room_id, "player1")
-    :ok = GameServer.move_card(room_id, "player1", source, dest, card)
+    :ok = GameServer.move_card(room_id, "player1", source, dest, tmp_card)
     updated_state = GameServer.get_state(room_id)
 
     assert length(updated_state.players["player1"][dest]) == 1
@@ -121,10 +123,10 @@ defmodule TcgmWebApp.Game.GameServerTest do
   test "players can update a card", %{room_id: room_id} do
     GameServer.join_room(room_id, "player1")
 
-    card = %{"Card Y" => %{
+    card = [%{"Card Y" => %{
       "name" => "magicien",
       "properties" => %{"attack" => 9, "defense" => 8}
-    }}
+    }}]
     location = "hand"
 
     :ok = GameServer.set_deck(room_id, "player1", card)

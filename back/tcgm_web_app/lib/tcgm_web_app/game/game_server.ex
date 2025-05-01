@@ -158,7 +158,7 @@ defmodule TcgmWebApp.Game.GameServer do
 
   def handle_cast({:set_deck, player_id, deck}, state) do
 
-    new_state = %{state | players: Map.update!(state.players, player_id, fn player -> %{player | "deck" => [deck]} end)}
+    new_state = %{state | players: Map.update!(state.players, player_id, fn player -> %{player | "deck" => deck} end)}
     {:noreply, new_state}
   end
 

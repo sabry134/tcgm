@@ -9,10 +9,17 @@ defmodule TcgmWebApp.Repo.Migrations.MakeNewCardtypeProperty do
       add :value, :string, null: false
       add :variant, :string, null: false
       add :mutable, :boolean, null: false
-      add :width, :integer
-      add :height, :integer
-      add :background_color, :string
-      add :z_axis, :integer
+      add :border_radius, :string, null: false
+      add :opacity, :int, null: false
+      add :image, :string, null: true
+      add :image_width, :integer, null: true
+      add :image_height, :integer, null: true
+      add :image_position_x, :integer, null: true
+      add :image_position_y, :integer, null: true
+      add :image_rotation, :integer, null: true
+      add :image_scale_x, :integer, null: true
+      add :image_scale_y, :integer, null: true
+      add :image_opacity, :integer, null: true
       add :font, :string, null: true
       add :font_size, :integer, null: true
       add :font_color, :string, null: true

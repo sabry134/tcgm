@@ -36,7 +36,7 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     push(socket, "insert_card", %{"player_id" => "player1", "card" => card, "location" => "hand"})
     assert_broadcast("game_update", %{state: updated_state})
 
-    assert Map.has_key?(updated_state.players["player1"]["hand"], "Card X") == true
+    assert Enum.any?(updated_state.players["player1"]["hand"], fn card -> Map.has_key?(card, "Card X") end) == true
   end
 
   test "playing a card updates game state", %{socket: socket, room_id: room_id} do
@@ -55,7 +55,7 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     push(socket, "play_card", %{"player_id" => "player1", "card" => card})
     assert_broadcast("game_update", %{state: updated_state})
 
-    assert Map.has_key?(updated_state.players["player1"]["field"], "Card X") == true
+    assert Enum.any?(updated_state.players["player1"]["field"], fn card -> Map.has_key?(card, "Card X") end) == true
   end
 
   test "setting a deck updates game state", %{socket: socket, room_id: room_id} do
@@ -72,7 +72,7 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     push(socket, "set_deck", %{"player_id" => "player1", "deck" => deck})
     assert_broadcast("game_update", %{state: updated_state})
 
-    assert Map.has_key?(updated_state.players["player1"]["deck"], "Card X") == true
+    assert Enum.any?(updated_state.players["player1"]["deck"], fn card -> Map.has_key?(card, "Card X") end) == true
   end
 
   test "drawing a card updates game state", %{socket: socket, room_id: room_id} do
@@ -92,7 +92,7 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     push(socket, "draw_card", %{"player_id" => "player1"})
     assert_broadcast("game_update", %{state: updated_state})
 
-    assert Map.has_key?(updated_state.players["player1"]["hand"], "Card X") == true
+    assert Enum.any?(updated_state.players["player1"]["hand"], fn card -> Map.has_key?(card, "Card X") end) == true
   end
 
   test "moving a card updates game state", %{socket: socket, room_id: room_id} do
@@ -117,7 +117,7 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     push(socket, "move_card", %{"player_id" => "player1", "source" => source, "dest" => dest, "card" => deck})
     assert_broadcast("game_update", %{state: updated_state})
 
-    assert Map.has_key?(updated_state.players["player1"][dest], "Card Y") == true
+    assert Enum.any?(updated_state.players["player1"][dest], fn card -> Map.has_key?(card, "Card Y") end) == true
   end
 
   test "updating a card updates game state", %{socket: socket, room_id: room_id} do
@@ -141,7 +141,8 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     push(socket, "update_card", %{"player_id" => "player1", "location" => location, "card" => "Card Y", "key" => "attack", "value" => 20})
     assert_broadcast("game_update", %{state: updated_state})
 
-    assert updated_state.players["player1"][location]["Card Y"]["properties"]["attack"] == 20
+    c = Enum.find(updated_state.players["player1"][location], fn c -> Map.has_key?(c, "Card Y") end)
+    assert c["Card Y"]["properties"]["attack"] == 20
   end
 
   test "setting the turn state", %{socket: socket, room_id: room_id} do

@@ -1,4 +1,5 @@
 import { Component } from 'react'
+import shallowEqual from 'shallowequal'
 
 export class FormComponnent extends Component {
   constructor (props) {
@@ -28,6 +29,33 @@ export class FormComponnent extends Component {
         this.props.name
       )
     })
+  }
+
+  componentDidUpdate () {
+    this.setState({
+      inputValue: this.getValueByPath(
+        JSON.parse(
+          localStorage.getItem(
+            this.props.localStorageName ?? 'currentEditedCard'
+          )
+        ),
+        this.props.name
+      )
+    })
+  }
+
+  shouldComponentUpdate () {
+    return !shallowEqual(
+      this.state.inputValue,
+      this.getValueByPath(
+        JSON.parse(
+          localStorage.getItem(
+            this.props.localStorageName ?? 'currentEditedCard'
+          )
+        ),
+        this.props.name
+      )
+    )
   }
 
   // Handle input change and update state

@@ -5,7 +5,7 @@ import './CustomizationList.css'
 export class NumberInput extends FormComponnent {
   handleChange = event => {
     const value = event.target.value
-    if (value === '' || /^[0-9\b]+$/.test(value)) {
+    if (value === '' || /^\-?[0-9]*\.?[0-9]*$/.test(value)) {
       this.setState({ inputValue: value })
     }
     this.updateJsonFile(value)

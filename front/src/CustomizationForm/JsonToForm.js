@@ -20,7 +20,7 @@ const JsonToForm = ({ data = {}, predecessor = "", localStorageName = "currentEd
     }}>
       {keys.map((item, index) => {
         return (
-          <div key={index} >
+          <div key={index} hidden={data[item] === 'none'} >
             <div>
               <DropDown isFirst={index === 0} isLast={index === keys.length - 1} item={item} predecessor={predecessor} data={data} localStorageName={localStorageName} />
             </div>
@@ -73,7 +73,7 @@ const DropDown = ({ item, data, predecessor, localStorageName, isFirst, isLast }
   }
 
   return (
-    <div className={"customFormItem " + (isFirst ? "first" : "") + (isLast ? "last" : "")} hidden={data[item] === 'none'}>
+    <div className={"customFormItem " + (isFirst ? "first" : "") + (isLast ? "last" : "")} >
       <h2 className={"customFormName " + (isFirst ? "first" : "") + (isLast ? "last" : "")}>
         {switchTitle(item)}
       </h2>

@@ -15,6 +15,7 @@ export class RightPanel extends Component {
   componentDidMount () {
     window.addEventListener('ComponnentSelected', this.handleSelected)
   }
+
   componentWillUnmount () {
     window.removeEventListener('ComponnentSelected', this.handleSelected)
   }

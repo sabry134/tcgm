@@ -3,14 +3,10 @@ import { VisualProperties } from './VisualProperties'
 import { Box } from '@mui/material'
 
 export class TCGMBox extends Component {
-  constructor (props) {
-    super(props)
-  }
-
   render () {
     //TODO(): when back is done changing properties remove those props values
     const backgroundColor =
-      this.props.data.backgroundColor ?? this.props.data.font_color
+      this.props.data.background_color ?? this.props.data.font_color
     const width = this.props.data.width ?? this.props.data.image_width
     const height = this.props.data.height ?? this.props.data.image_height
 
@@ -24,13 +20,14 @@ export class TCGMBox extends Component {
         <Box
           sx={{
             backgroundColor: backgroundColor,
-            rotate: this.props.data.rotation,
-            borderWidth: this.props.data.border_width,
+            rotate: `${this.props.data.rotation}deg`,
+            borderWidth: `${this.props.data.border_width}px`,
             borderColor: `rgba(${this.props.data.border_color[0]}, ${this.props.data.border_color[1]}, ${this.props.data.border_color[2]}, ${this.props.data.border_color[3]})`,
             borderRadius: this.props.data.borderRadius,
             width: width * this.props.data.scale_x,
             height: height * this.props.data.scale_y,
             borderStyle: 'solid',
+            opacity: this.props.data.opacity,
             bgcolor: `rgba(${backgroundColor[0]}, ${backgroundColor[1]}, ${backgroundColor[2]}, ${backgroundColor[3]})`
           }}
         >

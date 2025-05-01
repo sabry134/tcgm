@@ -18,7 +18,7 @@ const defaultProperties = {
   height: 50,
   font: 'Arial',
   font_size: 12,
-  font_color: [0, 0, 0, 0],
+  font_color: [0, 0, 0, 1],
   background_color: [25, 25, 25, 1],
   position_x: 50,
   position_y: 50,
@@ -101,6 +101,7 @@ export class Editor extends Component {
   }
 
   handleOnDragStart = event => {
+    event.stopPropagation()
     // Calculate offset from mouse to element's top-left corner
     if (this.state.idSelected === -1) return
 
@@ -152,53 +153,21 @@ export class Editor extends Component {
     })
   }
 
-  switchProperties (value, index, selected) {
-    let data = value
-    if (index === this.state.idSelected) {
-      data = localStorage.getItem('propertySelected')
-    }
-    switch (value.type) {
-      case 'text': {
-        return (
-          <TCGMTextField
-            data={data}
-            selected={selected}
-            positionX={selected ? this.state.position_x : value.position_x}
-            positionY={selected ? this.state.position_y : value.position_y}
-          />
-        )
-      }
-      case 'box': {
-        return (
-          <TCGMBox
-            data={data}
-            selected={selected}
-            positionX={selected ? this.state.position_x : value.position_x}
-            positionY={selected ? this.state.position_y : value.position_y}
-          />
-        )
-      }
-      default: {
-        return <Box />
-      }
-    }
-  }
-
   handleSelectedOnClick = (event, index) => {
     event.stopPropagation()
     localStorage.setItem(
       'propertySelected',
       JSON.stringify(this.state.properties[index])
     )
-    localStorage.setItem('idSelected', index)
 
-    window.dispatchEvent(new Event('ComponnentSelected'))
+    localStorage.setItem('idSelected', index)
 
     this.setState({
       idSelected: index,
       position_x: this.state.properties[index].position_x,
       position_y: this.state.properties[index].position_y
     })
+    window.dispatchEvent(new Event('ComponnentSelected'))
   }
 
   handleDeselectedOnClick = () => {

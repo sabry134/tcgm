@@ -101,14 +101,15 @@ defmodule TcgmWebApp.Game.SetDeckByIdTest do
 
     initial_state = GameServer.get_state(room_id)
 
-    assert map_size(initial_state.players["player1"]["deck"]) == 0
-    assert map_size(initial_state.players["player1"]["caster"]) == 0
+    assert length(initial_state.players["player1"]["deck"]) == 0
+    assert length(initial_state.players["player1"]["caster"]) == 0
 
     :ok = GameServer.set_deck_by_id(room_id, "player1", card_collection.id)
 
     updated_state = GameServer.get_state(room_id)
-    assert map_size(updated_state.players["player1"]["deck"]) == 2
-    assert map_size(updated_state.players["player1"]["caster"]) == 1
+    
+    assert length(updated_state.players["player1"]["deck"]) == 2
+    assert length(updated_state.players["player1"]["caster"]) == 1
   end
 
 end

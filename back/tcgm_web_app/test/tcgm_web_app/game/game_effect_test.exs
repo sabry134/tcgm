@@ -6,14 +6,14 @@ defmodule TcgmWebApp.Game.GameEffectTest do
     initial_state = %{
       players: %{
         "player1" => %{
-          "hand" => %{},
-          "deck" =>  %{
-            "Card A" => %{"name" => "Lion","properties" => %{"attack" => 7, "defense" => 3}},
-            "Card B" => %{"name" => "Zombie","properties" => %{"attack" => 5, "defense" => 11}},
-            "Card C" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}
-          },
-          "field" => %{},
-          "graveyard" => %{}
+          "hand" => [],
+          "deck" =>  [
+            %{"Card A" => %{"name" => "Lion","properties" => %{"attack" => 7, "defense" => 3}}},
+            %{"Card B" => %{"name" => "Zombie","properties" => %{"attack" => 5, "defense" => 11}}},
+            %{"Card C" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+          ],
+          "field" => [],
+          "graveyard" => []
         }
       }
     }
@@ -42,10 +42,8 @@ defmodule TcgmWebApp.Game.GameEffectTest do
       }
     }
 
-    new_state = put_in(state, [:players, "player1", "hand", "Card Y"], card1["Card Y"])
-    new_state = put_in(new_state, [:players, "player1", "hand", "Card 2"], card2["Card 2"])
-    new_state = put_in(new_state, [:players, "player1", "hand", "Card 3"], card3["Card 3"])
-    new_state = put_in(new_state, [:players, "player1", "hand", "Card 4"], card4["Card 4"])
+    new_hand = state.players["player1"]["hand"] ++ [card1] ++ [card2] ++ [card3] ++ [card4]
+    new_state = put_in(state, [:players, "player1", "hand"], new_hand)
     result = GameEffect.apply_effect(new_state, "player1", action, condition)
     assert match?({:error, _}, result)
   end
@@ -66,7 +64,7 @@ defmodule TcgmWebApp.Game.GameEffectTest do
       }
     }
 
-    updated_state = update_in(state[:players]["player1"]["deck"], fn _deck -> %{} end)
+    updated_state = put_in(state, [:players, "player1", "deck"], [])
     result = GameEffect.apply_effect(updated_state, "player1", action, condition)
     assert match?({:error, _}, result)
   end
@@ -147,7 +145,8 @@ defmodule TcgmWebApp.Game.GameEffectTest do
         "card" => card1
       }
     }
-    updated_state = update_in(state[:players]["player1"]["deck"], fn _deck -> %{} end)
+
+    updated_state = put_in(state, [:players, "player1", "deck"], [])
     result = GameEffect.apply_effect(updated_state, "player1", action, condition)
     assert match?({:error, _}, result)
   end

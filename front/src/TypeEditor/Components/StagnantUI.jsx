@@ -95,7 +95,6 @@ const StagnantUI = ({ createNewComponnent }) => {
         </div>
         <Popper anchorEl={anchorRef.current} open={open}>
           <div className='subAddMenu'>
-            {/* We need to add icon to menu item */}
             <MenuItem onClick={addText}> Text Field </MenuItem>
             <MenuItem onClick={addBox}> Box </MenuItem>
           </div>

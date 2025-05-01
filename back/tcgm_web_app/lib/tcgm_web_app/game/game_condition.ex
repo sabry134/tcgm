@@ -22,7 +22,7 @@ defmodule TcgmWebApp.Game.GameCondition do
   end
 
   def number_of_cards_in_hand(state, player_id, args) do
-    cond_result = @map_foncs[args["fonc"]].(map_size(state.players[player_id]["hand"]), args["number"])
+    cond_result = @map_foncs[args["fonc"]].(length(state.players[player_id]["hand"]), args["number"])
     cond_result
   end
 

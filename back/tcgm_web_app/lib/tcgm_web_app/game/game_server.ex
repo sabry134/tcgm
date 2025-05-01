@@ -102,7 +102,7 @@ defmodule TcgmWebApp.Game.GameServer do
     containers =
       config["card_containers"]
       |> Map.keys()
-      |> Enum.map(fn container -> {container, %{}} end)
+      |> Enum.map(fn container -> {container, []} end)
       |> Enum.into(%{})
 
     Map.merge(containers, config["player_properties"])
@@ -157,13 +157,13 @@ defmodule TcgmWebApp.Game.GameServer do
   end
 
   def handle_cast({:set_deck, player_id, deck}, state) do
+
     new_state = %{state | players: Map.update!(state.players, player_id, fn player -> %{player | "deck" => deck} end)}
     {:noreply, new_state}
   end
 
   def handle_cast({:set_deck_by_id, player_id, deck_id}, state) do
     card_collection_cards = CardCollectionCards.get_card_collection_cards_by_card_collection_id(deck_id)
-
     grouped_cards = Enum.group_by(card_collection_cards, & &1.group, fn card ->
       %{
         id: card.card_id,
@@ -172,7 +172,7 @@ defmodule TcgmWebApp.Game.GameServer do
     end)
 
     enriched_groups = Enum.map(grouped_cards, fn {group, cards} ->
-      enriched_cards = Enum.reduce(cards, %{}, fn card, acc ->
+      enriched_cards = Enum.map(cards, fn card ->
         base_card = Cards.get_card!(card.id)
         card_properties = CardProperties.get_card_properties_by_card_id(card.id)
 
@@ -187,8 +187,8 @@ defmodule TcgmWebApp.Game.GameServer do
           "image" => base_card.image,
           "properties" => enriched_properties
         }
-
-        Map.put(acc, "#{card.id}", enriched_card)
+        c = %{"#{card.id}" => enriched_card}
+        c
       end)
 
       {group, enriched_cards}

@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { callSetDeck, callDrawCard, callInsertCard, callMoveCard } from "../game_commands";
 import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
 import CardInfo from "./Componnent/CardInfo";
-import GameChat from "./Componnent/GameChat";
 import "./Room.css"
 import { DndContext } from '@dnd-kit/core';
 import { useChannel } from "../ChannelContext"; // Import the context hook
@@ -11,12 +10,13 @@ import CardZone from "./Componnent/CardZone";
 
 const Room = () => {
   const navigate = useNavigate();
-  const { channel, gameState, setGameState } = useChannel(); // Get channel from context
+  const { channel, gameState } = useChannel(); // Get channel from context
   const connectionRef = React.useRef({
     isMounted: false,
   });
   const [selectedCard, setSelectedCard] = useState(null);
   const [playerId, setPlayerId] = useState("");
+  const [hoveredCard, setHoveredCard] = useState(null);
 
   const cardBackImage =
     "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Card_back_06.svg/1200px-Card_back_06.svg.png";
@@ -102,8 +102,8 @@ const Room = () => {
             <CardZone opponent={opponent} cards={playerHand} handleCardClick={handleCardClick} selectedCard={selectedCard} boardLocation={"hand"} cssName={'playerHand'} hidden={opponent} draggable={!opponent} offsetXHandler={(key, card, index, length) => (-((index - ((length - 1) / 2)) * (180 / 3)))} rotationHandler={(key, card, index, length) => ((index - ((length - 1) / 2)) * 10)} />
             {/* <GameChat playerId={playerId} /> */}
           </div>;
+
         })}
-        {selectedCard && <CardInfo selectedCard={selectedCard[0]} cardList={gameState.players[playerId][selectedCard[1]]} />}
       </div>
     </DndContext>
   );

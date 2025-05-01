@@ -10,10 +10,8 @@ const GameMainPage = () => {
 
   return (
     <Box display="flex" flexDirection="column" height="100vh">
-      {/* Brown Banner with Menu */}
       <MainNavigationBar navigate={navigate} />
 
-      {/* Main Content Area */}
       <Box display="flex" flexGrow={1} bgcolor="#fff">
 
         <LeftPanel />

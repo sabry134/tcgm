@@ -4,7 +4,6 @@ import { VisualProperties } from './VisualProperties'
 export class TCGMTextField extends Component {
   constructor (props) {
     super(props)
-    console.log(this.props.data)
   }
   render () {
     const backgroundColor = this.props.data.background_color ?? [0, 0, 0, 0]

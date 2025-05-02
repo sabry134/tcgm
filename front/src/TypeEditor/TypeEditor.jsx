@@ -7,8 +7,6 @@ import { useNavigate } from 'react-router-dom'
 import { CreateTypePopup } from './Components/CreateTypePopup'
 import { MainNavigationBar } from '../NavigationBar/MainNavigationBar'
 
-// Pour le json des carte faudrais mettre l'image, le nom et le text dans properties pour faciliter le front je pense pas que sa devrais changer grand chose (1 sa permetrais plus de custom et 2 le front n'aurais plus qu'a regarder dans properties pour les editor ce qui facilitrais la tâche)
-
 const TypeEditor = () => {
   const navigate = useNavigate()
   const [anchor, setAnchor] = useState(null)

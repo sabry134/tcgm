@@ -23,7 +23,7 @@ export class TCGMCard extends Component {
   handleStorageChange = event => {
     const storedData = localStorage.getItem('currentEditedCard')
     if (storedData) {
-      const data = JSON.parse(storedData).card
+      const data = JSON.parse(storedData)
       if (data) {
         try {
           getCardTypesPropertiesbyTypeRequest(data.card_type_id).then(

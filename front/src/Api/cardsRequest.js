@@ -1,4 +1,5 @@
 import { baseRequest } from "./baseRequest";
+import { getCardTypesPropertiesbyTypeRequest } from "./cardTypesPropertiesRequest";
 
 export async function getCardRequest() {
   return await baseRequest('cards', 'GET', null, {});
@@ -18,17 +19,28 @@ export async function getCardRequest() {
 //   "card_type_id": 0
 // }
 export async function saveCardRequest(storedId, game_id, data) {
-  data.card.game_id = game_id;
+  data.game_id = game_id;
+  await getCardTypesPropertiesbyTypeRequest(data.card_type_id).then((properties) => {
+    if (!storedId || storedId === "0") {
+      return baseRequest('cards/with_properties', 'POST', {
+        "card": data,
+        "properties": properties,
+      }, {
+        'Content-Type': 'application/json'
+      });
+    } else {
+      return baseRequest('cards/' + storedId, 'PUT', {
+        "card": {
+          ...data,
+          properties: properties
+        }
+      }, {
+        'Content-Type': 'application/json'
+      });
+    }
+  })
 
-  if (!storedId || storedId === "0") {
-    return await baseRequest('cards', 'POST', data, {
-      'Content-Type': 'application/json'
-    });
-  } else {
-    return await baseRequest('cards/' + storedId, 'PUT', data, {
-      'Content-Type': 'application/json'
-    });
-  }
+
 }
 
 export async function getCardsByGameRequest(gameId) {

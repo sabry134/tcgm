@@ -21,10 +21,8 @@ const CardEditor = () => {
     return (
         <Box display="flex" flexDirection="column" height="100vh">
             <MainNavigationBar navigate={navigate} />
-
             <Box display="flex" flexGrow={1} bgcolor="#fff">
                 <LeftPanel />
-
                 <Box
                     className="main-area"
                     flexGrow={1}
@@ -33,7 +31,6 @@ const CardEditor = () => {
                 >
                     <TCGMCard />
                 </Box>
-
                 <RightPanel />
             </Box>
         </Box>

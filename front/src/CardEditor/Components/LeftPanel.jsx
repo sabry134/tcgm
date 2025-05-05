@@ -2,8 +2,17 @@ import { Button, Paper, TextField } from '@mui/material'
 import React, { Component } from 'react'
 import { CardPicker } from './CardPicker'
 import { createCardTypeRequest } from '../../Api/cardTypesRequest'
-import { saveCardRequest, getCardsByGameRequest } from '../../Api/cardsRequest'
+import {
+  saveCardRequest,
+  getCardsByGameRequest,
+  getCardsByGameWithPropertiesRequest
+} from '../../Api/cardsRequest'
 import { loginUserRequest, createUserRequest } from '../../Api/usersRequest'
+import { TCGMButton } from '../../Components/TCGMButton'
+
+// TODO(): change save card to save card with properties
+// TODO(): add new create card button
+// TODO(): change right pannel to only accept mutable properties change and name of card
 
 export class LeftPanel extends Component {
   constructor (props) {
@@ -54,9 +63,8 @@ export class LeftPanel extends Component {
     const gameId = localStorage.getItem('gameSelected')
     try {
       saveCardRequest(storedId, gameId, JSON.parse(card)).then(data => {
-        console.log(data)
+        this.getCard()
       })
-      this.getCard()
     } catch (error) {
       console.log(error)
     }
@@ -66,36 +74,15 @@ export class LeftPanel extends Component {
     const gameSelected = localStorage.getItem('gameSelected')
 
     try {
-      getCardsByGameRequest(gameSelected).then(data => {
+      getCardsByGameWithPropertiesRequest(gameSelected).then(data => {
         if (!data) {
           return []
         }
         this.setState({ cardList: data })
+        if (data.length > 0) {
+          this.loadCard(data[0])
+        }
         return data
-      })
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  login (json) {
-    try {
-      loginUserRequest({
-        user: { username: 'zac' }
-      }).then(data => {
-        console.log(data)
-      })
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  register (json) {
-    try {
-      createUserRequest({
-        user: { username: 'zac' }
-      }).then(data => {
-        console.log(data)
       })
     } catch (error) {
       console.log(error)
@@ -114,7 +101,7 @@ export class LeftPanel extends Component {
   }
 
   loadCard (card) {
-    localStorage.setItem('currentEditedCard', JSON.stringify({ card: card }))
+    localStorage.setItem('currentEditedCard', JSON.stringify(card))
     window.dispatchEvent(new Event('storage'))
   }
 

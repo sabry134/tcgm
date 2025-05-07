@@ -32,9 +32,20 @@ export class Popup extends Component {
           className={styles.backdrop}
         >
           <Box
-            sx={{ borderRadius: '10px' }}
-            alignItems={'center'}
-            className={styles.body}
+            sx={{
+              borderRadius: '10px',
+              position: 'relative',
+              width: '50vw',
+              height: '50vh',
+              left: '25vw',
+              top: '25vh',
+              display: 'flex',
+              py: 1,
+              flexDirection: 'column',
+              alignItems: 'center',
+              backgroundColor: 'primary.main',
+              color: 'primary.contrastText',
+            }}
             onClick={event => event.stopPropagation()}
           >
             <Box

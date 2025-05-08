@@ -331,7 +331,6 @@ defmodule TcgmWebApp.Game.GameLogicTest do
     state_with_card_in_graveyard = GameLogic.insert_card(state, "player1", action_args)
 
     assert Enum.any?(state_with_card_in_graveyard.players["player1"]["graveyard"], fn card -> Map.has_key?(card, "Card Y") end) == true
-
   end
 
   test "insert_card insert card into location with already cards", %{initial_state: state} do
@@ -371,5 +370,68 @@ defmodule TcgmWebApp.Game.GameLogicTest do
 
     assert state_pass_turn.turn == "player2"
     assert state_pass_turn.turnCount == 1
+  end
+
+  test "shuffle_card can shuffle card in deck location", %{initial_state: state} do
+    insert_args = %{"location" => "deck"}
+    original_deck = state.players["player1"]["deck"]
+    changed =
+      Enum.any?(1..10, fn _ ->
+        shuffled_state = GameLogic.shuffle_card_location(state, "player1", insert_args)
+        shuffled_deck = shuffled_state.players["player1"]["deck"]
+        shuffled_deck != original_deck
+      end)
+
+    assert changed
+  end
+
+  test "shuffle_card can shuffle card in hand location", %{initial_state: state} do
+    card1 = %{"Card A" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    card2 = %{"Card B" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    card3 = %{"Card C" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    card4 = %{"Card Y" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+
+    new_hand = state.players["player1"]["hand"] ++ [card1] ++ [card2] ++ [card3] ++ [card4]
+    new_state = put_in(state, [:players, "player1", "hand"], new_hand)
+
+    assert Enum.any?(new_state.players["player1"]["hand"], fn card -> Map.has_key?(card, "Card A") end) == true
+    assert Enum.any?(new_state.players["player1"]["hand"], fn card -> Map.has_key?(card, "Card B") end) == true
+    assert Enum.any?(new_state.players["player1"]["hand"], fn card -> Map.has_key?(card, "Card C") end) == true
+    assert Enum.any?(new_state.players["player1"]["hand"], fn card -> Map.has_key?(card, "Card Y") end) == true
+
+    insert_args = %{"location" => "hand"}
+    changed =
+      Enum.any?(1..10, fn _ ->
+        shuffled_state = GameLogic.shuffle_card_location(state, "player1", insert_args)
+        shuffled_deck = shuffled_state.players["player1"]["hand"]
+        shuffled_deck != new_hand
+      end)
+
+    assert changed
+  end
+
+  test "shuffle_card can shuffle card in graveyard location", %{initial_state: state} do
+    card1 = %{"Card A" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    card2 = %{"Card B" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    card3 = %{"Card C" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    card4 = %{"Card Y" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+
+    new_graveyard = state.players["player1"]["graveyard"] ++ [card1] ++ [card2] ++ [card3] ++ [card4]
+    new_state = put_in(state, [:players, "player1", "graveyard"], new_graveyard)
+
+    assert Enum.any?(new_state.players["player1"]["graveyard"], fn card -> Map.has_key?(card, "Card A") end) == true
+    assert Enum.any?(new_state.players["player1"]["graveyard"], fn card -> Map.has_key?(card, "Card B") end) == true
+    assert Enum.any?(new_state.players["player1"]["graveyard"], fn card -> Map.has_key?(card, "Card C") end) == true
+    assert Enum.any?(new_state.players["player1"]["graveyard"], fn card -> Map.has_key?(card, "Card Y") end) == true
+
+    insert_args = %{"location" => "graveyard"}
+    changed =
+      Enum.any?(1..10, fn _ ->
+        shuffled_state = GameLogic.shuffle_card_location(state, "player1", insert_args)
+        shuffled_deck = shuffled_state.players["player1"]["graveyard"]
+        shuffled_deck != new_graveyard
+      end)
+
+    assert changed
   end
 end

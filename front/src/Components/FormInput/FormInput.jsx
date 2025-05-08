@@ -20,9 +20,14 @@ export class FormInput extends Component {
   render () {
     return (
       <Box marginTop={'15px'} display={'flex'} flexDirection={'column'}>
-        <Typography>
+
+        <Typography
+          color={"primary.contrastText"}
+          fontWeight={600}
+        >
           {this.props.label}
         </Typography>
+
         <Input
           onFocus={this.changeFocus}
           onBlur={this.closeFocus}
@@ -31,6 +36,7 @@ export class FormInput extends Component {
           className={this.state.focused ? 'input focus' : 'input'}
           {...this.props}
         />
+
       </Box>
     )
   }

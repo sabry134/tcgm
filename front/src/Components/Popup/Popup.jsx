@@ -3,6 +3,31 @@ import styles from './Popup.module.css'
 import { Box, Button, Divider, Popper, Stack, Typography } from "@mui/material";
 import { FormInput } from "../FormInput/FormInput";
 
+/**
+ * Popup component for displaying a modal dialog with input fields and buttons.
+ * @param {Object} props - The component props.
+ * @param {string} props.id - ID for the Popper component.
+ * @param {boolean} props.open - Is the popup open or closed.
+ * @param {HTMLElement} props.anchorEl - Element to anchor the popup to.
+ *
+ * @param {Function} props.closeCallback - Callback function to close.
+ * @param {Function} props.receivedCallback - Callback function to handle received data.
+ * @param {string} props.title - Title of the popup.
+ * @param {Array} props.inputName - Array of input field names.
+ *
+ * @returns {JSX.Element} The rendered Popup component.
+ * @example
+ * <Popup
+ *  closeCallback={handleClose}
+ *  receivedCallback={handleReceived}
+ *  title="My Popup"
+ *  inputName={['Input 1', 'Input 2']}
+ *  id="my-popup"
+ *  anchorEl={anchorElement}
+ *  open={isOpen}
+ *  />
+ */
+
 export class Popup extends Component {
   constructor(props) {
     super();
@@ -33,19 +58,19 @@ export class Popup extends Component {
         >
           <Box
             sx={{
-              borderRadius: '10px',
-              position: 'relative',
               width: '50vw',
               height: '50vh',
               left: '25vw',
               top: '25vh',
+              borderRadius: 2,
+              position: 'relative',
               display: 'flex',
-              py: 1,
+              py: 5,
               flexDirection: 'column',
               alignItems: 'center',
               backgroundColor: 'primary.main',
-              color: 'primary.contrastText',
             }}
+            className={styles.bodyPopup}
             onClick={event => event.stopPropagation()}
           >
             <Box
@@ -56,7 +81,7 @@ export class Popup extends Component {
               justifyContent={'center'}
               width={'100%'}
             >
-              <Typography variant={'h5'} fontWeight={600}>
+              <Typography variant={'h5'} fontWeight={600} color={"primary.contrastText"}>
                 {this.title}
               </Typography>
             </Box>

@@ -1,19 +1,8 @@
-:root {
-  --baseSpace: 2vw;
-}
-
-.body {
-  position: relative;
+.bodyPopup {
   width: 50vw;
   height: 50vh;
   left: 25vw;
   top: 25vh;
-  background-color: #936639;
-  color: white;
-  display: flex;
-  padding-top: var(--baseSpace);
-  padding-bottom: var(--baseSpace);
-  flex-direction: column;
 }
 
 .backdrop {

@@ -67,6 +67,7 @@ defmodule TcgmWebAppWeb.Router do
     post "/rooms", RoomController, :create
     get "/rooms/:room_id", RoomController, :state
     post "/rooms/:room_id/join", RoomController, :join
+    post "/rooms/leave", RoomController, :leave
 
     get "/hello", HelloController, :index
   end

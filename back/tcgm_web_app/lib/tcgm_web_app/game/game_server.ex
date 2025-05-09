@@ -88,6 +88,10 @@ defmodule TcgmWebApp.Game.GameServer do
   end
   # Server interaction functions
 
+  def leave_room(room_id, player_id) do
+    GenServer.call(via_tuple(room_id), {:leave, player_id})
+  end
+
   defp load_game_config(game_id) do
     config_path = "assets/game_config/#{game_id}.json"
 
@@ -265,4 +269,15 @@ defmodule TcgmWebApp.Game.GameServer do
         {:reply, {:error, reason}, state}
     end
   end
+
+  def handle_call({:leave, player_id}, _from, state) do
+    if Map.has_key?(state.players, player_id) do
+      new_players = Map.delete(state.players, player_id)
+      new_state = %{state | players: new_players}
+      {:reply, :ok, new_state}
+    else
+      {:reply, {:error, :not_found}, state}
+    end
+  end
+
 end

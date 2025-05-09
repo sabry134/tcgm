@@ -23,12 +23,24 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     assert Map.has_key?(state.players, "player1")
   end
 
+  test "players can leave a room", %{room_id: room_id} do
+    GameServer.join_room(room_id, "player1")
+    state_before = GameServer.get_state(room_id)
+    assert Map.has_key?(state_before.players, "player1")
+
+    :ok = GameServer.leave_room(room_id, "player1")
+
+    state_after = GameServer.get_state(room_id)
+    refute Map.has_key?(state_after.players, "player1")
+  end
+  
   test "multiple players can join room channel", %{socket: socket, socket2: socket2, room_id: room_id} do
     {:ok, _, socket} = subscribe_and_join(socket, GameChannel, "room:" <> room_id, %{})
     assert socket.assigns.room_id == room_id
 
     push(socket, "join_room", %{"player_id" => "player1"})
     assert_broadcast("game_update", %{state: state})
+
     assert Map.has_key?(state.players, "player1")
 
     {:ok, _, socket2} = subscribe_and_join(socket2, GameChannel, "room:" <> room_id, %{})

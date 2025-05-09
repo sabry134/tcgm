@@ -22,6 +22,19 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     assert Map.has_key?(state.players, "player1")
   end
 
+  test "players can leave room channel", %{socket: socket, room_id: room_id} do
+    {:ok, _, socket} = subscribe_and_join(socket, GameChannel, "room:" <> room_id, %{})
+    assert socket.assigns.room_id == room_id
+
+    push(socket, "join_room", %{"player_id" => "player1"})
+    assert_broadcast("game_update", %{state: state})
+
+    push(socket, "leave_room", %{"player_id" => "player1"})
+    assert_broadcast("game_update", %{state: updated_state})
+
+    refute Map.has_key?(updated_state.players, "player1")
+  end
+
   test "inserting a card updates game state", %{socket: socket, room_id: room_id} do
     {:ok, _, socket} = subscribe_and_join(socket, GameChannel, "room:" <> room_id, %{})
 

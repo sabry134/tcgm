@@ -48,22 +48,22 @@ defmodule TcgmWebAppWeb.RoomController do
   end
 
   swagger_path(:leave) do
-  post("/rooms/leave")
-  description("Leave a room")
-  parameter(:body, :body, Schema.ref(:RoomRequest), "Room leave payload", required: true)
-  response(code(:ok), "Left the room successfully")
-  response(code(:not_found), "Room or player not found")
-end
-
-def leave(conn, %{"room_id" => room_id, "player_id" => player_id}) do
-  case TcgmWebApp.Game.GameServer.leave_room(room_id, player_id) do
-    :ok ->
-      json(conn, %{message: "Player left the room"})
-    {:error, :not_found} ->
-      conn
-      |> put_status(:not_found)
-      |> json(%{error: "Room or player not found"})
+    post("/rooms/leave")
+    description("Leave a room")
+    parameter(:body, :body, Schema.ref(:RoomRequest), "Room leave payload", required: true)
+    response(code(:ok), "Left the room successfully")
+    response(code(:not_found), "Room or player not found")
   end
-end
+
+  def leave(conn, %{"room_id" => room_id, "player_id" => player_id}) do
+    case TcgmWebApp.Game.GameServer.leave_room(room_id, player_id) do
+      :ok ->
+        json(conn, %{message: "Player left the room"})
+      {:error, :not_found} ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "Room or player not found"})
+    end
+  end
 
 end

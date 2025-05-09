@@ -76,4 +76,9 @@ defmodule TcgmWebAppWeb.GameChannel do
     broadcast!(socket, "game_update", %{state: TcgmWebApp.Game.GameServer.get_state(socket.assigns.room_id)})
     {:noreply, socket}
   end
+  def handle_in("shuffle_card", %{"player_id" => player_id, "location" => location}, socket) do
+    TcgmWebApp.Game.GameServer.shuffle_card(socket.assigns.room_id, player_id, location)
+    broadcast!(socket, "game_update", %{state: TcgmWebApp.Game.GameServer.get_state(socket.assigns.room_id)})
+    {:noreply, socket}
+  end
 end

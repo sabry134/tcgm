@@ -174,4 +174,68 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     assert updated_state.turn == "player2"
     assert updated_state.turnCount == 1
   end
+
+  test "shuffling the card in deck location", %{socket: socket, room_id: room_id} do
+    {:ok, _, socket} = subscribe_and_join(socket, GameChannel, "room:" <> room_id, %{})
+
+    push(socket, "join_room", %{"player_id" => "player1"})
+    assert_broadcast("game_update", %{state: state})
+    assert Map.has_key?(state.players, "player1")
+
+    card1 = %{"Card A" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    card2 = %{"Card B" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    card3 = %{"Card C" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    card4 = %{"Card Y" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    push(socket, "insert_card", %{"player_id" => "player1", "card" => card1, "location" => "deck"})
+    assert_broadcast("game_update", %{state: updated_state})
+    push(socket, "insert_card", %{"player_id" => "player1", "card" => card2, "location" => "deck"})
+    assert_broadcast("game_update", %{state: updated_state})
+    push(socket, "insert_card", %{"player_id" => "player1", "card" => card3, "location" => "deck"})
+    assert_broadcast("game_update", %{state: updated_state})
+    push(socket, "insert_card", %{"player_id" => "player1", "card" => card4, "location" => "deck"})
+    assert_broadcast("game_update", %{state: updated_state})
+
+    new_deck = updated_state.players["player1"]["deck"]
+    changed =
+      Enum.any?(1..10, fn _ ->
+        push(socket, "shuffle_card", %{"player_id" => "player1", "location" => "deck"})
+        assert_broadcast("game_update", %{state: shuffled_state})
+        shuffled_deck = shuffled_state.players["player1"]["deck"]
+        shuffled_deck != new_deck
+      end)
+
+    assert changed
+  end
+
+  test "shuffling the card in hand location", %{socket: socket, room_id: room_id} do
+    {:ok, _, socket} = subscribe_and_join(socket, GameChannel, "room:" <> room_id, %{})
+
+    push(socket, "join_room", %{"player_id" => "player1"})
+    assert_broadcast("game_update", %{state: state})
+    assert Map.has_key?(state.players, "player1")
+
+    card1 = %{"Card A" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    card2 = %{"Card B" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    card3 = %{"Card C" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    card4 = %{"Card Y" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    push(socket, "insert_card", %{"player_id" => "player1", "card" => card1, "location" => "hand"})
+    assert_broadcast("game_update", %{state: updated_state})
+    push(socket, "insert_card", %{"player_id" => "player1", "card" => card2, "location" => "hand"})
+    assert_broadcast("game_update", %{state: updated_state})
+    push(socket, "insert_card", %{"player_id" => "player1", "card" => card3, "location" => "hand"})
+    assert_broadcast("game_update", %{state: updated_state})
+    push(socket, "insert_card", %{"player_id" => "player1", "card" => card4, "location" => "hand"})
+    assert_broadcast("game_update", %{state: updated_state})
+
+    new_hand = updated_state.players["player1"]["hand"]
+    changed =
+      Enum.any?(1..10, fn _ ->
+        push(socket, "shuffle_card", %{"player_id" => "player1", "location" => "hand"})
+        assert_broadcast("game_update", %{state: shuffled_state})
+        shuffled_hand = shuffled_state.players["player1"]["hand"]
+        shuffled_hand != new_hand
+      end)
+
+    assert changed
+  end
 end

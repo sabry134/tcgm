@@ -215,4 +215,59 @@ defmodule TcgmWebApp.Game.GameServerTest do
     assert length(state.players["player2"]["hand"]) == 5
   end
 
+  test "shuffle card in deck location", %{room_id: room_id} do
+    GameServer.join_room(room_id, "player1")
+
+    initial_state = GameServer.get_state(room_id)
+    assert length(initial_state.players["player1"]["deck"]) == 0
+
+    card1 = %{"Card A" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    card2 = %{"Card B" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    card3 = %{"Card C" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    card4 = %{"Card Y" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    :ok = GameServer.insert_card(room_id, "player1", card1, "deck")
+    :ok = GameServer.insert_card(room_id, "player1", card2, "deck")
+    :ok = GameServer.insert_card(room_id, "player1", card3, "deck")
+    :ok = GameServer.insert_card(room_id, "player1", card4, "deck")
+
+    updated_state = GameServer.get_state(room_id)
+    new_deck = updated_state.players["player1"]["deck"]
+    changed =
+      Enum.any?(1..10, fn _ ->
+        :ok = GameServer.shuffle_card(room_id, "player1", "deck")
+        shuffled_state = GameServer.get_state(room_id)
+        shuffled_deck = shuffled_state.players["player1"]["deck"]
+        shuffled_deck != new_deck
+      end)
+
+    assert changed
+  end
+
+  test "shuffle card in field location", %{room_id: room_id} do
+    GameServer.join_room(room_id, "player1")
+
+    initial_state = GameServer.get_state(room_id)
+    assert length(initial_state.players["player1"]["field"]) == 0
+
+    card1 = %{"Card A" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    card2 = %{"Card B" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    card3 = %{"Card C" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    card4 = %{"Card Y" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+    :ok = GameServer.insert_card(room_id, "player1", card3, "field")
+    :ok = GameServer.insert_card(room_id, "player1", card2, "field")
+    :ok = GameServer.insert_card(room_id, "player1", card1, "field")
+    :ok = GameServer.insert_card(room_id, "player1", card4, "field")
+
+    updated_state = GameServer.get_state(room_id)
+    new_field = updated_state.players["player1"]["field"]
+    changed =
+      Enum.any?(1..10, fn _ ->
+        :ok = GameServer.shuffle_card(room_id, "player1", "field")
+        shuffled_state = GameServer.get_state(room_id)
+        shuffled_field = shuffled_state.players["player1"]["field"]
+        shuffled_field != new_field
+      end)
+
+    assert changed
+  end
 end

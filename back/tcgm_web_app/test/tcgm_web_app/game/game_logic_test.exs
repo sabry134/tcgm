@@ -403,8 +403,8 @@ defmodule TcgmWebApp.Game.GameLogicTest do
     changed =
       Enum.any?(1..10, fn _ ->
         shuffled_state = GameLogic.shuffle_card_location(state, "player1", insert_args)
-        shuffled_deck = shuffled_state.players["player1"]["hand"]
-        shuffled_deck != new_hand
+        shuffled_hand = shuffled_state.players["player1"]["hand"]
+        shuffled_hand != new_hand
       end)
 
     assert changed
@@ -428,8 +428,8 @@ defmodule TcgmWebApp.Game.GameLogicTest do
     changed =
       Enum.any?(1..10, fn _ ->
         shuffled_state = GameLogic.shuffle_card_location(state, "player1", insert_args)
-        shuffled_deck = shuffled_state.players["player1"]["graveyard"]
-        shuffled_deck != new_graveyard
+        shuffled_graveyard = shuffled_state.players["player1"]["graveyard"]
+        shuffled_graveyard != new_graveyard
       end)
 
     assert changed

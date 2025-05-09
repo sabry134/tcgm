@@ -14,6 +14,7 @@ import HelpGame from './HelpGame/HelpGame';
 import Room from './Room/Room';
 import DeckBuilder from './DeckBuilder/DeckBuilder';
 import DeckSelector from './DeckSelector/DeckSelector';
+import BoardEditor from './BoardEditor/BoardEditor';
 import Lobby from './Lobby/Lobby';
 import { ChannelProvider } from './ChannelContext';
 
@@ -36,6 +37,7 @@ function App() {
             <Route path="/select-deck" element={<DeckSelector />} />
             <Route path="/edit-deck" element={<DeckBuilder />} />
             <Route path='/lobby' element={<Lobby />} />
+            <Route path="/board-editor" element={<BoardEditor />} />
           </Routes>
         </Router>
       </ChannelProvider>

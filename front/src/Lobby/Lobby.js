@@ -12,57 +12,71 @@ const Lobby = () => {
     const navigate = useNavigate();
     const { channel, setChannel, setSocket, gameState, setGameState, resetConnection } = useChannel(); // Use the context
 
-    const testDeck = {
-        "Card X": {
-            "name": "king",
-            "properties": {
-                "attack": 15,
-                "defense": 10
+    const testDeck = [
+        {
+            'CARD A': {
+                "name": "king",
+                "properties": {
+                    "attack": 15,
+                    "defense": 10
+                }
             }
         },
-        "Card Y": {
-            "name": "queen",
-            "properties": {
-                "attack": 12,
-                "defense": 8
+        {
+            'CARD B': {
+                "name": "queen",
+                "properties": {
+                    "attack": 12,
+                    "defense": 8
+                }
             }
         },
-        "Card Z": {
-            "name": "jack",
-            "properties": {
-                "attack": 10,
-                "defense": 5
+        {
+            'CARD C': {
+                "name": "jack",
+                "properties": {
+                    "attack": 10,
+                    "defense": 5
+                }
             }
         },
-        "Card A": {
-            "name": "jack",
-            "properties": {
-                "attack": 10,
-                "defense": 5
+        {
+            "CARD D": {
+                "name": "jack",
+                "properties": {
+                    "attack": 10,
+                    "defense": 5
+                }
             }
         },
-        "Card B": {
-            "name": "jack",
-            "properties": {
-                "attack": 10,
-                "defense": 5
+        {
+            "CARD E": {
+                "name": "jack",
+                "properties": {
+                    "attack": 10,
+                    "defense": 5
+                }
             }
         },
-        "Card C": {
-            "name": "jack",
-            "properties": {
-                "attack": 10,
-                "defense": 5
+        {
+            "CARD F": {
+                "name": "jack",
+                "properties": {
+                    "attack": 10,
+                    "defense": 5
+                }
             }
         },
-        "Card D": {
-            "name": "jack",
-            "properties": {
-                "attack": 10,
-                "defense": 5
+        {
+            "CARD Z": {
+                "name": "jack",
+                "properties": {
+                    "attack": 10,
+                    "defense": 5
+                }
             }
         }
-    };
+    ];
 
 
     const connectionRef = React.useRef({

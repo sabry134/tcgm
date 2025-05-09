@@ -7,7 +7,6 @@ export class TCGMCard extends Component {
       cardData: {}
     };
   }
-
   componentDidMount() {
     this.handleStorageChange({})
 

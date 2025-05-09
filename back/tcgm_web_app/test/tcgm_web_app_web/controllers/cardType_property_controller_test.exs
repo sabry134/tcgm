@@ -16,7 +16,7 @@ defmodule TcgmWebAppWeb.CardTypePropertyControllerTest do
     |> Repo.insert!()
 
     cardTypeProperty = %CardTypeProperty{}
-    |> CardTypeProperty.changeset(%{ property_name: "property1", cardtype_id: cardType.id, type: "text", value: "test", variant: "test", mutable: true, font: "Arial", font_size: 12, font_color: "black", position_x: 0, position_y: 0, rotation: 0, scale_x: 1, scale_y: 1, border_width: 1, border_color: "red", border_radius: "130", opacity: 2, image: "image", image_width: 100, image_height: 100, image_position_x: 0, image_position_y: 0, image_rotation: 0, image_scale_x: 1, image_scale_y: 1, image_opacity: 100 })
+    |> CardTypeProperty.changeset(%{ property_name: "property1", cardtype_id: cardType.id, type: "text", value: "test", variant: "test", mutable: true, font: "Arial", font_size: 12, font_color: "black", position_x: 0, position_y: 0, rotation: 0, scale_x: 1, scale_y: 1, border_width: 1, border_color: "red", border_radius: "130", opacity: 2, width: 1, height: 50, z_axis: 0, background_color: "black" })
     |> Repo.insert!()
 
     {:ok, cardTypeProperty: cardTypeProperty, cardType: cardType}
@@ -38,14 +38,10 @@ defmodule TcgmWebAppWeb.CardTypePropertyControllerTest do
     assert Enum.any?(response, fn c -> c["rotation"] == cardTypeProperty.rotation end)
     assert Enum.any?(response, fn c -> c["scale_x"] == cardTypeProperty.scale_x end)
     assert Enum.any?(response, fn c -> c["scale_y"] == cardTypeProperty.scale_y end)
-    assert Enum.any?(response, fn c -> c["image"] == cardTypeProperty.image end)
-    assert Enum.any?(response, fn c -> c["image_width"] == cardTypeProperty.image_width end)
-    assert Enum.any?(response, fn c -> c["image_height"] == cardTypeProperty.image_height end)
-    assert Enum.any?(response, fn c -> c["image_position_x"] == cardTypeProperty.image_position_x end)
-    assert Enum.any?(response, fn c -> c["image_position_y"] == cardTypeProperty.image_position_y end)
-    assert Enum.any?(response, fn c -> c["image_rotation"] == cardTypeProperty.image_rotation end)
-    assert Enum.any?(response, fn c -> c["image_scale_x"] == cardTypeProperty.image_scale_x end)
-    assert Enum.any?(response, fn c -> c["image_scale_y"] == cardTypeProperty.image_scale_y end)
+    assert Enum.any?(response, fn c -> c["width"] == cardTypeProperty.width end)
+    assert Enum.any?(response, fn c -> c["height"] == cardTypeProperty.height end)
+    assert Enum.any?(response, fn c -> c["z_axis"] == cardTypeProperty.z_axis end)
+    assert Enum.any?(response, fn c -> c["background_color"] == cardTypeProperty.background_color end)
   end
 
   test "GET /api/cardTypeProperties/:id returns a single cardTypeProperty", %{conn: conn, cardTypeProperty: cardTypeProperty} do
@@ -64,14 +60,11 @@ defmodule TcgmWebAppWeb.CardTypePropertyControllerTest do
     assert response["rotation"] == cardTypeProperty.rotation
     assert response["scale_x"] == cardTypeProperty.scale_x
     assert response["scale_y"] == cardTypeProperty.scale_y
-    assert response["image"] == cardTypeProperty.image
-    assert response["image_width"] == cardTypeProperty.image_width
-    assert response["image_height"] == cardTypeProperty.image_height
-    assert response["image_position_x"] == cardTypeProperty.image_position_x
-    assert response["image_position_y"] == cardTypeProperty.image_position_y
-    assert response["image_rotation"] == cardTypeProperty.image_rotation
-    assert response["image_scale_x"] == cardTypeProperty.image_scale_x
-    assert response["image_scale_y"] == cardTypeProperty.image_scale_y
+    assert response["height"] == cardTypeProperty.height
+    assert response["width"] == cardTypeProperty.width
+    assert response["background_color"] == cardTypeProperty.background_color
+    assert response["z_axis"] == cardTypeProperty.z_axis
+
   end
 
   test "GET /api/cardTypeProperties/cardType/:cardType_id returns a list of cardTypeProperties by cardType_id", %{conn: conn, cardTypeProperty: cardTypeProperty, cardType: cardType} do
@@ -90,14 +83,10 @@ defmodule TcgmWebAppWeb.CardTypePropertyControllerTest do
     assert Enum.any?(response, fn c -> c["rotation"] == cardTypeProperty.rotation end)
     assert Enum.any?(response, fn c -> c["scale_x"] == cardTypeProperty.scale_x end)
     assert Enum.any?(response, fn c -> c["scale_y"] == cardTypeProperty.scale_y end)
-    assert Enum.any?(response, fn c -> c["image"] == cardTypeProperty.image end)
-    assert Enum.any?(response, fn c -> c["image_width"] == cardTypeProperty.image_width end)
-    assert Enum.any?(response, fn c -> c["image_height"] == cardTypeProperty.image_height end)
-    assert Enum.any?(response, fn c -> c["image_position_x"] == cardTypeProperty.image_position_x end)
-    assert Enum.any?(response, fn c -> c["image_position_y"] == cardTypeProperty.image_position_y end)
-    assert Enum.any?(response, fn c -> c["image_rotation"] == cardTypeProperty.image_rotation end)
-    assert Enum.any?(response, fn c -> c["image_scale_x"] == cardTypeProperty.image_scale_x end)
-    assert Enum.any?(response, fn c -> c["image_scale_y"] == cardTypeProperty.image_scale_y end)
+    assert Enum.any?(response, fn c -> c["width"] == cardTypeProperty.width end)
+    assert Enum.any?(response, fn c -> c["height"] == cardTypeProperty.height end)
+    assert Enum.any?(response, fn c -> c["z_axis"] == cardTypeProperty.z_axis end)
+    assert Enum.any?(response, fn c -> c["background_color"] == cardTypeProperty.background_color end)
   end
 
   test "GET /api/cardTypeProperties/cardType/:cardType_id/property/:property_name returns a list of cardTypeProperties by cardType_id and property_name", %{conn: conn, cardTypeProperty: cardTypeProperty, cardType: cardType} do
@@ -105,7 +94,7 @@ defmodule TcgmWebAppWeb.CardTypePropertyControllerTest do
     response = json_response(conn, 200)
 
     assert length(response) > 0
-    assert Enum.any?(response, fn c -> c["property_name"] == cardTypeProperty.property_name end)
+   assert Enum.any?(response, fn c -> c["property_name"] == cardTypeProperty.property_name end)
     assert Enum.any?(response, fn c -> c["cardtype_id"] == cardTypeProperty.cardtype_id end)
     assert Enum.any?(response, fn c -> c["type"] == cardTypeProperty.type end)
     assert Enum.any?(response, fn c -> c["font"] == cardTypeProperty.font end)
@@ -116,18 +105,14 @@ defmodule TcgmWebAppWeb.CardTypePropertyControllerTest do
     assert Enum.any?(response, fn c -> c["rotation"] == cardTypeProperty.rotation end)
     assert Enum.any?(response, fn c -> c["scale_x"] == cardTypeProperty.scale_x end)
     assert Enum.any?(response, fn c -> c["scale_y"] == cardTypeProperty.scale_y end)
-    assert Enum.any?(response, fn c -> c["image"] == cardTypeProperty.image end)
-    assert Enum.any?(response, fn c -> c["image_width"] == cardTypeProperty.image_width end)
-    assert Enum.any?(response, fn c -> c["image_height"] == cardTypeProperty.image_height end)
-    assert Enum.any?(response, fn c -> c["image_position_x"] == cardTypeProperty.image_position_x end)
-    assert Enum.any?(response, fn c -> c["image_position_y"] == cardTypeProperty.image_position_y end)
-    assert Enum.any?(response, fn c -> c["image_rotation"] == cardTypeProperty.image_rotation end)
-    assert Enum.any?(response, fn c -> c["image_scale_x"] == cardTypeProperty.image_scale_x end)
-    assert Enum.any?(response, fn c -> c["image_scale_y"] == cardTypeProperty.image_scale_y end)
+    assert Enum.any?(response, fn c -> c["width"] == cardTypeProperty.width end)
+    assert Enum.any?(response, fn c -> c["height"] == cardTypeProperty.height end)
+    assert Enum.any?(response, fn c -> c["z_axis"] == cardTypeProperty.z_axis end)
+    assert Enum.any?(response, fn c -> c["background_color"] == cardTypeProperty.background_color end)
   end
 
   test "POST /api/cardTypeProperties creates a new cardTypeProperty", %{conn: conn, cardType: cardType} do
-    attrs = %{ property_name: "property2", cardtype_id: cardType.id, type: "text", value: "test", variant: "test", mutable: true, font: "Arial", font_size: 12, font_color: "black", position_x: 0, position_y: 0, rotation: 0, scale_x: 1, scale_y: 1, border_width: 1, border_color: "red", border_radius: "130", opacity: 2, image: "image", image_width: 100, image_height: 100, image_position_x: 0, image_position_y: 0, image_rotation: 0, image_scale_x: 1, image_scale_y: 1, image_opacity: 100 }
+    attrs = %{property_name: "property2", cardtype_id: cardType.id, type: "text", value: "test", variant: "test", mutable: true, font: "Arial", font_size: 12, font_color: "black", position_x: 0, position_y: 0, rotation: 0, scale_x: 1, scale_y: 1, border_width: 1, border_color: "red", border_radius: "130", opacity: 2, width: 1, height: 50, z_axis: 0, background_color: "black"  }
     conn = post(conn, "/api/cardTypeProperties", cardTypeProperty: attrs)
     response = json_response(conn, 201)
 
@@ -143,19 +128,15 @@ defmodule TcgmWebAppWeb.CardTypePropertyControllerTest do
     assert response["rotation"] == 0
     assert response["scale_x"] == 1
     assert response["scale_y"] == 1
-    assert response["image"] == "image"
-    assert response["image_width"] == 100
-    assert response["image_height"] == 100
-    assert response["image_position_x"] == 0
-    assert response["image_position_y"] == 0
-    assert response["image_rotation"] == 0
-    assert response["image_scale_x"] == 1
-    assert response["image_scale_y"] == 1
-    assert response["image_opacity"] == 100
+    assert response["z_axis"] == 0
+    assert response["background_color"] == "black"
+    assert response["width"] == 1
+    assert response["height"] == 50
+
   end
 
   test "PUT /api/cardTypeProperties/:id updates a cardTypeProperty", %{conn: conn, cardTypeProperty: cardTypeProperty} do
-    attrs = %{ property_name: "property2", cardtype_id: cardTypeProperty.cardtype_id, type: "text", font: "Arial", font_size: 12, font_color: "black", position_x: 0, position_y: 0, rotation: 0, scale_x: 1, scale_y: 1, image: "image", image_width: 100, image_height: 100, image_position_x: 0, image_position_y: 0, image_rotation: 0, image_scale_x: 1, image_scale_y: 1, image_opacity: 100 }
+    attrs = %{ property_name: "property2", cardtype_id: cardTypeProperty.cardtype_id, type: "text", value: "test", variant: "test", mutable: true, font: "Arial", font_size: 12, font_color: "black", position_x: 0, position_y: 0, rotation: 0, scale_x: 1, scale_y: 1, border_width: 1, border_color: "red", border_radius: "130", opacity: 2, width: 1, height: 50, z_axis: 0, background_color: "black"  }
     conn = put(conn, "/api/cardTypeProperties/#{cardTypeProperty.id}", cardTypeProperty: attrs)
     response = json_response(conn, 200)
 
@@ -171,15 +152,6 @@ defmodule TcgmWebAppWeb.CardTypePropertyControllerTest do
     assert response["rotation"] == 0
     assert response["scale_x"] == 1
     assert response["scale_y"] == 1
-    assert response["image"] == "image"
-    assert response["image_width"] == 100
-    assert response["image_height"] == 100
-    assert response["image_position_x"] == 0
-    assert response["image_position_y"] == 0
-    assert response["image_rotation"] == 0
-    assert response["image_scale_x"] == 1
-    assert response["image_scale_y"] == 1
-    assert response["image_opacity"] == 100
   end
 
   test "DELETE /api/cardTypeProperties/:id deletes a cardTypeProperty", %{conn: conn, cardTypeProperty: cardTypeProperty} do

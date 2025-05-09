@@ -4,7 +4,7 @@ import { useDraggable } from "@dnd-kit/core";
 
 
 
-const GameCard = ({ card, hidden = false, cardBackside, index, draggable = true, handleCardClick, offsetX = 0, rotation = 0, selectedCard, src, cardName, opponent = true, offsetY = 0 }) => {
+const GameCard = ({ card, hidden = false, cardBackside, index, draggable = true, handleCardClick, offsetX = 0, rotation = 0, selectedCard, src, cardName, opponent = true, offsetY = 0, setHoveredCard }) => {
     const { attributes, listeners, setNodeRef, transform } = useDraggable({
         id: src + "/" + index?.toString() + "/" + opponent.toString()
     });
@@ -27,8 +27,9 @@ const GameCard = ({ card, hidden = false, cardBackside, index, draggable = true,
                 transition: "transform 0.3s",
                 zIndex: selectedCard && (selectedCard[0] === cardName) ? 10 : 1,
             }}
-
             onContextMenu={(event) => handleCardClick(event, cardName, src)}
+            onMouseEnter={(event) => { !hidden && setHoveredCard(card) }}
+            onMouseLeave={(event) => { !hidden && setHoveredCard(null) }}
         >
             <Card className="card" >
                 {!hidden ?

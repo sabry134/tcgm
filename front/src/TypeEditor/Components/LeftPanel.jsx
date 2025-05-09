@@ -89,7 +89,6 @@ export class LeftPanel extends Component {
 
   selectProperties (index) {
     localStorage.setItem('idSelected', index)
-    console.log('properties index left pannel', index, this.state.properties)
     this.setState({ selectedProperties: index })
     window.dispatchEvent(new Event('idSelected'))
     window.dispatchEvent(new Event('ComponnentSelected'))

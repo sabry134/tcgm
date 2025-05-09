@@ -55,32 +55,15 @@ const StagnantUI = ({ createNewComponnent }) => {
     try {
       getCardTypesPropertiesbyTypeRequest(typeId).then(data => {
         for (let i = 0; i < tmpProperties.length; i++) {
-          const updateProperties = {
-            ...tmpProperties[i],
-            font_color: tmpProperties[i].font_color.toString(),
-            border_color: tmpProperties[i].border_color.toString()
-          }
-          delete updateProperties.inserted_at
-          delete updateProperties.updated_at
-
           if (!data || i >= data.length) {
-            saveNewCardTypesPropertiesRequest({
-              cardTypeProperty: updateProperties
-            })
+            saveNewCardTypesPropertiesRequest(tmpProperties[i])
             continue
           }
-          const updatedData = {
-            ...data[i],
-            font_color: data[i].font_color.toString(),
-            border_color: data[i].border_color.toString()
-          }
-          delete updatedData.inserted_at
-          delete updatedData.updated_at
 
-          if (data && !shallowEqualObject(updateProperties, updatedData)) {
+          if (data && !shallowEqualObject(tmpProperties[i], data[i])) {
             editCardTypesPropertyByIdRequest(
-              updateProperties,
-              updateProperties.id
+              tmpProperties[i],
+              tmpProperties[i].id
             )
           }
         }
@@ -112,7 +95,6 @@ const StagnantUI = ({ createNewComponnent }) => {
         </div>
         <Popper anchorEl={anchorRef.current} open={open}>
           <div className='subAddMenu'>
-            {/* We need to add icon to menu item */}
             <MenuItem onClick={addText}> Text Field </MenuItem>
             <MenuItem onClick={addBox}> Box </MenuItem>
           </div>

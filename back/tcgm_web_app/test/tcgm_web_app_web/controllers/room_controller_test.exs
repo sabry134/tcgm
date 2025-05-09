@@ -27,7 +27,7 @@ defmodule TcgmWebAppWeb.RoomControllerTest do
     %{"room_id" => room_id} = json_response(conn, 200)
 
     conn = post(conn, "/api/rooms/#{room_id}/join", player_id: "player1")
-    assert json_response(conn, 200)["players"] == %{"player1" => %{"deck" => %{}, "field" => %{}, "graveyard" => %{}, "hand" => %{}, "health" => 20, "caster" => %{}}}
+    assert json_response(conn, 200)["players"] == %{"player1" => %{"deck" => [], "field" => [], "graveyard" => [], "hand" => [], "health" => 20, "caster" => []}}
   end
 
   test "players can leave a room", %{room_id: room_id} do

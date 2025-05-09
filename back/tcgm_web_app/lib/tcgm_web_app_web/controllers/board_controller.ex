@@ -250,4 +250,23 @@ defmodule TcgmWebAppWeb.BoardController do
         json(conn, %{board: board, zones: zones})
     end
   end
+
+  swagger_path :get_board_zones do
+    get("/boards/:board_id/zones")
+    description("Get all board zones")
+    response(code(:ok), "Success")
+  end
+
+  def get_board_zones(conn, %{"board_id" => board_id}) do
+    zones = BoardZones.get_board_zones_by_board_id(board_id)
+
+    case zones do
+      [] ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "No board zones found"})
+      _zones ->
+        json(conn, zones)
+    end
+  end
 end

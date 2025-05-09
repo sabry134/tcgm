@@ -113,4 +113,13 @@ defmodule TcgmWebAppWeb.BoardControllerTest do
     assert Enum.any?(response["zones"], fn z -> z["id"] == zone.id end)
   end
 
+  test "GET /api/boards/:board_id/zones returns a list of zones for a board", %{conn: conn, board: board, zone: zone} do
+    conn = get(conn, "/api/boards/#{board.id}/zones")
+    response = json_response(conn, 200)
+
+    assert length(response) > 0
+    assert Enum.any?(response, fn z -> z["id"] == zone.id end)
+    assert Enum.any?(response, fn z -> z["name"] == zone.name end)
+  end
+
 end

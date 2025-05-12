@@ -26,10 +26,11 @@ export class TCGMCard extends Component {
       const data = JSON.parse(storedData).card
       if (data) {
         try {
-          const tmpProperties = JSON.parse(
-            getCardTypesPropertiesbyTypeRequest(data.card_type_id)
+          getCardTypesPropertiesbyTypeRequest(data.card_type_id).then(
+            response => {
+              this.setState({ cardData: data, properties: response })
+            }
           )
-          this.setState({ cardData: data, properties: tmpProperties })
         } catch (error) {
           console.log(error)
         }

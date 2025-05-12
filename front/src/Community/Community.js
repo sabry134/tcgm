@@ -1,11 +1,12 @@
-import { React, useRef, useState } from "react";
-import { Box, Popper } from "@mui/material";
+import React, { useRef, useState } from "react";
+import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
 import { LeftPanel } from "./Components/LeftPanel";
 import { RightPanel } from "./Components/RightPanel";
 import { CommunityGamePicker } from "./Components/CommunityGamePicker";
-import { CreateGamePopupBody } from "./Components/CreateGamePopupBody";
+import { Popup } from "../Components/Popup/Popup";
+import { createGameRequest } from "../Api/gamesRequest";
 
 const Community = () => {
     const navigate = useNavigate();
@@ -18,6 +19,12 @@ const Community = () => {
 
     const closePopup = () => {
         setAnchor(null)
+    }
+
+    const onClickCreate = (data) => {
+      createGameRequest({
+        game: { name: data[0], description: data[1] },
+      }).then()
     }
 
     const open = Boolean(anchor);
@@ -36,9 +43,15 @@ const Community = () => {
                     bgcolor="#c4c4c4"
                     position="relative"
                 >
-                    <Popper id={id} open={open} anchorEl={anchor}>
-                        <CreateGamePopupBody closeCallback={closePopup} />
-                    </Popper>
+                    <Popup
+                      id={id}
+                      open={open}
+                      anchorEl={anchor}
+                      closeCallback={closePopup}
+                      receivedCallback={(data) => onClickCreate(data)}
+                      title={"Create Game"}
+                      inputName={["Name", "Description"]}
+                    />
                     <CommunityGamePicker />
                 </Box>
 

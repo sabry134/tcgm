@@ -1,11 +1,11 @@
-import { React, useRef, useState } from "react";
-import { Box, Popper } from "@mui/material";
+import React, { useRef, useState } from "react";
+import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { JoinRoomNavigationBar } from "../NavigationBar/JoinRoomNavigationBar";
 import { LeftPanel } from "./Components/LeftPanel";
 import { RightPanel } from "./Components/RightPanel";
 import { DeckPicker } from "./Components/DeckPicker";
-import { CreateGamePopupBody } from "./Components/CreateGamePopupBody";
+import { Popup } from "../Components/Popup/Popup";
 
 const DeckSelector = () => {
     const navigate = useNavigate();
@@ -36,9 +36,15 @@ const DeckSelector = () => {
                     bgcolor="#c4c4c4"
                     position="relative"
                 >
-                    <Popper id={id} open={open} anchorEl={anchor}>
-                        <CreateGamePopupBody closeCallback={closePopup} />
-                    </Popper>
+                    <Popup
+                        id={id}
+                        open={open}
+                        anchorEl={anchor}
+                        closeCallback={closePopup}
+                        receivedCallback={(data) => {}}
+                        title={"Create Deck"}
+                        inputName={["Name"]}
+                    />
                     <DeckPicker />
                 </Box>
 

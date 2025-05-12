@@ -91,13 +91,27 @@ export class Editor extends Component {
       localStorage.removeItem('propertySelected')
     window.addEventListener('storage', this.handlePropertyChange)
     window.addEventListener('delete', this.handleDelete)
-
     window.addEventListener('storeProperties', this.handlePropertiesSet)
+    window.addEventListener('idSelected', this.handleIdSelected)
   }
   componentWillUnmount () {
-    window.removeEventListener('storage', this.handlePropertiesSet)
-    window.removeEventListener('storeProperties', this.handlePropertyChange)
+    window.removeEventListener('storage', this.handlePropertyChange)
+    window.removeEventListener('storeProperties', this.handlePropertiesSet)
     window.removeEventListener('delete', this.handleDelete)
+    window.removeEventListener('idSelected', this.handleIdSelected)
+  }
+
+  handleIdSelected = () => {
+    const index = JSON.parse(localStorage.getItem('idSelected'))
+    localStorage.setItem(
+      'propertySelected',
+      JSON.stringify(this.state.properties[index])
+    )
+    this.setState({
+      idSelected: index,
+      position_x: this.state.properties[index].position_x,
+      position_y: this.state.properties[index].position_y
+    })
   }
 
   handleDelete = () => {
@@ -106,12 +120,12 @@ export class Editor extends Component {
 
   handlePropertyChange = () => {
     const tmpProperties = this.state.properties
-
     const currentPropertySelected = JSON.parse(
       localStorage.getItem('propertySelected')
     )
+    const index = localStorage.getItem('idSelected')
 
-    tmpProperties[this.state.idSelected] = currentPropertySelected
+    tmpProperties[index] = currentPropertySelected
 
     this.setState({
       properties: tmpProperties,
@@ -172,6 +186,7 @@ export class Editor extends Component {
         'currentTypeProperties',
         JSON.stringify(tmpProperties)
       )
+      window.dispatchEvent(new Event('componnentCreated'))
       return { properties: tmpProperties }
     })
   }
@@ -214,6 +229,7 @@ export class Editor extends Component {
       'propertySelected',
       JSON.stringify(this.state.properties[index])
     )
+    localStorage.setItem('idSelected', index)
 
     window.dispatchEvent(new Event('ComponnentSelected'))
 
@@ -252,9 +268,3 @@ export class Editor extends Component {
     )
   }
 }
-// props:
-// position_x
-// position_y
-// id_selected
-// handleSelectedOnClick
-// properties *required

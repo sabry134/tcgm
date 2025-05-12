@@ -30,12 +30,12 @@ export class RightPanel extends Component {
   render () {
     return (
       <Paper
-        className='sidebar'
         sx={{
-          width: 250,
-          p: 2,
+          width: this.state.selected ? '30vw' : 0,
+          transition: 'width 0.3s ease-in-out',
           bgcolor: '#5d3a00',
           color: 'white',
+          height: '100%',
           borderRadius: 0
         }}
       >

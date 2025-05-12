@@ -38,3 +38,11 @@ export async function getCardsByGameRequest(gameId) {
 export async function getCardByIdRequest(id) {
   return await baseRequest(`cards/${id}`, 'GET');
 }
+
+export async function getCardsByGameWithPropertiesRequest(gameId) {
+  return await baseRequest(`cards/game/${gameId}/with_properties`, 'GET');
+}
+
+export async function getCardCardType(cardId) {
+  return await baseRequest(`cards/${cardId}/cardtype`, 'GET');
+}

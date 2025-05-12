@@ -56,21 +56,26 @@ export class Popup extends Component {
 
           <Box
             sx={{
+              boxShadow: 2,
               borderRadius: 2,
-              py: 2,
+              px: 2,
               position: 'relative',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
-              alignItems: 'center',
               backgroundColor: 'primary.main',
-              boxShadow: 2,
             }}
             className={styles.positionPopup}
             onClick={event => event.stopPropagation()}
           >
 
-            <Stack alignItems={'center'} spacing={2}>
+            <Stack
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+              }}
+              spacing={2}
+            >
 
               <Box
                 sx={{
@@ -91,10 +96,14 @@ export class Popup extends Component {
 
               <Box
                 sx={{
-                  backgroundColor: 'primary.light',
-                  p: 2,
                   borderRadius: 2,
                   boxShadow: 2,
+                  p: 2,
+                  gap: 2,
+                  backgroundColor: 'primary.light',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-evenly',
                 }}
               >
                 {this.nameList.map((name, index) => (
@@ -105,40 +114,44 @@ export class Popup extends Component {
                   />
                 ))}
 
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'space-evenly',
-                    pt: 5,
-                  }}
-                >
-                  <Button
-                    onClick={this.closeCallback}
-                    sx={{
-                      backgroundColor: 'error.main',
-                      '&:hover': { backgroundColor: 'error.light' },
-                      '&:clicked': { backgroundColor: 'error.dark' }
-                    }}
-                    variant={'contained'}
-                    size={'large'}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={this.onSubmit}
-                    sx={{
-                      backgroundColor: 'success.main',
-                      '&:hover': { backgroundColor: 'success.light' },
-                      '&:clicked': { backgroundColor: 'success.dark' }
-                    }}
-                    variant={'contained'}
-                    size={'large'}
-                  >
-                    Create
-                  </Button>
+              </Box>
 
-                </Box>
+              <Box
+                sx={{
+                  boxShadow: 2,
+                  borderRadius: 2,
+                  p: 2,
+                  backgroundColor: 'primary.light',
+                  display: 'flex',
+                  flexDirection: 'row',
+                  justifyContent: 'space-evenly',
+                }}
+              >
+                <Button
+                  onClick={this.closeCallback}
+                  sx={{
+                    backgroundColor: 'error.main',
+                    '&:hover': { backgroundColor: 'error.light' },
+                    '&:clicked': { backgroundColor: 'error.dark' }
+                  }}
+                  variant={'contained'}
+                  size={'large'}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={this.onSubmit}
+                  sx={{
+                    backgroundColor: 'success.main',
+                    '&:hover': { backgroundColor: 'success.light' },
+                    '&:clicked': { backgroundColor: 'success.dark' }
+                  }}
+                  variant={'contained'}
+                  size={'large'}
+                >
+                  Create
+                </Button>
+
               </Box>
             </Stack>
           </Box>

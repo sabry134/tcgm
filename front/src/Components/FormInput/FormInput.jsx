@@ -1,6 +1,5 @@
-import { Component, React } from 'react'
+import React, { Component } from 'react'
 import { Input, Box, Typography } from '@mui/material'
-import './FormInput.css'
 
 export class FormInput extends Component {
   constructor (props) {
@@ -19,12 +18,9 @@ export class FormInput extends Component {
 
   render () {
     return (
-      <Box marginTop={'15px'} display={'flex'} flexDirection={'column'}>
+      <Box display={'flex'} flexDirection={'column'}>
 
-        <Typography
-          color={"primary.contrastText"}
-          fontWeight={600}
-        >
+        <Typography color={"primary.contrastText"} fontWeight={600}>
           {this.props.label}
         </Typography>
 
@@ -33,8 +29,12 @@ export class FormInput extends Component {
           onBlur={this.closeFocus}
           disableUnderline
           placeholder='...'
-          className={this.state.focused ? 'input focus' : 'input'}
-          {...this.props}
+          sx={{
+            backgroundColor: this.state.focused ? 'primary.main' : 'primary.dark',
+            borderRadius: 2,
+            p: 2,
+            color: 'primary.contrastText'
+          }}
         />
 
       </Box>

@@ -1,7 +1,7 @@
 import { Paper } from '@mui/material'
 import React, { Component } from 'react'
 import './LeftPanel.css'
-import { TCGMButton } from '../../Components/TCGMButton/TCGMButton'
+import { TCGMButton } from '../../Components/RawComponents/TCGMButton/TCGMButton'
 export class LeftPanel extends Component {
   constructor (props) {
     super(props)

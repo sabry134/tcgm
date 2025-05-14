@@ -166,7 +166,6 @@ defmodule TcgmWebApp.Game.GameLogic do
 
   @doc false
   def update_card_values(location, key, value, card) do
-    IO.inspect("bonjour")
     Enum.map(location, fn c ->
       if Map.has_key?(c, card) do
         card_data = c[card]
@@ -196,8 +195,6 @@ defmodule TcgmWebApp.Game.GameLogic do
         card = Map.get(args, "card")
         key = Map.get(args, "key")
         value = Map.get(args, "value")
-        IO.inspect("test")
-        IO.inspect(card)
         cond do
           Map.has_key?(state.players[player_id], location) == false ->
             {:error, "la location n'existe pas"}
@@ -234,5 +231,25 @@ defmodule TcgmWebApp.Game.GameLogic do
       |> put_in([:turnCount], count)
 
     update_state
+  end
+
+  def shuffle_card_location(state, player_id, args) do
+    expected_args = ["location"]
+    case check_valid_params(args, expected_args, state.players, player_id, []) do
+      {:error, message} ->
+        {:error, message}
+      :ok ->
+        location = Map.get(args, "location")
+        cond do
+          Map.has_key?(state.players[player_id], location) == false ->
+            {:error, "la location n'existe pas"}
+          true ->
+            update_state =
+              state
+              |> put_in([:players, player_id, location], Enum.shuffle(state.players[player_id][location]))
+
+            update_state
+        end
+    end
   end
 end

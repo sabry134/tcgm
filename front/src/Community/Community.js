@@ -1,64 +1,93 @@
 import React, { useRef, useState } from "react";
-import { Box } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
-import { LeftPanel } from "./Components/LeftPanel";
-import { RightPanel } from "./Components/RightPanel";
-import { CommunityGamePicker } from "./Components/CommunityGamePicker";
+import { CommunityGamePicker } from "./Components/CommunityGamePicker/CommunityGamePicker";
 import { Popup } from "../Components/Popup/Popup";
 import { createGameRequest } from "../Api/gamesRequest";
+import { SidePanel } from "../Components/RawComponents/SidePanel";
+import { TCGMButton } from "../Components/RawComponents/TCGMButton/TCGMButton";
 
 const Community = () => {
-    const navigate = useNavigate();
-    const [anchor, setAnchor] = useState(null);
-    const spanRef = useRef()
+  const navigate = useNavigate();
+  const [anchor, setAnchor] = useState(null);
+  const spanRef = useRef()
 
-    const openPopup = () => {
-        setAnchor(anchor ? null : spanRef);
-    };
+  const openPopup = () => {
+    setAnchor(anchor ? null : spanRef);
+  };
 
-    const closePopup = () => {
-        setAnchor(null)
-    }
+  const closePopup = () => {
+    setAnchor(null)
+  }
 
-    const onClickCreate = (data) => {
-      createGameRequest({
-        game: { name: data[0], description: data[1] },
-      }).then()
-    }
+  const onClickCreate = (data) => {
+    createGameRequest({
+      game: { name: data[0], description: data[1] },
+    }).then()
+  }
 
-    const open = Boolean(anchor);
-    const id = open ? 'simple-popper' : undefined;
+  const open = Boolean(anchor);
+  const id = open ? 'simple-popper' : undefined;
 
-    return (
-        <Box display="flex" flexDirection="column" height="100vh">
-            <MainNavigationBar navigate={navigate} />
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        bgcolor: "neutral.main",
+      }}
+    >
+      <MainNavigationBar navigate={navigate}/>
 
-            <Box display="flex" flexGrow={1} bgcolor="#fff">
-                <LeftPanel popupCallback={openPopup} />
-                <Box
-                    ref={spanRef}
-                    className="main-area"
-                    flexGrow={1}
-                    bgcolor="#c4c4c4"
-                    position="relative"
-                >
-                    <Popup
-                      id={id}
-                      open={open}
-                      anchorEl={anchor}
-                      closeCallback={closePopup}
-                      receivedCallback={(data) => onClickCreate(data)}
-                      title={"Create Game"}
-                      inputName={["Name", "Description"]}
-                    />
-                    <CommunityGamePicker />
-                </Box>
+      <Stack
+        direction="row"
+        spacing={1}
+        sx={{
+          flexGrow: 1,
+          p: 1,
+          bgcolor: "neutral.main",
+          overflowY: "auto",
+        }}
+      >
 
-                <RightPanel />
-            </Box>
+        <SidePanel>
+
+          <TCGMButton onClick={openPopup}>
+            Create Game
+          </TCGMButton>
+
+        </SidePanel>
+
+        <Box
+          sx={{
+            boxShadow: 2,
+            borderRadius: 2,
+            bgcolor: "neutral.light",
+            flexGrow: 1,
+          }}
+          ref={spanRef}
+        >
+
+          <Popup
+            id={id}
+            open={open}
+            anchorEl={anchor}
+            closeCallback={closePopup}
+            receivedCallback={(data) => onClickCreate(data)}
+            title={"Create Game"}
+            inputName={["Name", "Description"]}
+          />
+          <CommunityGamePicker/>
+
         </Box>
-    );
+
+        <SidePanel/>
+
+      </Stack>
+    </Box>
+  );
 };
 
 export default Community

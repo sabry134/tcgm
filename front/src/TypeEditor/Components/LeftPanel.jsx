@@ -6,7 +6,7 @@ import {
 } from '../../Api/cardTypesRequest'
 import CheckIcon from '@mui/icons-material/Check'
 import './LeftPanel.css'
-import { TCGMButton } from '../../Components/TCGMButton/TCGMButton'
+import { TCGMButton } from '../../Components/RawComponents/TCGMButton/TCGMButton'
 import { getCardTypesPropertiesbyTypeRequest } from '../../Api/cardTypesPropertiesRequest'
 
 export class LeftPanel extends Component {
@@ -136,6 +136,7 @@ export class LeftPanel extends Component {
         }}
       >
         <TCGMButton onClick={this.props.popupCallback}>Add Type</TCGMButton>
+
         <div className='titleList'> Type List </div>
         <ul className='typeList'>
           {this.state.types.map((value, index) => (
@@ -159,6 +160,7 @@ export class LeftPanel extends Component {
             </div>
           ))}
         </ul>
+
         <div className='titleList'> Properties List </div>
         <ul className='typeList'>
           {this.state.properties.map((value, index) => (
@@ -184,6 +186,7 @@ export class LeftPanel extends Component {
             </div>
           ))}
         </ul>
+
       </Paper>
     )
   }

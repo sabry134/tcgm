@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { Box } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
 import { CommunityGamePicker } from "./Components/CommunityGamePicker/CommunityGamePicker";
@@ -41,11 +41,14 @@ const Community = () => {
     >
       <MainNavigationBar navigate={navigate}/>
 
-      <Box
+      <Stack
+        direction="row"
+        spacing={1}
         sx={{
-          display: "flex",
           flexGrow: 1,
           p: 1,
+          bgcolor: "neutral.main",
+          overflowY: "auto",
         }}
       >
 
@@ -58,10 +61,13 @@ const Community = () => {
         </SidePanel>
 
         <Box
+          sx={{
+            boxShadow: 2,
+            borderRadius: 2,
+            bgcolor: "neutral.light",
+            flexGrow: 1,
+          }}
           ref={spanRef}
-          className="main-area"
-          flexGrow={1}
-          position="relative"
         >
 
           <Popup
@@ -76,7 +82,10 @@ const Community = () => {
           <CommunityGamePicker/>
 
         </Box>
-      </Box>
+
+        <SidePanel/>
+
+      </Stack>
     </Box>
   );
 };

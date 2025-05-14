@@ -7,7 +7,7 @@ import { Container } from "@mui/material";
  */
 
 type Props = {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 export class SidePanel extends Component<Props> {
@@ -19,7 +19,7 @@ export class SidePanel extends Component<Props> {
         sx={{
           borderRadius: 2,
           boxShadow: 2,
-          p: 1,
+          py: 2,
           width: '15%',
           bgcolor: 'primary.main',
         }}
@@ -30,7 +30,11 @@ export class SidePanel extends Component<Props> {
             sx={{
               borderRadius: 2,
               boxShadow: 2,
-              p: 1,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignItems: 'center',
+              p: 2,
               bgcolor: 'primary.light',
             }}>
             {child}

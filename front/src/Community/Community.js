@@ -24,7 +24,11 @@ const Community = () => {
   const onClickCreate = (data) => {
     createGameRequest({
       game: { name: data[0], description: data[1] },
-    }).then()
+    }).then((response) => {
+      console.log("Game created successfully", response);
+    }).catch((error) => {
+      console.log("Error creating game", error);
+    })
   }
 
   const open = Boolean(anchor);

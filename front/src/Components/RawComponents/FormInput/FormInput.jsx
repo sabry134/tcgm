@@ -27,6 +27,7 @@ export class FormInput extends Component {
         <Input
           onFocus={this.changeFocus}
           onBlur={this.closeFocus}
+          onChange={this.props.onChange}
           disableUnderline
           placeholder='...'
           sx={{

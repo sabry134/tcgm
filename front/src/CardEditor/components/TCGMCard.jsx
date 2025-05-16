@@ -11,9 +11,10 @@ export class TCGMCard extends Component {
     }
   }
 
-  componentDidMount () {
-    this.handleStorageChange()
-    window.addEventListener('storage', this.handleStorageChange)
+  componentDidMount() {
+    this.handleStorageChange({})
+
+    window.addEventListener("storage", this.handleStorageChange);
   }
 
   componentWillUnmount () {

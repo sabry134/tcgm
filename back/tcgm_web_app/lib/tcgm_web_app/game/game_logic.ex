@@ -50,18 +50,16 @@ defmodule TcgmWebApp.Game.GameLogic do
         {:error, message}
       :ok ->
         cond do
-          map_size(state.players[player_id]["deck"]) <= 0 ->
+          length(state.players[player_id]["deck"]) <= 0 ->
             {:error, "Le deck est vide"}
           true ->
             amount = Map.get(args, "amount", 1)
-            {drawn_cards, new_deck} = Enum.split(Map.to_list(state.players[player_id]["deck"]), amount)
-            drawn_cards_map = Enum.into(drawn_cards, %{})
-            new_deck_map = Enum.into(new_deck, %{})
-            new_hand = Map.merge(state.players[player_id]["hand"], drawn_cards_map)
+            {drawn_cards, new_deck} = Enum.split(state.players[player_id]["deck"], amount)
+            new_hand = state.players[player_id]["hand"] ++ drawn_cards
 
             updated_state =
               state
-              |> put_in([:players, player_id, "deck"], new_deck_map)
+              |> put_in([:players, player_id, "deck"], new_deck)
               |> put_in([:players, player_id, "hand"], new_hand)
 
             updated_state
@@ -82,13 +80,13 @@ defmodule TcgmWebApp.Game.GameLogic do
         card = Map.get(card, "card")
         [card_id | _rest] = Map.keys(card)
         cond do
-          map_size(state.players[player_id]["hand"]) <= 0 ->
+          length(state.players[player_id]["hand"]) <= 0 ->
             {:error, "La main est vide"}
-          Map.has_key?(state.players[player_id]["hand"], card_id) == false ->
+          Enum.any?(state.players[player_id]["hand"], fn card -> Map.has_key?(card, card_id) end) == false ->
             {:error, "la carte n'existe pas"}
           true ->
-            new_hand = Map.delete(state.players[player_id]["hand"], card_id)
-            new_field = Map.merge(state.players[player_id]["field"], card)
+            new_hand = Enum.reject(state.players[player_id]["hand"], fn card -> Map.has_key?(card, card_id) end)
+            new_field = state.players[player_id]["field"] ++ [card]
 
             updated_state =
               state
@@ -120,15 +118,15 @@ defmodule TcgmWebApp.Game.GameLogic do
         cond do
           Map.has_key?(state.players[player_id], source) == false ->
             {:error, "la source n'existe pas"}
-          map_size(state.players[player_id][source]) <= 0 ->
+          length(state.players[player_id][source]) <= 0 ->
               {:error, "La source est vide"}
-          Map.has_key?(state.players[player_id][source], card_id) == false ->
+          Enum.any?(state.players[player_id][source], fn card -> Map.has_key?(card, card_id) end) == false ->
             {:error, "la carte n'existe pas"}
           Map.has_key?(state.players[player_id], dest) == false ->
             {:error, "la destination n'existe pas"}
           true ->
-            new_source = Map.delete(state.players[player_id][source], card_id)
-            new_dest = Map.merge(state.players[player_id][dest], card)
+            new_source = Enum.reject(state.players[player_id][source], fn card -> Map.has_key?(card, card_id) end)
+            new_dest = state.players[player_id][dest] ++ [card]
 
             updated_state =
               state
@@ -158,17 +156,25 @@ defmodule TcgmWebApp.Game.GameLogic do
         cond do
           Map.has_key?(state.players[player_id], location) == false ->
             {:error, "la destination n'existe pas"}
-          Map.has_key?(state.players[player_id][location], card_id) == true ->
+          Enum.any?(state.players[player_id][location], fn card -> Map.has_key?(card, card_id) end) == true ->
             {:error, "la carte existe deja"}
           true ->
-            put_in(state, [:players, player_id, location, card_id], card[card_id])
+            put_in(state, [:players, player_id, location], state.players[player_id][location] ++ [card])
         end
       end
   end
 
   @doc false
-  def update_card_values(key, value, card) do
-    update_in(card, ["properties", key], fn _ -> value end)
+  def update_card_values(location, key, value, card) do
+    Enum.map(location, fn c ->
+      if Map.has_key?(c, card) do
+        card_data = c[card]
+        updated_card_data = put_in(card_data["properties"][key], value)
+        %{card => updated_card_data}
+      else
+        c
+      end
+    end)
   end
 
   @doc """
@@ -192,16 +198,16 @@ defmodule TcgmWebApp.Game.GameLogic do
         cond do
           Map.has_key?(state.players[player_id], location) == false ->
             {:error, "la location n'existe pas"}
-          Map.has_key?(state.players[player_id][location], card) == false ->
+          Enum.any?(state.players[player_id][location], fn c -> Map.has_key?(c, card) end) == false ->
             {:error, "la carte n'existe pas"}
-          Map.has_key?(state.players[player_id][location][card]["properties"], key) == false ->
+          Enum.any?(state.players[player_id][location], fn c -> Map.has_key?(c[card]["properties"], key) end) == false ->
             {:error, "la propriete n'existe pas"}
           true ->
-            new_card = update_card_values(key, value, state.players[player_id][location][card])
+            new_card = update_card_values(state.players[player_id][location], key, value, card)
 
             update_state =
               state
-              |> put_in([:players, player_id, location, card], new_card)
+              |> put_in([:players, player_id, location], new_card)
 
             update_state
         end
@@ -225,5 +231,25 @@ defmodule TcgmWebApp.Game.GameLogic do
       |> put_in([:turnCount], count)
 
     update_state
+  end
+
+  def shuffle_card_location(state, player_id, args) do
+    expected_args = ["location"]
+    case check_valid_params(args, expected_args, state.players, player_id, []) do
+      {:error, message} ->
+        {:error, message}
+      :ok ->
+        location = Map.get(args, "location")
+        cond do
+          Map.has_key?(state.players[player_id], location) == false ->
+            {:error, "la location n'existe pas"}
+          true ->
+            update_state =
+              state
+              |> put_in([:players, player_id, location], Enum.shuffle(state.players[player_id][location]))
+
+            update_state
+        end
+    end
   end
 end

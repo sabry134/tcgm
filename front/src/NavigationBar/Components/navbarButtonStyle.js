@@ -12,6 +12,7 @@ export const navbarButtonStyle = {
     backgroundColor: '#5d3a00',
     '&:hover': {
       backgroundColor: '#7e4f00',
-    }
+    },
+    marginLeft: '10px',
   }
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button, Typography, Box, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import debounce from 'lodash/debounce';
+import debounce from "lodash/debounce";
 
 const styles = {
   navbar: {
@@ -20,6 +20,8 @@ const clamp = (v, min, max) => Math.max(min, Math.min(v, max));
 const CANVAS_MARGIN = 10;
 const MAX_NAME_LENGTH = 30;
 const LIVE_FIELDS = ["name", "x", "y", "borderRadius"];
+
+const API_BASE = "http://localhost:4000";
 
 const BoardEditor = () => {
   const navigate = useNavigate();
@@ -43,14 +45,49 @@ const BoardEditor = () => {
     borderRadius: "",
   });
 
+  const [board, setBoard] = useState({});
+
   const persist = useRef(
     debounce((sceneKey, data) => {
       sessionStorage.setItem(sceneKey, JSON.stringify(data));
     }, 500)
   );
 
-  const frameRef = useRef(null);
-  const pendingRef = useRef({});
+  const syncToApi = useRef(
+    debounce(async (boardData, zonesData) => {
+      try {
+        if (!boardData.id) {
+          const response = await fetch(`${API_BASE}/api/boards/with_zones`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ board: boardData, zones: zonesData }),
+          });
+          if (!response.ok) throw new Error("Failed to create board");
+          const data = await response.json();
+          setBoard(data.board);
+          setZones(data.zones);
+        } else {
+          const response = await fetch(`${API_BASE}/api/boards/${boardData.id}/with_zones`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ board: boardData, zones: zonesData }),
+          });
+          if (!response.ok) throw new Error("Failed to update board");
+          const data = await response.json();
+          setBoard(data.board);
+          setZones(data.zones);
+        }
+      } catch (err) {
+        console.error("Error syncing board:", err);
+      }
+    }, 1000)
+  );
+
+  useEffect(() => {
+    if (board) {
+      syncToApi.current(board, zones);
+    }
+  }, [zones, board]);
 
   const selectedZone = zones.find((z) => z.id === selectedZoneId);
 
@@ -69,12 +106,9 @@ const BoardEditor = () => {
     setButtons(saved.buttons || []);
     setZones(saved.zones || []);
     setTableBackground(saved.tableBackground || null);
-  }, [selectedScene]);
 
-  useEffect(() => {
-    if (!selectedScene) return;
-    persist.current(selectedScene, { cards, buttons, zones, tableBackground });
-  }, [cards, buttons, zones, tableBackground, selectedScene]);
+    setBoard(saved.board || {});
+  }, [selectedScene]);
 
   useEffect(() => {
     if (scenes.length) {
@@ -142,6 +176,9 @@ const BoardEditor = () => {
     };
   }, [isDragging, selectedZoneId, zones]);
 
+  const frameRef = useRef(null);
+  const pendingRef = useRef({});
+
   const updateSymmetric = (id, newProps) => {
     setZones((prev) => {
       const origin = prev.find((z) => z.id === id);
@@ -202,200 +239,217 @@ const BoardEditor = () => {
     });
   };
 
-  const addZone = () => {
-    const rect = canvasRef.current?.getBoundingClientRect() || { width: 0, height: 0 };
-    const dx = clamp(rect.width / 2 - 50, 0, rect.width - 100 - CANVAS_MARGIN);
-    const half = rect.height / 2;
-    const offset = 50;
-    const bottomY = clamp(half + offset, 0, rect.height - 100 - CANVAS_MARGIN);
-    const topY = clamp(half - offset - 100, 0, rect.height - 100 - CANVAS_MARGIN);
-    const pairId = Date.now();
-    const idx = Math.floor(zones.length / 2) + 1;
+  const handleInputChange = (field, value) => {
+    if (!selectedZone) return;
+    let newVal = value;
+    if (["width", "height", "x", "y", "borderRadius"].includes(field)) {
+      newVal = Number(value);
+      if (isNaN(newVal)) return;
+    }
+    if (field === "name" && newVal.length > MAX_NAME_LENGTH) return;
 
-    const bottom = { id: pairId, pairId, name: `Zone ${idx}`, x: dx, y: bottomY, width: 100, height: 100, borderRadius: 0, background: null };
-    const top = { id: pairId + 1, pairId, name: `[OPPONENT] Zone ${idx}`, x: dx, y: topY, width: 100, height: 100, borderRadius: 0, background: null };
-    setZones((z) => [...z, bottom, top]);
-    setSelectedZoneId(bottom.id);
+    setInputs((prev) => ({ ...prev, [field]: value }));
+
+    if (LIVE_FIELDS.includes(field)) {
+      updateSymmetric(selectedZone.id, { [field]: newVal });
+    }
   };
-  const deleteZone = () => {
-    if (!selectedZoneId) return;
-    const pid = zones.find((z) => z.id === selectedZoneId)?.pairId;
-    if (pid == null) return;
-    setZones((z) => z.filter((z) => z.pairId !== pid));
+
+  const addZonePair = () => {
+    setZones((prev) => {
+      const id1 = Date.now() + Math.random();
+      const id2 = id1 + 1;
+      return [
+        ...prev,
+        {
+          id: id1,
+          pairId: id1,
+          name: "",
+          x: 100,
+          y: 100,
+          width: 400,
+          height: 350,
+          borderRadius: 0,
+          background: null,
+        },
+        {
+          id: id2,
+          pairId: id1,
+          name: "",
+          x: 100,
+          y: 350,
+          width: 400,
+          height: 350,
+          borderRadius: 0,
+          background: null,
+        },
+      ];
+    });
+  };
+
+  const deleteSelectedZone = () => {
+    if (!selectedZone) return;
+    setZones((prev) => prev.filter((z) => z.pairId !== selectedZone.pairId));
     setSelectedZoneId(null);
   };
 
-  const handleFieldChange = (field, raw) => {
-    setInputs((i) => ({ ...i, [field]: raw }));
-    if (!selectedZone) return;
-    if (LIVE_FIELDS.includes(field)) {
-      if (field === "name") {
-        const name = raw.slice(0, MAX_NAME_LENGTH);
-        updateSymmetric(selectedZoneId, { name });
-      } else {
-        const v = parseInt(raw, 10);
-        if (isNaN(v)) return;
-        updateSymmetric(selectedZoneId, { [field]: v });
-      }
-    }
-  };
-  const handleFieldBlur = (field) => {
-    if (!selectedZone) return;
-    if (LIVE_FIELDS.includes(field)) return;
-    const rect = canvasRef.current?.getBoundingClientRect() || { width: 0, height: 0 };
-    let props = {};
-    const v = parseInt(inputs[field], 10);
-    if (isNaN(v)) {
-      setInputs((i) => ({ ...i, [field]: String(selectedZone[field]) }));
-      return;
-    }
-    if (field === "width") props.width = clamp(v, 100, rect.width - selectedZone.x - CANVAS_MARGIN);
-    else if (field === "height") props.height = clamp(v, 100, rect.height - selectedZone.y - CANVAS_MARGIN);
-    updateSymmetric(selectedZoneId, props);
-  };
-
   const handleBackgroundUpload = (e) => {
+    if (!e.target.files.length) return;
     const file = e.target.files[0];
-    if (!file) return;
     const url = URL.createObjectURL(file);
-    if (selectedZoneId) {
-      setZones((prev) => prev.map((z) => {
-        if (z.id === selectedZoneId) {
-          if (z.background) URL.revokeObjectURL(z.background);
-          return { ...z, background: url };
-        }
-        return z;
-      }));
-    } else {
-      if (tableBackground) URL.revokeObjectURL(tableBackground);
-      setTableBackground(url);
-    }
-  };
-  const handleDeleteBackground = () => {
-    if (selectedZoneId) {
-      setZones((prev) => prev.map((z) => (z.id === selectedZoneId ? { ...z, background: null } : z)));
-    } else {
-      if (tableBackground) URL.revokeObjectURL(tableBackground);
-      setTableBackground(null);
-    }
+    setTableBackground(url);
+    setBoard((b) => ({ ...b, background_image: url }));
   };
 
   return (
-    <Box display="flex" flexDirection="column" height="100vh" sx={{ userSelect: "none" }}>
+    <>
       <Box sx={styles.navbar}>
-        {['/', '/documentation', '/forum', '/community'].map((path, i) => (
-          <Button key={i} onClick={() => navigate(path)} sx={styles.navButton}>
-            <Typography sx={styles.navText}>
-              {['🌟 Home', '📜 Documentation', '🖼️ Forum', '🌍 Community'][i]}
-            </Typography>
-          </Button>
-        ))}
+        <Button
+          sx={styles.navButton}
+          onClick={() => {
+            persist.current(selectedScene, { cards, buttons, zones, tableBackground, board });
+            navigate("/");
+          }}
+        >
+          Close
+        </Button>
+        <Typography sx={styles.navText}>Board Editor</Typography>
+        <Button sx={styles.navButton} onClick={addZonePair}>
+          Add Zone Pair
+        </Button>
+        <Button sx={styles.navButton} onClick={deleteSelectedZone} disabled={!selectedZoneId}>
+          Delete Zone
+        </Button>
       </Box>
 
-      <Box display="flex" flex={1}>
-        {/* Canvas area */}
+      <Box
+        sx={{
+          height: "calc(100vh - 110px)",
+          width: "100vw",
+          display: "flex",
+          backgroundColor: "#222",
+          gap: 2,
+          padding: 1,
+        }}
+      >
         <Box
-          ref={canvasRef}
           sx={{
             flex: 1,
             position: "relative",
-            bgcolor: tableBackground ? undefined : "#c4c4c4",
-            backgroundImage: tableBackground ? `url(${tableBackground})` : undefined,
+            backgroundColor: "#333",
+            borderRadius: 1,
+            overflow: "hidden",
+            backgroundImage: tableBackground ? `url(${tableBackground})` : "none",
             backgroundSize: "cover",
-            touchAction: "none",
           }}
-          onMouseDown={() => setSelectedZoneId(null)}
+          ref={canvasRef}
+          onClick={() => setSelectedZoneId(null)}
         >
-          {zones.map((z) => (
+          {zones.map((zone) => (
             <Box
-              key={z.id}
-              onMouseDown={(e) => handleMouseDown(e, z)}
+              key={zone.id}
               sx={{
                 position: "absolute",
-                left: z.x,
-                top: z.y,
-                width: z.width,
-                height: z.height,
-                border: z.id === selectedZoneId ? "2px solid #ff5722" : "2px dashed #333",
-                bgcolor: z.background ? undefined : "rgba(255,255,255,0.3)",
-                backgroundImage: z.background ? `url(${z.background})` : undefined,
-                backgroundSize: "cover",
-                borderRadius: z.borderRadius,
-                cursor: "move",
-                overflow: "hidden",
+                left: zone.x,
+                top: zone.y,
+                width: zone.width,
+                height: zone.height,
+                borderRadius: zone.borderRadius,
+                border: zone.id === selectedZoneId ? "3px solid #0ff" : "1px solid #aaa",
+                backgroundColor: "rgba(0,0,0,0.3)",
+                cursor: "grab",
+                userSelect: "none",
               }}
+              onMouseDown={(e) => handleMouseDown(e, zone)}
             >
               <Typography
-                variant="caption"
                 sx={{
+                  color: "white",
+                  fontWeight: "bold",
+                  pointerEvents: "none",
                   userSelect: "none",
-                  whiteSpace: "normal",
-                  wordBreak: "break-word",
-                  maxWidth: "100%",
                 }}
               >
-                {z.name}
+                {zone.name || "<no name>"}
               </Typography>
             </Box>
           ))}
         </Box>
 
-        {/* Sidebar editor */}
         <Box
           sx={{
             width: 300,
-            bgcolor: "#5d3a00",
-            color: "white",
-            p: 2,
             display: "flex",
             flexDirection: "column",
-            gap: 2,
+            gap: 1,
           }}
         >
-          <Typography variant="h6">Zones Editor</Typography>
-
-          <Button variant="contained" component="label">
-            {selectedZoneId ? "Upload Zone Background" : "Upload Table Background"}
-            <input type="file" hidden onChange={handleBackgroundUpload} />
+          <Button variant="outlined" component="label" fullWidth>
+            Upload Table Background
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={handleBackgroundUpload}
+            />
           </Button>
 
-          <Button variant="outlined" color="secondary" onClick={handleDeleteBackground}>
-            {selectedZoneId ? "Delete Zone Background" : "Delete Table Background"}
-          </Button>
-
-          <Button variant="contained" onClick={addZone}>
-            Add Zone Pair
-          </Button>
-
-          {selectedZone && (
-            <Button variant="outlined" color="error" onClick={deleteZone}>
-              Delete Zone Pair
-            </Button>
-          )}
-
-          {selectedZone ? (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              {['name', 'width', 'height', 'x', 'y', 'borderRadius'].map((field) => (
-                <TextField
-                  key={field}
-                  label={field}
-                  variant="filled"
-                  size="small"
-                  value={inputs[field]}
-                  onChange={(e) => handleFieldChange(field, e.target.value)}
-                  onBlur={() => handleFieldBlur(field)}
-                  type={LIVE_FIELDS.includes(field) ? (field === "name" ? "text" : "number") : "number"}
-                  inputProps={field === "name" ? { maxLength: MAX_NAME_LENGTH } : {}}
-                  InputProps={{ style: { background: "#fff", userSelect: field === "name" ? "text" : "none" } }}
-                />
-              ))}
-            </Box>
-          ) : (
-            <Typography>Select a zone to edit</Typography>
-          )}
+          <TextField
+            label="Selected Zone Name"
+            variant="outlined"
+            size="small"
+            value={inputs.name}
+            onChange={(e) => handleInputChange("name", e.target.value)}
+            disabled={!selectedZoneId}
+          />
+          <TextField
+            label="Width"
+            variant="outlined"
+            size="small"
+            type="number"
+            value={inputs.width}
+            onChange={(e) => handleInputChange("width", e.target.value)}
+            disabled={!selectedZoneId}
+          />
+          <TextField
+            label="Height"
+            variant="outlined"
+            size="small"
+            type="number"
+            value={inputs.height}
+            onChange={(e) => handleInputChange("height", e.target.value)}
+            disabled={!selectedZoneId}
+          />
+          <TextField
+            label="X"
+            variant="outlined"
+            size="small"
+            type="number"
+            value={inputs.x}
+            onChange={(e) => handleInputChange("x", e.target.value)}
+            disabled={!selectedZoneId}
+          />
+          <TextField
+            label="Y"
+            variant="outlined"
+            size="small"
+            type="number"
+            value={inputs.y}
+            onChange={(e) => handleInputChange("y", e.target.value)}
+            disabled={!selectedZoneId}
+          />
+          <TextField
+            label="Border Radius"
+            variant="outlined"
+            size="small"
+            type="number"
+            value={inputs.borderRadius}
+            onChange={(e) => handleInputChange("borderRadius", e.target.value)}
+            disabled={!selectedZoneId}
+          />
         </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 

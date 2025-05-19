@@ -1,7 +1,8 @@
-import { Box, Typography } from '@mui/material'
+import { Typography } from '@mui/material'
 import React, { Component } from 'react'
 import { GameSelectedAddOn } from "./EditorsAddOn/GameSelectedAddOn";
 import { ListEditorsAddOn } from "./EditorsAddOn/ListEditorsAddOn";
+import { BaseTopBar } from "./Components/BaseTopBar";
 
 export class MainNavigationBar extends Component {
   constructor (props) {
@@ -38,29 +39,16 @@ export class MainNavigationBar extends Component {
     return (
       <>
         { this.state.noGameChosen ? (
-          <Box
-            sx={{
-              backgroundColor: '#5d3a00',
-              color: 'white',
-              padding: '20px',
-              display: 'flex',
-              justifyContent: 'space-around'
-            }}
-          >
-            <Typography variant='h5' sx={{ color: 'white' }}>
+          <BaseTopBar>
+
+            <Typography variant='h5' sx={{ color: 'primary.contrastText' }}>
               Game List
             </Typography>
-          </Box>
+
+          </BaseTopBar>
         ) : (
-          <Box
-            sx={{
-              backgroundColor: '#C4C4C4',
-              color: 'white',
-              padding: '10px',
-              display: 'flex',
-              justifyContent: 'space-around'
-            }}
-          >
+          <BaseTopBar>
+
             { this.state.showEditors ? (
               <>
                 <ListEditorsAddOn toggleDisplay={this.toggleDisplayEditors} />
@@ -68,7 +56,8 @@ export class MainNavigationBar extends Component {
             ) : (
               <GameSelectedAddOn toggleDisplay={ this.toggleDisplayEditors } />
             )}
-          </Box>
+
+          </BaseTopBar>
         )}
       </>
     )

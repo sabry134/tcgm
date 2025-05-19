@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import styles from './Popup.module.css'
 import { Box, Button, Popper, Stack, Typography } from "@mui/material";
-import { FormInput } from "../RawComponents/FormInput/FormInput";
+import { FormInput } from "../RawComponents/FormInput";
 
 /**
  * Popup component for displaying a modal dialog with input fields and buttons.

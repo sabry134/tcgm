@@ -2,11 +2,10 @@ import React, { useEffect, useState } from "react";
 import "./Lobby.css"
 import { Socket } from "phoenix";
 import { callSetDeck } from "../game_commands";
-import defaultGameState from '../Room/Data/GameState.json'
 import { useNavigate } from "react-router-dom";
 import { useChannel } from "../ChannelContext"; // Import the context hook
 import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
-import { TCGMButton } from "../Components/RawComponents/TCGMButton/TCGMButton";
+import { TCGMButton } from "../Components/RawComponents/TCGMButton";
 
 const Lobby = () => {
     const navigate = useNavigate();

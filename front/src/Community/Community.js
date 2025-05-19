@@ -6,7 +6,7 @@ import { CommunityGamePicker } from "./Components/CommunityGamePicker/CommunityG
 import { Popup } from "../Components/Popup/Popup";
 import { createGameRequest } from "../Api/gamesRequest";
 import { SidePanel } from "../Components/RawComponents/SidePanel";
-import { TCGMButton } from "../Components/RawComponents/TCGMButton/TCGMButton";
+import { TCGMButton } from "../Components/RawComponents/TCGMButton";
 
 const Community = () => {
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ const Community = () => {
         sx={{
           flexGrow: 1,
           p: 1,
-          bgcolor: "neutral.main",
+          bgcolor: "neutral.dark",
           overflowY: "auto",
         }}
       >
@@ -66,7 +66,7 @@ const Community = () => {
 
         <Box
           sx={{
-            boxShadow: 2,
+            boxShadow: 5,
             borderRadius: 2,
             bgcolor: "neutral.light",
             flexGrow: 1,

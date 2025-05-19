@@ -32,7 +32,7 @@ export class SidePanel extends Component<Props> {
         sx={{
           borderRadius: 2,
           boxShadow: 2,
-          py: 2,
+          p: 2,
           width: '15%',
           bgcolor: 'primary.main',
         }}
@@ -45,8 +45,6 @@ export class SidePanel extends Component<Props> {
               boxShadow: 2,
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
               p: 2,
               bgcolor: 'primary.light',
             }}>

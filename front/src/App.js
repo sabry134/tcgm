@@ -24,12 +24,12 @@ function App() {
       <ChannelProvider>
         <Router>
           <Routes>
-            {/*<Route path="/" element={<SceneEditor />} />*/}
+            <Route path="/" element={<Community />} />
+            <Route path="/game-main-page" element={<GameMainPage />} />
             <Route path="/templates" element={<Templates />} />
             <Route path="/card-editor" element={<CardEditor />} />
             <Route path="/type-editor" element={<TypeEditor />} />
-            <Route path="/game-main-page" element={<GameMainPage />} />
-            <Route path="/" element={<Community />} />
+            <Route path="/board-editor" element={<BoardEditor />} />
             <Route path="/join" element={<JoinRoom />} />
             <Route path="/login" element={<Login />} />
             <Route path="/help-game" element={<HelpGame />} />
@@ -37,7 +37,6 @@ function App() {
             <Route path="/select-deck" element={<DeckSelector />} />
             <Route path="/edit-deck" element={<DeckBuilder />} />
             <Route path='/lobby' element={<Lobby />} />
-            <Route path="/board-editor" element={<BoardEditor />} />
           </Routes>
         </Router>
       </ChannelProvider>

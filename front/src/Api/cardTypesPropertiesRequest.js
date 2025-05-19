@@ -12,7 +12,15 @@ export async function getCardTypesPropertiesRequest() {
 // }
 // right now everything is a string but it will change
 export async function saveNewCardTypesPropertiesRequest(data) {
-    return await baseRequest('cardTypeProperties', 'POST', data, {
+    let tmpData = {
+        ...data, font_color: data.font_color.toString(),
+        border_color: data.border_color.toString(),
+        background_color: data.background_color.toString(),
+        variant: "variant" //TODO(): add variant capacity
+    }
+    delete data.inserted_at
+    delete data.updated_at
+    return await baseRequest('cardTypeProperties', 'POST', { cardTypeProperty: tmpData }, {
         'Content-Type': 'application/json'
     });
 }
@@ -26,7 +34,8 @@ export async function getCardTypesPropertiesbyTypeRequest(typeId) {
                 return {
                     ...property,
                     border_color: property.border_color.split(','),
-                    font_color: property.font_color.split(',')
+                    font_color: property.font_color.split(','),
+                    background_color: property.background_color.split(',')
                 }
             })
         } catch (error) {
@@ -50,7 +59,15 @@ export async function getCardTypesPropertyByIdRequest(propertyId) {
 
 // Edit a card Property
 export async function editCardTypesPropertyByIdRequest(data, propertyId) {
-    return await baseRequest('cardTypeProperties/' + propertyId, 'PUT', data, {
+    let tmpData = {
+        ...data, font_color: data.font_color.toString(),
+        border_color: data.border_color.toString(),
+        background_color: data.background_color.toString(),
+        variant: "variant" //TODO(): add variant capacity
+    }
+    delete data.inserted_at
+    delete data.updated_at
+    return await baseRequest('cardTypeProperties/' + propertyId, 'PUT', { cardTypeProperty: tmpData }, {
         'Content-Type': 'application/json'
     });
 }

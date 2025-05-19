@@ -14,6 +14,7 @@ import HelpGame from './HelpGame/HelpGame';
 import Room from './Room/Room';
 import DeckBuilder from './DeckBuilder/DeckBuilder';
 import DeckSelector from './DeckSelector/DeckSelector';
+import BoardEditor from './BoardEditor/BoardEditor';
 import Lobby from './Lobby/Lobby';
 import { ChannelProvider } from './ChannelContext';
 
@@ -23,12 +24,12 @@ function App() {
       <ChannelProvider>
         <Router>
           <Routes>
-            {/*<Route path="/" element={<SceneEditor />} />*/}
+            <Route path="/" element={<Community />} />
+            <Route path="/game-main-page" element={<GameMainPage />} />
             <Route path="/templates" element={<Templates />} />
             <Route path="/card-editor" element={<CardEditor />} />
             <Route path="/type-editor" element={<TypeEditor />} />
-            <Route path="/game-main-page" element={<GameMainPage />} />
-            <Route path="/" element={<Community />} />
+            <Route path="/board-editor" element={<BoardEditor />} />
             <Route path="/join" element={<JoinRoom />} />
             <Route path="/login" element={<Login />} />
             <Route path="/help-game" element={<HelpGame />} />

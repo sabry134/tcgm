@@ -3,7 +3,20 @@ import { Container } from "@mui/material";
 
 /**
  * SidePanel component for displaying components on the side.
- * @extends Component
+ * It wraps its children in a styled container.
+ * @param {Object} props - The component props.
+ * @param {ReactNode} props.children - The child components to be rendered inside the SidePanel.
+ *
+ * @returns {JSX.Element} The rendered SidePanel component.
+ * @example
+ *
+ * <SidePanel>
+ *   <ChildComponent1 />
+ *   <ChildComponent2 />
+ *   <ChildComponent3 />
+ *   ...
+ *   <ChildComponentN />
+ * </SidePanel>
  */
 
 type Props = {

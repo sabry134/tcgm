@@ -25,7 +25,7 @@ import { FormInput } from "../RawComponents/FormInput/FormInput";
  *  id="my-popup"
  *  anchorEl={anchorElement}
  *  open={isOpen}
- *  />
+ * />
  */
 
 export class Popup extends Component {

@@ -2,7 +2,7 @@ import { Box, Button, Typography } from '@mui/material'
 import React, { Component } from 'react'
 import './GameBox.css'
 import { useNavigate } from 'react-router-dom'
-import logo from '../../../assets/TCGMlogo.png'
+import logo from '../../../Assets/TCGMlogo.png'
 import { createUserRequest } from '../../../Api/userRequest'
 
 const height = '120px'

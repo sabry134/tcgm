@@ -1,0 +1,15 @@
+export const ROUTES = {
+  HOME: "/",
+  GAME_MAIN_PAGE: "/game-main-page",
+  TEMPLATES: "/templates",
+  CARD_EDITOR: "/card-editor",
+  TYPE_EDITOR: "/type-editor",
+  BOARD_EDITOR: "/board-editor",
+  JOIN: "/join",
+  LOGIN: "/login",
+  HELP_GAME: "/help-game",
+  ROOM: "/room",
+  SELECT_DECK: "/select-deck",
+  EDIT_DECK: "/edit-deck",
+  LOBBY: "/lobby",
+}

@@ -2,7 +2,7 @@ import { Typography } from '@mui/material'
 import React, { Component } from 'react'
 import { GameSelectedAddOn } from "./EditorsAddOn/GameSelectedAddOn";
 import { ListEditorsAddOn } from "./EditorsAddOn/ListEditorsAddOn";
-import { BaseTopBar } from "./Components/BaseTopBar";
+import { BaseTopBar } from "../Components/RawComponents/BaseTopBar";
 
 export class MainNavigationBar extends Component {
   constructor (props) {

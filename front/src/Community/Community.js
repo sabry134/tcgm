@@ -1,7 +1,6 @@
 import React, { useRef, useState } from "react";
 import { Box, Stack } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
+import { EmptyNavigationBar } from "../Components/NavigationBar/EmptyNavigationBar";
 import { CommunityGamePicker } from "./Components/CommunityGamePicker/CommunityGamePicker";
 import { Popup } from "../Components/Popup/Popup";
 import { createGameRequest } from "../Api/gamesRequest";
@@ -9,7 +8,6 @@ import { SidePanel } from "../Components/RawComponents/SidePanel";
 import { TCGMButton } from "../Components/RawComponents/TCGMButton";
 
 const Community = () => {
-  const navigate = useNavigate();
   const [anchor, setAnchor] = useState(null);
   const spanRef = useRef()
 
@@ -43,7 +41,7 @@ const Community = () => {
         bgcolor: "neutral.main",
       }}
     >
-      <MainNavigationBar navigate={navigate}/>
+      <EmptyNavigationBar/>
 
       <Stack
         direction="row"

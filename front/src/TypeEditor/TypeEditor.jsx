@@ -4,7 +4,7 @@ import { LeftPanel } from './Components/LeftPanel'
 import { RightPanel } from './Components/RightPanel'
 import { Editor } from './Components/Editor'
 import { useNavigate } from 'react-router-dom'
-import { MainNavigationBar } from '../NavigationBar/MainNavigationBar'
+import { MainNavigationBar } from '../Components/NavigationBar/MainNavigationBar'
 import { Popup } from "../Components/Popup/Popup";
 import { createCardTypeRequest } from "../Api/cardTypesRequest";
 

@@ -4,7 +4,7 @@ import { Socket } from "phoenix";
 import { callSetDeck } from "../game_commands";
 import { useNavigate } from "react-router-dom";
 import { useChannel } from "../ChannelContext"; // Import the context hook
-import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
+import { RoomNavigationBar } from "../Components/NavigationBar/RoomNavigationBar";
 import { TCGMButton } from "../Components/RawComponents/TCGMButton";
 
 const Lobby = () => {

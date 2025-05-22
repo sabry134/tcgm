@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
+import { MainNavigationBar } from "../Components/NavigationBar/MainNavigationBar";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { LeftPanel } from "./component/LeftPanel";

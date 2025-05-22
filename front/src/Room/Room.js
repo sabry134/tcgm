@@ -7,6 +7,7 @@ import "./Room.css"
 import { DndContext } from '@dnd-kit/core';
 import { useChannel } from "../ChannelContext"; // Import the context hook
 import CardZone from "./Componnent/CardZone";
+import { ROUTES } from "../Routes/routes";
 
 const Room = () => {
   const navigate = useNavigate();
@@ -16,7 +17,6 @@ const Room = () => {
   });
   const [selectedCard, setSelectedCard] = useState(null);
   const [playerId, setPlayerId] = useState("");
-  const [hoveredCard, setHoveredCard] = useState(null);
 
   const cardBackImage =
     "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Card_back_06.svg/1200px-Card_back_06.svg.png";
@@ -26,7 +26,7 @@ const Room = () => {
       return
     if (!channel) {
       console.error("No Channel Found");
-      navigate("/join");
+      navigate(ROUTES.JOIN);
       return;
     }
 
@@ -34,7 +34,7 @@ const Room = () => {
     const storedPlayerId = localStorage.getItem("playerUsername");
     if (!storedPlayerId) {
       console.error("No player ID found");
-      navigate("/join");
+      navigate(ROUTES.JOIN);
       return;
     }
     setPlayerId(storedPlayerId);

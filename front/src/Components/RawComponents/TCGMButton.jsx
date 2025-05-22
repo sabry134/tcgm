@@ -17,9 +17,11 @@ export class TCGMButton extends Component {
           justifyContent: "center",
         }}
       >
+
         <Typography variant={"body1"} fontWeight={500} color={"secondary.contrastText"}>
           {this.props.children}
         </Typography>
+
       </Button>
     )
   }

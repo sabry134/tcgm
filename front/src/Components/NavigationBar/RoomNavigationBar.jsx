@@ -4,7 +4,6 @@ import { Home, Chat as ChatIcon } from '@mui/icons-material'
 import { NavbarButton, NavbarSmallButton } from './Components/navbarButton'
 import { Box, Button, Popover, TextField, Typography } from '@mui/material'
 import LinkIcon from '@mui/icons-material/Link'
-import GameChat from '../Room/Componnent/GameChat'
 
 export const RoomNavigationBar = ({ roomId }) => {
   const navigate = useNavigate()

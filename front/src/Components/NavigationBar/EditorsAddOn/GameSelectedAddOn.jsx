@@ -8,7 +8,7 @@ export const GameSelectedAddOn = ({ toggleDisplay }) => {
 
   const unselectGame = () => {
     if (localStorage.getItem('gameSelected'))
-      localStorage.removeItem('gameSelected')
+      localStorage.setItem('gameSelected', false);
     navigate('/')
   }
 

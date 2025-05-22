@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { callSetDeck, callDrawCard, callInsertCard, callMoveCard } from "../game_commands";
-import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
+import { RoomNavigationBar } from "../Components/NavigationBar/RoomNavigationBar";
 import CardInfo from "./Componnent/CardInfo";
 import "./Room.css"
 import { DndContext } from '@dnd-kit/core';

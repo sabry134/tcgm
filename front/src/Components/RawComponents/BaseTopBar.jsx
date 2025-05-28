@@ -31,6 +31,7 @@ export class BaseTopBar extends Component {
           p: 2,
           display: 'flex',
           justifyContent: 'space-around',
+          height: theme => theme.spacing(4),
         }}
       >
         {this.props.children}

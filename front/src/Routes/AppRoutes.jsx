@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import Community from "../Community/Community";
+import GameList from "../Community/GameList";
 import GameMainPage from "../GameMainPage/GameMainPage";
 import Templates from "../Templates/Templates";
 import CardEditor from "../CardEditor/CardEditor";
@@ -17,7 +17,7 @@ import React from "react";
 import { ROUTES } from "./routes";
 
 export class AppRoutes extends React.Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
   }
 
@@ -25,19 +25,19 @@ export class AppRoutes extends React.Component {
     return (
       <Router>
         <Routes>
-          <Route path={ROUTES.HOME} element={<Community />} />
-          <Route path={ROUTES.GAME_MAIN_PAGE} element={<GameMainPage />} />
-          <Route path={ROUTES.TEMPLATES} element={<Templates />} />
-          <Route path={ROUTES.CARD_EDITOR} element={<CardEditor />} />
-          <Route path={ROUTES.TYPE_EDITOR} element={<TypeEditor />} />
-          <Route path={ROUTES.BOARD_EDITOR} element={<BoardEditor />} />
-          <Route path={ROUTES.JOIN} element={<JoinRoom />} />
-          <Route path={ROUTES.LOGIN} element={<Login />} />
-          <Route path={ROUTES.HELP_GAME} element={<HelpGame />} />
-          <Route path={ROUTES.ROOM} element={<Room />} />
-          <Route path={ROUTES.SELECT_DECK} element={<DeckSelector />} />
-          <Route path={ROUTES.EDIT_DECK} element={<DeckBuilder />} />
-          <Route path={ROUTES.LOBBY} element={<Lobby />} />
+          <Route path={ROUTES.HOME} element={<GameList/>}/>
+          <Route path={ROUTES.GAME_MAIN_PAGE} element={<GameMainPage/>}/>
+          <Route path={ROUTES.TEMPLATES} element={<Templates/>}/>
+          <Route path={ROUTES.CARD_EDITOR} element={<CardEditor/>}/>
+          <Route path={ROUTES.TYPE_EDITOR} element={<TypeEditor/>}/>
+          <Route path={ROUTES.BOARD_EDITOR} element={<BoardEditor/>}/>
+          <Route path={ROUTES.JOIN} element={<JoinRoom/>}/>
+          <Route path={ROUTES.LOGIN} element={<Login/>}/>
+          <Route path={ROUTES.HELP_GAME} element={<HelpGame/>}/>
+          <Route path={ROUTES.ROOM} element={<Room/>}/>
+          <Route path={ROUTES.SELECT_DECK} element={<DeckSelector/>}/>
+          <Route path={ROUTES.EDIT_DECK} element={<DeckBuilder/>}/>
+          <Route path={ROUTES.LOBBY} element={<Lobby/>}/>
         </Routes>
       </Router>
     )

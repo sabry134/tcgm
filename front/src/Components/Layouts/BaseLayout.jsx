@@ -4,6 +4,7 @@ import { SidePanel } from "../RawComponents/SidePanel";
 import { BaseTopBar } from "../RawComponents/BaseTopBar";
 
 type Props = {
+  spanRef?: React.RefObject<HTMLSpanElement>;
   topBar: React.ReactNode;
   leftPanel?: React.ReactNode;
   centerPanel: React.ReactNode;
@@ -14,6 +15,7 @@ type Props = {
  * BaseLayout component for displaying the default layout of the application
  * It wraps the topBar, leftPanel, centerPanel and rightPanel
  * @param {Object} props - The properties passed to the component
+ * @param {React.RefObject<HTMLSpanElement>} [props.spanRef] - Optional reference used with the Popup component
  * @param {React.ReactNode} props.topBar - The top bar component
  * @param {React.ReactNode} [props.leftPanel] - The left panel component (optional)
  * @param {React.ReactNode} props.centerPanel - The center panel component
@@ -40,6 +42,7 @@ export class BaseLayout extends Component<Props> {
           bgcolor: "neutral.main",
         }}
       >
+        {this.props.spanRef && <span ref={this.props.spanRef}/>}
         <BaseTopBar>
           {this.props.topBar}
         </BaseTopBar>

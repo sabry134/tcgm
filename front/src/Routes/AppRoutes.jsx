@@ -1,5 +1,5 @@
 import { Route, Routes } from "react-router-dom";
-import Community from "../Community/Community";
+import GameList from "../Community/GameList";
 import GameMainPage from "../GameMainPage/GameMainPage";
 import Templates from "../Templates/Templates";
 import CardEditor from "../CardEditor/CardEditor";
@@ -15,7 +15,6 @@ import Lobby from "../Lobby/Lobby";
 import { HashRouter as Router } from "react-router";
 import React from "react";
 import { ROUTES } from "./routes";
-import { BaseLayout } from "../Components/Layouts/BaseLayout";
 
 export class AppRoutes extends React.Component {
   constructor(props) {
@@ -26,9 +25,7 @@ export class AppRoutes extends React.Component {
     return (
       <Router>
         <Routes>
-          <Route path="/test" element={<BaseLayout centerPanel={<div/>} topBar={<div/>}/>}/>
-          <Route path={ROUTES.HOME} element={<Community/>}/>
-          {/*<Route path={ROUTES.HOME} element={<GameList/>}/>*/}
+          <Route path={ROUTES.HOME} element={<GameList/>}/>
           <Route path={ROUTES.GAME_MAIN_PAGE} element={<GameMainPage/>}/>
           <Route path={ROUTES.TEMPLATES} element={<Templates/>}/>
           <Route path={ROUTES.CARD_EDITOR} element={<CardEditor/>}/>

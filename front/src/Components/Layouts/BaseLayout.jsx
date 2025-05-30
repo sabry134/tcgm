@@ -7,7 +7,7 @@ type Props = {
   spanRef?: React.RefObject<HTMLSpanElement>;
   topBar: React.ReactNode;
   leftPanel?: React.ReactNode;
-  centerPanel: React.ReactNode;
+  centerPanel?: React.ReactNode;
   rightPanel?: React.ReactNode;
 };
 
@@ -17,9 +17,9 @@ type Props = {
  * @param {Object} props - The properties passed to the component
  * @param {React.RefObject<HTMLSpanElement>} [props.spanRef] - Optional reference used with the Popup component
  * @param {React.ReactNode} props.topBar - The top bar component
- * @param {React.ReactNode} [props.leftPanel] - The left panel component (optional)
- * @param {React.ReactNode} props.centerPanel - The center panel component
- * @param {React.ReactNode} [props.rightPanel] - The right panel component (optional)
+ * @param {React.ReactNode} [props.leftPanel] - The components to be displayed in the left panel (optional)
+ * @param {React.ReactNode} [props.centerPanel] - The components to be displayed in the center panel (optional)
+ * @param {React.ReactNode} [props.rightPanel] - The components to be displayed in the right panel (optional)
  *
  * @returns {JSX.Element} The rendered BaseLayout component
  * @example

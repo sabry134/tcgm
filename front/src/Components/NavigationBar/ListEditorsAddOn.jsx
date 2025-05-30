@@ -1,7 +1,8 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowBack } from '@mui/icons-material'
-import { NavbarButton, NavbarSmallButton } from '../Components/navbarButton'
+import { NavbarButton, NavbarSmallButton } from '../RawComponents/navbarButton'
+import { ROUTES } from '../../Routes/routes'
 
 export const ListEditorsAddOn = ({ toggleDisplay }) => {
   const navigate = useNavigate()
@@ -26,12 +27,12 @@ export const ListEditorsAddOn = ({ toggleDisplay }) => {
         disabled={true}
       />
       <NavbarButton
-        event={() => navigate('/card-editor')}
+        event={() => navigate(ROUTES.CARD_EDITOR)}
         altText={'Edit cards and decks'}
         buttonText={'Card Editor'}
       />
       <NavbarButton
-        event={() => navigate('/type-editor')}
+        event={() => navigate(ROUTES.TYPE_EDITOR)}
         altText={'Edit type'}
         buttonText={'Type Editor'}
       />

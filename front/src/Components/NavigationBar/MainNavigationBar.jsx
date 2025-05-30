@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
-import { GameSelectedAddOn } from "./EditorsAddOn/GameSelectedAddOn";
-import { ListEditorsAddOn } from "./EditorsAddOn/ListEditorsAddOn";
-import { BaseTopBar } from "../RawComponents/BaseTopBar";
+import { GameSelectedAddOn } from "./GameSelectedAddOn";
+import { ListEditorsAddOn } from "./ListEditorsAddOn";
 
 export class MainNavigationBar extends Component {
   constructor(props) {
@@ -26,7 +25,7 @@ export class MainNavigationBar extends Component {
 
   render() {
     return (
-      <BaseTopBar>
+      <>
 
         {this.state.showEditors ? (
           <>
@@ -36,7 +35,7 @@ export class MainNavigationBar extends Component {
           <GameSelectedAddOn toggleDisplay={this.toggleDisplayEditors}/>
         )}
 
-      </BaseTopBar>
+      </>
     )
   }
 }

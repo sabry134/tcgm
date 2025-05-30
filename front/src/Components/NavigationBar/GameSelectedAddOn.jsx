@@ -1,7 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Close } from "@mui/icons-material";
-import { NavbarButton, NavbarSmallButton } from "../Components/navbarButton";
+import { NavbarButton, NavbarSmallButton } from "../RawComponents/navbarButton";
+import { ROUTES } from "../../Routes/routes";
 
 export const GameSelectedAddOn = ({ toggleDisplay }) => {
   const navigate = useNavigate()
@@ -9,7 +10,7 @@ export const GameSelectedAddOn = ({ toggleDisplay }) => {
   const unselectGame = () => {
     if (localStorage.getItem('gameSelected'))
       localStorage.setItem('gameSelected', false);
-    navigate('/')
+    navigate(ROUTES.HOME);
   }
 
   return (
@@ -26,9 +27,10 @@ export const GameSelectedAddOn = ({ toggleDisplay }) => {
       >
       </NavbarButton>
       <NavbarButton
-        event={() => navigate('/templates')}
+        event={() => console.log('templates')}
         altText={ 'Edit the templates' }
         buttonText={ "Templates" }
+        disabled={ true }
       >
       </NavbarButton>
       <NavbarButton

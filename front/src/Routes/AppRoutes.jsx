@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router-dom";
-import GameList from "../Community/GameList";
+import GameList from "../GameList/GameList";
 import GameMainPage from "../GameMainPage/GameMainPage";
-import Templates from "../Templates/Templates";
 import CardEditor from "../CardEditor/CardEditor";
 import TypeEditor from "../TypeEditor/TypeEditor";
 import BoardEditor from "../BoardEditor/BoardEditor";
@@ -27,7 +26,6 @@ export class AppRoutes extends React.Component {
         <Routes>
           <Route path={ROUTES.HOME} element={<GameList/>}/>
           <Route path={ROUTES.GAME_MAIN_PAGE} element={<GameMainPage/>}/>
-          <Route path={ROUTES.TEMPLATES} element={<Templates/>}/>
           <Route path={ROUTES.CARD_EDITOR} element={<CardEditor/>}/>
           <Route path={ROUTES.TYPE_EDITOR} element={<TypeEditor/>}/>
           <Route path={ROUTES.BOARD_EDITOR} element={<BoardEditor/>}/>

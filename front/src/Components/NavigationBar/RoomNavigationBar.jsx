@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Home, Chat as ChatIcon } from '@mui/icons-material'
-import { NavbarButton, NavbarSmallButton } from './Components/navbarButton'
+import { NavbarButton, NavbarSmallButton } from '../RawComponents/navbarButton'
 import { Box, Button, Popover, TextField, Typography } from '@mui/material'
 import LinkIcon from '@mui/icons-material/Link'
 

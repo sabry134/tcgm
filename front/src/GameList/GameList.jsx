@@ -1,6 +1,6 @@
 import React, { Component, createRef } from "react";
 import { EmptyNavigationBar } from "../Components/NavigationBar/EmptyNavigationBar";
-import { CommunityGamePicker } from "./Components/CommunityGamePicker/CommunityGamePicker";
+import { GameListPicker } from "./GameListPicker/GameListPicker";
 import { Popup } from "../Components/Popup/Popup";
 import { createGameRequest } from "../Api/gamesRequest";
 import { TCGMButton } from "../Components/RawComponents/TCGMButton";
@@ -68,7 +68,7 @@ class GameList extends Component {
                 inputName={["Name", "Description"]}
               />
 
-              <CommunityGamePicker />
+              <GameListPicker />
             </>
           }
 

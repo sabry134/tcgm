@@ -45,14 +45,17 @@ class GameList extends Component {
       <>
         <BaseLayout
           spanRef={this.spanRef}
+
           topBar={
             <EmptyNavigationBar />
           }
+
           leftPanel={
             <TCGMButton onClick={this.openPopup}>
               Create Game
             </TCGMButton>
           }
+
           centerPanel={
             <>
               <Popup
@@ -64,9 +67,11 @@ class GameList extends Component {
                 title={"Create Game"}
                 inputName={["Name", "Description"]}
               />
+
               <CommunityGamePicker />
             </>
           }
+
         />
       </>
     );

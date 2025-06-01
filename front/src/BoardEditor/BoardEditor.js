@@ -52,29 +52,37 @@ const BoardEditor = () => {
     }, 500)
   );
 
-  const syncToApi = useRef(
-    debounce(async (boardData, zonesData) => {
-      try {
-        const method = boardData.id ? "PUT" : "POST";
-        const url = boardData.id
-          ? `${API_BASE}/api/boards/${boardData.id}/with_zones`
-          : `${API_BASE}/api/boards/with_zones`;
+const syncToApi = useRef(
+  debounce(async (boardData, zonesData) => {
+    try {
+      const method = boardData.id ? "PUT" : "POST";
+      const url = boardData.id
+        ? `${API_BASE}/api/boards/${boardData.id}/with_zones`
+        : `${API_BASE}/api/boards/with_zones`;
 
-        const response = await fetch(url, {
-          method,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ board: boardData, zones: zonesData }),
-        });
+      const gameId = localStorage.getItem("room_id");
 
-        if (!response.ok) throw new Error("Failed to sync board");
-        const data = await response.json();
-        setBoard(data.board);
-        setZones(data.zones);
-      } catch (err) {
-        console.error("Error syncing board:", err);
-      }
-    }, 1000)
-  );
+      const boardWithGameId = {
+        ...boardData,
+        game_id: gameId,
+      };
+
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ board: boardWithGameId, zones: zonesData }),
+      });
+
+      if (!response.ok) throw new Error("Failed to sync board");
+      const data = await response.json();
+      setBoard(data.board);
+      setZones(data.zones);
+    } catch (err) {
+      console.error("Error syncing board:", err);
+    }
+  }, 1000)
+);
+
 
   useEffect(() => {
     if (board) syncToApi.current(board, zones);

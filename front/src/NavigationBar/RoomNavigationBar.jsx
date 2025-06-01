@@ -9,8 +9,8 @@ import GameChat from '../Room/Componnent/GameChat'
 export const RoomNavigationBar = ({ roomId }) => {
   const navigate = useNavigate()
 
-  // Retrieve player username
   const username = localStorage.getItem('playerUsername') || 'Unknown'
+  localStorage.setItem('room_id', roomId) || roomId
 
   const [copyButtonText, setCopyButtonText] = useState('Copy')
   const [anchorEl, setAnchorEl] = useState(null)

@@ -17,10 +17,7 @@ const styles = {
 };
 
 const clamp = (v, min, max) => Math.max(min, Math.min(v, max));
-const CANVAS_MARGIN = 10;
 const MAX_NAME_LENGTH = 30;
-const LIVE_FIELDS = ["name", "x", "y", "borderRadius"];
-
 const API_BASE = "http://localhost:4000";
 
 const BoardEditor = () => {
@@ -32,8 +29,10 @@ const BoardEditor = () => {
   const [zones, setZones] = useState([]);
   const [selectedZoneId, setSelectedZoneId] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
   const [tableBackground, setTableBackground] = useState(null);
   const dragOffset = useRef({ x: 0, y: 0 });
+  const resizeStart = useRef({ x: 0, y: 0, width: 0, height: 0 });
   const canvasRef = useRef(null);
 
   const [inputs, setInputs] = useState({
@@ -56,27 +55,21 @@ const BoardEditor = () => {
   const syncToApi = useRef(
     debounce(async (boardData, zonesData) => {
       try {
-        if (!boardData.id) {
-          const response = await fetch(`${API_BASE}/api/boards/with_zones`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ board: boardData, zones: zonesData }),
-          });
-          if (!response.ok) throw new Error("Failed to create board");
-          const data = await response.json();
-          setBoard(data.board);
-          setZones(data.zones);
-        } else {
-          const response = await fetch(`${API_BASE}/api/boards/${boardData.id}/with_zones`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ board: boardData, zones: zonesData }),
-          });
-          if (!response.ok) throw new Error("Failed to update board");
-          const data = await response.json();
-          setBoard(data.board);
-          setZones(data.zones);
-        }
+        const method = boardData.id ? "PUT" : "POST";
+        const url = boardData.id
+          ? `${API_BASE}/api/boards/${boardData.id}/with_zones`
+          : `${API_BASE}/api/boards/with_zones`;
+
+        const response = await fetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ board: boardData, zones: zonesData }),
+        });
+
+        if (!response.ok) throw new Error("Failed to sync board");
+        const data = await response.json();
+        setBoard(data.board);
+        setZones(data.zones);
       } catch (err) {
         console.error("Error syncing board:", err);
       }
@@ -84,9 +77,7 @@ const BoardEditor = () => {
   );
 
   useEffect(() => {
-    if (board) {
-      syncToApi.current(board, zones);
-    }
+    if (board) syncToApi.current(board, zones);
   }, [zones, board]);
 
   const selectedZone = zones.find((z) => z.id === selectedZoneId);
@@ -106,15 +97,8 @@ const BoardEditor = () => {
     setButtons(saved.buttons || []);
     setZones(saved.zones || []);
     setTableBackground(saved.tableBackground || null);
-
     setBoard(saved.board || {});
   }, [selectedScene]);
-
-  useEffect(() => {
-    if (scenes.length) {
-      localStorage.setItem("scenes", JSON.stringify(scenes));
-    }
-  }, [scenes]);
 
   useEffect(() => {
     document.title = "JCCE";
@@ -130,6 +114,15 @@ const BoardEditor = () => {
         y: String(selectedZone.y),
         borderRadius: String(selectedZone.borderRadius),
       });
+    } else {
+      setInputs({
+        name: "",
+        width: "",
+        height: "",
+        x: "",
+        y: "",
+        borderRadius: "",
+      });
     }
   }, [selectedZone]);
 
@@ -137,35 +130,67 @@ const BoardEditor = () => {
     e.stopPropagation();
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
+
+    const resizeThreshold = 15;
+    const offsetX = e.clientX - rect.left - zone.x;
+    const offsetY = e.clientY - rect.top - zone.y;
+    const isResize =
+      offsetX > zone.width - resizeThreshold && offsetY > zone.height - resizeThreshold;
+
+    if (isResize) {
+      setIsResizing(true);
+      resizeStart.current = {
+        x: e.clientX,
+        y: e.clientY,
+        width: zone.width,
+        height: zone.height,
+      };
+    } else {
+      setIsDragging(true);
+      dragOffset.current = {
+        x: e.clientX - rect.left - zone.x,
+        y: e.clientY - rect.top - zone.y,
+      };
+    }
     setSelectedZoneId(zone.id);
-    setIsDragging(true);
-    dragOffset.current = {
-      x: e.clientX - rect.left - zone.x,
-      y: e.clientY - rect.top - zone.y,
-    };
   };
 
   const handleMouseMove = (e) => {
-    if (!isDragging || selectedZoneId == null) return;
     const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const origin = zones.find((z) => z.id === selectedZoneId);
-    if (!origin) return;
+    if (!rect || !selectedZoneId) return;
 
-    const rawX = e.clientX - rect.left - dragOffset.current.x;
-    const rawY = e.clientY - rect.top - dragOffset.current.y;
-    pendingRef.current = {
-      x: clamp(rawX, 0, rect.width - origin.width - CANVAS_MARGIN),
-      y: clamp(rawY, 0, rect.height - origin.height - CANVAS_MARGIN),
-    };
-    if (!frameRef.current) {
-      frameRef.current = requestAnimationFrame(() => {
-        updateSymmetric(selectedZoneId, pendingRef.current);
-        frameRef.current = null;
-      });
+    if (isDragging) {
+      const origin = zones.find((z) => z.id === selectedZoneId);
+      if (!origin) return;
+
+      const x = clamp(
+        e.clientX - rect.left - dragOffset.current.x,
+        0,
+        rect.width - origin.width
+      );
+      const y = clamp(
+        e.clientY - rect.top - dragOffset.current.y,
+        0,
+        rect.height - origin.height
+      );
+
+      updateSymmetric(selectedZoneId, { x, y });
+    }
+
+    if (isResizing) {
+      const dx = e.clientX - resizeStart.current.x;
+      const dy = e.clientY - resizeStart.current.y;
+      const newWidth = clamp(resizeStart.current.width + dx, 100, rect.width);
+      const newHeight = clamp(resizeStart.current.height + dy, 100, rect.height);
+
+      updateSymmetric(selectedZoneId, { width: newWidth, height: newHeight });
     }
   };
-  const handleMouseUp = () => setIsDragging(false);
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    setIsResizing(false);
+  };
 
   useEffect(() => {
     window.addEventListener("mousemove", handleMouseMove);
@@ -174,74 +199,65 @@ const BoardEditor = () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, selectedZoneId, zones]);
-
-  const frameRef = useRef(null);
-  const pendingRef = useRef({});
+  }, [selectedZoneId, isDragging, isResizing, zones]);
 
   const updateSymmetric = (id, newProps) => {
-    setZones((prev) => {
-      const origin = prev.find((z) => z.id === id);
-      if (!origin) return prev;
-      const twin = prev.find((z) => z.pairId === origin.pairId && z.id !== id);
-      const rect = canvasRef.current?.getBoundingClientRect() || { width: 0, height: 0 };
-      if (!twin) return prev;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-      let x = clamp(
-        newProps.x ?? origin.x,
-        0,
-        rect.width - (newProps.width ?? origin.width) - CANVAS_MARGIN
-      );
-      let y = clamp(
-        newProps.y ?? origin.y,
-        0,
-        rect.height - (newProps.height ?? origin.height) - CANVAS_MARGIN
-      );
-      let width = clamp(
-        newProps.width ?? origin.width,
-        100,
-        rect.width - x - CANVAS_MARGIN
-      );
-      let height = clamp(
-        newProps.height ?? origin.height,
-        100,
-        rect.height - y - CANVAS_MARGIN
-      );
+    setZones((prevZones) => {
+      const targetZone = prevZones.find((z) => z.id === id);
+      if (!targetZone) return prevZones;
 
-      const br = newProps.borderRadius ?? origin.borderRadius;
-      const name = newProps.name ?? origin.name;
+      const pairId = targetZone.pairId;
 
-      const half = rect.height / 2;
-      const isBottom = origin.id < twin.id;
-      if (isBottom) y = Math.max(y, half + 1);
-      else y = Math.min(y, half - height - 1);
+      const cw = canvas.clientWidth;
+      const ch = canvas.clientHeight;
 
-      const mirrorY = clamp(
-        rect.height - y - height,
-        0,
-        rect.height - height - CANVAS_MARGIN
-      );
+      return prevZones.map((zone) => {
+        if (zone.id === id) {
+          return { ...zone, ...newProps };
+        }
 
-      const updatedOrigin = { ...origin, x, y, width, height, borderRadius: br, name };
-      const updatedTwin = {
-        ...twin,
-        x: rect.width - x - width,
-        y: mirrorY,
-        width,
-        height,
-        borderRadius: br,
-        name: twin.name,
-      };
+        if (zone.pairId === pairId && zone.id !== id) {
+          const newX =
+            newProps.x !== undefined
+              ? cw - newProps.x - (newProps.width ?? zone.width)
+              : zone.x;
 
-      return prev.map((z) =>
-        z.id === updatedOrigin.id ? updatedOrigin : z.id === updatedTwin.id ? updatedTwin : z
-      );
+          const newY =
+            newProps.y !== undefined
+              ? ch - newProps.y - (newProps.height ?? zone.height)
+              : zone.y;
+
+          const newWidth = newProps.width !== undefined ? newProps.width : zone.width;
+          const newHeight = newProps.height !== undefined ? newProps.height : zone.height;
+
+          const newBorderRadius =
+            newProps.borderRadius !== undefined ? newProps.borderRadius : zone.borderRadius;
+
+          const newName = newProps.name !== undefined ? newProps.name : zone.name;
+
+          return {
+            ...zone,
+            x: newX,
+            y: newY,
+            width: newWidth,
+            height: newHeight,
+            borderRadius: newBorderRadius,
+            name: newName,
+          };
+        }
+
+        return zone;
+      });
     });
   };
 
   const handleInputChange = (field, value) => {
     if (!selectedZone) return;
     let newVal = value;
+
     if (["width", "height", "x", "y", "borderRadius"].includes(field)) {
       newVal = Number(value);
       if (isNaN(newVal)) return;
@@ -250,41 +266,46 @@ const BoardEditor = () => {
 
     setInputs((prev) => ({ ...prev, [field]: value }));
 
-    if (LIVE_FIELDS.includes(field)) {
-      updateSymmetric(selectedZone.id, { [field]: newVal });
-    }
+    updateSymmetric(selectedZone.id, { [field]: newVal });
   };
 
   const addZonePair = () => {
-    setZones((prev) => {
-      const id1 = Date.now() + Math.random();
-      const id2 = id1 + 1;
-      return [
-        ...prev,
-        {
-          id: id1,
-          pairId: id1,
-          name: "",
-          x: 100,
-          y: 100,
-          width: 400,
-          height: 350,
-          borderRadius: 0,
-          background: null,
-        },
-        {
-          id: id2,
-          pairId: id1,
-          name: "",
-          x: 100,
-          y: 350,
-          width: 400,
-          height: 350,
-          borderRadius: 0,
-          background: null,
-        },
-      ];
-    });
+    const id1 = Date.now() + Math.random();
+    const pairId = id1;
+    const id2 = id1 + 1;
+
+    const canvas = canvasRef.current;
+    const cw = canvas?.clientWidth || 800;
+    const ch = canvas?.clientHeight || 600;
+
+    const width = 200;
+    const height = 150;
+    const borderRadius = 10;
+
+    const zone1 = {
+      id: id1,
+      pairId,
+      name: "",
+      x: cw / 4 - width / 2,
+      y: ch / 2 - height / 2,
+      width,
+      height,
+      borderRadius,
+    };
+
+    const zone2 = {
+      id: id2,
+      pairId,
+      name: "",
+      x: cw - zone1.x - width,
+      y: ch - zone1.y - height,
+      width,
+      height,
+      borderRadius,
+    };
+
+    setZones((prev) => [...prev, zone1, zone2]);
+    setSelectedZoneId(id1);
   };
 
   const deleteSelectedZone = () => {
@@ -307,7 +328,13 @@ const BoardEditor = () => {
         <Button
           sx={styles.navButton}
           onClick={() => {
-            persist.current(selectedScene, { cards, buttons, zones, tableBackground, board });
+            persist.current(selectedScene, {
+              cards,
+              buttons,
+              zones,
+              tableBackground,
+              board,
+            });
             navigate("/");
           }}
         >
@@ -324,12 +351,10 @@ const BoardEditor = () => {
 
       <Box
         sx={{
-          height: "calc(100vh - 110px)",
+          height: "calc(100vh - 60px)",
           width: "100vw",
           display: "flex",
-          backgroundColor: "#222",
-          gap: 2,
-          padding: 1,
+          overflow: "hidden",
         }}
       >
         <Box
@@ -337,10 +362,9 @@ const BoardEditor = () => {
             flex: 1,
             position: "relative",
             backgroundColor: "#333",
-            borderRadius: 1,
-            overflow: "hidden",
             backgroundImage: tableBackground ? `url(${tableBackground})` : "none",
             backgroundSize: "cover",
+            overflow: "hidden",
           }}
           ref={canvasRef}
           onClick={() => setSelectedZoneId(null)}
@@ -355,98 +379,44 @@ const BoardEditor = () => {
                 width: zone.width,
                 height: zone.height,
                 borderRadius: zone.borderRadius,
-                border: zone.id === selectedZoneId ? "3px solid #0ff" : "1px solid #aaa",
+                border: zone.id === selectedZoneId ? "3px solid cyan" : "1px solid #aaa",
                 backgroundColor: "rgba(0,0,0,0.3)",
-                cursor: "grab",
+                cursor: "move",
                 userSelect: "none",
               }}
               onMouseDown={(e) => handleMouseDown(e, zone)}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (selectedZoneId !== zone.id) {
+                  setSelectedZoneId(zone.id);
+                }
+              }}
             >
-              <Typography
-                sx={{
-                  color: "white",
-                  fontWeight: "bold",
-                  pointerEvents: "none",
-                  userSelect: "none",
-                }}
-              >
-                {zone.name || "<no name>"}
-              </Typography>
+              <Typography sx={{ color: "#fff", p: 1 }}>{zone.name || "<no name>"}</Typography>
             </Box>
           ))}
         </Box>
 
-        <Box
-          sx={{
-            width: 300,
-            display: "flex",
-            flexDirection: "column",
-            gap: 1,
-          }}
-        >
+        <Box sx={{ width: 300, p: 2, backgroundColor: "#222", color: "#fff" }}>
           <Button variant="outlined" component="label" fullWidth>
             Upload Table Background
-            <input
-              type="file"
-              accept="image/*"
-              hidden
-              onChange={handleBackgroundUpload}
-            />
+            <input type="file" accept="image/*" hidden onChange={handleBackgroundUpload} />
           </Button>
 
-          <TextField
-            label="Selected Zone Name"
-            variant="outlined"
-            size="small"
-            value={inputs.name}
-            onChange={(e) => handleInputChange("name", e.target.value)}
-            disabled={!selectedZoneId}
-          />
-          <TextField
-            label="Width"
-            variant="outlined"
-            size="small"
-            type="number"
-            value={inputs.width}
-            onChange={(e) => handleInputChange("width", e.target.value)}
-            disabled={!selectedZoneId}
-          />
-          <TextField
-            label="Height"
-            variant="outlined"
-            size="small"
-            type="number"
-            value={inputs.height}
-            onChange={(e) => handleInputChange("height", e.target.value)}
-            disabled={!selectedZoneId}
-          />
-          <TextField
-            label="X"
-            variant="outlined"
-            size="small"
-            type="number"
-            value={inputs.x}
-            onChange={(e) => handleInputChange("x", e.target.value)}
-            disabled={!selectedZoneId}
-          />
-          <TextField
-            label="Y"
-            variant="outlined"
-            size="small"
-            type="number"
-            value={inputs.y}
-            onChange={(e) => handleInputChange("y", e.target.value)}
-            disabled={!selectedZoneId}
-          />
-          <TextField
-            label="Border Radius"
-            variant="outlined"
-            size="small"
-            type="number"
-            value={inputs.borderRadius}
-            onChange={(e) => handleInputChange("borderRadius", e.target.value)}
-            disabled={!selectedZoneId}
-          />
+          {["name", "width", "height", "x", "y", "borderRadius"].map((field) => (
+            <TextField
+              key={field}
+              label={field}
+              variant="outlined"
+              size="small"
+              type={field === "name" ? "text" : "number"}
+              value={inputs[field]}
+              onChange={(e) => handleInputChange(field, e.target.value)}
+              disabled={!selectedZoneId}
+              fullWidth
+              margin="dense"
+            />
+          ))}
         </Box>
       </Box>
     </>

@@ -18,13 +18,27 @@ export async function getCardRequest() {
 //   "game_id": 0
 //   "card_type_id": 0
 // }
+
+function adddMutablePropertiesFromProperties(typeProperties) {
+  let tmpProperties = typeProperties.filter((value, index) => value.mutable)
+  return tmpProperties.map((value, index) => {
+    console.log(value)
+    return {
+      "name": value.property_name,
+      "value_number": value.value,
+      "cardtype_property_id": value.id
+    }
+  })
+}
+
 export async function saveCardRequest(storedId, game_id, data) {
   data.game_id = game_id;
   await getCardTypesPropertiesbyTypeRequest(data.card_type_id).then((properties) => {
     if (!storedId || storedId === "0") {
+      delete data["properties"]
       return baseRequest('cards/with_properties', 'POST', {
         "card": data,
-        "properties": properties,
+        "properties": adddMutablePropertiesFromProperties(properties),
       }, {
         'Content-Type': 'application/json'
       });

@@ -52,48 +52,55 @@ const BoardEditor = () => {
     }, 500)
   );
 
-const syncToApi = useRef(
-  debounce(async (boardData, zonesData) => {
-    try {
-      const method = boardData.id ? "PUT" : "POST";
-      const url = boardData.id
-        ? `${API_BASE}/api/boards/${boardData.id}/with_zones`
-        : `${API_BASE}/api/boards/with_zones`;
+  const isSyncing = useRef(false);
 
-      const gameId = localStorage.getItem("gameSelected");
+  const syncToApi = useRef(
+    debounce(async (boardData, zonesData) => {
+      try {
+        isSyncing.current = true;
 
-      const boardWithGameId = {
-        ...boardData,
-        game_id: gameId,
-      };
+        let method = "POST";
+        let url = `${API_BASE}/api/boards/with_zones`;
 
-      console.log("Sending to API:", {
-        url,
-        method,
-        body: { board: boardWithGameId, zones: zonesData },
-      });
+        const gameId = localStorage.getItem("gameSelected");
+        const boardWithGameId = {
+          ...boardData,
+          game_id: gameId,
+        };
 
-      const response = await fetch(url, {
-        method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ board: boardWithGameId, zones: zonesData }),
-      });
+        if (boardData.id) {
+          const check = await fetch(`${API_BASE}/api/boards/${boardData.id}`);
+          if (check.ok) {
+            method = "PUT";
+            url = `${API_BASE}/api/boards/with_zones/${boardData.id}`;
+          } else {
+            delete boardWithGameId.id;
+          }
+        }
 
-      if (!response.ok) throw new Error("Failed to sync board");
-      const data = await response.json();
-      setBoard(data.board);
-      setZones(data.zones);
-    } catch (err) {
-      console.error("Error syncing board:", err);
-    }
-  }, 1000)
-);
+        const response = await fetch(url, {
+          method,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ board: boardWithGameId, zones: zonesData }),
+        });
 
-
+        if (!response.ok) throw new Error("Failed to sync board");
+        const data = await response.json();
+        setBoard(data.board);
+        setZones(data.zones);
+      } catch (err) {
+        console.error("Error syncing board:", err);
+      } finally {
+        isSyncing.current = false;
+      }
+    }, 1000)
+  );
 
   useEffect(() => {
-    if (board) syncToApi.current(board, zones);
-  }, [zones, board]);
+    if (!isSyncing.current && board && zones.length) {
+      syncToApi.current(board, zones);
+    }
+  }, [zones]);
 
   const selectedZone = zones.find((z) => z.id === selectedZoneId);
 
@@ -225,41 +232,40 @@ const syncToApi = useRef(
       if (!targetZone) return prevZones;
 
       const pairId = targetZone.pairId;
-
       const cw = canvas.clientWidth;
       const ch = canvas.clientHeight;
 
+      const updatedTarget = {
+        ...targetZone,
+        ...newProps,
+      };
+
       return prevZones.map((zone) => {
-        if (zone.id === id) {
-          return { ...zone, ...newProps };
-        }
+        const isTarget = zone.id === id;
+        const isPair = zone.pairId === pairId && !isTarget;
 
-        if (zone.pairId === pairId && zone.id !== id) {
-          const newX =
-            newProps.x !== undefined
-              ? cw - newProps.x - (newProps.width ?? zone.width)
-              : zone.x;
+        if (isTarget) return updatedTarget;
 
-          const newY =
-            newProps.y !== undefined
-              ? ch - newProps.y - (newProps.height ?? zone.height)
-              : zone.y;
+        if (isPair) {
+          const mirroredX = cw - updatedTarget.x - updatedTarget.width;
+          const mirroredY = ch - updatedTarget.y - updatedTarget.height;
 
-          const newWidth = newProps.width !== undefined ? newProps.width : zone.width;
-          const newHeight = newProps.height !== undefined ? newProps.height : zone.height;
-
-          const newBorderRadius =
-            newProps.borderRadius !== undefined ? newProps.borderRadius : zone.borderRadius;
-
-          const newName = newProps.name !== undefined ? newProps.name : zone.name;
+          let newName = zone.name;
+          if (newProps.name !== undefined) {
+            const baseName = newProps.name.replace(/_enemy$/, "");
+            newName = zone.name.endsWith("_enemy")
+              ? baseName
+              : `${baseName}_enemy`;
+            newName = newName.slice(0, MAX_NAME_LENGTH);
+          }
 
           return {
             ...zone,
-            x: newX,
-            y: newY,
-            width: newWidth,
-            height: newHeight,
-            borderRadius: newBorderRadius,
+            x: mirroredX,
+            y: mirroredY,
+            width: updatedTarget.width,
+            height: updatedTarget.height,
+            borderRadius: updatedTarget.borderRadius,
             name: newName,
           };
         }
@@ -280,14 +286,13 @@ const syncToApi = useRef(
     if (field === "name" && newVal.length > MAX_NAME_LENGTH) return;
 
     setInputs((prev) => ({ ...prev, [field]: value }));
-
     updateSymmetric(selectedZone.id, { [field]: newVal });
   };
 
   const addZonePair = () => {
-    const id1 = Date.now() + Math.random();
-    const pairId = id1;
+    const id1 = Date.now();
     const id2 = id1 + 1;
+    const pairId = id1;
 
     const canvas = canvasRef.current;
     const cw = canvas?.clientWidth || 800;
@@ -364,14 +369,7 @@ const syncToApi = useRef(
         </Button>
       </Box>
 
-      <Box
-        sx={{
-          height: "calc(100vh - 60px)",
-          width: "100vw",
-          display: "flex",
-          overflow: "hidden",
-        }}
-      >
+      <Box sx={{ height: "calc(100vh - 60px)", width: "100vw", display: "flex", overflow: "hidden" }}>
         <Box
           sx={{
             flex: 1,

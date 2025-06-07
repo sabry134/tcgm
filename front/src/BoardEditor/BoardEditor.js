@@ -60,12 +60,18 @@ const syncToApi = useRef(
         ? `${API_BASE}/api/boards/${boardData.id}/with_zones`
         : `${API_BASE}/api/boards/with_zones`;
 
-      const gameId = localStorage.getItem("room_id");
+      const gameId = localStorage.getItem("gameSelected");
 
       const boardWithGameId = {
         ...boardData,
         game_id: gameId,
       };
+
+      console.log("Sending to API:", {
+        url,
+        method,
+        body: { board: boardWithGameId, zones: zonesData },
+      });
 
       const response = await fetch(url, {
         method,
@@ -82,6 +88,7 @@ const syncToApi = useRef(
     }
   }, 1000)
 );
+
 
 
   useEffect(() => {

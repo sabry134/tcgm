@@ -3,8 +3,9 @@ import { Stack, ToggleButtonGroup } from "@mui/material";
 import { TopBarIconButton, TopBarTextButton } from "./TopBarButton";
 import { Close } from "@mui/icons-material";
 import { ROUTES } from "../../Routes/routes";
+import { withRouterProps } from "../../Utility/HocNavigation";
 
-export class EditNavigationBar extends Component {
+class EditNavigationBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -50,3 +51,5 @@ export class EditNavigationBar extends Component {
     )
   }
 }
+
+export default withRouterProps(EditNavigationBar);

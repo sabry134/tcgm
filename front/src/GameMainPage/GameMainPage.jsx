@@ -1,18 +1,16 @@
 import React, { Component } from "react";
 import { BaseLayout } from "../Components/Layouts/BaseLayout";
-import { EditNavigationWrapper } from "../Utility/wrapperNavigation";
+import EditNavigationBar from "../Components/NavigationBar/EditNavigationBar";
 
-class GameMainPage extends Component {
+export class GameMainPage extends Component {
   render() {
     return (
       <>
         <BaseLayout
           topBar={
-            <EditNavigationWrapper/>
+            <EditNavigationBar/>
           }/>
       </>
     )
   }
 }
-
-export default GameMainPage;

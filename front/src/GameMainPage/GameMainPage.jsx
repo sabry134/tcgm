@@ -1,6 +1,6 @@
-import { MainNavigationBar } from "../Components/NavigationBar/MainNavigationBar";
 import React, { Component } from "react";
 import { BaseLayout } from "../Components/Layouts/BaseLayout";
+import { EditNavigationWrapper } from "../Utility/wrapperNavigation";
 
 class GameMainPage extends Component {
   render() {
@@ -8,7 +8,7 @@ class GameMainPage extends Component {
       <>
         <BaseLayout
           topBar={
-            <MainNavigationBar />
+            <EditNavigationWrapper/>
           }/>
       </>
     )

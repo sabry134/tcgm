@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button, Typography, Box, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import debounce from 'lodash/debounce';
+import debounce from "lodash/debounce";
 
 const styles = {
   navbar: {
@@ -17,9 +17,8 @@ const styles = {
 };
 
 const clamp = (v, min, max) => Math.max(min, Math.min(v, max));
-const CANVAS_MARGIN = 10;
 const MAX_NAME_LENGTH = 30;
-const LIVE_FIELDS = ["name", "x", "y", "borderRadius"];
+const API_BASE = "http://localhost:4000";
 
 const BoardEditor = () => {
   const navigate = useNavigate();
@@ -30,8 +29,10 @@ const BoardEditor = () => {
   const [zones, setZones] = useState([]);
   const [selectedZoneId, setSelectedZoneId] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
   const [tableBackground, setTableBackground] = useState(null);
   const dragOffset = useRef({ x: 0, y: 0 });
+  const resizeStart = useRef({ x: 0, y: 0, width: 0, height: 0 });
   const canvasRef = useRef(null);
 
   const [inputs, setInputs] = useState({
@@ -43,14 +44,135 @@ const BoardEditor = () => {
     borderRadius: "",
   });
 
+  const [board, setBoard] = useState({});
+
   const persist = useRef(
     debounce((sceneKey, data) => {
       sessionStorage.setItem(sceneKey, JSON.stringify(data));
     }, 500)
   );
 
-  const frameRef = useRef(null);
-  const pendingRef = useRef({});
+  const isSyncing = useRef(false);
+
+const syncToApi = useRef(
+  debounce(async (boardData, zonesData) => {
+    try {
+      isSyncing.current = true;
+
+      const gameId = localStorage.getItem("gameSelected");
+      if (!gameId) {
+        console.error("No gameSelected ID in localStorage");
+        return;
+      }
+
+      const boardParams = {
+        game_id: gameId,
+        background_image: boardData.background_image || null,
+      };
+
+      const sanitizedZones = zonesData.map((zone) => ({
+        id: zone.id,
+        name:
+          zone.name && zone.name.trim() !== ""
+            ? zone.name.trim()
+            : "Unnamed Zone",
+        width: Number(zone.width) || 0,
+        height: Number(zone.height) || 0,
+        x: Number(zone.x) || 0,
+        y: Number(zone.y) || 0,
+        border_radius: Number(zone.borderRadius) || 0,
+        background_image: zone.background_image || null,
+      }));
+
+      let method = "POST";
+      let url = `${API_BASE}/api/boards/with_zones`;
+      let payload = {
+        board: boardParams,
+        zones: sanitizedZones,
+      };
+
+      const existingRes = await fetch(
+        `${API_BASE}/api/boards?game_id=${gameId}`
+      );
+      if (!existingRes.ok) {
+        console.error("Failed to fetch existing boards");
+        return;
+      }
+      const existingBoard = (await existingRes.json())[0];
+
+      if (existingBoard) {
+        method = "PUT";
+        url = `${API_BASE}/api/boards/with_zones/${existingBoard.id}`;
+        payload = {
+          board: boardParams,
+          zones: sanitizedZones,
+        };
+      }
+
+      console.log(`[SYNC-API][${method}] ${url}`);
+      console.log("Payload:", JSON.stringify(payload, null, 2));
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const clone = response.clone();
+        let errorBody;
+        try {
+          errorBody = await clone.json();
+        } catch {
+          errorBody = await clone.text();
+        }
+
+        if (errorBody && errorBody.errors) {
+          const messages = Object.entries(errorBody.errors)
+            .map(([f, msgs]) => `${f}: ${msgs.join(", ")}`)
+            .join("\n");
+          alert(`Validation errors:\n${messages}`);
+          console.error("Validation errors:", errorBody.errors);
+        } else {
+          const msg =
+            typeof errorBody === "string"
+              ? errorBody
+              : JSON.stringify(errorBody);
+          alert(`Sync failed: ${msg}`);
+          console.error("Sync error:", errorBody);
+        }
+        return;
+      }
+
+      const data = await response.json();
+      console.log("[SYNC-API] Response:", data);
+      setBoard(data.board);
+      setZones(data.zones);
+    } catch (err) {
+      console.error("Error syncing board:", err);
+      alert("Error syncing board. See console for details.");
+    } finally {
+      isSyncing.current = false;
+    }
+  }, 1000)
+);
+
+
+
+
+
+
+
+
+
+  useEffect(() => {
+    if (!isSyncing.current && board && zones.length) {
+      syncToApi.current(board, zones);
+    }
+  }, [zones]);
 
   const selectedZone = zones.find((z) => z.id === selectedZoneId);
 
@@ -69,18 +191,8 @@ const BoardEditor = () => {
     setButtons(saved.buttons || []);
     setZones(saved.zones || []);
     setTableBackground(saved.tableBackground || null);
+    setBoard(saved.board || {});
   }, [selectedScene]);
-
-  useEffect(() => {
-    if (!selectedScene) return;
-    persist.current(selectedScene, { cards, buttons, zones, tableBackground });
-  }, [cards, buttons, zones, tableBackground, selectedScene]);
-
-  useEffect(() => {
-    if (scenes.length) {
-      localStorage.setItem("scenes", JSON.stringify(scenes));
-    }
-  }, [scenes]);
 
   useEffect(() => {
     document.title = "JCCE";
@@ -96,6 +208,15 @@ const BoardEditor = () => {
         y: String(selectedZone.y),
         borderRadius: String(selectedZone.borderRadius),
       });
+    } else {
+      setInputs({
+        name: "",
+        width: "",
+        height: "",
+        x: "",
+        y: "",
+        borderRadius: "",
+      });
     }
   }, [selectedZone]);
 
@@ -103,35 +224,67 @@ const BoardEditor = () => {
     e.stopPropagation();
     const rect = canvasRef.current?.getBoundingClientRect();
     if (!rect) return;
+
+    const resizeThreshold = 15;
+    const offsetX = e.clientX - rect.left - zone.x;
+    const offsetY = e.clientY - rect.top - zone.y;
+    const isResize =
+      offsetX > zone.width - resizeThreshold && offsetY > zone.height - resizeThreshold;
+
+    if (isResize) {
+      setIsResizing(true);
+      resizeStart.current = {
+        x: e.clientX,
+        y: e.clientY,
+        width: zone.width,
+        height: zone.height,
+      };
+    } else {
+      setIsDragging(true);
+      dragOffset.current = {
+        x: e.clientX - rect.left - zone.x,
+        y: e.clientY - rect.top - zone.y,
+      };
+    }
     setSelectedZoneId(zone.id);
-    setIsDragging(true);
-    dragOffset.current = {
-      x: e.clientX - rect.left - zone.x,
-      y: e.clientY - rect.top - zone.y,
-    };
   };
 
   const handleMouseMove = (e) => {
-    if (!isDragging || selectedZoneId == null) return;
     const rect = canvasRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    const origin = zones.find((z) => z.id === selectedZoneId);
-    if (!origin) return;
+    if (!rect || !selectedZoneId) return;
 
-    const rawX = e.clientX - rect.left - dragOffset.current.x;
-    const rawY = e.clientY - rect.top - dragOffset.current.y;
-    pendingRef.current = {
-      x: clamp(rawX, 0, rect.width - origin.width - CANVAS_MARGIN),
-      y: clamp(rawY, 0, rect.height - origin.height - CANVAS_MARGIN),
-    };
-    if (!frameRef.current) {
-      frameRef.current = requestAnimationFrame(() => {
-        updateSymmetric(selectedZoneId, pendingRef.current);
-        frameRef.current = null;
-      });
+    if (isDragging) {
+      const origin = zones.find((z) => z.id === selectedZoneId);
+      if (!origin) return;
+
+      const x = clamp(
+        e.clientX - rect.left - dragOffset.current.x,
+        0,
+        rect.width - origin.width
+      );
+      const y = clamp(
+        e.clientY - rect.top - dragOffset.current.y,
+        0,
+        rect.height - origin.height
+      );
+
+      updateSymmetric(selectedZoneId, { x, y });
+    }
+
+    if (isResizing) {
+      const dx = e.clientX - resizeStart.current.x;
+      const dy = e.clientY - resizeStart.current.y;
+      const newWidth = clamp(resizeStart.current.width + dx, 100, rect.width);
+      const newHeight = clamp(resizeStart.current.height + dy, 100, rect.height);
+
+      updateSymmetric(selectedZoneId, { width: newWidth, height: newHeight });
     }
   };
-  const handleMouseUp = () => setIsDragging(false);
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    setIsResizing(false);
+  };
 
   useEffect(() => {
     window.addEventListener("mousemove", handleMouseMove);
@@ -140,262 +293,218 @@ const BoardEditor = () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isDragging, selectedZoneId, zones]);
+  }, [selectedZoneId, isDragging, isResizing, zones]);
 
   const updateSymmetric = (id, newProps) => {
-    setZones((prev) => {
-      const origin = prev.find((z) => z.id === id);
-      if (!origin) return prev;
-      const twin = prev.find((z) => z.pairId === origin.pairId && z.id !== id);
-      const rect = canvasRef.current?.getBoundingClientRect() || { width: 0, height: 0 };
-      if (!twin) return prev;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-      let x = clamp(
-        newProps.x ?? origin.x,
-        0,
-        rect.width - (newProps.width ?? origin.width) - CANVAS_MARGIN
-      );
-      let y = clamp(
-        newProps.y ?? origin.y,
-        0,
-        rect.height - (newProps.height ?? origin.height) - CANVAS_MARGIN
-      );
-      let width = clamp(
-        newProps.width ?? origin.width,
-        100,
-        rect.width - x - CANVAS_MARGIN
-      );
-      let height = clamp(
-        newProps.height ?? origin.height,
-        100,
-        rect.height - y - CANVAS_MARGIN
-      );
+    setZones((prevZones) => {
+      const targetZone = prevZones.find((z) => z.id === id);
+      if (!targetZone) return prevZones;
 
-      const br = newProps.borderRadius ?? origin.borderRadius;
-      const name = newProps.name ?? origin.name;
+      const pairId = targetZone.pairId;
+      const cw = canvas.clientWidth;
+      const ch = canvas.clientHeight;
 
-      const half = rect.height / 2;
-      const isBottom = origin.id < twin.id;
-      if (isBottom) y = Math.max(y, half + 1);
-      else y = Math.min(y, half - height - 1);
-
-      const mirrorY = clamp(
-        rect.height - y - height,
-        0,
-        rect.height - height - CANVAS_MARGIN
-      );
-
-      const updatedOrigin = { ...origin, x, y, width, height, borderRadius: br, name };
-      const updatedTwin = {
-        ...twin,
-        x: rect.width - x - width,
-        y: mirrorY,
-        width,
-        height,
-        borderRadius: br,
-        name: twin.name,
+      const updatedTarget = {
+        ...targetZone,
+        ...newProps,
       };
 
-      return prev.map((z) =>
-        z.id === updatedOrigin.id ? updatedOrigin : z.id === updatedTwin.id ? updatedTwin : z
-      );
+      return prevZones.map((zone) => {
+        const isTarget = zone.id === id;
+        const isPair = zone.pairId === pairId && !isTarget;
+
+        if (isTarget) return updatedTarget;
+
+        if (isPair) {
+          const mirroredX = cw - updatedTarget.x - updatedTarget.width;
+          const mirroredY = ch - updatedTarget.y - updatedTarget.height;
+
+          let newName = zone.name;
+          if (newProps.name !== undefined) {
+            const baseName = newProps.name.replace(/_enemy$/, "");
+            newName = zone.name.endsWith("_enemy")
+              ? baseName
+              : `${baseName}_enemy`;
+            newName = newName.slice(0, MAX_NAME_LENGTH);
+          }
+
+          return {
+            ...zone,
+            x: mirroredX,
+            y: mirroredY,
+            width: updatedTarget.width,
+            height: updatedTarget.height,
+            borderRadius: updatedTarget.borderRadius,
+            name: newName,
+          };
+        }
+
+        return zone;
+      });
     });
   };
 
-  const addZone = () => {
-    const rect = canvasRef.current?.getBoundingClientRect() || { width: 0, height: 0 };
-    const dx = clamp(rect.width / 2 - 50, 0, rect.width - 100 - CANVAS_MARGIN);
-    const half = rect.height / 2;
-    const offset = 50;
-    const bottomY = clamp(half + offset, 0, rect.height - 100 - CANVAS_MARGIN);
-    const topY = clamp(half - offset - 100, 0, rect.height - 100 - CANVAS_MARGIN);
-    const pairId = Date.now();
-    const idx = Math.floor(zones.length / 2) + 1;
+  const handleInputChange = (field, value) => {
+    if (!selectedZone) return;
+    let newVal = value;
 
-    const bottom = { id: pairId, pairId, name: `Zone ${idx}`, x: dx, y: bottomY, width: 100, height: 100, borderRadius: 0, background: null };
-    const top = { id: pairId + 1, pairId, name: `[OPPONENT] Zone ${idx}`, x: dx, y: topY, width: 100, height: 100, borderRadius: 0, background: null };
-    setZones((z) => [...z, bottom, top]);
-    setSelectedZoneId(bottom.id);
+    if (["width", "height", "x", "y", "borderRadius"].includes(field)) {
+      newVal = Number(value);
+      if (isNaN(newVal)) return;
+    }
+    if (field === "name" && newVal.length > MAX_NAME_LENGTH) return;
+
+    setInputs((prev) => ({ ...prev, [field]: value }));
+    updateSymmetric(selectedZone.id, { [field]: newVal });
   };
-  const deleteZone = () => {
-    if (!selectedZoneId) return;
-    const pid = zones.find((z) => z.id === selectedZoneId)?.pairId;
-    if (pid == null) return;
-    setZones((z) => z.filter((z) => z.pairId !== pid));
+
+  const addZonePair = () => {
+    const id1 = Date.now();
+    const id2 = id1 + 1;
+    const pairId = id1;
+
+    const canvas = canvasRef.current;
+    const cw = canvas?.clientWidth || 800;
+    const ch = canvas?.clientHeight || 600;
+
+    const width = 200;
+    const height = 150;
+    const borderRadius = 10;
+
+    const zone1 = {
+      id: id1,
+      pairId,
+      name: "",
+      x: cw / 4 - width / 2,
+      y: ch / 2 - height / 2,
+      width,
+      height,
+      borderRadius,
+    };
+
+    const zone2 = {
+      id: id2,
+      pairId,
+      name: "",
+      x: cw - zone1.x - width,
+      y: ch - zone1.y - height,
+      width,
+      height,
+      borderRadius,
+    };
+
+    setZones((prev) => [...prev, zone1, zone2]);
+    setSelectedZoneId(id1);
+  };
+
+  const deleteSelectedZone = () => {
+    if (!selectedZone) return;
+    setZones((prev) => prev.filter((z) => z.pairId !== selectedZone.pairId));
     setSelectedZoneId(null);
   };
 
-  const handleFieldChange = (field, raw) => {
-    setInputs((i) => ({ ...i, [field]: raw }));
-    if (!selectedZone) return;
-    if (LIVE_FIELDS.includes(field)) {
-      if (field === "name") {
-        const name = raw.slice(0, MAX_NAME_LENGTH);
-        updateSymmetric(selectedZoneId, { name });
-      } else {
-        const v = parseInt(raw, 10);
-        if (isNaN(v)) return;
-        updateSymmetric(selectedZoneId, { [field]: v });
-      }
-    }
-  };
-  const handleFieldBlur = (field) => {
-    if (!selectedZone) return;
-    if (LIVE_FIELDS.includes(field)) return;
-    const rect = canvasRef.current?.getBoundingClientRect() || { width: 0, height: 0 };
-    let props = {};
-    const v = parseInt(inputs[field], 10);
-    if (isNaN(v)) {
-      setInputs((i) => ({ ...i, [field]: String(selectedZone[field]) }));
-      return;
-    }
-    if (field === "width") props.width = clamp(v, 100, rect.width - selectedZone.x - CANVAS_MARGIN);
-    else if (field === "height") props.height = clamp(v, 100, rect.height - selectedZone.y - CANVAS_MARGIN);
-    updateSymmetric(selectedZoneId, props);
-  };
-
   const handleBackgroundUpload = (e) => {
+    if (!e.target.files.length) return;
     const file = e.target.files[0];
-    if (!file) return;
     const url = URL.createObjectURL(file);
-    if (selectedZoneId) {
-      setZones((prev) => prev.map((z) => {
-        if (z.id === selectedZoneId) {
-          if (z.background) URL.revokeObjectURL(z.background);
-          return { ...z, background: url };
-        }
-        return z;
-      }));
-    } else {
-      if (tableBackground) URL.revokeObjectURL(tableBackground);
-      setTableBackground(url);
-    }
-  };
-  const handleDeleteBackground = () => {
-    if (selectedZoneId) {
-      setZones((prev) => prev.map((z) => (z.id === selectedZoneId ? { ...z, background: null } : z)));
-    } else {
-      if (tableBackground) URL.revokeObjectURL(tableBackground);
-      setTableBackground(null);
-    }
+    setTableBackground(url);
+    setBoard((b) => ({ ...b, background_image: url }));
   };
 
   return (
-    <Box display="flex" flexDirection="column" height="100vh" sx={{ userSelect: "none" }}>
+    <>
       <Box sx={styles.navbar}>
-        {['/', '/documentation', '/forum', '/community'].map((path, i) => (
-          <Button key={i} onClick={() => navigate(path)} sx={styles.navButton}>
-            <Typography sx={styles.navText}>
-              {['🌟 Home', '📜 Documentation', '🖼️ Forum', '🌍 Community'][i]}
-            </Typography>
-          </Button>
-        ))}
+        <Button
+          sx={styles.navButton}
+          onClick={() => {
+            persist.current(selectedScene, {
+              cards,
+              buttons,
+              zones,
+              tableBackground,
+              board,
+            });
+            navigate("/");
+          }}
+        >
+          Close
+        </Button>
+        <Typography sx={styles.navText}>Board Editor</Typography>
+        <Button sx={styles.navButton} onClick={addZonePair}>
+          Add Zone Pair
+        </Button>
+        <Button sx={styles.navButton} onClick={deleteSelectedZone} disabled={!selectedZoneId}>
+          Delete Zone
+        </Button>
       </Box>
 
-      <Box display="flex" flex={1}>
-        {/* Canvas area */}
+      <Box sx={{ height: "calc(100vh - 60px)", width: "100vw", display: "flex", overflow: "hidden" }}>
         <Box
-          ref={canvasRef}
           sx={{
             flex: 1,
             position: "relative",
-            bgcolor: tableBackground ? undefined : "#c4c4c4",
-            backgroundImage: tableBackground ? `url(${tableBackground})` : undefined,
+            backgroundColor: "#333",
+            backgroundImage: tableBackground ? `url(${tableBackground})` : "none",
             backgroundSize: "cover",
-            touchAction: "none",
+            overflow: "hidden",
           }}
-          onMouseDown={() => setSelectedZoneId(null)}
+          ref={canvasRef}
+          onClick={() => setSelectedZoneId(null)}
         >
-          {zones.map((z) => (
+          {zones.map((zone) => (
             <Box
-              key={z.id}
-              onMouseDown={(e) => handleMouseDown(e, z)}
+              key={zone.id}
               sx={{
                 position: "absolute",
-                left: z.x,
-                top: z.y,
-                width: z.width,
-                height: z.height,
-                border: z.id === selectedZoneId ? "2px solid #ff5722" : "2px dashed #333",
-                bgcolor: z.background ? undefined : "rgba(255,255,255,0.3)",
-                backgroundImage: z.background ? `url(${z.background})` : undefined,
-                backgroundSize: "cover",
-                borderRadius: z.borderRadius,
+                left: zone.x,
+                top: zone.y,
+                width: zone.width,
+                height: zone.height,
+                borderRadius: zone.borderRadius,
+                border: zone.id === selectedZoneId ? "3px solid cyan" : "1px solid #aaa",
+                backgroundColor: "rgba(0,0,0,0.3)",
                 cursor: "move",
-                overflow: "hidden",
+                userSelect: "none",
+              }}
+              onMouseDown={(e) => handleMouseDown(e, zone)}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (selectedZoneId !== zone.id) {
+                  setSelectedZoneId(zone.id);
+                }
               }}
             >
-              <Typography
-                variant="caption"
-                sx={{
-                  userSelect: "none",
-                  whiteSpace: "normal",
-                  wordBreak: "break-word",
-                  maxWidth: "100%",
-                }}
-              >
-                {z.name}
-              </Typography>
+              <Typography sx={{ color: "#fff", p: 1 }}>{zone.name || "<no name>"}</Typography>
             </Box>
           ))}
         </Box>
 
-        {/* Sidebar editor */}
-        <Box
-          sx={{
-            width: 300,
-            bgcolor: "#5d3a00",
-            color: "white",
-            p: 2,
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-          }}
-        >
-          <Typography variant="h6">Zones Editor</Typography>
-
-          <Button variant="contained" component="label">
-            {selectedZoneId ? "Upload Zone Background" : "Upload Table Background"}
-            <input type="file" hidden onChange={handleBackgroundUpload} />
+        <Box sx={{ width: 300, p: 2, backgroundColor: "#222", color: "#fff" }}>
+          <Button variant="outlined" component="label" fullWidth>
+            Upload Table Background
+            <input type="file" accept="image/*" hidden onChange={handleBackgroundUpload} />
           </Button>
 
-          <Button variant="outlined" color="secondary" onClick={handleDeleteBackground}>
-            {selectedZoneId ? "Delete Zone Background" : "Delete Table Background"}
-          </Button>
-
-          <Button variant="contained" onClick={addZone}>
-            Add Zone Pair
-          </Button>
-
-          {selectedZone && (
-            <Button variant="outlined" color="error" onClick={deleteZone}>
-              Delete Zone Pair
-            </Button>
-          )}
-
-          {selectedZone ? (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              {['name', 'width', 'height', 'x', 'y', 'borderRadius'].map((field) => (
-                <TextField
-                  key={field}
-                  label={field}
-                  variant="filled"
-                  size="small"
-                  value={inputs[field]}
-                  onChange={(e) => handleFieldChange(field, e.target.value)}
-                  onBlur={() => handleFieldBlur(field)}
-                  type={LIVE_FIELDS.includes(field) ? (field === "name" ? "text" : "number") : "number"}
-                  inputProps={field === "name" ? { maxLength: MAX_NAME_LENGTH } : {}}
-                  InputProps={{ style: { background: "#fff", userSelect: field === "name" ? "text" : "none" } }}
-                />
-              ))}
-            </Box>
-          ) : (
-            <Typography>Select a zone to edit</Typography>
-          )}
+          {["name", "width", "height", "x", "y", "borderRadius"].map((field) => (
+            <TextField
+              key={field}
+              label={field}
+              variant="outlined"
+              size="small"
+              type={field === "name" ? "text" : "number"}
+              value={inputs[field]}
+              onChange={(e) => handleInputChange(field, e.target.value)}
+              disabled={!selectedZoneId}
+              fullWidth
+              margin="dense"
+            />
+          ))}
         </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 

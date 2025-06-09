@@ -54,47 +54,119 @@ const BoardEditor = () => {
 
   const isSyncing = useRef(false);
 
-  const syncToApi = useRef(
-    debounce(async (boardData, zonesData) => {
-      try {
-        isSyncing.current = true;
+const syncToApi = useRef(
+  debounce(async (boardData, zonesData) => {
+    try {
+      isSyncing.current = true;
 
-        let method = "POST";
-        let url = `${API_BASE}/api/boards/with_zones`;
+      const gameId = localStorage.getItem("gameSelected");
+      if (!gameId) {
+        console.error("No gameSelected ID in localStorage");
+        return;
+      }
 
-        const gameId = localStorage.getItem("gameSelected");
-        const boardWithGameId = {
-          ...boardData,
-          game_id: gameId,
+      const boardParams = {
+        game_id: gameId,
+        background_image: boardData.background_image || null,
+      };
+
+      const sanitizedZones = zonesData.map((zone) => ({
+        id: zone.id,
+        name:
+          zone.name && zone.name.trim() !== ""
+            ? zone.name.trim()
+            : "Unnamed Zone",
+        width: Number(zone.width) || 0,
+        height: Number(zone.height) || 0,
+        x: Number(zone.x) || 0,
+        y: Number(zone.y) || 0,
+        border_radius: Number(zone.borderRadius) || 0,
+        background_image: zone.background_image || null,
+      }));
+
+      let method = "POST";
+      let url = `${API_BASE}/api/boards/with_zones`;
+      let payload = {
+        board: boardParams,
+        zones: sanitizedZones,
+      };
+
+      const existingRes = await fetch(
+        `${API_BASE}/api/boards?game_id=${gameId}`
+      );
+      if (!existingRes.ok) {
+        console.error("Failed to fetch existing boards");
+        return;
+      }
+      const existingBoard = (await existingRes.json())[0];
+
+      if (existingBoard) {
+        method = "PUT";
+        url = `${API_BASE}/api/boards/with_zones/${existingBoard.id}`;
+        payload = {
+          board: boardParams,
+          zones: sanitizedZones,
         };
+      }
 
-        if (boardData.id) {
-          const check = await fetch(`${API_BASE}/api/boards/${boardData.id}`);
-          if (check.ok) {
-            method = "PUT";
-            url = `${API_BASE}/api/boards/with_zones/${boardData.id}`;
-          } else {
-            delete boardWithGameId.id;
-          }
+      console.log(`[SYNC-API][${method}] ${url}`);
+      console.log("Payload:", JSON.stringify(payload, null, 2));
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const clone = response.clone();
+        let errorBody;
+        try {
+          errorBody = await clone.json();
+        } catch {
+          errorBody = await clone.text();
         }
 
-        const response = await fetch(url, {
-          method,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ board: boardWithGameId, zones: zonesData }),
-        });
-
-        if (!response.ok) throw new Error("Failed to sync board");
-        const data = await response.json();
-        setBoard(data.board);
-        setZones(data.zones);
-      } catch (err) {
-        console.error("Error syncing board:", err);
-      } finally {
-        isSyncing.current = false;
+        if (errorBody && errorBody.errors) {
+          const messages = Object.entries(errorBody.errors)
+            .map(([f, msgs]) => `${f}: ${msgs.join(", ")}`)
+            .join("\n");
+          alert(`Validation errors:\n${messages}`);
+          console.error("Validation errors:", errorBody.errors);
+        } else {
+          const msg =
+            typeof errorBody === "string"
+              ? errorBody
+              : JSON.stringify(errorBody);
+          alert(`Sync failed: ${msg}`);
+          console.error("Sync error:", errorBody);
+        }
+        return;
       }
-    }, 1000)
-  );
+
+      const data = await response.json();
+      console.log("[SYNC-API] Response:", data);
+      setBoard(data.board);
+      setZones(data.zones);
+    } catch (err) {
+      console.error("Error syncing board:", err);
+      alert("Error syncing board. See console for details.");
+    } finally {
+      isSyncing.current = false;
+    }
+  }, 1000)
+);
+
+
+
+
+
+
+
+
 
   useEffect(() => {
     if (!isSyncing.current && board && zones.length) {

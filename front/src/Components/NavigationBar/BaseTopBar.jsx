@@ -19,10 +19,6 @@ import React, { Component } from "react";
  */
 
 export class BaseTopBar extends Component {
-  constructor (props) {
-    super(props)
-  }
-
   render() {
     return (
       <Box

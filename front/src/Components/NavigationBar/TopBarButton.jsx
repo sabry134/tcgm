@@ -10,9 +10,12 @@ export class TopBarIconButton extends Component<IconProps> {
   render() {
     return (
       <ToggleButton
-        value="return"
-        aria-label="return"
+        value={this.props.altText}
+        title={this.props.altText}
         onClick={this.props.event}
+        sx={{
+          color: "primary.contrastText",
+        }}
       >
         <SvgIcon component={this.props.svgComponent}/>
       </ToggleButton>
@@ -29,11 +32,20 @@ export class TopBarTextButton extends Component<TextProps> {
   render() {
     return (
       <ToggleButton
-        value="editors"
-        aria-label="editors"
-        title={ this.props.altText }
+        value={this.props.altText}
+        title={this.props.altText}
+        sx={{
+          color: "primary.contrastText",
+          '&.Mui-selected': {
+            color: "primary.contrastText",
+            backgroundColor: "primary.main",
+            '&:hover': {
+              backgroundColor: "primary.dark",
+            },
+          }
+        }}
       >
-        { this.props.title }
+        {this.props.title}
       </ToggleButton>
     )
   }

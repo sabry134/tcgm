@@ -35,9 +35,23 @@ class EditNavigationBar extends Component {
         exclusive
         onChange={this.handleSelectionChange}
         aria-label="edit navigation bar"
+        size={"large"}
+        color={"primary"}
+        sx={{
+          '& .MuiToggleButton-root': {
+            border: 'none',
+            '&.Mui-selected': {
+              border: 'none',
+            },
+          },
+        }}
       >
-        <Stack direction="row" spacing={2}>
+        <Stack
+          direction="row"
+          spacing={2}
+        >
           <TopBarIconButton
+            altText="Unselect Game"
             svgComponent={Close}
             event={this.unselectGame}
           />

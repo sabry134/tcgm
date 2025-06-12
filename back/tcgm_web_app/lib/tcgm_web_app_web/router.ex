@@ -71,6 +71,7 @@ defmodule TcgmWebAppWeb.Router do
     get "/boards/with_zones/:board_id", BoardController, :get_board_with_zones
     put "/boards/with_zones/:board_id", BoardController, :update_board_with_zones
     get "/boards/:board_id/zones", BoardController, :get_board_zones
+    delete "/boards/zones/:zone_id", BoardController, :delete_board_zone
 
     post "/rooms", RoomController, :create
     get "/rooms/:room_id", RoomController, :state

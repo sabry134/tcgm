@@ -4,7 +4,7 @@ import CardPreview from './CardPreview';
 import CardList from './CardList';
 import DeckPreview from './DeckPreview';
 import { mockCards } from './mockData';
-import { JoinRoomNavigationBar } from "../Components/NavigationBar/JoinRoomNavigationBar";
+import { JoinRoomNavigationBar } from "../Components/JoinRoomNavigationBar";
 import './styles.css';
 import { getCardsByGameWithPropertiesRequest } from '../Api/cardsRequest';
 import { saveCollectionWithCardsRequest, getCardsInCollectionRequest } from '../Api/collectionsRequest';

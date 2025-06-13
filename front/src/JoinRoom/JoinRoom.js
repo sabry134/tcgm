@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { createRoomRequest, joinRoomRequest } from "../Api/roomRequest";
-import { JoinRoomNavigationBar } from "../Components/NavigationBar/JoinRoomNavigationBar";
+import { JoinRoomNavigationBar } from "../Components/JoinRoomNavigationBar";
 import { useChannel } from "../ChannelContext";
 
 const JoinRoom = () => {

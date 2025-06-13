@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import { MainNavigationBar } from "../Components/NavigationBar/MainNavigationBar";
+import { MainNavigationBar } from "../Components/MainNavigationBar";
 const Templates = () => {
     const navigate = useNavigate();
 

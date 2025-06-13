@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { JoinRoomNavigationBar } from "../Components/NavigationBar/JoinRoomNavigationBar";
+import { JoinRoomNavigationBar } from "../Components/JoinRoomNavigationBar";
 import { LeftPanel } from "./Components/LeftPanel";
 import { RightPanel } from "./Components/RightPanel";
 import { DeckPicker } from "./Components/DeckPicker";

@@ -6,6 +6,25 @@ type IconProps = {
   svgComponent: React.ElementType;
 }
 
+/**
+ * A button component for the top bar that displays an icon.
+ * It uses a ToggleButton from Material-UI for styling and interaction.
+ *
+ * @param {Object} props - The properties for the component.
+ * @param {Function} props.event - The function to call when the button is clicked.
+ * @param {React.ElementType} props.svgComponent - The SVG component to render as the icon.
+ * @param {string} props.altText - The alternative text for the button, used for accessibility.
+ * @return {JSX.Element} The rendered button component.
+ *
+ * @example
+ * <TopBarIconButton
+ *  event={() => console.log('Button clicked')}
+ *  svgComponent={SomeSvgIcon}
+ *  altText="Click me"
+ * />
+ * @see TopBarTextButton for an example of a button with text.
+ */
+
 export class TopBarIconButton extends Component<IconProps> {
   render() {
     return (
@@ -27,6 +46,23 @@ type TextProps = {
   title: string;
   altText: string;
 }
+
+/**
+ * A button component for the top bar that displays text.
+ * It uses a ToggleButton from Material-UI for styling and interaction.
+ *
+ * @param {Object} props - The properties for the component.
+ * @param {string} props.title - The text to display on the button.
+ * @param {string} props.altText - The alternative text for the button, used for accessibility.
+ * @return {JSX.Element} The rendered button component.
+ *
+ * @example
+ * <TopBarTextButton
+ *  title="Click Me"
+ *  altText="Click this button to perform an action"
+ * />
+ * @see TopBarIconButton for an example of a button with an icon.
+ */
 
 export class TopBarTextButton extends Component<TextProps> {
   render() {

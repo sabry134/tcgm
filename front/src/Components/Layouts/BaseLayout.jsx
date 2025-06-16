@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Box, Stack } from "@mui/material";
 import { SidePanel } from "../RawComponents/SidePanel";
-import { BaseTopBar } from "../NavigationBar/BaseTopBar";
+import { BaseTopBar } from "../TopBar/BaseTopBar";
 
 type Props = {
   spanRef?: React.RefObject<HTMLSpanElement>;

@@ -22,7 +22,7 @@ export class TCGMButton extends Component {
   render() {
     return (
       <Button
-        {...this.props}
+        onClick={this.props.onClick}
         variant="contained"
         size="large"
         sx={{

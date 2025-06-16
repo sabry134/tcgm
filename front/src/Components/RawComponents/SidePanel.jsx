@@ -1,13 +1,14 @@
 import React, { Component, ReactNode } from 'react';
-import { Container } from "@mui/material";
+import { Box } from "@mui/material";
 
 /**
  * SidePanel component for displaying components on the side.
  * It wraps its children in a styled container.
+ *
  * @param {Object} props - The component props.
  * @param {ReactNode} props.children - The child components to be rendered inside the SidePanel.
- *
  * @returns {JSX.Element} The rendered SidePanel component.
+ *
  * @example
  *
  * <SidePanel>
@@ -28,30 +29,32 @@ export class SidePanel extends Component<Props> {
     const { children } = this.props;
 
     return (
-      <Container
+      <Box
         sx={{
           borderRadius: 2,
           boxShadow: 2,
           p: 2,
           width: '15%',
           bgcolor: 'primary.main',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
         >
-        {React.Children.map(children, (child, index) => (
-          <Container
-            key={index}
+          <Box
             sx={{
               borderRadius: 2,
               boxShadow: 2,
               display: 'flex',
               flexDirection: 'column',
-              p: 2,
+              p: 1,
+              gap: 4,
               bgcolor: 'primary.light',
-            }}>
-            {child}
-          </Container>
-        ))}
-      </Container>
+            }}
+          >
+            {children}
+          </Box>
+      </Box>
     );
   }
 }

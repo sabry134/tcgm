@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom";
 import GameList from "../GameList/GameList";
-import { GameMainPage } from "../GameMainPage/GameMainPage";
+import GameMainPage from "../GameMainPage/GameMainPage";
 import CardEditor from "../CardEditor/CardEditor";
 import TypeEditor from "../TypeEditor/TypeEditor";
 import BoardEditor from "../BoardEditor/BoardEditor";

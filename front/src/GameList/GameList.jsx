@@ -1,5 +1,5 @@
 import React, { Component, createRef } from "react";
-import { EmptyNavigationBar } from "../Components/NavigationBar/EmptyNavigationBar";
+import { GameListTopBar } from "../Components/TopBar/GameListTopBar";
 import { GameListPicker } from "./GameListPicker/GameListPicker";
 import { Popup } from "../Components/Popup/Popup";
 import { createGameRequest } from "../Api/gamesRequest";
@@ -47,7 +47,7 @@ class GameList extends Component {
           spanRef={this.spanRef}
 
           topBar={
-            <EmptyNavigationBar />
+            <GameListTopBar />
           }
 
           leftPanel={

@@ -14,6 +14,23 @@ defmodule TcgmWebApp.Game.GameLogicTest do
           ],
           "field" => [],
           "graveyard" => []
+        },
+         "player2" => %{
+          "hand" => [
+            %{"Card A" => %{"name" => "Lion", "effects" => [%{"trigger"=>"card_summoned",
+            "conditions"=>[%{"type"=>"player_life_less_than", "value"=>2000}],
+            "actions"=>[%{"type"=>"draw", "target"=>"player", "amount"=>2}]
+            }, %{"trigger"=>"card_summoned",
+            "conditions"=>[%{"type"=>"player_life_less_than", "value"=>2000}],
+            "actions"=>[%{"type"=>"draw", "target"=>"player", "amount"=>2}]
+            }], "properties" => %{"attack" => 7, "defense" => 3}}},
+            %{"Card B" => %{"name" => "Zombie","properties" => %{"attack" => 5, "defense" => 11}}},
+            %{"Card C" => %{"name" => "Gobelin","properties" => %{"attack" => 8, "defense" => 4}}}
+          ],
+          "caster" => [],
+          "deck" => [],
+          "field" => [],
+          "graveyard" => []
         }
       },
       turn: "player1",
@@ -433,5 +450,10 @@ defmodule TcgmWebApp.Game.GameLogicTest do
       end)
 
     assert changed
+  end
+
+  test "list all effects", %{initial_state: state} do
+    list = GameLogic.list_all_effects(state)
+    IO.inspect(list)
   end
 end

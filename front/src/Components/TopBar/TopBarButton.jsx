@@ -4,6 +4,7 @@ import { SvgIcon, ToggleButton } from "@mui/material";
 type IconProps = {
   event: () => void;
   svgComponent: React.ElementType;
+  text?: string;
 }
 
 /**
@@ -14,6 +15,7 @@ type IconProps = {
  * @param {Function} props.event - The function to call when the button is clicked.
  * @param {React.ElementType} props.svgComponent - The SVG component to render as the icon.
  * @param {string} props.altText - The alternative text for the button, used for accessibility.
+ * @param {string} [props.text] - Optional text to display alongside the icon.
  * @return {JSX.Element} The rendered button component.
  *
  * @example
@@ -21,6 +23,7 @@ type IconProps = {
  *  event={() => console.log('Button clicked')}
  *  svgComponent={SomeSvgIcon}
  *  altText="Click me"
+ *  text="Button"
  * />
  * @see TopBarTextButton for an example of a button with text.
  */
@@ -37,6 +40,7 @@ export class TopBarIconButton extends Component<IconProps> {
         }}
       >
         <SvgIcon component={this.props.svgComponent}/>
+        {this.props.text}
       </ToggleButton>
     )
   }

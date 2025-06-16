@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { Stack, ToggleButtonGroup } from "@mui/material";
-import { TopBarIconButton, TopBarTextButton } from "./TopBarButton";
+import { TopBarIconButton } from "./TopBarButton";
 import { Close } from "@mui/icons-material";
 import { ROUTES } from "../../Routes/routes";
 import { withRouterProps } from "../../Utility/HocNavigation";
 
-class EditNavigationBar extends Component {
+class GameMainPageTopBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -55,15 +55,10 @@ class EditNavigationBar extends Component {
             svgComponent={Close}
             event={this.unselectGame}
           />
-          <TopBarTextButton
-            event={() => console.log('editors')}
-            title="Show Editors"
-            altText="Edit the cards"
-          />
         </Stack>
       </ToggleButtonGroup>
     )
   }
 }
 
-export default withRouterProps(EditNavigationBar);
+export default withRouterProps(GameMainPageTopBar);

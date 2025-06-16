@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Close } from "@mui/icons-material";
-import { NavbarButton, NavbarSmallButton } from "./RawComponents/navbarButton";
+import { NavbarButton, NavbarSmallButton } from "./navbarButton";
 import { ROUTES } from "../Routes/routes";
 
 export const GameSelectedAddOn = ({ toggleDisplay }) => {

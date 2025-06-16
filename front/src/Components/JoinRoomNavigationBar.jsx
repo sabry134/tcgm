@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Home } from '@mui/icons-material'
-import { NavbarButton, NavbarSmallButton } from './RawComponents/navbarButton'
+import { NavbarButton, NavbarSmallButton } from './navbarButton'
 import { Box } from '@mui/material'
 import { useChannel } from '../ChannelContext'
 

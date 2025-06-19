@@ -1,5 +1,5 @@
 import React, { Component, createRef } from "react";
-import { GameListTopBar } from "../Components/TopBar/GameListTopBar";
+import { Typography } from "@mui/material";
 import { GameListPicker } from "./GameListPicker/GameListPicker";
 import { Popup } from "../Components/Popup/Popup";
 import { createGameRequest } from "../Api/gamesRequest";
@@ -47,7 +47,9 @@ class GameList extends Component {
           spanRef={this.spanRef}
 
           topBar={
-            <GameListTopBar />
+            <Typography variant='h5' sx={{ color: 'primary.contrastText' }}>
+              Game List
+            </Typography>
           }
 
           leftPanel={
@@ -71,7 +73,6 @@ class GameList extends Component {
               <GameListPicker />
             </>
           }
-
         />
       </>
     );

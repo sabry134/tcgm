@@ -252,4 +252,32 @@ defmodule TcgmWebApp.Game.GameLogic do
         end
     end
   end
+
+  defp get_effects_by_location(acc, player_id, player_data, location) do
+    acc = Enum.reduce(player_data[location], acc, fn card, acc_inner ->
+      old_deck = get_in(acc_inner, [player_id, location]) || []
+      [card_id | _rest] = Map.keys(card)
+      cond do
+        Map.has_key?(card[card_id], "effects") == false ->
+          acc_inner
+        true ->
+          res = old_deck ++ card[card_id]["effects"]
+          #IO.inspect(res)
+          put_in(acc_inner, [player_id, card_id], res)
+      end
+    end)
+    acc
+  end
+
+  def list_all_effects(state) do
+    list = Enum.reduce(state.players, %{}, fn {player_id, player_data}, acc ->
+      acc = put_in(acc[player_id], %{})
+      acc = get_effects_by_location(acc, player_id, player_data, "deck")
+      acc = get_effects_by_location(acc, player_id, player_data, "hand")
+      acc = get_effects_by_location(acc, player_id, player_data, "graveyard")
+      acc = get_effects_by_location(acc, player_id, player_data, "field")
+      acc
+    end)
+    list
+  end
 end

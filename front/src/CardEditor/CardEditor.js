@@ -1,43 +1,31 @@
-import React, { useEffect } from "react";
-import { Box } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import React, { Component } from "react";
+import { Typography } from "@mui/material";
 import { TCGMCard } from "./Components/TCGMCard";
-import { MainNavigationBar } from "../Components/MainNavigationBar";
 import { LeftPanel } from "./Components/LeftPanel";
 import { RightPanel } from "./Components/RightPanel";
-import defaultData from "./Data/TestBack.json"
+import defaultData from "./Data/TestBack.json";
+import { BaseLayout } from "../Components/Layouts/BaseLayout";
 
-const CardEditor = () => {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    document.title = "JCCE";
-
+export default class CardEditor extends Component {
+  componentDidMount() {
     if (!localStorage.getItem("currentEditedCard")) {
       localStorage.setItem("currentEditedCard", JSON.stringify(defaultData));
     }
-  }, []);
+  }
 
-  return (
-    <Box display="flex" flexDirection="column" height="100vh">
-      <MainNavigationBar navigate={navigate}/>
+  render() {
+    return (
+      <BaseLayout
+        topBar={
+          <Typography variant="h5" sx={{ color: "primary.contrastText" }}>
+            Card Editor
+          </Typography>
+        }
 
-      <Box display="flex" flexGrow={1} bgcolor="#fff">
-        <LeftPanel/>
-
-        <Box
-          className="main-area"
-          flexGrow={1}
-          bgcolor="#c4c4c4"
-          position="relative"
-        >
-          <TCGMCard/>
-        </Box>
-
-        <RightPanel/>
-      </Box>
-    </Box>
-  );
-};
-
-export default CardEditor
+        leftPanel={<LeftPanel />}
+        centerPanel={<TCGMCard />}
+        rightPanel={<RightPanel />}
+      />
+    );
+  }
+}

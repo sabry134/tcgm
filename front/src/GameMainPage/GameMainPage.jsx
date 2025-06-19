@@ -21,40 +21,38 @@ class GameMainPage extends Component {
 
   render() {
     return (
-      <>
-        <BaseLayout
+      <BaseLayout
 
-          topBar={
-            <TopBarButtonGroup>
-              <TopBarIconButton
-                event={this.unselectGame}
-                svgComponent={Close}
-                altText="Unselect Game"
-              />
-            </TopBarButtonGroup>
-          }
+        topBar={
+          <TopBarButtonGroup>
+            <TopBarIconButton
+              event={this.unselectGame}
+              svgComponent={Close}
+              altText="Unselect Game"
+            />
+          </TopBarButtonGroup>
+        }
 
-          leftPanel={
-            <>
-              <TCGMButton
-                onClick={this.navigateTo.bind(this, ROUTES.CARD_EDITOR)}
-              >
-                Create & customize cards
-              </TCGMButton>
-              <TCGMButton
-                onClick={this.navigateTo.bind(this, ROUTES.BOARD_EDITOR)}
-              >
-                Design the play area
-              </TCGMButton>
-              <TCGMButton
-                onClick={this.navigateTo.bind(this, ROUTES.TYPE_EDITOR)}
-              >
-                Set up card types and behaviors
-              </TCGMButton>
-            </>
-          }
-        />
-      </>
+        leftPanel={
+          <>
+            <TCGMButton
+              onClick={this.navigateTo.bind(this, ROUTES.CARD_EDITOR)}
+            >
+              Create & customize cards
+            </TCGMButton>
+            <TCGMButton
+              onClick={this.navigateTo.bind(this, ROUTES.BOARD_EDITOR)}
+            >
+              Design the play area
+            </TCGMButton>
+            <TCGMButton
+              onClick={this.navigateTo.bind(this, ROUTES.TYPE_EDITOR)}
+            >
+              Set up card types and behaviors
+            </TCGMButton>
+          </>
+        }
+      />
     )
   }
 }

@@ -42,39 +42,37 @@ class GameList extends Component {
     const id = open ? "simple-popper" : undefined;
 
     return (
-      <>
-        <BaseLayout
-          spanRef={this.spanRef}
+      <BaseLayout
+        spanRef={this.spanRef}
 
-          topBar={
-            <Typography variant='h5' sx={{ color: 'primary.contrastText' }}>
-              Game List
-            </Typography>
-          }
+        topBar={
+          <Typography variant='h5' sx={{ color: 'primary.contrastText' }}>
+            Game List
+          </Typography>
+        }
 
-          leftPanel={
-            <TCGMButton onClick={this.openPopup}>
-              Create Game
-            </TCGMButton>
-          }
+        leftPanel={
+          <TCGMButton onClick={this.openPopup}>
+            Create Game
+          </TCGMButton>
+        }
 
-          centerPanel={
-            <>
-              <Popup
-                id={id}
-                open={open}
-                anchorEl={this.state.anchor}
-                closeCallback={this.closePopup}
-                receivedCallback={(data) => this.onClickCreate(data)}
-                title={"Create Game"}
-                inputName={["Name", "Description"]}
-              />
+        centerPanel={
+          <>
+            <Popup
+              id={id}
+              open={open}
+              anchorEl={this.state.anchor}
+              closeCallback={this.closePopup}
+              receivedCallback={(data) => this.onClickCreate(data)}
+              title={"Create Game"}
+              inputName={["Name", "Description"]}
+            />
 
-              <GameListPicker />
-            </>
-          }
-        />
-      </>
+            <GameListPicker/>
+          </>
+        }
+      />
     );
   }
 }

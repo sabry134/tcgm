@@ -32,7 +32,6 @@ const onClickCreate = (data) => {
     })
     .then((game) => {
       console.log("Game details:", game);
-      navigate(`/game/${game.id}`);
     })
     .catch((error) => {
       console.error("Error creating or fetching game:", error);

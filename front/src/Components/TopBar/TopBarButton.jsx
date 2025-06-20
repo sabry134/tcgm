@@ -49,6 +49,7 @@ export class TopBarIconButton extends Component<IconProps> {
 type TextProps = {
   title: string;
   altText: string;
+  event: () => void;
 }
 
 /**
@@ -58,12 +59,14 @@ type TextProps = {
  * @param {Object} props - The properties for the component.
  * @param {string} props.title - The text to display on the button.
  * @param {string} props.altText - The alternative text for the button, used for accessibility.
+ * @param {Function} props.event - The function to call when the button is clicked.
  * @return {JSX.Element} The rendered button component.
  *
  * @example
  * <TopBarTextButton
  *  title="Click Me"
  *  altText="Click this button to perform an action"
+ *  event={() => console.log('Button clicked')}
  * />
  * @see TopBarIconButton for an example of a button with an icon.
  */
@@ -74,6 +77,7 @@ export class TopBarTextButton extends Component<TextProps> {
       <ToggleButton
         value={this.props.altText}
         title={this.props.altText}
+        onClick={this.props.event}
         sx={{
           color: "primary.contrastText",
           '&.Mui-selected': {

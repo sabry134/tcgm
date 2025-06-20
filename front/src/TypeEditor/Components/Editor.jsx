@@ -184,7 +184,6 @@ export class Editor extends Component {
         onMouseLeave={this.handleOnDragEnd}
         onMouseUp={this.handleOnDragEnd}
         onClick={this.handleDeselectedOnClick}
-        className='editor'
       >
         <StagnantUI createNewComponnent={this.createNewComponnent} />
         <CardTypeDisplay

@@ -270,4 +270,26 @@ defmodule TcgmWebApp.Game.GameServerTest do
 
     assert changed
   end
+
+  test "send chat message", %{room_id: room_id} do
+    GameServer.join_room(room_id, "player1")
+    GameServer.join_room(room_id, "player2")
+
+    initial_state = GameServer.get_state(room_id)
+    assert length(initial_state.chat) == 0
+
+    :ok = GameServer.add_chat_message(room_id, "player1", "Hello, world!")
+    :ok = GameServer.add_chat_message(room_id, "player2", "Hi there!")
+
+    new_state = GameServer.get_state(room_id)
+    assert length(new_state.chat) == 2
+    assert Enum.any?(new_state.chat, fn msg -> msg[:player_id] == "player1" and msg[:message] == "Hello, world!" end)
+    assert Enum.any?(new_state.chat, fn msg -> msg[:player_id] == "player2" and msg[:message] == "Hi there!" end)
+
+    chat = GameServer.get_chat(room_id)
+
+    assert length(chat) == 2
+    assert Enum.any?(chat, fn msg -> msg[:player_id] == "player1" and msg[:message] == "Hello, world!" end)
+    assert Enum.any?(chat, fn msg -> msg[:player_id] == "player2" and msg[:message] == "Hi there!" end)
+  end
 end

@@ -26,6 +26,9 @@ defmodule TcgmWebAppWeb.Router do
     post "/games/groups", GameController, :create_card_collection_group
     get "/games/:game_id/groups", GameController, :get_card_collection_groups_by_game_id
     get "/games/:game_id/groups/:collection_type", GameController, :get_card_collection_group_by_game_id_and_collection_type
+    get "/games/role/:role_name/user/:user_id", GameController, :get_games_by_role_and_user_id
+    get "/games/:game_id/user/:user_id/roles", GameController, :get_user_roles_for_game
+    post "/games/:game_id/user/:user_id/role", GameController, :grant_role_to_user
 
     resources "/actions", ActionController, only: [:index, :show, :create, :update]
     delete "/actions/delete/:action_id", ActionController, :delete_action

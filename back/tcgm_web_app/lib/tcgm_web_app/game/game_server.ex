@@ -28,7 +28,8 @@ defmodule TcgmWebApp.Game.GameServer do
       players: %{},
       turn: "",
       turnCount: 0,
-      phase: :waiting
+      phase: :waiting,
+      chat: [],
     }
     {:ok, state}
   end
@@ -86,6 +87,17 @@ defmodule TcgmWebApp.Game.GameServer do
   def shuffle_card(room_id, player_id, location) do
     GenServer.cast(via_tuple(room_id), {:shuffle_card, player_id, location})
   end
+
+  # server chat functions
+
+  def get_chat(room_id) do
+    GenServer.call(via_tuple(room_id), :get_chat)
+  end
+
+  def add_chat_message(room_id, player_id, message) do
+    GenServer.cast(via_tuple(room_id), {:add_chat_message, player_id, message})
+  end
+
   # Server interaction functions
 
   def leave_room(room_id, player_id) do
@@ -268,6 +280,16 @@ defmodule TcgmWebApp.Game.GameServer do
       {:error, reason} ->
         {:reply, {:error, reason}, state}
     end
+  end
+
+  def handle_call(:get_chat, _from, state) do
+    {:reply, state.chat, state}
+  end
+
+  def handle_cast({:add_chat_message, player_id, message}, state) do
+    new_chat = [%{player_id: player_id, message: message} | state.chat]
+    new_state = %{state | chat: new_chat}
+    {:noreply, new_state}
   end
 
   def handle_call({:leave, player_id}, _from, state) do

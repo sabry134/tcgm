@@ -52,9 +52,10 @@ class GameList extends Component {
         }
 
         leftPanel={
-          <TCGMButton onClick={this.openPopup}>
-            Create Game
-          </TCGMButton>
+          <TCGMButton
+            onClick={this.openPopup}
+            text="Create Game"
+          />
         }
 
         centerPanel={

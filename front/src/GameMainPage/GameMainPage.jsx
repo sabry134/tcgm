@@ -5,18 +5,12 @@ import { TopBarIconButton } from "../Components/TopBar/TopBarButton";
 import { Close } from "@mui/icons-material";
 import { TCGMButton } from "../Components/RawComponents/TCGMButton";
 import { ROUTES } from "../Routes/routes";
-import { withRouterProps } from "../Utility/HocNavigation";
+import { withRouterProps } from "../Utility/hocNavigation";
+import { unselectGame } from "../Utility/navigate";
 
 class GameMainPage extends Component {
   navigateTo = (route) => {
     this.props.navigate(route);
-  }
-
-  unselectGame = () => {
-    if (localStorage.getItem('gameSelected')) {
-      localStorage.setItem('gameSelected', false);
-    }
-    this.props.navigate(ROUTES.HOME);
   }
 
   render() {
@@ -26,7 +20,7 @@ class GameMainPage extends Component {
         topBar={
           <TopBarButtonGroup>
             <TopBarIconButton
-              event={this.unselectGame}
+              event={() => unselectGame(this.props.navigate)}
               svgComponent={Close}
               altText="Unselect Game"
             />
@@ -37,19 +31,16 @@ class GameMainPage extends Component {
           <>
             <TCGMButton
               onClick={this.navigateTo.bind(this, ROUTES.CARD_EDITOR)}
-            >
-              Create & customize cards
-            </TCGMButton>
+              text="Create & customize cards"
+            />
             <TCGMButton
               onClick={this.navigateTo.bind(this, ROUTES.BOARD_EDITOR)}
-            >
-              Design the play area
-            </TCGMButton>
+              text="Design the play area"
+            />
             <TCGMButton
               onClick={this.navigateTo.bind(this, ROUTES.TYPE_EDITOR)}
-            >
-              Set up card types and behaviors
-            </TCGMButton>
+              text="Set up card types and behaviors"
+            />
           </>
         }
       />

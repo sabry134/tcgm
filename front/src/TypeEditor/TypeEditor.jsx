@@ -9,7 +9,8 @@ import { BaseLayout } from "../Components/Layouts/BaseLayout";
 import { TopBarIconButton, TopBarTextButton } from "../Components/TopBar/TopBarButton";
 import { Close } from "@mui/icons-material";
 import { TopBarButtonGroup } from "../Components/TopBar/TopBarButtonGroup";
-import { withRouterProps } from "../Utility/HocNavigation";
+import { withRouterProps } from "../Utility/hocNavigation";
+import { unselectGame } from "../Utility/navigate";
 
 class TypeEditor extends Component {
   constructor(props) {
@@ -19,13 +20,6 @@ class TypeEditor extends Component {
       leftPanelKey: 0,
     };
     this.spanRef = createRef();
-  }
-
-  unselectGame = () => {
-    if (localStorage.getItem("gameSelected")) {
-      localStorage.setItem("gameSelected", false);
-    }
-    this.props.navigate(ROUTES.HOME);
   }
 
   openPopup = () => {
@@ -62,7 +56,7 @@ class TypeEditor extends Component {
         topBar={
           <TopBarButtonGroup>
             <TopBarIconButton
-              event={this.unselectGame}
+              event={() => unselectGame(this.props.navigate)}
               svgComponent={Close}
               altText="Unselect Game"
             />

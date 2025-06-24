@@ -180,10 +180,18 @@ const Lobby = () => {
                     </div>
                 </div>
                 <div className="buttonList">
-                    <TCGMButton onClick={handleSetDeck}>Set Deck</TCGMButton>
-                    <TCGMButton onClick={handleLaunch}>Launch</TCGMButton>
-                    <TCGMButton onClick={handleLeave}>Leave</TCGMButton>
-
+                    <TCGMButton
+                      onClick={handleSetDeck}
+                      text="Set Deck"
+                    />
+                    <TCGMButton
+                      onClick={handleLaunch}
+                      text="Launch"
+                    />
+                    <TCGMButton
+                      onClick={handleLeave}
+                      text="Leave"
+                    />
                 </div>
             </div>
         </div>

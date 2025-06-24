@@ -8,7 +8,8 @@ import defaultData from "./Data/TestBack.json";
 import { BaseLayout } from "../Components/Layouts/BaseLayout";
 import { TopBarButtonGroup } from "../Components/TopBar/TopBarButtonGroup";
 import { TopBarIconButton, TopBarTextButton } from "../Components/TopBar/TopBarButton";
-import { withRouterProps } from "../Utility/HocNavigation";
+import { withRouterProps } from "../Utility/hocNavigation";
+import { unselectGame } from "../Utility/navigate";
 
 class CardEditor extends Component {
   componentDidMount() {
@@ -17,20 +18,13 @@ class CardEditor extends Component {
     }
   }
 
-  unselectGame = () => {
-    if (localStorage.getItem("gameSelected")) {
-      localStorage.setItem("gameSelected", false);
-    }
-    this.props.navigate(ROUTES.HOME);
-  }
-
   render() {
     return (
       <BaseLayout
         topBar={
           <TopBarButtonGroup>
             <TopBarIconButton
-              event={this.unselectGame}
+              event={() => unselectGame(this.props.navigate)}
               svgComponent={Close}
               altText="Unselect Game"
             />

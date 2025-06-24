@@ -40,6 +40,8 @@ export class BaseLayout extends Component<Props> {
           flexDirection: "column",
           height: "100vh",
           bgcolor: "neutral.main",
+          overflow: "hidden",
+          position: "relative",
         }}
       >
         {this.props.spanRef && <span ref={this.props.spanRef}/>}

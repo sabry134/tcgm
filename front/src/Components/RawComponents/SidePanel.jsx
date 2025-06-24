@@ -47,6 +47,7 @@ export class SidePanel extends Component<Props> {
               boxShadow: 2,
               display: 'flex',
               flexDirection: 'column',
+              alignItems: 'center',
               p: 1,
               gap: 4,
               bgcolor: 'primary.light',

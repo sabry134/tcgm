@@ -9,13 +9,14 @@ import { Button, Typography } from "@mui/material";
  * @extends Component
  * @param {Object} props - The component props.
  * @param {function} props.onClick - The function to call when the button is clicked.
- * @param {ReactNode} props.children - The content to be displayed inside the button.
+ * @param {string} props.text - Optional text to display inside the button.
  * @returns {JSX.Element} The rendered TCGMButton component.
  *
  * @example
- * <TCGMButton onClick={handleClick}>
- *   Click Me
- * </TCGMButton>
+ * <TCGMButton
+ *  onClick={() => console.log('Button clicked!')}
+ *  text="Click Me"
+ * />
  */
 
 export class TCGMButton extends Component {
@@ -35,9 +36,11 @@ export class TCGMButton extends Component {
         }}
       >
 
-        <Typography variant={"body1"} fontWeight={500} color={"secondary.contrastText"}>
-          {this.props.children}
-        </Typography>
+        {this.props.text && (
+          <Typography variant={"body1"} fontWeight={500} color={"secondary.contrastText"}>
+            {this.props.text}
+          </Typography>
+        )}
 
       </Button>
     )

@@ -1,7 +1,6 @@
 export const ROUTES = {
   HOME: "/",
   GAME_MAIN_PAGE: "/game-main-page",
-  TEMPLATES: "/templates",
   CARD_EDITOR: "/card-editor",
   TYPE_EDITOR: "/type-editor",
   BOARD_EDITOR: "/board-editor",

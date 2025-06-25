@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import CardFilter from './CardFilter';
-import CardPreview from './CardPreview';
-import CardList from './CardList';
-import DeckPreview from './DeckPreview';
-import { mockCards } from './mockData';
+import CardFilter from './Components/CardFilter';
+import CardPreview from './Components/CardPreview';
+import CardList from './Components/CardList';
+import DeckPreview from './Components/DeckPreview';
+import { mockCards } from './Components/mockData';
 import { JoinRoomNavigationBar } from "../Components/JoinRoomNavigationBar";
-import './styles.css';
+import './Components/styles.css';
 import { getCardsByGameWithPropertiesRequest } from '../Api/cardsRequest';
 import { saveCollectionWithCardsRequest, getCardsInCollectionRequest } from '../Api/collectionsRequest';
 import { getCardCardType } from '../Api/cardsRequest';

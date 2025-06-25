@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { getCardTypesByGameRequest } from '../Api/cardTypesRequest';
-import { getCardTypesPropertiesbyTypeRequest } from '../Api/cardTypesPropertiesRequest';
+import { getCardTypesByGameRequest } from '../../Api/cardTypesRequest';
+import { getCardTypesPropertiesbyTypeRequest } from '../../Api/cardTypesPropertiesRequest';
 
 const CardFilter = ({ cards, onFilter }) => {
   const [filter, setFilter] = useState({

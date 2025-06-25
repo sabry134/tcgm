@@ -269,4 +269,19 @@ defmodule TcgmWebAppWeb.BoardController do
         json(conn, zones)
     end
   end
+
+  swagger_path :delete_board_zone do
+    delete("/boards/zones/{zone_id}")
+    description("Delete a board zone by ID")
+    parameter("zone_id", :path, :integer, "Board zone ID", required: true)
+    response(code(:no_content), "Board zone deleted")
+    response(code(:not_found), "Board zone not found")
+  end
+
+  def delete_board_zone(conn, %{"zone_id" => zone_id}) do
+    board_zone = BoardZones.get_board_zone!(zone_id)
+
+    BoardZones.delete_board_zone(board_zone)
+    send_resp(conn, :no_content, "")
+  end
 end

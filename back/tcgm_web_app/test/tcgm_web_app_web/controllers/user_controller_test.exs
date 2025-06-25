@@ -4,8 +4,8 @@ defmodule TcgmWebAppWeb.UserControllerTest do
   alias TcgmWebApp.Accounts.User
   alias TcgmWebApp.Repo
 
-  @valid_attrs %{ username: "John Doe" }
-  @create_attrs %{ username: "Jane Doe" }
+  @valid_attrs %{ username: "John Doe", password: "jd", email: "john.doe@gmail.com"}
+  @create_attrs %{ username: "Jane Doe" , password: "test", email: "jane.doe@gmail.com"}
   @invalid_attrs %{ username: "" }
 
   setup do
@@ -20,6 +20,7 @@ defmodule TcgmWebAppWeb.UserControllerTest do
     conn = get(conn, "/api/users")
     response = json_response(conn, 200)
 
+    IO.inspect(response)
     assert length(response) > 0
     assert Enum.any?(response, fn u -> u["username"] == user.username end)
   end
@@ -46,7 +47,7 @@ defmodule TcgmWebAppWeb.UserControllerTest do
   end
 
   test "PUT /api/users/:id updates an existing user", %{conn: conn, user: user} do
-    update_attrs = %{username: "usernamee"}
+    update_attrs = %{username: "usernamee", password: user.password}
 
     conn = put(conn, "/api/users/#{user.id}", %{"user" => update_attrs})
     response = json_response(conn, 200)
@@ -63,7 +64,7 @@ defmodule TcgmWebAppWeb.UserControllerTest do
   end
 
   test "POST /api/users/login authenticates a user", %{conn: conn, user: user} do
-    conn = post(conn, "/api/users/login", user: %{username: user.username})
+    conn = post(conn, "/api/users/login", user: %{username: user.username, password: user.password})
     response = json_response(conn, 200)
 
     assert response["id"] == user.id

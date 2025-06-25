@@ -68,7 +68,7 @@ defmodule TcgmWebAppWeb.BoardControllerTest do
   end
 
   test "POST /api/boards/with_zones creates a new board with zones", %{conn: conn, board: board} do
-    zone1 = %{name: "Deck", width: 100, height: 200, x: 0, y: 0, border_radius: 0, background_image: "test"}
+    zone1 = %{name: "Deck", width: 100.5, height: 200.5, x: 0.5, y: 0.5, border_radius: 0, background_image: "test"}
     zone2 = %{name: "Hand", width: 100, height: 200, x: 0, y: 0, border_radius: 0, background_image: "test"}
     zones = [zone1, zone2]
 
@@ -90,8 +90,7 @@ defmodule TcgmWebAppWeb.BoardControllerTest do
 
   test "PUT /api/boads/with_zones/:id updates a board with zones", %{conn: conn, board: board, zone: zone} do
     updated_board_attrs = %{background_image: "updated_image"}
-    updated_zones = [%{id: zone.id, name: "Updated Zone", width: 150, height: 250, x: 10, y: 10, border_radius: 5, background_image: "updated_test"}]
-
+    updated_zones = [%{id: zone.id, name: "Updated Zone", width: 150.5, height: 250.5, x: 10.5, y: 10.5, border_radius: 5.5, background_image: "updated_test"}]
     conn = put(conn, "/api/boards/with_zones/#{board.id}", board: updated_board_attrs, zones: updated_zones)
     response = json_response(conn, 200)
 
@@ -120,6 +119,13 @@ defmodule TcgmWebAppWeb.BoardControllerTest do
     assert length(response) > 0
     assert Enum.any?(response, fn z -> z["id"] == zone.id end)
     assert Enum.any?(response, fn z -> z["name"] == zone.name end)
+  end
+
+  test "POST /api/boards/zones/:zone_id deletes a board zone", %{conn: conn, zone: zone} do
+    conn = delete(conn, "/api/boards/zones/#{zone.id}")
+    assert response(conn, 204)
+
+    assert Repo.get(BoardZone, zone.id) == nil
   end
 
 end

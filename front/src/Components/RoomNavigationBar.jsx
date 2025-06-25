@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Home, Chat as ChatIcon } from '@mui/icons-material'
 import { NavbarButton, NavbarSmallButton } from './navbarButton'
@@ -8,8 +8,14 @@ import LinkIcon from '@mui/icons-material/Link'
 export const RoomNavigationBar = ({ roomId }) => {
   const navigate = useNavigate()
 
-  // Retrieve player username
   const username = localStorage.getItem('playerUsername') || 'Unknown'
+
+  // Store roomId in localStorage when component mounts or roomId changes
+  useEffect(() => {
+    if (roomId) {
+      localStorage.setItem('room_id', roomId)
+    }
+  }, [roomId])
 
   const [copyButtonText, setCopyButtonText] = useState('Copy')
   const [anchorEl, setAnchorEl] = useState(null)

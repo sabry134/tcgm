@@ -63,11 +63,16 @@ defmodule TcgmWebApp.Accounts do
   @doc """
     Authenticates a user with the given username.
   """
-  def authenticate_user(%{"username" => username}) do
+  def authenticate_user(%{"username" => username, "password" => password}) do
     user = get_user_by_username(username)
     case user do
       nil -> {:error, "User not found"}
-      _ -> {:ok, user}
+      user ->
+        if User.verify_password(user, password) do
+          {:ok, user}
+        else
+          {:error, "Invalid credentials"}
+        end
     end
   end
 end

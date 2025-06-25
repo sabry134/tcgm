@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Games } from "@mui/icons-material";
-import { NavbarSmallButton } from "./navbarButton";
+import { NavbarSmallButton } from "./Components/navbarButton";
 import { Box } from "@mui/material";
 
 export const HelpGameNavigationBar = () => {

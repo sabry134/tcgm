@@ -1,51 +1,34 @@
-import React, { Component } from "react";
-import { BaseLayout } from "../Components/Layouts/BaseLayout";
-import { TopBarButtonGroup } from "../Components/TopBar/TopBarButtonGroup";
-import { TopBarIconButton } from "../Components/TopBar/TopBarButton";
-import { Close } from "@mui/icons-material";
-import { TCGMButton } from "../Components/RawComponents/TCGMButton";
-import { ROUTES } from "../Routes/routes";
-import { withRouterProps } from "../Utility/hocNavigation";
-import { unselectGame } from "../Utility/navigate";
+import { Box } from "@mui/material";
+import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { LeftPanel } from "./Component/LeftPanel";
+import { RightPanel } from "./Component/RightPanel";
 
-class GameMainPage extends Component {
-  navigateTo = (route) => {
-    this.props.navigate(route);
-  }
+const GameMainPage = () => {
+  const navigate = useNavigate(); // Initialize useNavigate hook
 
-  render() {
-    return (
-      <BaseLayout
+  return (
+    <Box display="flex" flexDirection="column" height="100vh">
+      <MainNavigationBar navigate={navigate} />
 
-        topBar={
-          <TopBarButtonGroup>
-            <TopBarIconButton
-              event={() => unselectGame(this.props.navigate)}
-              svgComponent={Close}
-              altText="Unselect Game"
-            />
-          </TopBarButtonGroup>
-        }
+      <Box display="flex" flexGrow={1} bgcolor="#fff">
 
-        leftPanel={
-          <>
-            <TCGMButton
-              onClick={this.navigateTo.bind(this, ROUTES.CARD_EDITOR)}
-              text="Create & customize cards"
-            />
-            <TCGMButton
-              onClick={this.navigateTo.bind(this, ROUTES.BOARD_EDITOR)}
-              text="Design the play area"
-            />
-            <TCGMButton
-              onClick={this.navigateTo.bind(this, ROUTES.TYPE_EDITOR)}
-              text="Set up card types and behaviors"
-            />
-          </>
-        }
-      />
-    )
-  }
+        <LeftPanel />
+
+        <Box
+          className="main-area"
+          flexGrow={1}
+          bgcolor="#c4c4c4"
+          position="relative"
+        >
+        </Box>
+
+        <RightPanel />
+
+      </Box>
+    </Box>
+  );
 }
 
-export default withRouterProps(GameMainPage);
+export default GameMainPage;

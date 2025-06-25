@@ -1,67 +1,35 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import CardFilter from './Components/CardFilter';
 import CardPreview from './Components/CardPreview';
 import CardList from './Components/CardList';
 import DeckPreview from './Components/DeckPreview';
 import { mockCards } from './Components/mockData';
+import { JoinRoomNavigationBar } from "../NavigationBar/JoinRoomNavigationBar";
 import './Components/styles.css';
 import { getCardsByGameWithPropertiesRequest } from '../Api/cardsRequest';
 import { saveCollectionWithCardsRequest, getCardsInCollectionRequest } from '../Api/collectionsRequest';
 import { getCardCardType } from '../Api/cardsRequest';
 import { getGroupsForCollectionType } from '../Api/gamesRequest';
-import { BaseLayout } from "../Components/Layouts/BaseLayout";
-import { TopBarIconButton, TopBarTextButton } from "../Components/TopBar/TopBarButton";
-import { unselectGame } from "../Utility/navigate";
-import { Home } from "@mui/icons-material";
-import { ROUTES } from "../Routes/routes";
-import { TopBarButtonGroup } from "../Components/TopBar/TopBarButtonGroup";
-import { Box } from "@mui/material";
-import { TCGMButton } from "../Components/RawComponents/TCGMButton";
 
-class DeckBuilder extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      deck: {},
-      deckGroups: [],
-      allCards: [],
-      filteredCards: mockCards,
-      hoveredCard: null,
-      gotCards: false,
-    };
-  }
+const DeckBuilder = () => {
+  const [deck, setDeck] = useState({});
+  const [deckGroups, setDeckGroups] = useState([]);
+  const [allCards, setAllCards] = useState([]);
+  const [filteredCards, setFilteredCards] = useState(mockCards);
+  const [hoveredCard, setHoveredCard] = useState(null);
+  const [gotCards, setGotCards] = useState(false);
 
-  async componentDidMount() {
-    try {
-      await this.getCardsWithProperties();
-
-      const gameId = localStorage.getItem('gameSelected');
-      const groupsResponse = await getGroupsForCollectionType(gameId, 'deck');
-      this.setState({ deckGroups: groupsResponse });
-
-      const initialDeck = {};
-      groupsResponse.forEach((group) => {
-        initialDeck[group.name] = [];
-      });
-      this.setState({ deck: initialDeck });
-
-      await this.getCardsInDeck(initialDeck);
-    } catch (error) {
-      console.error('Error during deck initialization:', error);
-    }
-  }
-
-  getCardsWithProperties = async () => {
+  async function getCardsWithProperties() {
     try {
       const gameId = localStorage.getItem('gameSelected');
       const response = await getCardsByGameWithPropertiesRequest(gameId);
-      this.setState({ allCards: response });
+      setAllCards(response);
     } catch (error) {
       console.error('Error fetching cards:', error);
     }
-  };
+  }
 
-  getCardsInDeck = async (initializedDeck) => {
+  async function getCardsInDeck(initializedDeck) {
     try {
       const deckId = localStorage.getItem('deckSelected');
       const response = await getCardsInCollectionRequest(deckId);
@@ -74,15 +42,42 @@ class DeckBuilder extends Component {
           }
         }
       });
-      this.setState({ deck: deckData, gotCards: true });
+      setDeck(deckData);
+      setGotCards(true);
     } catch (error) {
       console.error('Error fetching deck cards:', error);
     }
-  };
+  }
 
-  addCardToDeck = (card) => {
+  useEffect(() => {
+    async function initializeDeck() {
+      try {
+        // Fetch cards with properties first (independent of deck initialization)
+        await getCardsWithProperties();
+
+        // Fetch deck groups and initialize the deck
+        const gameId = localStorage.getItem('gameSelected');
+        const groupsResponse = await getGroupsForCollectionType(gameId, 'deck');
+        setDeckGroups(groupsResponse);
+
+        const initialDeck = {};
+        groupsResponse.forEach((group) => {
+          initialDeck[group.name] = [];
+        });
+        setDeck(initialDeck);
+
+        // Fetch cards in the deck using the initialized deck structure
+        await getCardsInDeck(initialDeck);
+      } catch (error) {
+        console.error('Error during deck initialization:', error);
+      }
+    }
+
+    initializeDeck();
+  }, []);
+
+  const addCardToDeck = (card) => {
     getCardCardType(card.id).then((cardType) => {
-      const { deck, deckGroups } = this.state;
       let groupName = '';
       for (const g of deckGroups) {
         if (g.allowed_card_types.includes(cardType.id)) {
@@ -98,11 +93,9 @@ class DeckBuilder extends Component {
           return;
         }
         if (copies < group.max_copies) {
-          this.setState((prevState) => ({
-            deck: {
-              ...prevState.deck,
-              [groupName]: [...prevState.deck[groupName], card],
-            },
+          setDeck(prev => ({
+            ...prev,
+            [groupName]: [ ...prev[groupName], card]
           }));
         } else {
           alert(`You already have ${copies} copies of this card in the ${group.name} group!`);
@@ -111,9 +104,8 @@ class DeckBuilder extends Component {
     });
   };
 
-  removeSingleCard = (cardToRemove) => {
+  const removeSingleCard = (cardToRemove) => {
     getCardCardType(cardToRemove.id).then((cardType) => {
-      const { deck, deckGroups } = this.state;
       let groupName = '';
       for (const g of deckGroups) {
         if (g.allowed_card_types.includes(cardType.id)) {
@@ -127,20 +119,13 @@ class DeckBuilder extends Component {
         if (index !== -1) {
           const newCasters = [...deck[groupName]];
           newCasters.splice(index, 1);
-          this.setState((prevState) => ({
-            deck: {
-              ...prevState.deck,
-              [groupName]: newCasters,
-            },
-          }));
+          setDeck(prev => ({ ...prev, [groupName]: newCasters }));
         }
       }
     });
   };
 
-  saveDeck = () => {
-    const { deck, deckGroups } = this.state;
-
+  const saveDeck = () => {
     for (const group of deckGroups) {
       if (deck[group.name].length < group.min_cards) {
         alert(`You need at least ${group.min_cards} cards in the ${group.name} group!`);
@@ -165,8 +150,8 @@ class DeckBuilder extends Component {
       }
     });
 
-    saveCollectionWithCardsRequest(localStorage.getItem("deckSelected"), { cards: formattedCards })
-      .then(() => {
+    saveCollectionWithCardsRequest( localStorage.getItem("deckSelected"), { cards: formattedCards })
+      .then((response) => {
         alert('Deck saved successfully!');
       })
       .catch((error) => {
@@ -175,73 +160,29 @@ class DeckBuilder extends Component {
       });
   };
 
-  render() {
-    const { deck, deckGroups, allCards, filteredCards, hoveredCard } = this.state;
 
-    return (
-      <BaseLayout
-        topBar={
-          <TopBarButtonGroup>
-            <TopBarIconButton
-              event={() => {
-                unselectGame(this.props.navigate);
-              }}
-              svgComponent={Home}
-              altText="Return to home"
-            />
-            <TopBarTextButton
-              title={"Create/Join Room"}
-              altText={"Create or join a game room"}
-              event={() => this.props.navigate(ROUTES.JOIN)}
-            />
-            <TopBarTextButton
-              title={"Edit Deck"}
-              altText={"Edit your decks"}
-              event={() => this.props.navigate(ROUTES.EDIT_DECK)}
-            />
-          </TopBarButtonGroup>
-        }
+  return (
+    <div className="deck-builder-container">
+      <JoinRoomNavigationBar />
+      <div className="deck-builder">
+        <CardFilter cards={allCards} onFilter={setFilteredCards} />
+        <CardPreview card={hoveredCard} />
 
-        centerPanel={
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
+        <div className="deck-content">
+          <CardList cards={filteredCards} addCardToDeck={addCardToDeck} setHoveredCard={setHoveredCard} />
+          <DeckPreview deck={deck} removeSingleCard={removeSingleCard} setHoveredCard={setHoveredCard} deckGroups={deckGroups} />
+        </div>
+        <div className="deck-save">
+          <button
+            onClick={saveDeck}
           >
-            <CardFilter cards={allCards} onFilter={(cards) => this.setState({ filteredCards: cards })} />
-            <CardPreview card={hoveredCard} />
+            💾 Save Deck
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-              }}
-            >
-              <CardList
-                cards={filteredCards}
-                addCardToDeck={this.addCardToDeck}
-                setHoveredCard={(card) => this.setState({ hoveredCard: card })}
-              />
-              <DeckPreview
-                deck={deck}
-                removeSingleCard={this.removeSingleCard}
-                setHoveredCard={(card) => this.setState({ hoveredCard: card })}
-                deckGroups={deckGroups}
-              />
-            </Box>
-
-            <TCGMButton
-              onClick={this.saveDeck}
-              text="💾 Save Deck"
-            />
-          </Box>
-        }
-      />
-    );
-  }
-}
+};
 
 export default DeckBuilder;

@@ -1,100 +1,72 @@
-import React, { Component, createRef } from 'react';
-import { LeftPanel } from './Components/LeftPanel';
-import { RightPanel } from './Components/RightPanel';
-import { Editor } from './Components/Editor';
-import { Popup } from '../Components/Popup/Popup';
-import { createCardTypeRequest } from '../Api/cardTypesRequest';
-import { ROUTES } from "../Routes/routes";
-import { BaseLayout } from "../Components/Layouts/BaseLayout";
-import { TopBarIconButton, TopBarTextButton } from "../Components/TopBar/TopBarButton";
-import { Close } from "@mui/icons-material";
-import { TopBarButtonGroup } from "../Components/TopBar/TopBarButtonGroup";
-import { withRouterProps } from "../Utility/hocNavigation";
-import { unselectGame } from "../Utility/navigate";
+import { Box } from '@mui/material'
+import React, { useRef, useState } from 'react'
+import { LeftPanel } from './Components/LeftPanel'
+import { RightPanel } from './Components/RightPanel'
+import { Editor } from './Components/Editor'
+import { useNavigate } from 'react-router-dom'
+import { MainNavigationBar } from '../NavigationBar/MainNavigationBar'
+import { Popup } from "../Components/Popup/Popup";
+import { createCardTypeRequest } from "../Api/cardTypesRequest";
 
-class TypeEditor extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      anchor: null,
-      leftPanelKey: 0,
-    };
-    this.spanRef = createRef();
+// Pour le json des carte faudrais mettre l'image, le nom et le text dans properties pour faciliter le front je pense pas que sa devrais changer grand chose (1 sa permetrais plus de custom et 2 le front n'aurais plus qu'a regarder dans properties pour les editor ce qui facilitrais la tâche)
+
+const TypeEditor = () => {
+  const navigate = useNavigate()
+  const [anchor, setAnchor] = useState(null)
+  const [leftPanelKey, setLeftPanelKey] = useState(0) // Added key state
+
+  const spanRef = useRef()
+
+  const openPopup = () => {
+    setAnchor(anchor ? null : spanRef)
   }
 
-  openPopup = () => {
-    this.setState((prevState) => ({
-      anchor: prevState.anchor ? null : this.spanRef.current,
-    }));
-  };
+  const closePopup = () => {
+    setAnchor(null)
+    setLeftPanelKey(prevKey => prevKey + 1)
+  }
 
-  closePopup = () => {
-    this.setState((prevState) => ({
-      anchor: null,
-      leftPanelKey: prevState.leftPanelKey + 1,
-    }));
-  };
-
-  onClickCreate = (data) => {
+  const onClickCreate = data => {
     createCardTypeRequest({
       cardType: {
         name: data[0],
         game_id: localStorage.getItem('gameSelected'),
-        properties: [],
-      },
-    }).then();
-  };
-
-  render() {
-    const { anchor, leftPanelKey } = this.state;
-    const open = Boolean(anchor);
-    const id = open ? 'simple-popper' : undefined;
-
-    return (
-      <BaseLayout
-        spanRef={this.spanRef}
-        topBar={
-          <TopBarButtonGroup>
-            <TopBarIconButton
-              event={() => unselectGame(this.props.navigate)}
-              svgComponent={Close}
-              altText="Unselect Game"
-            />
-            <TopBarTextButton
-              title="Edit Card"
-              altText="Edit card"
-              event={() => this.props.navigate(ROUTES.CARD_EDITOR)}
-            />
-            <TopBarTextButton
-              title="Edit Board"
-              altText="Edit board"
-              event={() => this.props.navigate(ROUTES.BOARD_EDITOR)}
-            />
-          </TopBarButtonGroup>
-        }
-
-        leftPanel={<LeftPanel key={leftPanelKey} popupCallback={this.openPopup}/>}
-
-        centerPanel={
-          <>
-            <Editor/>
-            <Popup
-              id={id}
-              open={open}
-              anchorEl={anchor}
-              closeCallback={this.closePopup}
-              receivedCallback={(data) => this.onClickCreate(data)}
-              title={'Create Type'}
-              inputName={['Name']}
-            />
-          </>
-        }
-
-        rightPanel={<RightPanel/>}
-
-      />
-    );
+        properties: []
+      }
+    }).then()
   }
+
+  const open = Boolean(anchor)
+  const id = open ? 'simple-popper' : undefined
+
+  return (
+    <Box display='flex' flexDirection='column' height='100vh'>
+      <MainNavigationBar navigate={navigate} />
+
+      <Box display='flex' flexGrow={1} bgcolor='#fff'>
+        <LeftPanel key={leftPanelKey} popupCallback={openPopup} />
+        <Box
+          className='main-area'
+          flexGrow={1}
+          bgcolor='#c4c4c4'
+          position='relative'
+          ref={spanRef}
+        >
+          <Editor />
+        </Box>
+        <Popup
+          id={id}
+          open={open}
+          anchorEl={anchor}
+          closeCallback={closePopup}
+          receivedCallback={(data) => onClickCreate(data)}
+          title={'Create Type'}
+          inputName={['Name']}
+        />
+        <RightPanel />
+      </Box>
+    </Box>
+  )
 }
 
-export default withRouterProps(TypeEditor)
+export default TypeEditor

@@ -1,52 +1,43 @@
-import React, { Component } from "react";
-import { ROUTES } from "../Routes/routes";
-import { Close } from "@mui/icons-material";
+import React, { useEffect } from "react";
+import { Box } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import { TCGMCard } from "./Components/TCGMCard";
+import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
 import { LeftPanel } from "./Components/LeftPanel";
 import { RightPanel } from "./Components/RightPanel";
-import defaultData from "./Data/TestBack.json";
-import { BaseLayout } from "../Components/Layouts/BaseLayout";
-import { TopBarButtonGroup } from "../Components/TopBar/TopBarButtonGroup";
-import { TopBarIconButton, TopBarTextButton } from "../Components/TopBar/TopBarButton";
-import { withRouterProps } from "../Utility/hocNavigation";
-import { unselectGame } from "../Utility/navigate";
+import defaultData from "./Data/TestBack.json"
 
-class CardEditor extends Component {
-  componentDidMount() {
+const CardEditor = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    document.title = "JCCE";
+
     if (!localStorage.getItem("currentEditedCard")) {
       localStorage.setItem("currentEditedCard", JSON.stringify(defaultData));
     }
-  }
+  }, []);
 
-  render() {
-    return (
-      <BaseLayout
-        topBar={
-          <TopBarButtonGroup>
-            <TopBarIconButton
-              event={() => unselectGame(this.props.navigate)}
-              svgComponent={Close}
-              altText="Unselect Game"
-            />
-            <TopBarTextButton
-              title="Edit Type"
-              altText="Edit card type"
-              event={() => this.props.navigate(ROUTES.TYPE_EDITOR)}
-            />
-            <TopBarTextButton
-              title="Edit Board"
-              altText="Edit board"
-              event={() => this.props.navigate(ROUTES.BOARD_EDITOR)}
-            />
-          </TopBarButtonGroup>
-        }
+  return (
+    <Box display="flex" flexDirection="column" height="100vh">
+      <MainNavigationBar navigate={navigate}/>
 
-        leftPanel={<LeftPanel />}
-        centerPanel={<TCGMCard />}
-        rightPanel={<RightPanel />}
-      />
-    );
-  }
-}
+      <Box display="flex" flexGrow={1} bgcolor="#fff">
+        <LeftPanel/>
 
-export default withRouterProps(CardEditor);
+        <Box
+          className="main-area"
+          flexGrow={1}
+          bgcolor="#c4c4c4"
+          position="relative"
+        >
+          <TCGMCard/>
+        </Box>
+
+        <RightPanel/>
+      </Box>
+    </Box>
+  );
+};
+
+export default CardEditor

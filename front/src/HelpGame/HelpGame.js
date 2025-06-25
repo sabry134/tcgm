@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Box } from "@mui/material";
-import { HelpGameNavigationBar } from "../Components/HelpGameNavigationBar";
+import { HelpGameNavigationBar } from "../NavigationBar/HelpGameNavigationBar";
 
 const HelpGame = () => {
   const [scenes, setScenes] = useState([]);

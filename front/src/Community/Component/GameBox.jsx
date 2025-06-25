@@ -4,7 +4,6 @@ import './GameBox.css'
 import { useNavigate } from 'react-router-dom'
 import logo from '../../Assets/TCGMlogo.png'
 import { createUserRequest } from '../../Api/userRequest'
-import { ROUTES } from "../../Routes/routes";
 
 const height = '120px'
 const width = '140px'
@@ -64,16 +63,16 @@ const Deck = ({ checked, gameId }) => {
   const handleEditButton = () => {
     localStorage.setItem('gameSelected', gameId)
     window.dispatchEvent(new Event('gameSelected'))
-    navigate(ROUTES.GAME_MAIN_PAGE)
+    navigate('/game-main-page')
   }
 
   const handleClickButton = () => {
     localStorage.setItem('gameSelected', gameId)
     if (!localStorage.getItem('userId')) {
       console.log('User not found, creating a new user...')
-      createUser().then()
+      createUser()
     }
-    navigate(ROUTES.JOIN)
+    navigate('/join')
   }
 
   return (

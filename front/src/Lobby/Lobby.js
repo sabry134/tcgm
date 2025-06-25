@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import "./Lobby.css"
 import { Socket } from "phoenix";
 import { callSetDeck } from "../game_commands";
+import defaultGameState from '../Room/Data/GameState.json'
 import { useNavigate } from "react-router-dom";
 import { useChannel } from "../ChannelContext"; // Import the context hook
-import { RoomNavigationBar } from "../Components/RoomNavigationBar";
+import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
 import { TCGMButton } from "../Components/RawComponents/TCGMButton";
 
 const Lobby = () => {
@@ -126,13 +127,13 @@ const Lobby = () => {
             tmpSocket.connect();
             const tmpChannel = tmpSocket.channel(`room:${roomId}`, {})
             tmpChannel
-                .join()
-                .receive("ok", (resp) => {
-                    console.log("WebSocket connection established", resp);
-                })
-                .receive("error", (resp) => {
-                    console.error("WebSocket connection failed", resp);
-                });
+              .join()
+              .receive("ok", (resp) => {
+                  console.log("WebSocket connection established", resp);
+              })
+              .receive("error", (resp) => {
+                  console.error("WebSocket connection failed", resp);
+              });
 
             console.log("channel and socket = ", tmpSocket, tmpChannel)
 
@@ -172,26 +173,18 @@ const Lobby = () => {
                     </div>
                     <div className="playerList">
                         {gameState.players && Object.entries(gameState.players).map(
-                            (player, index) => (
-                                <div key={index} className="playerContainer">
-                                    {player[0]}
-                                </div>
-                            ))}
+                          (player, index) => (
+                            <div key={index} className="playerContainer">
+                                {player[0]}
+                            </div>
+                          ))}
                     </div>
                 </div>
                 <div className="buttonList">
-                    <TCGMButton
-                      onClick={handleSetDeck}
-                      text="Set Deck"
-                    />
-                    <TCGMButton
-                      onClick={handleLaunch}
-                      text="Launch"
-                    />
-                    <TCGMButton
-                      onClick={handleLeave}
-                      text="Leave"
-                    />
+                    <TCGMButton onClick={handleSetDeck}>Set Deck</TCGMButton>
+                    <TCGMButton onClick={handleLaunch}>Launch</TCGMButton>
+                    <TCGMButton onClick={handleLeave}>Leave</TCGMButton>
+
                 </div>
             </div>
         </div>

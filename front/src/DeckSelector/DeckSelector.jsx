@@ -1,83 +1,57 @@
-import React, { Component, createRef } from "react";
+import React, { useRef, useState } from "react";
+import { Box } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import { JoinRoomNavigationBar } from "../NavigationBar/JoinRoomNavigationBar";
 import { LeftPanel } from "./Components/LeftPanel";
+import { RightPanel } from "./Components/RightPanel";
 import { DeckPicker } from "./Components/DeckPicker";
 import { Popup } from "../Components/Popup/Popup";
-import { withRouterProps } from "../Utility/hocNavigation";
-import { BaseLayout } from "../Components/Layouts/BaseLayout";
-import { TopBarIconButton, TopBarTextButton } from "../Components/TopBar/TopBarButton";
-import { unselectGame } from "../Utility/navigate";
-import { Home } from "@mui/icons-material";
-import { ROUTES } from "../Routes/routes";
-import { TopBarButtonGroup } from "../Components/TopBar/TopBarButtonGroup";
 
-class DeckSelector extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      anchor: null,
-    };
-    this.spanRef = createRef();
-  }
+const DeckSelector = () => {
+  const navigate = useNavigate();
+  const [anchor, setAnchor] = useState(null);
+  const spanRef = useRef()
 
-  openPopup = () => {
-    this.setState((prevState) => ({
-      anchor: prevState.anchor ? null : this.spanRef.current,
-    }));
+  const openPopup = () => {
+    setAnchor(anchor ? null : spanRef);
   };
 
-  closePopup = () => {
-    this.setState({ anchor: null });
-  };
-
-  render() {
-    const { anchor } = this.state;
-    const open = Boolean(anchor);
-    const id = open ? "simple-popper" : undefined;
-
-    return (
-      <BaseLayout
-        spanRef={this.spanRef}
-        topBar={
-          <TopBarButtonGroup>
-            <TopBarIconButton
-              event={() => {
-                unselectGame(this.props.navigate);
-              }}
-              svgComponent={Home}
-              altText="Return to home"
-            />
-            <TopBarTextButton
-              title={"Create/Join Room"}
-              altText={"Create or join a game room"}
-              event={() => this.props.navigate(ROUTES.JOIN)}
-            />
-            <TopBarTextButton
-              title={"Edit Deck"}
-              altText={"Edit your decks"}
-              event={() => this.props.navigate(ROUTES.EDIT_DECK)}
-            />
-          </TopBarButtonGroup>
-        }
-
-        leftPanel={<LeftPanel popupCallback={this.openPopup}/>}
-
-        centerPanel={
-          <>
-            <Popup
-              id={id}
-              open={open}
-              anchorEl={anchor}
-              closeCallback={this.closePopup}
-              receivedCallback={(data) => {}}
-              title={"Create Deck"}
-              inputName={["Name"]}
-            />
-            <DeckPicker/>
-          </>
-        }
-      />
-    );
+  const closePopup = () => {
+    setAnchor(null)
   }
-}
 
-export default withRouterProps(DeckSelector);
+  const open = Boolean(anchor);
+  const id = open ? 'simple-popper' : undefined;
+
+  return (
+    <Box display="flex" flexDirection="column" height="100vh">
+      <JoinRoomNavigationBar navigate={navigate}/>
+
+      <Box display="flex" flexGrow={1} bgcolor="#fff">
+        <LeftPanel popupCallback={openPopup} />
+        <Box
+          ref={spanRef}
+          className="main-area"
+          flexGrow={1}
+          bgcolor="#c4c4c4"
+          position="relative"
+        >
+          <Popup
+            id={id}
+            open={open}
+            anchorEl={anchor}
+            closeCallback={closePopup}
+            receivedCallback={(data) => {}}
+            title={"Create Deck"}
+            inputName={["Name"]}
+          />
+          <DeckPicker />
+        </Box>
+
+        <RightPanel />
+      </Box>
+    </Box>
+  );
+};
+
+export default DeckSelector;

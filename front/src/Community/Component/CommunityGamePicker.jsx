@@ -3,7 +3,7 @@ import { Grid2, Box } from '@mui/material'
 import { GameBox } from './GameBox'
 import { getGamesRequest } from '../../Api/gamesRequest'
 
-export class GameListPicker extends Component {
+export class CommunityGamePicker extends Component {
   constructor (props) {
     super(props)
     this.state = {

@@ -1,33 +1,23 @@
 import React, { useState, useEffect } from "react";
 import {
   Button,
-  Checkbox,
-  FormControlLabel,
-  Slider,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Typography,
   Box,
   Paper,
   Card,
   IconButton,
 } from "@mui/material";
 import { Close as CloseIcon } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
-
-const SceneEditor = () => {
+const Templates = () => {
   const navigate = useNavigate();
 
   const [scenes, setScenes] = useState([]);
   const [selectedScene, setSelectedScene] = useState("");
-  const [trueFalseProperty, setTrueFalseProperty] = useState(true);
-  const [sliderValue, setSliderValue] = useState(50);
   const [cards, setCards] = useState([]);
   const [buttons, setButtons] = useState([]);
 
+  // Load scenes and their respective Data (cards and buttons) from localStorage and sessionStorage
   useEffect(() => {
     const savedScenes = JSON.parse(localStorage.getItem("scenes")) || [];
     if (savedScenes.length > 0) {
@@ -46,6 +36,7 @@ const SceneEditor = () => {
     }
   }, [selectedScene]);
 
+  // Save scene Data (cards and buttons) for the selected scene to sessionStorage
   useEffect(() => {
     if (selectedScene) {
       sessionStorage.setItem(selectedScene, JSON.stringify({ cards, buttons }));
@@ -61,33 +52,6 @@ const SceneEditor = () => {
   useEffect(() => {
     document.title = "JCCE";
   }, []);
-
-  const addScene = () => {
-    const newScene = `Scene ${scenes.length + 1}`;
-    setScenes([...scenes, newScene]);
-    setSelectedScene(newScene);
-  };
-
-  const deleteScene = () => {
-    const updatedScenes = scenes.filter((scene) => scene !== selectedScene);
-    setScenes(updatedScenes);
-    setSelectedScene(updatedScenes[0] || "");
-  };
-
-  const addCard = () => {
-    const newCard = { id: Date.now(), x: 100, y: 100, height: 400 };
-    setCards([...cards, newCard]);
-  };
-
-  const addButton = () => {
-    const newButton = {
-      id: Date.now(),
-      label: `Button ${buttons.length + 1}`,
-      x: 100,
-      y: 200,
-    };
-    setButtons([...buttons, newButton]);
-  };
 
   const handleCardMouseDown = (event, id) => {
     const card = cards.find((c) => c.id === id);
@@ -166,7 +130,6 @@ const SceneEditor = () => {
 
   return (
     <Box display="flex" flexDirection="column" height="100vh">
-
       <MainNavigationBar navigate={navigate}></MainNavigationBar>
 
 
@@ -181,34 +144,6 @@ const SceneEditor = () => {
             borderRadius: 0,
           }}
         >
-          <Typography variant="h6">🔍 Scene Inspector</Typography>
-          <Button
-            variant="contained"
-            color="warning"
-            fullWidth
-            onClick={addScene}
-            sx={{ mt: 1, mb: 2, borderRadius: 0 }}
-          >
-            Add Scene
-          </Button>
-          <List>
-            {scenes.map((scene) => (
-              <ListItem key={scene} disablePadding>
-                <ListItemButton
-                  selected={scene === selectedScene}
-                  onClick={() => setSelectedScene(scene)}
-                  sx={{ borderRadius: 0 }}
-                >
-                  <ListItemText
-                    primary={scene}
-                    sx={{
-                      color: scene === selectedScene ? "yellow" : "white",
-                    }}
-                  />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
         </Paper>
 
         <Box
@@ -221,7 +156,7 @@ const SceneEditor = () => {
             <Card
               key={card.id}
               sx={{
-                width: 250,
+                width: 150,
                 height: card.height,
                 position: "absolute",
                 left: card.x,
@@ -232,7 +167,7 @@ const SceneEditor = () => {
                 cursor: "grab",
                 p: 2,
                 bgcolor: "white",
-                borderRadius: 5,
+                borderRadius: 0,
               }}
               onMouseDown={(e) => handleCardMouseDown(e, card.id)}
             >
@@ -293,55 +228,10 @@ const SceneEditor = () => {
             borderRadius: 0,
           }}
         >
-          <Typography variant="h6">{selectedScene}</Typography>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={trueFalseProperty}
-                onChange={() => setTrueFalseProperty(!trueFalseProperty)}
-                color="default"
-              />
-            }
-            label="True false properties"
-          />
-          <Slider
-            value={sliderValue}
-            min={0}
-            max={100}
-            onChange={(e, newValue) => setSliderValue(newValue)}
-            sx={{ color: "yellow" }}
-          />
-          <Button
-            variant="contained"
-            color="error"
-            fullWidth
-            onClick={deleteScene}
-            sx={{ mt: 2, borderRadius: 0 }}
-          >
-            Delete Scene
-          </Button>
-          <Button
-            variant="contained"
-            color="secondary"
-            fullWidth
-            onClick={addCard}
-            sx={{ mt: 2, borderRadius: 0 }}
-          >
-            Generate Card
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            onClick={addButton}
-            sx={{ mt: 2, borderRadius: 0 }}
-          >
-            Generate Button
-          </Button>
         </Paper>
       </Box>
     </Box>
   );
 };
 
-export default SceneEditor;
+export default Templates;

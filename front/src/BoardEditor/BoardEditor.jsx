@@ -62,104 +62,104 @@ const BoardEditor = () => {
 
 
 
-const handleSaveClick = async () => {
-  try {
-    const gameId = localStorage.getItem("gameSelected");
-    if (!gameId) {
-      alert("No gameSelected ID found");
-      return;
-    }
-
-    const boardParams = {
-      game_id: gameId,
-      background_image: board.background_image || null,
-    };
-
-    const sanitizedZones = zones.map((zone) => ({
-      id: zone.id,
-      name: zone.name?.trim() || "Unnamed Zone",
-      width: Number(zone.width) || 0,
-      height: Number(zone.height) || 0,
-      x: Number(zone.x) || 0,
-      y: Number(zone.y) || 0,
-      border_radius: Number(zone.borderRadius) || 0,
-      background_image: zone.background_image || null,
-    }));
-
-    let boardId = localStorage.getItem("boardSelected");
-
-    const postCacheKey = "boardPostDone";
-
-    const postDone = localStorage.getItem(postCacheKey) === "done";
-
-    let method, url;
-
-    if (!boardId || !postDone) {
-      method = "POST";
-      url = `${API_BASE}/api/boards/with_zones`;
-    } else {
-      method = "PUT";
-      url = `${API_BASE}/api/boards/with_zones/${boardId}`;
-    }
-
-    const payload = { board: boardParams, zones: sanitizedZones };
-
-    console.log(`[SAVE-API][${method}] ${url}`);
-    console.log("Payload:", JSON.stringify(payload, null, 2));
-
-    const response = await fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      if (method === "POST") {
-        localStorage.setItem(postCacheKey, "failed");
-      }
-      const errBody = await response.json().catch(() => ({}));
-      alert(`Save failed: ${JSON.stringify(errBody)}`);
-      console.error("Save error:", errBody);
-      return;
-    }
-
-    const data = await response.json();
-    console.log(`[SAVE-API] ${method} Response:`, data);
-
-    if (method === "POST") {
-      if (data.board?.id) {
-        boardId = data.board.id;
-        localStorage.setItem("boardSelected", boardId);
-        localStorage.setItem(postCacheKey, "done");
-        console.log("Stored new boardSelected:", boardId);
-      } else {
-        localStorage.setItem(postCacheKey, "failed");
-        alert("POST succeeded but no board ID returned.");
+  const handleSaveClick = async () => {
+    try {
+      const gameId = localStorage.getItem("gameSelected");
+      if (!gameId) {
+        alert("No gameSelected ID found");
         return;
       }
+
+      const boardParams = {
+        game_id: gameId,
+        background_image: board.background_image || null,
+      };
+
+      const sanitizedZones = zones.map((zone) => ({
+        id: zone.id,
+        name: zone.name?.trim() || "Unnamed Zone",
+        width: Number(zone.width) || 0,
+        height: Number(zone.height) || 0,
+        x: Number(zone.x) || 0,
+        y: Number(zone.y) || 0,
+        border_radius: Number(zone.borderRadius) || 0,
+        background_image: zone.background_image || null,
+      }));
+
+      let boardId = localStorage.getItem("boardSelected");
+
+      const postCacheKey = "boardPostDone";
+
+      const postDone = localStorage.getItem(postCacheKey) === "done";
+
+      let method, url;
+
+      if (!boardId || !postDone) {
+        method = "POST";
+        url = `${API_BASE}/api/boards/with_zones`;
+      } else {
+        method = "PUT";
+        url = `${API_BASE}/api/boards/with_zones/${boardId}`;
+      }
+
+      const payload = { board: boardParams, zones: sanitizedZones };
+
+      console.log(`[SAVE-API][${method}] ${url}`);
+      console.log("Payload:", JSON.stringify(payload, null, 2));
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        if (method === "POST") {
+          localStorage.setItem(postCacheKey, "failed");
+        }
+        const errBody = await response.json().catch(() => ({}));
+        alert(`Save failed: ${JSON.stringify(errBody)}`);
+        console.error("Save error:", errBody);
+        return;
+      }
+
+      const data = await response.json();
+      console.log(`[SAVE-API] ${method} Response:`, data);
+
+      if (method === "POST") {
+        if (data.board?.id) {
+          boardId = data.board.id;
+          localStorage.setItem("boardSelected", boardId);
+          localStorage.setItem(postCacheKey, "done");
+          console.log("Stored new boardSelected:", boardId);
+        } else {
+          localStorage.setItem(postCacheKey, "failed");
+          alert("POST succeeded but no board ID returned.");
+          return;
+        }
+      }
+
+      if (method === "PUT") {
+        localStorage.setItem(postCacheKey, "done");
+      }
+
+      setBoard(data.board);
+      setZones(
+        (data.zones || []).map((zone) => ({
+          ...zone,
+          borderRadius: zone.border_radius || 0,
+        }))
+      );
+
+      alert("Board saved successfully!");
+    } catch (err) {
+      console.error("Error saving board:", err);
+      alert("Error saving board. See console for details.");
     }
-
-    if (method === "PUT") {
-      localStorage.setItem(postCacheKey, "done");
-    }
-
-    setBoard(data.board);
-    setZones(
-      (data.zones || []).map((zone) => ({
-        ...zone,
-        borderRadius: zone.border_radius || 0,
-      }))
-    );
-
-    alert("Board saved successfully!");
-  } catch (err) {
-    console.error("Error saving board:", err);
-    alert("Error saving board. See console for details.");
-  }
-};
+  };
 
 
 
@@ -216,7 +216,7 @@ const handleSaveClick = async () => {
 
 
 
-useEffect(() => {
+  useEffect(() => {
     const fetchBoardWithZones = async () => {
       const boardId = localStorage.getItem("boardSelected");
       if (!boardId) return;
@@ -516,53 +516,53 @@ useEffect(() => {
   };
 
 
-const handleDeleteZone = async (zoneId) => {
-  if (!zoneId) return;
+  const handleDeleteZone = async (zoneId) => {
+    if (!zoneId) return;
 
-  const confirmDelete = window.confirm("Are you sure you want to delete this zone and its symmetric pair?");
-  if (!confirmDelete) return;
+    const confirmDelete = window.confirm("Are you sure you want to delete this zone and its symmetric pair?");
+    if (!confirmDelete) return;
 
-  const zoneToDelete = zones.find((z) => z.id === zoneId);
-  if (!zoneToDelete) return;
+    const zoneToDelete = zones.find((z) => z.id === zoneId);
+    if (!zoneToDelete) return;
 
-  const symmetricZone = zones.find((z) =>
-    z.id !== zoneId &&
-    z.width === zoneToDelete.width &&
-    z.height === zoneToDelete.height &&
-    z.y === zoneToDelete.y &&
-    z.x === zoneToDelete.x * -1
-  );
+    const symmetricZone = zones.find((z) =>
+      z.id !== zoneId &&
+      z.width === zoneToDelete.width &&
+      z.height === zoneToDelete.height &&
+      z.y === zoneToDelete.y &&
+      z.x === zoneToDelete.x * -1
+    );
 
-  const idsToDelete = [zoneId];
-  if (symmetricZone) {
-    idsToDelete.push(symmetricZone.id);
-  }
+    const idsToDelete = [zoneId];
+    if (symmetricZone) {
+      idsToDelete.push(symmetricZone.id);
+    }
 
-  try {
-    for (const id of idsToDelete) {
-      const response = await fetch(`${API_BASE}/api/boards/zones/${id}`, {
-        method: "DELETE",
-      });
+    try {
+      for (const id of idsToDelete) {
+        const response = await fetch(`${API_BASE}/api/boards/zones/${id}`, {
+          method: "DELETE",
+        });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to delete zone ${id}: ${errorText}`);
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Failed to delete zone ${id}: ${errorText}`);
+        }
+
       }
 
+      setZones((prev) => prev.filter((z) => !idsToDelete.includes(z.id)));
+
+      if (idsToDelete.includes(selectedZoneId)) {
+        setSelectedZoneId(null);
+      }
+
+      alert(`Deleted zone${idsToDelete.length > 1 ? "s" : ""} successfully.`);
+    } catch (err) {
+      console.error("Error deleting zone(s):", err);
+      alert("Failed to delete zone(s). See console for details.");
     }
-
-    setZones((prev) => prev.filter((z) => !idsToDelete.includes(z.id)));
-
-    if (idsToDelete.includes(selectedZoneId)) {
-      setSelectedZoneId(null);
-    }
-
-    alert(`Deleted zone${idsToDelete.length > 1 ? "s" : ""} successfully.`);
-  } catch (err) {
-    console.error("Error deleting zone(s):", err);
-    alert("Failed to delete zone(s). See console for details.");
-  }
-};
+  };
 
 
 

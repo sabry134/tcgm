@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import CardFilter from './CardFilter';
-import CardPreview from './CardPreview';
-import CardList from './CardList';
-import DeckPreview from './DeckPreview';
-import { mockCards } from './mockData';
+import CardFilter from './Components/CardFilter';
+import CardPreview from './Components/CardPreview';
+import CardList from './Components/CardList';
+import DeckPreview from './Components/DeckPreview';
+import { mockCards } from './Components/mockData';
 import { JoinRoomNavigationBar } from "../NavigationBar/JoinRoomNavigationBar";
-import './styles.css';
+import './Components/styles.css';
 import { getCardsByGameWithPropertiesRequest } from '../Api/cardsRequest';
 import { saveCollectionWithCardsRequest, getCardsInCollectionRequest } from '../Api/collectionsRequest';
 import { getCardCardType } from '../Api/cardsRequest';
 import { getGroupsForCollectionType } from '../Api/gamesRequest';
 
-const Deckbuilder = () => {
+const DeckBuilder = () => {
   const [deck, setDeck] = useState({});
   const [deckGroups, setDeckGroups] = useState([]);
   const [allCards, setAllCards] = useState([]);
@@ -54,28 +54,28 @@ const Deckbuilder = () => {
       try {
         // Fetch cards with properties first (independent of deck initialization)
         await getCardsWithProperties();
-  
+
         // Fetch deck groups and initialize the deck
         const gameId = localStorage.getItem('gameSelected');
         const groupsResponse = await getGroupsForCollectionType(gameId, 'deck');
         setDeckGroups(groupsResponse);
-  
+
         const initialDeck = {};
         groupsResponse.forEach((group) => {
           initialDeck[group.name] = [];
         });
         setDeck(initialDeck);
-  
+
         // Fetch cards in the deck using the initialized deck structure
         await getCardsInDeck(initialDeck);
       } catch (error) {
         console.error('Error during deck initialization:', error);
       }
     }
-  
+
     initializeDeck();
   }, []);
-  
+
   const addCardToDeck = (card) => {
     getCardCardType(card.id).then((cardType) => {
       let groupName = '';
@@ -103,7 +103,7 @@ const Deckbuilder = () => {
       }
     });
   };
-  
+
   const removeSingleCard = (cardToRemove) => {
     getCardCardType(cardToRemove.id).then((cardType) => {
       let groupName = '';
@@ -132,7 +132,7 @@ const Deckbuilder = () => {
         return;
       }
     }
-  
+
     const formattedCards = [];
 
     Object.entries(deck).forEach(([groupName, cards]) => {
@@ -149,7 +149,7 @@ const Deckbuilder = () => {
         });
       }
     });
-  
+
     saveCollectionWithCardsRequest( localStorage.getItem("deckSelected"), { cards: formattedCards })
       .then((response) => {
         alert('Deck saved successfully!');
@@ -159,30 +159,30 @@ const Deckbuilder = () => {
         alert('Error saving deck!');
       });
   };
-  
+
 
   return (
-  <div className="deck-builder-container">
-    <JoinRoomNavigationBar />
-    <div className="deck-builder">
-      <CardFilter cards={allCards} onFilter={setFilteredCards} />
-      <CardPreview card={hoveredCard} />
-      
-      <div className="deck-content">
-        <CardList cards={filteredCards} addCardToDeck={addCardToDeck} setHoveredCard={setHoveredCard} />
-        <DeckPreview deck={deck} removeSingleCard={removeSingleCard} setHoveredCard={setHoveredCard} deckGroups={deckGroups} />
-      </div>
-      <div className="deck-save">
-        <button 
-          onClick={saveDeck}
-        >
-          💾 Save Deck
-        </button>
+    <div className="deck-builder-container">
+      <JoinRoomNavigationBar />
+      <div className="deck-builder">
+        <CardFilter cards={allCards} onFilter={setFilteredCards} />
+        <CardPreview card={hoveredCard} />
+
+        <div className="deck-content">
+          <CardList cards={filteredCards} addCardToDeck={addCardToDeck} setHoveredCard={setHoveredCard} />
+          <DeckPreview deck={deck} removeSingleCard={removeSingleCard} setHoveredCard={setHoveredCard} deckGroups={deckGroups} />
+        </div>
+        <div className="deck-save">
+          <button
+            onClick={saveDeck}
+          >
+            💾 Save Deck
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
 
 };
 
-export default Deckbuilder;
+export default DeckBuilder;

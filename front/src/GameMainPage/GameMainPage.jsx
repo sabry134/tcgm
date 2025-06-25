@@ -2,8 +2,8 @@ import { Box } from "@mui/material";
 import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { LeftPanel } from "./component/LeftPanel";
-import { RightPanel } from "./component/RightPanel";
+import { LeftPanel } from "./Component/LeftPanel";
+import { RightPanel } from "./Component/RightPanel";
 
 const GameMainPage = () => {
   const navigate = useNavigate(); // Initialize useNavigate hook

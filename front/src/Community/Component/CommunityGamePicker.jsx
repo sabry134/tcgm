@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Grid2, Box } from '@mui/material'
 import { GameBox } from './GameBox'
-import { getGamesRequest } from '../../../Api/gamesRequest'
+import { getGamesRequest } from '../../Api/gamesRequest'
 
 export class CommunityGamePicker extends Component {
   constructor (props) {

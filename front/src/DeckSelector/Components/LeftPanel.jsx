@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { TCGMButton } from '../../Components/RawComponents/TCGMButton'
+import { SidePanel } from "../../Components/RawComponents/SidePanel";
 
 export class LeftPanel extends Component {
   constructor(props) {
@@ -63,10 +64,14 @@ export class LeftPanel extends Component {
 
   render() {
     return (
-      <TCGMButton
-        onClick={this.popupCallback}
-        text="Create Deck"
-      />
+      <SidePanel>
+
+        <TCGMButton
+          onClick={this.popupCallback}
+          text="Create Deck"
+        />
+
+      </SidePanel>
     )
   }
 }

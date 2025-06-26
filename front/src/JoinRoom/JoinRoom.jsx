@@ -1,18 +1,10 @@
-import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Box,
-  Tabs,
-  Tab,
-  TextField,
-  Stack,
-  Snackbar,
-  Alert
-} from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Alert, Box, Button, Snackbar, Stack, Tab, Tabs, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { createRoomRequest, joinRoomRequest } from "../Api/roomRequest";
 import { JoinRoomNavigationBar } from "../NavigationBar/JoinRoomNavigationBar";
 import { useChannel } from "../ChannelContext";
+import { ROUTES } from "../Routes/routes";
 
 const JoinRoom = () => {
   const navigate = useNavigate();
@@ -94,7 +86,7 @@ const JoinRoom = () => {
         localStorage.setItem("room_id", room_id);
         localStorage.setItem("player_id", username);
         localStorage.setItem("playerUsername", username);
-        navigate("/lobby");
+        navigate(ROUTES.LOBBY);
       } catch (error) {
         console.error("Join room failed with username", username, error);
         const currentCounter = parseInt(localStorage.getItem("playerCounter") || "1", 10);
@@ -106,7 +98,7 @@ const JoinRoom = () => {
           const data = await joinRoomFetch(newUsername, room_id);
           localStorage.setItem("player_id", data.player_id);
           localStorage.setItem("room_id", roomId);
-          navigate("/lobby");
+          navigate(ROUTES.LOBBY);
         } catch (err) {
           console.error("Retry join room failed with username", newUsername, err);
           throw err;
@@ -118,7 +110,6 @@ const JoinRoom = () => {
       setSnackbarOpen(true);
     }
   };
-
 
   const createRoom = async (navigate) => {
     try {
@@ -138,7 +129,7 @@ const JoinRoom = () => {
   return (
     <Box display="flex" flexDirection="column" height="100vh">
 
-      <JoinRoomNavigationBar />
+      <JoinRoomNavigationBar/>
 
       <Box sx={styles.container}>
         <Box sx={styles.contentBox}>
@@ -148,8 +139,8 @@ const JoinRoom = () => {
             textColor="inherit"
             indicatorColor="secondary"
           >
-            <Tab label="Join Room" />
-            <Tab label="Create Room" />
+            <Tab label="Join Room"/>
+            <Tab label="Create Room"/>
           </Tabs>
           {tabIndex === 0 ? (
             <Box sx={styles.formBox}>

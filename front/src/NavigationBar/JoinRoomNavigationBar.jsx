@@ -4,6 +4,7 @@ import { Home } from '@mui/icons-material'
 import { NavbarButton, NavbarSmallButton } from './Components/navbarButton'
 import { Box } from '@mui/material'
 import { useChannel } from '../ChannelContext'
+import { ROUTES } from "../Routes/routes";
 
 export const JoinRoomNavigationBar = () => {
   const navigate = useNavigate()
@@ -11,7 +12,7 @@ export const JoinRoomNavigationBar = () => {
 
   const returnHome = () => {
     resetConnection()
-    navigate('/')
+    navigate(ROUTES.HOME)
   }
 
   return (
@@ -30,12 +31,12 @@ export const JoinRoomNavigationBar = () => {
         svgComponent={Home}
       />
       <NavbarButton
-        event={() => navigate('/join')}
+        event={() => navigate(ROUTES.JOIN)}
         altText={'Join a game'}
         buttonText={'Join room'}
       />
       <NavbarButton
-        event={() => navigate('/select-deck')}
+        event={() => navigate(ROUTES.SELECT_DECK)}
         altText={'Edit your deck'}
         buttonText={'Edit deck'}
       />

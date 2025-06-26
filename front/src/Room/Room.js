@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { callDrawCard, callMoveCard } from "../game_commands";
 import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
@@ -6,6 +6,7 @@ import "./Room.css";
 import { DndContext } from "@dnd-kit/core";
 import { useChannel } from "../ChannelContext";
 import CardZone from "./Componnent/CardZone";
+import { ROUTES } from "../Routes/routes";
 
 const API_BASE = "http://localhost:4000";
 
@@ -27,14 +28,14 @@ const Room = () => {
 
     if (!channel) {
       console.error("No Channel Found");
-      navigate("/join");
+      navigate(ROUTES.JOIN);
       return;
     }
 
     const storedPlayerId = localStorage.getItem("playerUsername");
     if (!storedPlayerId) {
       console.error("No player ID found");
-      navigate("/join");
+      navigate(ROUTES.JOIN);
       return;
     }
 
@@ -113,7 +114,7 @@ const Room = () => {
           overflow: "hidden",
         }}
       >
-        <RoomNavigationBar roomId={gameState.id} />
+        <RoomNavigationBar roomId={gameState.id}/>
 
         {zones.map((zone) => (
           <div
@@ -181,7 +182,7 @@ export default Room;
 //       return
 //     if (!channel) {
 //       console.error("No Channel Found");
-//       navigate("/join");
+//       navigate(ROUTES.JOIN);
 //       return;
 //     }
 
@@ -189,7 +190,7 @@ export default Room;
 //     const storedPlayerId = localStorage.getItem("playerUsername");
 //     if (!storedPlayerId) {
 //       console.error("No player ID found");
-//       navigate("/join");
+//       navigate(ROUTES.JOIN);
 //       return;
 //     }
 //     setPlayerId(storedPlayerId);

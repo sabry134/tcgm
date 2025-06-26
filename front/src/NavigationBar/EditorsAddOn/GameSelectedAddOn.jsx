@@ -15,27 +15,14 @@ export const GameSelectedAddOn = ({ toggleDisplay }) => {
   return (
     <>
       <NavbarSmallButton
-        event={ unselectGame }
-        altText={ "Unselect the game" }
-        svgComponent={ Close }
+        event={unselectGame}
+        altText={"Unselect the game"}
+        svgComponent={Close}
       />
       <NavbarButton
-        event={ toggleDisplay }
-        altText={ 'Edit the cards' }
-        buttonText={ "Editor" }
-      >
-      </NavbarButton>
-      <NavbarButton
-        event={() => navigate('/templates')}
-        altText={ 'Edit the templates' }
-        buttonText={ "Templates" }
-      >
-      </NavbarButton>
-      <NavbarButton
-        event={() => console.log('game settings')}
-        altText={ 'Edit the game settings' }
-        buttonText={ "Game Settings" }
-        disabled={ true }
+        event={toggleDisplay}
+        altText={'Edit the cards'}
+        buttonText={"Editor"}
       >
       </NavbarButton>
     </>

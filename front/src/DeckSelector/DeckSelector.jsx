@@ -27,13 +27,12 @@ const DeckSelector = () => {
     <Box display="flex" flexDirection="column" height="100vh">
       <JoinRoomNavigationBar navigate={navigate}/>
 
-      <Box display="flex" flexGrow={1} bgcolor="#fff">
+      <Box display="flex" flexGrow={1} bgcolor="#c4c4c4">
         <LeftPanel popupCallback={openPopup} />
         <Box
           ref={spanRef}
           className="main-area"
           flexGrow={1}
-          bgcolor="#c4c4c4"
           position="relative"
         >
           <Popup
@@ -47,8 +46,6 @@ const DeckSelector = () => {
           />
           <DeckPicker />
         </Box>
-
-        <RightPanel />
       </Box>
     </Box>
   );

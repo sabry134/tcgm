@@ -14,10 +14,9 @@ export const ListEditorsAddOn = ({ toggleDisplay }) => {
         svgComponent={ArrowBack}
       />
       <NavbarButton
-        event={() => console.log('Board Editor')}
+        event={() => navigate('/board-editor')}
         altText={'Edit boards'}
         buttonText={'Board Editor'}
-        disabled={true}
       />
       <NavbarButton
         event={() => console.log('Gameplay Editor')}

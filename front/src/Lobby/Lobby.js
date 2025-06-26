@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useChannel } from "../ChannelContext"; // Import the context hook
 import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
 import { TCGMButton } from "../Components/RawComponents/TCGMButton";
+import { ROUTES } from "../Routes/routes";
 
 const Lobby = () => {
   const navigate = useNavigate();
@@ -93,7 +94,7 @@ const Lobby = () => {
 
     if (!roomId) {
       console.error("No room_id found in localStorage");
-      navigate("/join");
+      navigate(ROUTES.JOIN);
       return;
     }
 
@@ -149,12 +150,12 @@ const Lobby = () => {
   }
 
   const handleLaunch = () => {
-    navigate("/room");
+    navigate(ROUTES.ROOM);
   }
 
   const handleLeave = () => {
     resetConnection();
-    navigate("/join");
+    navigate(ROUTES.JOIN);
   }
 
   const handleSetDeck = () => {

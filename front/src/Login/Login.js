@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Button, Typography, Box, Tabs, Tab, TextField } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Box, Button, Tab, Tabs, TextField, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../Routes/routes";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -48,27 +49,22 @@ const Login = () => {
   return (
     <Box display="flex" flexDirection="column" height="100vh">
       <Box sx={styles.navbar}>
-        <Button onClick={() => navigate("/")} sx={styles.navButton}>
+        <Button onClick={() => navigate(ROUTES.HOME)} sx={styles.navButton}>
           <Typography variant="h6" sx={styles.navText}>
-            🌟 Home
+            Home
           </Typography>
         </Button>
         <Button
-          onClick={() => navigate("/documentation")}
+          onClick={() => navigate(ROUTES.TYPE_EDITOR)}
           sx={styles.navButton}
         >
           <Typography variant="h6" sx={styles.navText}>
-            📜 Documentation
+            Type Editor
           </Typography>
         </Button>
-        <Button onClick={() => navigate("/forum")} sx={styles.navButton}>
+        <Button onClick={() => navigate(ROUTES.CARD_EDITOR)} sx={styles.navButton}>
           <Typography variant="h6" sx={styles.navText}>
-            🖼️ Forum
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/community")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🌍 Community
+            Card Editor
           </Typography>
         </Button>
       </Box>
@@ -81,8 +77,8 @@ const Login = () => {
             indicatorColor="secondary"
             sx={styles.tabs}
           >
-            <Tab label="Login" />
-            <Tab label="Register" />
+            <Tab label="Login"/>
+            <Tab label="Register"/>
           </Tabs>
 
           {tabIndex === 0 ? (

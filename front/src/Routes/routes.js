@@ -5,7 +5,6 @@ export const ROUTES = {
   CARD_EDITOR: "/card-editor",
   TYPE_EDITOR: "/type-editor",
   BOARD_EDITOR: "/board-editor",
-  TEMPLATES: "/templates",
 
   JOIN: "/join",
   SELECT_DECK: "/select-deck",

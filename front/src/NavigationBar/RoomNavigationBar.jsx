@@ -1,20 +1,54 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Home, Chat as ChatIcon } from '@mui/icons-material'
 import { NavbarButton, NavbarSmallButton } from './Components/navbarButton'
 import { Box, Button, Popover, TextField, Typography } from '@mui/material'
 import LinkIcon from '@mui/icons-material/Link'
-import GameChat from '../Room/Componnent/GameChat'
 
 export const RoomNavigationBar = ({ roomId }) => {
   const navigate = useNavigate()
-
   const username = localStorage.getItem('playerUsername') || 'Unknown'
+  const playerId = localStorage.getItem('playerId') || 'anonymous'
 
-  // Store roomId in localStorage when component mounts or roomId changes
+  const socketRef = useRef(null)
+
   useEffect(() => {
-    if (roomId) {
-      localStorage.setItem('room_id', roomId)
+    const socket = new WebSocket('ws://localhost:4000/socket')
+    socketRef.current = socket
+
+    const joinPayload = {
+      topic: `room:${roomId}`,
+      event: 'phx_join',
+      payload: {},
+      ref: '1'
+    }
+
+    socket.onopen = () => {
+      socket.send(JSON.stringify(joinPayload))
+
+      socket.send(JSON.stringify({
+        topic: `room:${roomId}`,
+        event: 'get_chat',
+        payload: {},
+        ref: '2'
+      }))
+    }
+
+    socket.onmessage = event => {
+      const data = JSON.parse(event.data)
+
+      if (data.event === 'chat_update') {
+        const chat = data.payload.chat || []
+        setMessages(chat)
+      }
+    }
+
+    socket.onerror = err => {
+      console.error('WebSocket error:', err)
+    }
+
+    return () => {
+      socket.close()
     }
   }, [roomId])
 
@@ -30,22 +64,13 @@ export const RoomNavigationBar = ({ roomId }) => {
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState([])
 
-  const handleIconClick = event => {
-    setAnchorEl(event.currentTarget)
-  }
-
-  const handleChatClick = event => {
-    setChatAnchorEl(event.currentTarget)
-  }
-
+  const handleIconClick = event => setAnchorEl(event.currentTarget)
+  const handleChatClick = event => setChatAnchorEl(event.currentTarget)
   const handleClose = () => {
     setAnchorEl(null)
     setCopyButtonText('Copy')
   }
-
-  const handleChatClose = () => {
-    setChatAnchorEl(null)
-  }
+  const handleChatClose = () => setChatAnchorEl(null)
 
   const handleCopy = () => {
     navigator.clipboard
@@ -63,8 +88,19 @@ export const RoomNavigationBar = ({ roomId }) => {
   }
 
   const handleSendMessage = () => {
-    if (message.trim() === '') return
-    setMessages([...messages, message])
+    if (!message.trim() || !socketRef.current) return
+
+    const payload = {
+      topic: `room:${roomId}`,
+      event: 'add_chat_message',
+      payload: {
+        player_id: playerId,
+        message: message.trim()
+      },
+      ref: `${Date.now()}`
+    }
+
+    socketRef.current.send(JSON.stringify(payload))
     setMessage('')
   }
 
@@ -189,7 +225,7 @@ export const RoomNavigationBar = ({ roomId }) => {
               key={index}
               sx={{ color: 'white', marginBottom: '8px' }}
             >
-              {username}: {msg}
+              {msg.username || 'Player'}: {msg.message}
             </Typography>
           ))}
         </Box>

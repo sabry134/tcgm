@@ -26,7 +26,8 @@ export class BaseTopBar extends Component {
           bgcolor: 'primary.dark',
           p: 2,
           display: 'flex',
-          justifyContent: 'space-around',
+          justifyContent: 'center',
+          gap: 2,
           height: theme => theme.spacing(4),
         }}
       >

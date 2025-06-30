@@ -5,7 +5,7 @@ import { JoinRoomNavigationBar } from "../NavigationBar/JoinRoomNavigationBar";
 import { LeftPanel } from "./Components/LeftPanel";
 import { RightPanel } from "./Components/RightPanel";
 import { DeckPicker } from "./Components/DeckPicker";
-import { Popup } from "../Components/Popup/Popup";
+import { TCGMPopup } from "../Components/RawComponents/TCGMPopup";
 
 const DeckSelector = () => {
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ const DeckSelector = () => {
           flexGrow={1}
           position="relative"
         >
-          <Popup
+          <TCGMPopup
             id={id}
             open={open}
             anchorEl={anchor}

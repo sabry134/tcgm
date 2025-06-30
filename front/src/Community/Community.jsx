@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Typography } from "@mui/material";
 import { CommunityGamePicker } from "./Component/CommunityGamePicker";
-import { Popup } from "../Components/Popup/Popup";
+import { TCGMPopup } from "../Components/RawComponents/TCGMPopup";
 import { createGameRequest, getGameRequest } from "../Api/gamesRequest";
 import { TCGMButton } from "../Components/RawComponents/TCGMButton";
 import { BaseLayout } from "../Components/Layouts/BaseLayout";
@@ -60,7 +60,7 @@ const Community = () => {
 
       centerPanel={
         <>
-          <Popup
+          <TCGMPopup
             id={id}
             open={open}
             anchorEl={anchor}

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Box, Stack } from "@mui/material";
-import { SidePanel } from "../RawComponents/SidePanel";
+import { SidePanel } from "./SidePanel";
 import { BaseTopBar } from "../TopBar/BaseTopBar";
 
 type Props = {
@@ -15,7 +15,7 @@ type Props = {
  * BaseLayout component for displaying the default layout of the application
  * It wraps the topBar, leftPanel, centerPanel and rightPanel
  * @param {Object} props - The properties passed to the component
- * @param {React.RefObject<HTMLSpanElement>} [props.spanRef] - Optional reference used with the Popup component
+ * @param {React.RefObject<HTMLSpanElement>} [props.spanRef] - Optional reference used with the TCGMPopup component
  * @param {React.ReactNode} props.topBar - The top bar component
  * @param {React.ReactNode} [props.leftPanel] - The components to be displayed in the left panel (optional)
  * @param {React.ReactNode} [props.centerPanel] - The components to be displayed in the center panel (optional)

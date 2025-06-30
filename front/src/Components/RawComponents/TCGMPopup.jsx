@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import styles from './Popup.module.css'
+import styles from './TCGMPopup.module.css'
 import { Box, Button, Popper, Stack, Typography } from "@mui/material";
-import { FormInput } from "../RawComponents/FormInput";
+import { TCGMInputField } from "./TCGMInputField";
 
 /**
  * Popup component for displaying a modal dialog with input fields and buttons.
@@ -15,9 +15,9 @@ import { FormInput } from "../RawComponents/FormInput";
  * @param {string} props.title - Title of the popup.
  * @param {Array} props.inputName - Array of input field names.
  *
- * @returns {JSX.Element} The rendered Popup component.
+ * @returns {JSX.Element} The rendered TCGMPopup component.
  * @example
- * <Popup
+ * <TCGMPopup
  *  closeCallback={handleClose}
  *  receivedCallback={handleReceived}
  *  title="My Popup"
@@ -28,7 +28,7 @@ import { FormInput } from "../RawComponents/FormInput";
  * />
  */
 
-export class Popup extends Component {
+export class TCGMPopup extends Component {
   constructor(props) {
     super();
     this.closeCallback = props.closeCallback;
@@ -107,7 +107,7 @@ export class Popup extends Component {
                 }}
               >
                 {this.nameList.map((name, index) => (
-                  <FormInput
+                  <TCGMInputField
                     key={index}
                     label={name}
                     onChange={event => this.onChangeInput(event, index)}

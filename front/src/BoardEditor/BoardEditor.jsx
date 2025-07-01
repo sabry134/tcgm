@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Button, Typography, Box, TextField } from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
+import { Box, Button, TextField, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import debounce from "lodash/debounce";
+import { ROUTES } from "../Routes/routes";
 
 const styles = {
   navbar: {
@@ -52,15 +53,6 @@ const BoardEditor = () => {
   );
 
   const isSyncing = useRef(false);
-
-
-
-
-
-
-
-
-
 
   const handleSaveClick = async () => {
     try {
@@ -162,10 +154,6 @@ const BoardEditor = () => {
   };
 
 
-
-
-
-
   const selectedZone = zones.find((z) => z.id === selectedZoneId);
 
   useEffect(() => {
@@ -213,9 +201,6 @@ const BoardEditor = () => {
   }, [selectedZone]);
 
 
-
-
-
   useEffect(() => {
     const fetchBoardWithZones = async () => {
       const boardId = localStorage.getItem("boardSelected");
@@ -254,8 +239,6 @@ const BoardEditor = () => {
 
     fetchBoardWithZones();
   }, []);
-
-
 
 
   useEffect(() => {
@@ -392,7 +375,6 @@ const BoardEditor = () => {
   };
 
 
-
   const updateSymmetric = (id, newProps) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -442,8 +424,6 @@ const BoardEditor = () => {
       });
     });
   };
-
-
 
 
   const handleInputChange = (field, value) => {
@@ -565,8 +545,6 @@ const BoardEditor = () => {
   };
 
 
-
-
   const handleBackgroundUpload = (e) => {
     if (!e.target.files.length) return;
     const file = e.target.files[0];
@@ -574,7 +552,6 @@ const BoardEditor = () => {
     setTableBackground(url);
     setBoard((b) => ({ ...b, background_image: url }));
   };
-
 
 
   return (
@@ -590,7 +567,7 @@ const BoardEditor = () => {
               tableBackground,
               board,
             });
-            navigate("/");
+            navigate(ROUTES.HOME);
           }}
         >
           Close
@@ -654,7 +631,7 @@ const BoardEditor = () => {
         <Box sx={{ width: 300, p: 2, backgroundColor: "#222", color: "#fff" }}>
           <Button variant="outlined" component="label" fullWidth>
             Upload Table Background
-            <input type="file" accept="image/*" hidden onChange={handleBackgroundUpload} />
+            <input type="file" accept="image/*" hidden onChange={handleBackgroundUpload}/>
           </Button>
 
           <Button

@@ -66,9 +66,10 @@ const onClickCreate = (data) => {
 
         <SidePanel>
 
-          <TCGMButton onClick={openPopup}>
-            Create Game
-          </TCGMButton>
+          <TCGMButton
+            onClick={openPopup}
+            text={"Create Game"}
+          />
 
         </SidePanel>
 
@@ -94,8 +95,6 @@ const onClickCreate = (data) => {
           <CommunityGamePicker/>
 
         </Box>
-
-        <SidePanel/>
 
       </Stack>
     </Box>

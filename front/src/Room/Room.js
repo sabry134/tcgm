@@ -18,6 +18,7 @@ const Room = () => {
   const [playerId, setPlayerId] = useState("");
   const [zones, setZones] = useState([]);
   const [tableBackground, setTableBackground] = useState(null);
+  const roomId = localStorage.getItem("room_id");
 
   const cardBackImage =
     "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Card_back_06.svg/1200px-Card_back_06.svg.png";
@@ -25,8 +26,8 @@ const Room = () => {
   useEffect(() => {
     if (connectionRef.current.isMounted) return;
 
-    if (!channel) {
-      console.error("No Channel Found");
+    if (!roomId) {
+      console.error("No Room found");
       navigate("/join");
       return;
     }

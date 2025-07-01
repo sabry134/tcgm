@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { callDrawCard, callMoveCard } from "../game_commands";
 import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
@@ -6,7 +6,6 @@ import "./Room.css";
 import { DndContext } from "@dnd-kit/core";
 import { useChannel } from "../ChannelContext";
 import CardZone from "./Componnent/CardZone";
-import { ROUTES } from "../Routes/routes";
 
 const API_BASE = "http://localhost:4000";
 
@@ -19,6 +18,7 @@ const Room = () => {
   const [playerId, setPlayerId] = useState("");
   const [zones, setZones] = useState([]);
   const [tableBackground, setTableBackground] = useState(null);
+  const roomId = localStorage.getItem("room_id");
 
   const cardBackImage =
     "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Card_back_06.svg/1200px-Card_back_06.svg.png";
@@ -26,16 +26,16 @@ const Room = () => {
   useEffect(() => {
     if (connectionRef.current.isMounted) return;
 
-    if (!channel) {
-      console.error("No Channel Found");
-      navigate(ROUTES.JOIN);
+    if (!roomId) {
+      console.error("No Room found");
+      navigate("/join");
       return;
     }
 
     const storedPlayerId = localStorage.getItem("playerUsername");
     if (!storedPlayerId) {
       console.error("No player ID found");
-      navigate(ROUTES.JOIN);
+      navigate("/join");
       return;
     }
 
@@ -114,7 +114,7 @@ const Room = () => {
           overflow: "hidden",
         }}
       >
-        <RoomNavigationBar roomId={gameState.id}/>
+        <RoomNavigationBar roomId={gameState.id} />
 
         {zones.map((zone) => (
           <div
@@ -182,7 +182,7 @@ export default Room;
 //       return
 //     if (!channel) {
 //       console.error("No Channel Found");
-//       navigate(ROUTES.JOIN);
+//       navigate("/join");
 //       return;
 //     }
 
@@ -190,7 +190,7 @@ export default Room;
 //     const storedPlayerId = localStorage.getItem("playerUsername");
 //     if (!storedPlayerId) {
 //       console.error("No player ID found");
-//       navigate(ROUTES.JOIN);
+//       navigate("/join");
 //       return;
 //     }
 //     setPlayerId(storedPlayerId);

@@ -33,7 +33,7 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     state_after = GameServer.get_state(room_id)
     refute Map.has_key?(state_after.players, "player1")
   end
-  
+
   test "multiple players can join room channel", %{socket: socket, socket2: socket2, room_id: room_id} do
     {:ok, _, socket} = subscribe_and_join(socket, GameChannel, "room:" <> room_id, %{})
     assert socket.assigns.room_id == room_id
@@ -283,5 +283,46 @@ defmodule TcgmWebAppWeb.GameChannelTest do
       end)
 
     assert changed
+  end
+
+  test "get_chat retrieves the chat messages", %{socket: socket, room_id: room_id} do
+    {:ok, _, socket} = subscribe_and_join(socket, GameChannel, "room:" <> room_id, %{})
+    # Add some chat messages to the room
+    TcgmWebApp.Game.GameServer.add_chat_message(room_id, "player1", "Hello!")
+    TcgmWebApp.Game.GameServer.add_chat_message(room_id, "player2", "Hi there!")
+
+    # Push the "get_chat" event
+    push(socket, "get_chat", %{})
+
+    # Assert that the chat messages are pushed to the socket
+    assert_push("chat_update", %{chat: chat})
+    assert Enum.any?(chat, fn msg -> msg[:player_id] == "player1" and msg[:message] == "Hello!" and Map.has_key?(msg, :timestamp) end)
+    assert Enum.any?(chat, fn msg -> msg[:player_id] == "player2" and msg[:message] == "Hi there!" and Map.has_key?(msg, :timestamp) end)
+  end
+
+  test "add_chat_message broadcasts the updated chat", %{socket: socket, room_id: room_id} do
+    {:ok, _, socket} = subscribe_and_join(socket, GameChannel, "room:" <> room_id, %{})
+
+    # Push the "add_chat_message" event
+    push(socket, "add_chat_message", %{"player_id" => "player1", "message" => "Hello!"})
+
+    # Assert that the updated chat is broadcasted
+    assert_broadcast("chat_update", %{chat: chat})
+    assert Enum.any?(chat, fn msg ->
+      msg[:player_id] == "player1" and
+      msg[:message] == "Hello!" and
+      Map.has_key?(msg, :timestamp)
+    end)
+
+    # Add another message
+    push(socket, "add_chat_message", %{"player_id" => "player2", "message" => "Hi there!"})
+
+    # Assert that the updated chat is broadcasted again
+    assert_broadcast("chat_update", %{chat: chat})
+    assert Enum.any?(chat, fn msg ->
+      msg[:player_id] == "player2" and
+      msg[:message] == "Hi there!" and
+      Map.has_key?(msg, :timestamp)
+    end)
   end
 end

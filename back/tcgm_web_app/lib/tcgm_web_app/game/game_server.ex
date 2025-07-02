@@ -287,7 +287,9 @@ defmodule TcgmWebApp.Game.GameServer do
   end
 
   def handle_cast({:add_chat_message, player_id, message}, state) do
-    new_chat = [%{player_id: player_id, message: message} | state.chat]
+    timestamp = DateTime.utc_now() |> DateTime.to_iso8601()
+    message = %{timestamp: timestamp, player_id: player_id, message: message}
+    new_chat = [message | state.chat]
     new_state = %{state | chat: new_chat}
     {:noreply, new_state}
   end

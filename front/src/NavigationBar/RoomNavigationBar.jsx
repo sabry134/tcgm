@@ -26,7 +26,6 @@ export const RoomNavigationBar = ({ roomId }) => {
   const openChat = Boolean(chatAnchorEl)
   const chatPopoverId = openChat ? 'chat-popover' : undefined
 
-  // Scroll to bottom on new messages
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
@@ -39,21 +38,33 @@ export const RoomNavigationBar = ({ roomId }) => {
     let socketURL = process.env.REACT_WS_URL
     if (!socketURL) socketURL = 'ws://localhost:4000/socket'
 
-    const socket = new Socket(socketURL)
+    const socket = new Socket(socketURL, {
+      logger: (kind, msg, data) => window.console.log('[PHX]', kind, msg, data),
+    })
     socket.connect()
     socketRef.current = socket
 
     const channel = socket.channel(`room:${roomId}`, {})
+    window.console.log('[DEBUG] Connecting to channel room:', roomId)
 
     channel.join()
       .receive('ok', () => {
+        window.console.log('[DEBUG] Joined channel successfully')
         channelRef.current = channel
+        window.console.log('[DEBUG] Pushing get_chat')
         channel.push('get_chat', {})
       })
-      .receive('error', () => {})
+      .receive('error', err => {
+        window.console.error('[DEBUG] Failed to join channel:', err)
+      })
 
     channel.on('chat_update', payload => {
+      window.console.log('[DEBUG EVENT] chat_update full payload:', payload.chat)
       setMessages(payload.chat || [])
+    })
+
+    channel.on('get_message', payload => {
+      window.console.log('[DEBUG EVENT] get_message payload:', payload)
     })
 
     return () => {
@@ -66,11 +77,16 @@ export const RoomNavigationBar = ({ roomId }) => {
     if (!message.trim() || !channelRef.current) return
 
     const payload = { player_id: playerId, message: message.trim() }
+    window.console.log('[DEBUG] Sending message payload:', payload)
+
     channelRef.current.push('add_chat_message', payload)
       .receive('ok', () => {
+        window.console.log('[DEBUG] Message sent OK')
         if (messagesEndRef.current) messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
       })
-      .receive('error', () => {})
+      .receive('error', err => {
+        window.console.error('[DEBUG] Send error:', err)
+      })
 
     setMessage('')
   }
@@ -81,12 +97,21 @@ export const RoomNavigationBar = ({ roomId }) => {
   const handleChatClose = () => setChatAnchorEl(null)
 
   const handleCopy = () => {
+    window.console.log('[DEBUG] Copying roomId:', roomId)
     navigator.clipboard.writeText(roomId)
-      .then(() => { setCopyButtonText('Copied'); setTimeout(() => setCopyButtonText('Copy'), 2000) })
-      .catch(() => {})
+      .then(() => {
+        setCopyButtonText('Copied')
+        setTimeout(() => setCopyButtonText('Copy'), 2000)
+      })
+      .catch(err => {
+        window.console.error('[DEBUG] Copy failed:', err)
+      })
   }
 
-  const returnHome = () => { localStorage.removeItem('room_id'); navigate('/') }
+  const returnHome = () => {
+    localStorage.removeItem('room_id')
+    navigate('/')
+  }
 
   return (
     <>

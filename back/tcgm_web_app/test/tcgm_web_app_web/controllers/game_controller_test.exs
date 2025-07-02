@@ -21,7 +21,7 @@ defmodule TcgmWebAppWeb.GameControllerTest do
     |> Repo.insert!()
 
     user = %User{}
-    |> User.changeset(%{ username: "testuser"})
+    |> User.changeset(%{ username: "testuser", password: "jd", email: "john.doe@gmail.com"})
     |> Repo.insert!()
 
     userGameRole = %UserGameRole{}

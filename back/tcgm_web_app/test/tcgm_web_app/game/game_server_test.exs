@@ -283,13 +283,13 @@ defmodule TcgmWebApp.Game.GameServerTest do
 
     new_state = GameServer.get_state(room_id)
     assert length(new_state.chat) == 2
-    assert Enum.any?(new_state.chat, fn msg -> msg[:player_id] == "player1" and msg[:message] == "Hello, world!" end)
-    assert Enum.any?(new_state.chat, fn msg -> msg[:player_id] == "player2" and msg[:message] == "Hi there!" end)
+    assert Enum.any?(new_state.chat, fn msg -> msg[:player_id] == "player1" and msg[:message] == "Hello, world!" and Map.has_key?(msg, :timestamp) end)
+    assert Enum.any?(new_state.chat, fn msg -> msg[:player_id] == "player2" and msg[:message] == "Hi there!" and Map.has_key?(msg, :timestamp) end)
 
     chat = GameServer.get_chat(room_id)
 
     assert length(chat) == 2
-    assert Enum.any?(chat, fn msg -> msg[:player_id] == "player1" and msg[:message] == "Hello, world!" end)
-    assert Enum.any?(chat, fn msg -> msg[:player_id] == "player2" and msg[:message] == "Hi there!" end)
+    assert Enum.any?(chat, fn msg -> msg[:player_id] == "player1" and msg[:message] == "Hello, world!" and Map.has_key?(msg, :timestamp) end)
+    assert Enum.any?(chat, fn msg -> msg[:player_id] == "player2" and msg[:message] == "Hi there!" and Map.has_key?(msg, :timestamp) end)
   end
 end

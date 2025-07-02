@@ -26,7 +26,7 @@ defmodule TcgmWebApp.Game.SetDeckByIdTest do
     |> Repo.insert!()
 
     user = %User{}
-    |> User.changeset(%{ username: "username"})
+    |> User.changeset(%{ username: "username", password: "jd", email: "john.doe@gmail.com"})
     |> Repo.insert!()
 
     cardType = %CardType{}
@@ -107,7 +107,7 @@ defmodule TcgmWebApp.Game.SetDeckByIdTest do
     :ok = GameServer.set_deck_by_id(room_id, "player1", card_collection.id)
 
     updated_state = GameServer.get_state(room_id)
-    
+
     assert length(updated_state.players["player1"]["deck"]) == 2
     assert length(updated_state.players["player1"]["caster"]) == 1
   end

@@ -17,7 +17,7 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
     |> Repo.insert!()
 
     user = %User{}
-    |> User.changeset(%{ username: "username"})
+    |> User.changeset(%{ username: "username", password: "jd", email: "john.doe@gmail.com"})
     |> Repo.insert!()
 
     cardType = %CardType{}

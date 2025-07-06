@@ -1,7 +1,7 @@
 defmodule TcgmWebApp.Rules.Rules do
   alias TcgmWebApp.Rules.Rule
   alias TcgmWebApp.Repo
-
+  import Ecto.Query, warn: false
   @moduledoc """
     This module is responsible for handling rules.
   """
@@ -50,5 +50,16 @@ defmodule TcgmWebApp.Rules.Rules do
     rule
     |> Rule.changeset(attrs)
     |> Repo.update()
+  end
+
+  @doc """
+    Retrieves a rule by it's game rule id.
+  """
+  def get_rule_by_game_rule_id(game_rule_id) do
+    from(r in Rule,
+      where: r.game_rule_id == ^game_rule_id,
+      select: r
+    )
+    |> Repo.all()
   end
 end

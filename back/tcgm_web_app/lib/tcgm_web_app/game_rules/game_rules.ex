@@ -55,7 +55,7 @@ defmodule TcgmWebApp.GameRules.GameRules do
   @doc """
     Retrieves a game rule by it's game id.
   """
-  def get_game_rule_by_game_id(game_id) do
+  def get_game_rules_by_game_id(game_id) do
     from(gr in GameRule,
       where: gr.game_id == ^game_id,
       select: gr

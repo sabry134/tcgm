@@ -55,7 +55,7 @@ defmodule TcgmWebApp.PlayerProperties.PlayerProperties do
   @doc """
     Retrieves a player property by it's game_rule id.
   """
-  def get_player_properties_by_rule_id(game_rule_id) do
+  def get_player_properties_by_game_rule_id(game_rule_id) do
     from(pp in PlayerProperty,
       where: pp.game_rule_id == ^game_rule_id,
       select: pp

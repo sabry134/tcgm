@@ -3,7 +3,7 @@ defmodule :"Elixir.TcgmWebApp.Repo.Migrations.Create rules table" do
 
   def change do
     create table(:rules) do
-      add :game_rule_id, references(:game_rules, on_delete: :delete_all),
+      add :game_rule_id, references(:game_rules, on_delete: :delete_all)
       add :rule_name, :string
       add :value, :integer
       timestamps()

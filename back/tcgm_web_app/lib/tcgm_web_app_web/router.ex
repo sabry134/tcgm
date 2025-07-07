@@ -81,6 +81,18 @@ defmodule TcgmWebAppWeb.Router do
     post "/rooms/:room_id/join", RoomController, :join
     post "/rooms/leave", RoomController, :leave
 
+    resources "/rules", RuleController, only: [:index, :show, :create, :update]
+    delete "/rules/delete/:rule_id", RuleController, :delete_rule
+    get "/rules/rule/:game_rule_id", RuleController, :get_rules_by_game_rule_id
+
+    resources "/playerProperties", PlayerPropertyController, only: [:index, :show, :create, :update]
+    delete "/playerProperties/delete/:player_property_id", PlayerPropertyController, :delete_player_property
+    get "/playerProperties/playerProperty/:game_rule_id", PlayerPropertyController, :get_player_properties_by_game_rule_id
+
+    resources "/gameRules", GameRuleController, only: [:index, :show, :create, :update]
+    delete "/gameRules/delete/:game_rule_id", GameRuleController, :delete_game_rule
+    get "/gameRules/gameRule/:game_id", GameRuleController, :get_game_rules_by_game_id
+
     get "/hello", HelloController, :index
   end
 

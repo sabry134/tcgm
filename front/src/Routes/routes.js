@@ -14,4 +14,5 @@ export const ROUTES = {
   ROOM: "/room",
   LOGIN: "/login",
   HELP_GAME: "/help-game",
+  RULE_EDITOR: "/rule-editor",
 }

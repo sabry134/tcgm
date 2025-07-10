@@ -6,9 +6,12 @@ import {
   Typography,
   Card,
   CardContent,
+  IconButton,
 } from "@mui/material";
 import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../Routes/routes";
 
@@ -27,33 +30,74 @@ const styles = {
   navText: { color: "white", fontSize: "1.25rem", userSelect: "none" },
 };
 
+const toTitleCase = (str) =>
+  str
+    .replace(/_/g, " ")
+    .replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+
 const RuleEditor = () => {
   const navigate = useNavigate();
   const [rules, setRules] = useState({
-    starting_hand_size: 5,
-    max_deck_size: 5,
-    max_hand_size: 7,
-    draw_per_turn: 1,
+    starting_hand_size: 0,
+    max_deck_size: 0,
+    max_hand_size: 0,
+    draw_per_turn: 0,
     player_properties: {
-      health: 20,
+      health: 0,
+      power: 0,
     },
   });
+  const [newProps, setNewProps] = useState([]);
 
   const handleChange = (field, value) => {
-    if (field === "health") {
-      setRules((prev) => ({
+    setRules((prev) => ({
+      ...prev,
+      [field]: Number(value),
+    }));
+  };
+
+  const handlePropertyChange = (prop, value) => {
+    setRules((prev) => ({
+      ...prev,
+      player_properties: {
+        ...prev.player_properties,
+        [prop]: Number(value),
+      },
+    }));
+  };
+
+  const deleteExistingProperty = (prop) => {
+    setRules((prev) => {
+      const updated = { ...prev.player_properties };
+      delete updated[prop];
+      return {
         ...prev,
-        player_properties: {
-          ...prev.player_properties,
-          health: Number(value),
-        },
-      }));
-    } else {
-      setRules((prev) => ({
-        ...prev,
-        [field]: Number(value),
-      }));
-    }
+        player_properties: updated,
+      };
+    });
+  };
+
+  const addCustomProperty = () => {
+    setNewProps((prev) => [...prev, { key: "", value: 0 }]);
+  };
+
+  const updateNewProp = (index, field, value) => {
+    const updated = [...newProps];
+    updated[index][field] = value;
+    setNewProps(updated);
+  };
+
+  const saveCustomProp = (index) => {
+    const { key, value } = newProps[index];
+    if (!key) return;
+    handlePropertyChange(key, value);
+    const updated = newProps.filter((_, i) => i !== index);
+    setNewProps(updated);
+  };
+
+  const deleteCustomProp = (index) => {
+    const updated = newProps.filter((_, i) => i !== index);
+    setNewProps(updated);
   };
 
   const handleSaveClick = async () => {
@@ -66,9 +110,7 @@ const RuleEditor = () => {
 
       const response = await fetch(`${API_BASE}/api/rules/${gameId}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(rules),
       });
 
@@ -98,211 +140,110 @@ const RuleEditor = () => {
 
       <Box
         sx={{
-          display: "flex",
-          height: "calc(100vh - 60px)",
-          width: "100vw",
+          p: 4,
           backgroundColor: "#111",
           color: "#fff",
-          overflow: "auto",
-          userSelect: "none",
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "flex-start",
         }}
       >
-        <Box
+        <Card
           sx={{
-            width: 300,
-            p: 2,
+            width: 400,
             backgroundColor: "#222",
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
+            color: "#0f0",
+            border: "1px solid #0f0",
+            boxShadow: "0px 4px 20px rgba(0, 255, 0, 0.3)",
+            p: 3,
           }}
         >
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            Game Rules
-          </Typography>
 
-          {[
-            "starting_hand_size",
-            "max_deck_size",
-            "max_hand_size",
-            "draw_per_turn",
-          ].map((field) => (
-            <TextField
-              key={field}
-              label={field.replace(/_/g, " ")}
-              type="number"
-              variant="outlined"
-              fullWidth
-              value={rules[field]}
-              onChange={(e) => handleChange(field, e.target.value)}
-              margin="dense"
-              InputLabelProps={{ style: { color: "#ccc" } }}
-              inputProps={{ style: { color: "#fff" } }}
-            />
-          ))}
-
-          <TextField
-            label="Player Health"
-            type="number"
-            variant="outlined"
-            fullWidth
-            value={rules.player_properties.health}
-            onChange={(e) => handleChange("health", e.target.value)}
-            margin="dense"
-            InputLabelProps={{ style: { color: "#ccc" } }}
-            inputProps={{ style: { color: "#fff" } }}
-          />
-        </Box>
-
-        <Box
-          sx={{
-            flex: 1,
-            p: 4,
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "flex-start",
-            gap: 6,
-          }}
-        >
-          <Box
-            sx={{
-              width: 280,
-              minHeight: 320,
-              backgroundColor: "#222",
-              borderRadius: 2,
-              boxShadow: "0 0 12px cyan",
-              p: 3,
-              color: "cyan",
-              fontWeight: "bold",
-              fontSize: "1.2rem",
-              userSelect: "none",
-              border: "2px solid cyan",
-            }}
-          >
-            <SportsEsportsIcon
-              sx={{ fontSize: 60, mb: 1, color: "cyan" }}
-              aria-hidden="true"
-            />
-            <Typography
-              sx={{ mb: 2, textAlign: "center", fontWeight: "bold" }}
-              color="cyan"
-            >
-              Game Board
+          <CardContent>
+            <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+              <SportsEsportsIcon sx={{ fontSize: 50 }} />
+            </Box>
+            <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
+              Player Properties
             </Typography>
 
-            {[
-              { label: "Starting Hand", value: rules.starting_hand_size },
-              { label: "Max Deck", value: rules.max_deck_size },
-              { label: "Max Hand", value: rules.max_hand_size },
-              { label: "Draw / Turn", value: rules.draw_per_turn },
-            ].map(({ label, value }) => (
-              <Box
-                key={label}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  mb: 1,
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 16,
-                    height: 16,
-                    borderRadius: "50%",
-                    backgroundColor: "cyan",
-                    mr: 1,
-                    flexShrink: 0,
-                  }}
-                  aria-label={`${label} value preview`}
+            {["starting_hand_size", "max_deck_size", "max_hand_size", "draw_per_turn"].map(
+              (field) => (
+                <TextField
+                  key={field}
+                  label={toTitleCase(field)}
+                  type="number"
+                  fullWidth
+                  margin="dense"
+                  variant="outlined"
+                  value={rules[field]}
+                  onChange={(e) => handleChange(field, e.target.value)}
+                  InputLabelProps={{ style: { color: "#ccc" } }}
+                  inputProps={{ style: { color: "#fff" } }}
                 />
-                <Typography sx={{ flexGrow: 1, fontWeight: "bold" }}>
-                  {label}
-                </Typography>
-                <Typography
-                  sx={{
-                    minWidth: 32,
-                    textAlign: "right",
-                    fontWeight: "bold",
-                    fontSize: "1.1rem",
-                  }}
-                  aria-live="polite"
-                >
-                  {value}
-                </Typography>
+              )
+            )}
+
+            {Object.entries(rules.player_properties).map(([key, value]) => (
+              <Box key={key} sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+                <TextField
+                  label={toTitleCase(key)}
+                  type="number"
+                  fullWidth
+                  margin="dense"
+                  variant="outlined"
+                  value={value}
+                  onChange={(e) => handlePropertyChange(key, e.target.value)}
+                  InputLabelProps={{ style: { color: "#ccc" } }}
+                  inputProps={{ style: { color: "#fff" } }}
+                />
+                <IconButton onClick={() => deleteExistingProperty(key)} color="error">
+                  <DeleteIcon />
+                </IconButton>
               </Box>
             ))}
-          </Box>
 
-          <Card
-            sx={{
-              width: 200,
-              height: 300,
-              backgroundColor: "#222",
-              boxShadow: "0 0 12px lime",
-              border: "2px solid lime",
-              userSelect: "none",
-              color: "lime",
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "space-between",
-            }}
-            aria-label="Card preview"
-          >
-            <CardContent
-              sx={{
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-between",
-                color: "lime",
-              }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  mb: 2,
-                }}
-              >
-                <CreditCardIcon sx={{ fontSize: 60 }} aria-hidden="true" />
-              </Box>
-
-              <Typography
-                variant="h6"
-                sx={{ textAlign: "center", fontWeight: "bold", mb: 2 }}
-              >
-                Player Card
-              </Typography>
-
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 16,
-                    height: 16,
-                    borderRadius: "50%",
-                    backgroundColor: "lime",
-                    mr: 1,
-                    flexShrink: 0,
-                  }}
-                  aria-label="Health value preview"
+            {newProps.map((prop, i) => (
+              <Box key={i} sx={{ display: "flex", gap: 1, alignItems: "center", mb: 1 }}>
+                <TextField
+                  label="Name"
+                  variant="outlined"
+                  value={prop.key}
+                  onChange={(e) => updateNewProp(i, "key", e.target.value)}
+                  sx={{ flex: 1 }}
+                  InputLabelProps={{ style: { color: "#ccc" } }}
+                  inputProps={{ style: { color: "#fff" } }}
                 />
-                <Typography
-                  variant="body1"
-                  sx={{ fontWeight: "bold", fontSize: "1.3rem" }}
-                  aria-live="polite"
-                >
-                  Health: {rules.player_properties.health}
-                </Typography>
+                <TextField
+                  label="Value"
+                  variant="outlined"
+                  type="number"
+                  value={prop.value}
+                  onChange={(e) => updateNewProp(i, "value", e.target.value)}
+                  sx={{ width: 80 }}
+                  InputLabelProps={{ style: { color: "#ccc" } }}
+                  inputProps={{ style: { color: "#fff" } }}
+                />
+                <Button variant="contained" onClick={() => saveCustomProp(i)}>
+                  Save
+                </Button>
+                <IconButton onClick={() => deleteCustomProp(i)} color="error">
+                  <DeleteIcon />
+                </IconButton>
               </Box>
-            </CardContent>
-          </Card>
-        </Box>
+            ))}
+
+            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+              <IconButton onClick={addCustomProperty} color="success">
+                <AddIcon />
+              </IconButton>
+              <Typography variant="body2" sx={{ ml: 1, color: "#0f0" }}>
+                Add property
+              </Typography>
+            </Box>
+          </CardContent>
+        </Card>
       </Box>
     </>
   );

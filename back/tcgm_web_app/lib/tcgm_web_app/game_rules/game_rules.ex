@@ -62,4 +62,11 @@ defmodule TcgmWebApp.GameRules.GameRules do
     )
     |> Repo.all()
   end
+
+  @doc """
+    Retrieves game rules with true public_template.
+  """
+  def get_game_rule_templates do
+    Repo.all(from gr in GameRule, where: gr.public_template == true)
+  end
 end

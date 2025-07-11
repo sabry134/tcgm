@@ -41,6 +41,7 @@ defmodule TcgmWebAppWeb.Router do
     get "/cards/game/:game_id/with_properties", CardController, :get_cards_with_properties_by_game_id
     get "/cards/:card_id/cardtype", CardController, :get_card_cardtype
 
+    get "/cardTypes/templates", CardTypeController, :get_card_type_templates
     resources "/cardTypes", CardTypeController, only: [:index, :show, :create, :update]
     delete "/cardTypes/delete/:cardType_id", CardTypeController, :delete_cardType
     get "/cardTypes/game/:game_id", CardTypeController, :get_cardTypes_by_game_id
@@ -60,6 +61,7 @@ defmodule TcgmWebAppWeb.Router do
     get "/cardProperties/card/:card_id", CardPropertyController, :get_card_properties_by_card_id
     get "/cardProperties/card/:card_id/property/:cardtype_property_id", CardPropertyController, :get_card_properties_by_card_id_and_cardtype_property_id
 
+    get "/card_collections/templates", CardCollectionController, :get_card_collection_templates
     resources "/card_collections", CardCollectionController, only: [:index, :show, :create, :update]
     delete "/card_collections/delete/:card_collection_id", CardCollectionController, :delete_card_collection
     get "/card_collections/:card_collection_id/cards", CardCollectionController, :get_cards_in_card_collection
@@ -67,6 +69,7 @@ defmodule TcgmWebAppWeb.Router do
     get "/card_collections/user/:user_id", CardCollectionController, :get_card_collections_by_user_id
     get "/card_collections/user/:user_id/game/:game_id", CardCollectionController, :get_card_collections_by_user_id_and_game_id
 
+    get "/boards/templates", BoardController, :get_board_templates
     resources "/boards", BoardController, only: [:index, :show, :create, :update]
     delete "/boards/delete/:board_id", BoardController, :delete_board
     get "/boards/game/:game_id", BoardController, :get_board_by_game_id
@@ -90,6 +93,7 @@ defmodule TcgmWebAppWeb.Router do
     get "/playerProperties/playerProperty/:game_rule_id", PlayerPropertyController, :get_player_properties_by_game_rule_id
     post "/playerProperties/create", PlayerPropertyController, :create_player_properties
 
+    get "/gameRules/templates", GameRuleController, :get_game_rule_templates
     resources "/gameRules", GameRuleController, only: [:index, :show, :create, :update]
     delete "/gameRules/delete/:game_rule_id", GameRuleController, :delete_game_rule
     get "/gameRules/gameRule/:game_id", GameRuleController, :get_game_rules_by_game_id

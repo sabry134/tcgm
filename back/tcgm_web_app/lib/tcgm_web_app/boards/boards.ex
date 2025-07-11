@@ -55,4 +55,14 @@ defmodule TcgmWebApp.Boards.Boards do
     )
     |> Repo.one()
   end
+
+  @doc """
+    Retrieves boards with public template true.
+  """
+  def get_board_templates do
+    from(b in Board,
+      where: b.public_template == true
+    )
+    |> Repo.all()
+  end
 end

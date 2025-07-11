@@ -12,7 +12,7 @@ defmodule TcgmWebAppWeb.BoardControllerTest do
     |> Repo.insert!()
 
     board = %Board{}
-    |> Board.changeset(%{ game_id: game.id, background_image: "test" })
+    |> Board.changeset(%{ game_id: game.id, background_image: "test", public_template: true })
     |> Repo.insert!()
 
     zone = %BoardZone{}
@@ -126,6 +126,15 @@ defmodule TcgmWebAppWeb.BoardControllerTest do
     assert response(conn, 204)
 
     assert Repo.get(BoardZone, zone.id) == nil
+  end
+
+  test "GET /api/boards/templates returns board templates", %{conn: conn} do
+    conn = get(conn, "/api/boards/templates")
+    response = json_response(conn, 200)
+
+    assert is_list(response)
+    assert length(response) > 0
+    assert Enum.all?(response, fn template -> Map.has_key?(template, "id") end)
   end
 
 end

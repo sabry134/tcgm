@@ -87,4 +87,11 @@ defmodule TcgmWebApp.CardCollections.CardCollections do
   def get_card_collections_by_user_id_and_game_id_and_type(user_id, game_id, type) do
     Repo.all(from c in CardCollection, where: c.user_id == ^user_id and c.game_id == ^game_id and c.type == ^type)
   end
+
+  @doc """
+    Retrieves card collections with true public_template.
+  """
+  def get_card_collection_templates do
+    Repo.all(from c in CardCollection, where: c.public_template == true)
+  end
 end

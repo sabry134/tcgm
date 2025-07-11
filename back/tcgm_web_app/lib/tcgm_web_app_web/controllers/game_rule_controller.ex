@@ -91,7 +91,7 @@ defmodule TcgmWebAppWeb.GameRuleController do
     send_resp(conn, :no_content, "")
   end
 
-    swagger_path :get_game_rules_by_game_id do
+  swagger_path :get_game_rules_by_game_id do
     get("/gameRules/gameRule/{game_id}")
     description("Get game rules by game ID")
     parameter("game_id", :path, :integer, "Game ID", required: true)
@@ -109,4 +109,26 @@ defmodule TcgmWebAppWeb.GameRuleController do
         json(conn, game_rules)
     end
   end
+
+  swagger_path :get_game_rule_templates do
+    get("/gameRules/templates")
+    description("Get all public templates for game rules")
+    response(code(:ok), "Success")
+  end
+
+  def get_game_rule_templates(conn, _params) do
+    case GameRules.get_game_rule_templates() do
+      [] ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{})
+      game_rules ->
+        json(conn, game_rules)
+      _ ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(%{error: "Could not retrieve public template game rules"})
+    end
+  end
+
 end

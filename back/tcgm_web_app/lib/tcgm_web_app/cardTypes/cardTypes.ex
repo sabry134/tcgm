@@ -60,4 +60,11 @@ defmodule TcgmWebApp.CardTypes.CardTypes do
     Repo.all(from c in CardType, where: c.game_id == ^game_id)
   end
 
+  @doc """
+    Retrieves card types with true public_template.
+  """
+  def get_card_type_templates do
+    Repo.all(from c in CardType, where: c.public_template == true)
+  end
+
 end

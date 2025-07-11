@@ -41,7 +41,7 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
     |> Repo.insert!()
 
     card_collection = %CardCollection{}
-    |> CardCollection.changeset(%{ name: "test", quantity: 1, game_id: game.id, user_id: user.id, type: "Test_type" })
+    |> CardCollection.changeset(%{ name: "test", quantity: 1, game_id: game.id, user_id: user.id, type: "Test_type", public_template: true })
     |> Repo.insert!()
 
     card_collection_card = %CardCollectionCard{}
@@ -167,5 +167,14 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
 
     assert length(response) > 0
     assert Enum.any?(response, fn cc -> cc["id"] == card.id end)
+  end
+
+  test "GET /api/card_collections/templates returns card collection templates", %{conn: conn} do
+    conn = get(conn, "/api/card_collections/templates")
+    response = json_response(conn, 200)
+
+    assert is_list(response)
+    assert length(response) > 0
+    assert Enum.all?(response, fn template -> Map.has_key?(template, "id") end)
   end
 end

@@ -88,6 +88,7 @@ defmodule TcgmWebAppWeb.Router do
     resources "/playerProperties", PlayerPropertyController, only: [:index, :show, :create, :update]
     delete "/playerProperties/delete/:player_property_id", PlayerPropertyController, :delete_player_property
     get "/playerProperties/playerProperty/:game_rule_id", PlayerPropertyController, :get_player_properties_by_game_rule_id
+    post "/playerProperties/create", PlayerPropertyController, :create_player_properties
 
     resources "/gameRules", GameRuleController, only: [:index, :show, :create, :update]
     delete "/gameRules/delete/:game_rule_id", GameRuleController, :delete_game_rule

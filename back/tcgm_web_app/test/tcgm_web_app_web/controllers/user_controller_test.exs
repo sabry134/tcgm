@@ -20,7 +20,6 @@ defmodule TcgmWebAppWeb.UserControllerTest do
     conn = get(conn, "/api/users")
     response = json_response(conn, 200)
 
-    IO.inspect(response)
     assert length(response) > 0
     assert Enum.any?(response, fn u -> u["username"] == user.username end)
   end

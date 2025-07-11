@@ -100,6 +100,21 @@ defmodule TcgmWebAppWeb.PlayerPropertyControllerTest do
     assert response["value"] == 23
   end
 
+  test "POST /api/playerProperties/create creates multiple player properties", %{conn: conn, game_rule2: game_rule2} do
+    conn = post(conn, "/api/playerProperties/create", %{
+      "playerProperties" => [
+        %{"game_rule_id" => game_rule2.id, "property_name" => "defense1", "value" => 10},
+        %{"game_rule_id" => game_rule2.id, "property_name" => "defense2", "value" => 20}
+      ]
+    })
+    response = json_response(conn, 201)
+
+    assert length(response) == 2
+    assert Enum.any?(response, fn pp -> pp["property_name"] == "defense1" and pp["value"] == 10 end)
+    assert Enum.any?(response, fn pp -> pp["property_name"] == "defense2" and pp["value"] == 20 end)
+    assert Enum.all?(response, fn pp -> pp["game_rule_id"] == game_rule2.id end)
+  end
+
    test "PUT /api/playerProperties/:id updates a player property", %{conn: conn, player_property: player_property} do
     conn = put(conn, "/api/playerProperties/#{player_property.id}", %{
       "playerProperty" => %{

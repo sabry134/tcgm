@@ -53,6 +53,36 @@ defmodule TcgmWebAppWeb.PlayerPropertyController do
     end
   end
 
+  swagger_path :create_player_properties do
+    post("/playerProperties/create")
+    description("Create multiple player properties")
+    parameter(:body, :body, Schema.ref(:PlayerPropertyRequest), "player property request payload", required: true)
+    response(code(:created), "player properties created")
+    response(code(:unprocessable_entity), "Invalid parameters")
+  end
+
+  def create_player_properties(conn, %{"playerProperties" => player_property_params}) do
+    results =
+      Enum.map(player_property_params, fn property_params ->
+        case PlayerProperties.create_player_property(property_params) do
+          {:ok, player_property} -> {:ok, player_property}
+          {:error, changeset} -> {:error, changeset}
+        end
+      end)
+
+    if Enum.all?(results, fn result -> match?({:ok, _}, result) end) do
+      created_properties = Enum.map(results, fn {:ok, property} -> property end)
+      conn
+      |> put_status(:created)
+      |> json(created_properties)
+    else
+      errors = Enum.filter(results, fn result -> match?({:error, _}, result) end)
+      conn
+      |> put_status(:unprocessable_entity)
+      |> json(errors)
+    end
+  end
+
   swagger_path :update do
     put("/playerProperties/{id}")
     description("Update a player property by ID")

@@ -452,8 +452,4 @@ defmodule TcgmWebApp.Game.GameLogicTest do
     assert changed
   end
 
-  test "list all effects", %{initial_state: state} do
-    list = GameLogic.list_all_effects(state)
-    IO.inspect(list)
-  end
 end

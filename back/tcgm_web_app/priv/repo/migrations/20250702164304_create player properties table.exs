@@ -9,6 +9,6 @@ defmodule :"Elixir.TcgmWebApp.Repo.Migrations.Create player properties table" do
       timestamps()
     end
 
-    create unique_index(:player_properties, [:game_rule_id])
+    create unique_index(:player_properties, [:game_rule_id, :property_name])
   end
 end

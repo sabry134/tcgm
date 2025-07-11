@@ -25,7 +25,7 @@ defmodule TcgmWebAppWeb.GameRuleControllerTest do
     |> Repo.insert!()
 
     game_rule2 = %GameRule{}
-    |> GameRule.changeset(%{starting_hand_size: 2, min_deck_size: 3, max_deck_size: 3, max_hand_size: 7, draw_per_turn: 9, game_id: game.id})
+    |> GameRule.changeset(%{starting_hand_size: 2, min_deck_size: 3, max_deck_size: 3, max_hand_size: 7, draw_per_turn: 9, game_id: game.id, public_template: true})
     |> Repo.insert!()
 
     cardType = %CardType{}
@@ -152,5 +152,14 @@ defmodule TcgmWebAppWeb.GameRuleControllerTest do
     assert Enum.any?(response, fn gr -> gr["max_deck_size"] == game_rule.max_deck_size end)
     assert Enum.any?(response, fn gr -> gr["max_hand_size"] == game_rule.max_hand_size end)
     assert Enum.any?(response, fn gr -> gr["draw_per_turn"] == game_rule.draw_per_turn end)
+  end
+
+  test "GET /api/gameRules/templates returns public game rule templates", %{conn: conn} do
+    conn = get(conn, "/api/gameRules/templates")
+    response = json_response(conn, 200)
+
+    assert is_list(response)
+    assert length(response) > 0
+    assert Enum.all?(response, fn template -> Map.has_key?(template, "id") end)
   end
 end

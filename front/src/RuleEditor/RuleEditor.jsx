@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -7,27 +7,26 @@ import {
   Card,
   CardContent,
   IconButton,
+  Collapse,
 } from "@mui/material";
-import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
-import CreditCardIcon from "@mui/icons-material/CreditCard";
-import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useNavigate } from "react-router-dom";
-import { ROUTES } from "../Routes/routes";
+import SaveIcon from "@mui/icons-material/Save";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
 
 const API_BASE = "http://localhost:4000";
 
 const styles = {
   navbar: {
     backgroundColor: "#5d3a00",
-    color: "white",
+    color: "#eee",
     padding: "10px",
     display: "flex",
     justifyContent: "space-around",
     userSelect: "none",
   },
   navButton: { borderRadius: 0, userSelect: "none" },
-  navText: { color: "white", fontSize: "1.25rem", userSelect: "none" },
+  navText: { color: "#eee", fontSize: "1.25rem", userSelect: "none" },
 };
 
 const toTitleCase = (str) =>
@@ -36,216 +35,449 @@ const toTitleCase = (str) =>
     .replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
 
 const RuleEditor = () => {
-  const navigate = useNavigate();
-  const [rules, setRules] = useState({
-    starting_hand_size: 0,
-    max_deck_size: 0,
-    max_hand_size: 0,
-    draw_per_turn: 0,
-    player_properties: {
-      health: 0,
-      power: 0,
-    },
-  });
-  const [newProps, setNewProps] = useState([]);
+  const [rules, setRules] = useState([]);
+  const [newRuleName, setNewRuleName] = useState("");
+  const [newRuleValue, setNewRuleValue] = useState(0);
+  const [expandedRuleId, setExpandedRuleId] = useState(null);
+  const [ruleEdits, setRuleEdits] = useState({});
 
-  const handleChange = (field, value) => {
-    setRules((prev) => ({
-      ...prev,
-      [field]: Number(value),
-    }));
+  useEffect(() => {
+    fetchRules();
+  }, []);
+
+  const fetchRules = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/rules`);
+      const data = await res.json();
+      setRules(data);
+      setExpandedRuleId(null);
+    } catch (e) {
+      console.error("Failed to fetch rules:", e);
+    }
   };
 
-  const handlePropertyChange = (prop, value) => {
-    setRules((prev) => ({
+  const handleCreateRule = async () => {
+    if (!newRuleName) return alert("Rule name cannot be empty");
+    const gameId = localStorage.getItem("gameSelected");
+    if (!gameId) return alert("Game ID not found");
+
+    try {
+      const ruleRes = await fetch(`${API_BASE}/api/rules`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          rule: { rule_name: newRuleName, value: newRuleValue, game_rule_id: null },
+        }),
+      });
+      const ruleData = await ruleRes.json();
+      if (!ruleRes.ok) throw new Error("Failed to create rule");
+
+      const gameRuleRes = await fetch(`${API_BASE}/api/gameRules`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          gameRule: {
+            starting_hand_size: 5,
+            max_deck_size: 60,
+            max_hand_size: 7,
+            draw_per_turn: 1,
+            game_id: parseInt(gameId),
+          },
+        }),
+      });
+      const gameRuleData = await gameRuleRes.json();
+      if (!gameRuleRes.ok) throw new Error("Failed to create game rule");
+
+      await fetch(`${API_BASE}/api/rules/${ruleData.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          rule: { rule_name: newRuleName, value: newRuleValue, game_rule_id: gameRuleData.id },
+        }),
+      });
+
+      const defaultProps = [
+        { name: "health", value: 100 },
+        { name: "power", value: 10 },
+      ];
+      for (const prop of defaultProps) {
+        await fetch(`${API_BASE}/api/playerProperties`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            playerProperty: {
+              property_name: prop.name,
+              value: prop.value,
+              game_rule_id: gameRuleData.id,
+            },
+          }),
+        });
+      }
+
+      setNewRuleName("");
+      setNewRuleValue(0);
+      fetchRules();
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const handleDeleteRule = async (ruleId) => {
+    if (!window.confirm("Are you sure you want to delete this rule?")) return;
+    try {
+      await fetch(`${API_BASE}/api/rules/delete/${ruleId}`, { method: "DELETE" });
+      fetchRules();
+    } catch (e) {
+      alert("Failed to delete rule");
+    }
+  };
+
+  const toggleExpand = async (id) => {
+    setExpandedRuleId((prev) => (prev === id ? null : id));
+    if (expandedRuleId === id) return;
+
+    const rule = rules.find((r) => r.id === id);
+    if (!rule) return;
+
+    try {
+      const gameRulesRes = await fetch(`${API_BASE}/api/gameRules/gameRule/${rule.game_rule_id}`);
+      const gameRules = await gameRulesRes.json();
+      const gameRule = gameRules[0];
+
+      const playerPropsRes = await fetch(
+        `${API_BASE}/api/playerProperties/playerProperty/${rule.game_rule_id}`
+      );
+      const playerProps = await playerPropsRes.json();
+
+      setRuleEdits((prev) => ({
+        ...prev,
+        [id]: {
+          gameRule,
+          playerProps,
+        },
+      }));
+    } catch {
+      alert("Failed to fetch rule details");
+    }
+  };
+
+  const handleSaveEdit = async (ruleId) => {
+    const edit = ruleEdits[ruleId];
+    if (!edit) return alert("Nothing to save");
+
+    try {
+      const gameRuleId = rules.find((r) => r.id === ruleId).game_rule_id;
+
+      await fetch(`${API_BASE}/api/gameRules/${gameRuleId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ gameRule: edit.gameRule }),
+      });
+
+      for (const prop of edit.playerProps) {
+        await fetch(`${API_BASE}/api/playerProperties/${prop.id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            playerProperty: { property_name: prop.property_name, value: prop.value },
+          }),
+        });
+      }
+
+      alert("Saved successfully.");
+      fetchRules();
+      setExpandedRuleId(null);
+    } catch {
+      alert("Failed to save edits");
+    }
+  };
+
+  const updateGameRuleField = (ruleId, field, value) => {
+    setRuleEdits((prev) => ({
       ...prev,
-      player_properties: {
-        ...prev.player_properties,
-        [prop]: Number(value),
+      [ruleId]: {
+        ...prev[ruleId],
+        gameRule: {
+          ...prev[ruleId].gameRule,
+          [field]: Number(value),
+        },
       },
     }));
   };
 
-  const deleteExistingProperty = (prop) => {
-    setRules((prev) => {
-      const updated = { ...prev.player_properties };
-      delete updated[prop];
+  const updatePlayerPropField = (ruleId, index, value) => {
+    setRuleEdits((prev) => {
+      const updatedProps = [...prev[ruleId].playerProps];
+      updatedProps[index] = { ...updatedProps[index], value: Number(value) };
       return {
         ...prev,
-        player_properties: updated,
+        [ruleId]: {
+          ...prev[ruleId],
+          playerProps: updatedProps,
+        },
       };
     });
   };
 
-  const addCustomProperty = () => {
-    setNewProps((prev) => [...prev, { key: "", value: 0 }]);
-  };
-
-  const updateNewProp = (index, field, value) => {
-    const updated = [...newProps];
-    updated[index][field] = value;
-    setNewProps(updated);
-  };
-
-  const saveCustomProp = (index) => {
-    const { key, value } = newProps[index];
-    if (!key) return;
-    handlePropertyChange(key, value);
-    const updated = newProps.filter((_, i) => i !== index);
-    setNewProps(updated);
-  };
-
-  const deleteCustomProp = (index) => {
-    const updated = newProps.filter((_, i) => i !== index);
-    setNewProps(updated);
-  };
-
-  const handleSaveClick = async () => {
-    try {
-      const gameId = localStorage.getItem("gameSelected");
-      if (!gameId) {
-        alert("No gameSelected ID found");
-        return;
-      }
-
-      const response = await fetch(`${API_BASE}/api/rules/${gameId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(rules),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText);
-      }
-
-      alert("Rules saved successfully!");
-    } catch (err) {
-      console.error("Error saving rules:", err);
-      alert("Error saving rules. See console.");
-    }
-  };
+  const brown = "#5d3a00";
+  const brownLight = "#7a541c";
+  const greyText = "#ccc";
+  const greyBorder = "#444";
 
   return (
-    <>
+    <Box sx={{ backgroundColor: "#111", minHeight: "100vh", pb: 4 }}>
+      {/* Navbar */}
       <Box sx={styles.navbar}>
-        <Button sx={styles.navButton} onClick={() => navigate(ROUTES.HOME)}>
-          Close
-        </Button>
-        <Typography sx={styles.navText}>Rule Editor</Typography>
-        <Button sx={styles.navButton} onClick={handleSaveClick}>
-          Save
-        </Button>
+        <Typography sx={styles.navText}>Rule Manager</Typography>
       </Box>
 
+      {/* Create Rule Card */}
       <Box
         sx={{
-          p: 4,
-          backgroundColor: "#111",
-          color: "#fff",
-          minHeight: "100vh",
           display: "flex",
           justifyContent: "center",
-          alignItems: "flex-start",
+          mt: 4,
+          mb: 4,
+          px: 2,
         }}
       >
         <Card
           sx={{
             width: 400,
             backgroundColor: "#222",
-            color: "#0f0",
-            border: "1px solid #0f0",
-            boxShadow: "0px 4px 20px rgba(0, 255, 0, 0.3)",
+            color: greyText,
+            border: `1px solid ${brown}`,
+            boxShadow: `0px 4px 15px ${brownLight}`,
             p: 3,
           }}
         >
-
           <CardContent>
             <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
-              <SportsEsportsIcon sx={{ fontSize: 50 }} />
+              <CreditCardIcon sx={{ fontSize: 40, color: brown }} />
             </Box>
-            <Typography variant="h6" sx={{ mb: 2, textAlign: "center" }}>
-              Player Properties
+
+            <Typography
+              variant="h6"
+              sx={{ mb: 1, textAlign: "center", color: brownLight }}
+            >
+              Add New Rule
             </Typography>
-
-            {["starting_hand_size", "max_deck_size", "max_hand_size", "draw_per_turn"].map(
-              (field) => (
-                <TextField
-                  key={field}
-                  label={toTitleCase(field)}
-                  type="number"
-                  fullWidth
-                  margin="dense"
-                  variant="outlined"
-                  value={rules[field]}
-                  onChange={(e) => handleChange(field, e.target.value)}
-                  InputLabelProps={{ style: { color: "#ccc" } }}
-                  inputProps={{ style: { color: "#fff" } }}
-                />
-              )
-            )}
-
-            {Object.entries(rules.player_properties).map(([key, value]) => (
-              <Box key={key} sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
-                <TextField
-                  label={toTitleCase(key)}
-                  type="number"
-                  fullWidth
-                  margin="dense"
-                  variant="outlined"
-                  value={value}
-                  onChange={(e) => handlePropertyChange(key, e.target.value)}
-                  InputLabelProps={{ style: { color: "#ccc" } }}
-                  inputProps={{ style: { color: "#fff" } }}
-                />
-                <IconButton onClick={() => deleteExistingProperty(key)} color="error">
-                  <DeleteIcon />
-                </IconButton>
-              </Box>
-            ))}
-
-            {newProps.map((prop, i) => (
-              <Box key={i} sx={{ display: "flex", gap: 1, alignItems: "center", mb: 1 }}>
-                <TextField
-                  label="Name"
-                  variant="outlined"
-                  value={prop.key}
-                  onChange={(e) => updateNewProp(i, "key", e.target.value)}
-                  sx={{ flex: 1 }}
-                  InputLabelProps={{ style: { color: "#ccc" } }}
-                  inputProps={{ style: { color: "#fff" } }}
-                />
-                <TextField
-                  label="Value"
-                  variant="outlined"
-                  type="number"
-                  value={prop.value}
-                  onChange={(e) => updateNewProp(i, "value", e.target.value)}
-                  sx={{ width: 80 }}
-                  InputLabelProps={{ style: { color: "#ccc" } }}
-                  inputProps={{ style: { color: "#fff" } }}
-                />
-                <Button variant="contained" onClick={() => saveCustomProp(i)}>
-                  Save
-                </Button>
-                <IconButton onClick={() => deleteCustomProp(i)} color="error">
-                  <DeleteIcon />
-                </IconButton>
-              </Box>
-            ))}
-
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-              <IconButton onClick={addCustomProperty} color="success">
-                <AddIcon />
-              </IconButton>
-              <Typography variant="body2" sx={{ ml: 1, color: "#0f0" }}>
-                Add property
-              </Typography>
-            </Box>
+            <TextField
+              label="Rule Name"
+              fullWidth
+              variant="outlined"
+              value={newRuleName}
+              onChange={(e) => setNewRuleName(e.target.value)}
+              sx={{ mb: 2 }}
+              InputLabelProps={{ style: { color: brownLight } }}
+              inputProps={{ style: { color: greyText } }}
+              
+            />
+            <TextField
+              label="Rule Value"
+              fullWidth
+              variant="outlined"
+              type="number"
+              value={newRuleValue}
+              onChange={(e) => setNewRuleValue(Number(e.target.value))}
+              InputLabelProps={{ style: { color: brownLight } }}
+              inputProps={{ style: { color: greyText } }}
+              sx={{
+                mb: 2,
+                "& .MuiOutlinedInput-root": {
+                  color: greyText,
+                  "& fieldset": {
+                    borderColor: brown,
+                  },
+                  "&:hover fieldset": {
+                    borderColor: brownLight,
+                  },
+                  "&.Mui-focused fieldset": {
+                    borderColor: brownLight,
+                  },
+                },
+                "& .MuiInputLabel-root": {
+                  color: brownLight,
+                },
+              }}
+            />
+            <Button
+              variant="contained"
+              fullWidth
+              onClick={handleCreateRule}
+              sx={{
+                bgcolor: brown,
+                color: greyText,
+                fontWeight: "bold",
+                "&:hover": { bgcolor: brownLight },
+              }}
+            >
+              Create Rule
+            </Button>
           </CardContent>
         </Card>
       </Box>
-    </>
+
+      {/* Rules List */}
+      <Box
+        sx={{
+          maxWidth: 600,
+          mx: "auto",
+          px: 2,
+        }}
+      >
+        {rules.map((rule) => (
+          <Card
+            key={rule.id}
+            sx={{
+              backgroundColor: "#222",
+              color: greyText,
+              mb: 3,
+              border:
+                expandedRuleId === rule.id
+                  ? `1px solid ${brownLight}`
+                  : `1px solid transparent`,
+              boxShadow:
+                expandedRuleId === rule.id ? `0 0 12px ${brownLight}` : "none",
+              transition: "all 0.3s ease",
+              p: 2,
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <Typography variant="h6" sx={{ userSelect: "none" }}>
+                {rule.rule_name} — {rule.value}
+              </Typography>
+              <Box>
+                <IconButton
+                  color="inherit"
+                  onClick={() => toggleExpand(rule.id)}
+                  size="large"
+                  aria-label={`Edit ${rule.rule_name}`}
+                  sx={{ color: brownLight }}
+                >
+                  <EditIcon />
+                </IconButton>
+                <IconButton
+                  color="inherit"
+                  onClick={() => handleDeleteRule(rule.id)}
+                  size="large"
+                  aria-label={`Delete ${rule.rule_name}`}
+                  sx={{ color: "#aa2222" }}
+                >
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+            </Box>
+
+            <Collapse in={expandedRuleId === rule.id} timeout="auto" unmountOnExit>
+              {ruleEdits[rule.id] && (
+                <Box sx={{ mt: 3 }}>
+                  <Typography
+                    sx={{ fontWeight: "bold", mb: 1, color: brownLight }}
+                  >
+                    Game Rule
+                  </Typography>
+                  {Object.entries(ruleEdits[rule.id].gameRule).map(
+                    ([key, val]) =>
+                      key !== "id" &&
+                      key !== "game_id" && (
+                        <TextField
+                          key={key}
+                          label={toTitleCase(key)}
+                          value={val}
+                          type="number"
+                          onChange={(e) =>
+                            updateGameRuleField(rule.id, key, e.target.value)
+                          }
+                          fullWidth
+                          sx={{
+                            mb: 1,
+                            "& .MuiOutlinedInput-root": {
+                              color: greyText,
+                              "& fieldset": {
+                                borderColor: brown,
+                              },
+                              "&:hover fieldset": {
+                                borderColor: brownLight,
+                              },
+                              "&.Mui-focused fieldset": {
+                                borderColor: brownLight,
+                              },
+                            },
+                            "& .MuiInputLabel-root": {
+                              color: brownLight,
+                            },
+                          }}
+                          variant="outlined"
+                        />
+                      )
+                  )}
+
+                  <Typography
+                    sx={{ fontWeight: "bold", mt: 3, mb: 1, color: brownLight }}
+                  >
+                    Player Properties
+                  </Typography>
+                  {ruleEdits[rule.id].playerProps.map((prop, idx) => (
+                    <TextField
+                      key={prop.id}
+                      label={toTitleCase(prop.property_name)}
+                      value={prop.value}
+                      type="number"
+                      onChange={(e) =>
+                        updatePlayerPropField(rule.id, idx, e.target.value)
+                      }
+                      fullWidth
+                      sx={{
+                        mb: 1,
+                        "& .MuiOutlinedInput-root": {
+                          color: greyText,
+                          "& fieldset": {
+                            borderColor: brown,
+                          },
+                          "&:hover fieldset": {
+                            borderColor: brownLight,
+                          },
+                          "&.Mui-focused fieldset": {
+                            borderColor: brownLight,
+                          },
+                        },
+                        "& .MuiInputLabel-root": {
+                          color: brownLight,
+                        },
+                      }}
+                      variant="outlined"
+                    />
+                  ))}
+
+                  <Button
+                    variant="contained"
+                    startIcon={<SaveIcon />}
+                    onClick={() => handleSaveEdit(rule.id)}
+                    fullWidth
+                    sx={{
+                      mt: 2,
+                      bgcolor: brown,
+                      color: greyText,
+                      fontWeight: "bold",
+                      "&:hover": { bgcolor: brownLight },
+                    }}
+                  >
+                    Save
+                  </Button>
+                </Box>
+              )}
+            </Collapse>
+          </Card>
+        ))}
+      </Box>
+    </Box>
   );
 };
 

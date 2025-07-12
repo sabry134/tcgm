@@ -41,8 +41,8 @@ defmodule TcgmWebAppWeb.RoomController do
     response(code(:not_found), "Room not found")
   end
 
-  def join(conn, %{"room_id" => room_id, "player_id" => player_id}) do
-    TcgmWebApp.Game.GameServer.join_room(room_id, player_id)
+  def join(conn, %{"room_id" => room_id, "player_id" => player_id, "game_id" => game_id}) do
+    TcgmWebApp.Game.GameServer.join_room(room_id, player_id, game_id)
     state = TcgmWebApp.Game.GameServer.get_state(room_id)
     json(conn, state)
   end

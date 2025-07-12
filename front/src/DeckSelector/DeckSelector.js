@@ -6,6 +6,7 @@ import { LeftPanel } from "./Components/LeftPanel";
 import { RightPanel } from "./Components/RightPanel";
 import { DeckPicker } from "./Components/DeckPicker";
 import { Popup } from "../Components/Popup/Popup";
+import { createCollectionRequest } from "../Api/collectionsRequest";
 
 const DeckSelector = () => {
     const navigate = useNavigate();
@@ -25,7 +26,7 @@ const DeckSelector = () => {
 
     return (
         <Box display="flex" flexDirection="column" height="100vh">
-            <JoinRoomNavigationBar navigate={navigate}/>
+            <JoinRoomNavigationBar navigate={navigate} />
 
             <Box display="flex" flexGrow={1} bgcolor="#fff">
                 <LeftPanel popupCallback={openPopup} />
@@ -41,7 +42,7 @@ const DeckSelector = () => {
                         open={open}
                         anchorEl={anchor}
                         closeCallback={closePopup}
-                        receivedCallback={(data) => {}}
+                        receivedCallback={(data) => { console.log(data); createCollectionRequest(data[0]) }}
                         title={"Create Deck"}
                         inputName={["Name"]}
                     />

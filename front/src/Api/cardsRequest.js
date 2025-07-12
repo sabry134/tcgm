@@ -20,15 +20,17 @@ export async function getCardRequest() {
 // }
 
 function adddMutablePropertiesFromProperties(typeProperties) {
-  let tmpProperties = typeProperties.filter((value, index) => value.mutable)
+  let tmpProperties = typeProperties.filter((value, index) => value.mutable);
   return tmpProperties.map((value, index) => {
-    console.log(value)
+    console.log(value);
     return {
       "name": value.property_name,
-      "value_number": value.value,
+      "value_string": typeof value.value === "string" ? value.value : null,
+      "value_number": typeof value.value === "number" ? value.value : null,
+      "value_boolean": typeof value.value === "boolean" ? value.value : null,
       "cardtype_property_id": value.id
-    }
-  })
+    };
+  });
 }
 
 export async function saveCardRequest(storedId, game_id, data) {
@@ -43,11 +45,23 @@ export async function saveCardRequest(storedId, game_id, data) {
         'Content-Type': 'application/json'
       });
     } else {
+      baseRequest('/cardProperties/card/' + storedId, 'GET').then((response) => {
+        response.forEach((element, index) => {
+          baseRequest('cardProperties/' + element.id, 'PUT', {
+            "cardProperty": {
+              ...element,
+              value_string: typeof data.properties[index].value === "string" ? data.properties[index].value : null,
+              value_number: typeof data.properties[index].value === "number" ? data.properties[index].value : null,
+              value_boolean: typeof data.properties[index].value === "boolean" ? data.properties[index].value : null,
+            }
+          }, {
+            'Content-Type': 'application/json'
+          });
+        });
+      })
+
       return baseRequest('cards/' + storedId, 'PUT', {
-        "card": {
-          ...data,
-          properties: properties
-        }
+        "card": data
       }, {
         'Content-Type': 'application/json'
       });

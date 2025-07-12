@@ -7,10 +7,7 @@ import {
   getCardsByGameRequest,
   getCardsByGameWithPropertiesRequest
 } from '../../Api/cardsRequest'
-import { loginUserRequest, createUserRequest } from '../../Api/usersRequest'
-import { TCGMButton } from '../../Components/TCGMButton'
 
-// TODO(): change save card to save card with properties
 // TODO(): add new create card button
 // TODO(): change right pannel to only accept mutable properties change and name of card
 

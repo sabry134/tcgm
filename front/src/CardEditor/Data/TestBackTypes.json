@@ -3,6 +3,6 @@
   "text": "text",
   "image": "text",
   "card_type_id": "cardType",
-  "effect_ids": [],
-  "properties": []
+  "effect_ids": "array",
+  "properties": "propertiesArray"
 }

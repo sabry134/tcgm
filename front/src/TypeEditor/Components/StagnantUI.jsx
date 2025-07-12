@@ -28,7 +28,7 @@ const StagnantUI = ({ createNewComponnent }) => {
 
   const addBox = event => {
     setOpen(!open)
-    createNewComponnent('box')
+    createNewComponnent('text')
   }
 
   const selectButton = event => {

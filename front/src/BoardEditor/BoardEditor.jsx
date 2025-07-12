@@ -1,5 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { 
+  Box,
+  Button,
+  TextField,
+  Typography,
+  Switch,
+  FormControlLabel,
+  ListItemText,
+  ListItem,
+  List,
+  DialogContent,
+  DialogTitle,
+  Dialog, 
+  IconButton
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 import debounce from "lodash/debounce";
 import { ROUTES } from "../Routes/routes";
@@ -31,6 +46,10 @@ const BoardEditor = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [tableBackground, setTableBackground] = useState(null);
+  const [publicTemplate, setPublicTemplate] = useState(false);
+  const [hasPrompted, setHasPrompted] = useState(false);
+  const [templates, setTemplates] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const dragOffset = useRef({ x: 0, y: 0 });
   const resizeStart = useRef({ x: 0, y: 0, width: 0, height: 0 });
   const canvasRef = useRef(null);
@@ -54,6 +73,20 @@ const BoardEditor = () => {
 
   const isSyncing = useRef(false);
 
+  const handlePublicTemplateChange = (event) => {
+    const value = event.target.checked;
+    if (value && !hasPrompted) {
+      const confirmChange = window.confirm(
+        "Are you sure you want to make this board a public template ?"
+      );
+      if (!confirmChange) {
+        return;
+      }
+      setHasPrompted(true);
+    }
+    setPublicTemplate(value);
+  };
+
   const handleSaveClick = async () => {
     try {
       const gameId = localStorage.getItem("gameSelected");
@@ -65,6 +98,7 @@ const BoardEditor = () => {
       const boardParams = {
         game_id: gameId,
         background_image: board.background_image || null,
+        public_template: publicTemplate
       };
 
       const sanitizedZones = zones.map((zone) => ({
@@ -153,6 +187,100 @@ const BoardEditor = () => {
     }
   };
 
+  const HandleListPublicTemplates = async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/boards/templates`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch public templates");
+      }
+
+      const templates = await response.json();
+      if (!templates.length) {
+        alert("No public templates available");
+        return;
+      }
+
+      const templatesWithGameNames = await Promise.all(
+        templates.map(async (template) => {
+          const gameName = await getTemplateGameName(template.game_id);
+          return { ...template, game_name: gameName };
+        })
+      );
+
+      setTemplates(templatesWithGameNames);
+      setIsModalOpen(true);
+      console.log("Public templates:", templates);
+    } catch (err) {
+      console.error("Error loading public templates:", err);
+      alert("Error loading public templates. See console for details.");
+    }
+  }
+
+  const getTemplateGameName = async (gameId) => {
+    try {
+      const game = await fetch(`${API_BASE}/api/games/${gameId}`);
+      if (!game.ok) {
+        throw new Error("Failed to fetch game name");
+      }
+      const gameData = await game.json();
+      return gameData.name || "Unknown Game";
+    } catch (err) {
+      console.error("Error fetching game name:", err);
+      return "Unknown Game";
+    }
+  }
+
+  const LoadTemplate = async (templateId) => {
+    try {
+      const response = await fetch(`${API_BASE}/api/boards/with_zones/${templateId}`);
+
+      if (!response.ok) {
+        throw new Error("Failed to load template board data");
+      }
+
+      console.log(`Got response for template ${templateId}:`, response);
+
+      const data = await response.json();
+      const serverBg = data.board.background_image || null;
+      const cachedBg = localStorage.getItem("boardBackgroundCache");
+      const cachedBgURL = localStorage.getItem("boardBackgroundCacheURL");
+      
+      if (cachedBg && cachedBgURL === serverBg) {
+        setTableBackground(cachedBg);
+        setBoard(data.board);
+      } else {
+        setTableBackground(serverBg);
+        setBoard(data.board);
+        localStorage.setItem("boardBackgroundCacheURL", serverBg || "");
+        localStorage.removeItem("boardBackgroundCache");
+      }
+      setZones(
+        (data.zones || []).map((zone) => ({
+          ...zone,
+          borderRadius: zone.border_radius || 0,
+        }))
+      );
+
+      setSelectedZoneId(null);
+      setInputs({
+        name: "",
+        width: "",
+        height: "",
+        x: "",
+        y: "",
+        borderRadius: "",
+      });
+
+      localStorage.setItem("boardSelected", templateId);
+      alert("Template loaded successfully!");
+    }
+    catch (err) {
+      console.error("Error loading template:", err);
+      alert("Error loading template. See console for details.");
+    } finally {
+      setIsModalOpen(false);
+    }
+  }
 
   const selectedZone = zones.find((z) => z.id === selectedZoneId);
 
@@ -373,7 +501,6 @@ const BoardEditor = () => {
       });
     }
   };
-
 
   const updateSymmetric = (id, newProps) => {
     const canvas = canvasRef.current;
@@ -644,6 +771,16 @@ const BoardEditor = () => {
             Save
           </Button>
 
+          <Button
+            variant="outlined"
+            component="label"
+            fullWidth
+            onClick={HandleListPublicTemplates}
+            sx={{ mt: 2 }}
+          >
+            List Public Templates
+          </Button>
+
 
           {["name", "width", "height", "x", "y", "borderRadius"].map((field) => (
             <TextField
@@ -659,7 +796,50 @@ const BoardEditor = () => {
               margin="dense"
             />
           ))}
+
+          <FormControlLabel
+            control={
+              <Switch
+                checked={publicTemplate}
+                onChange={handlePublicTemplateChange}
+                color="primary"
+              />
+            }
+            label="Public Template"
+            sx={{ mt: 2}}
+          />
         </Box>
+
+        <Dialog open={isModalOpen} onClose={() => setIsModalOpen(false)} fullWidth>
+          <DialogTitle>
+            Public Templates
+            <IconButton
+              aria-label="close"
+              onClick={() => setIsModalOpen(false)}
+              sx={{ position: "absolute", right: 8, top: 8}}
+            >
+              <CloseIcon />
+            </IconButton>
+            </DialogTitle>
+          <DialogContent>
+            <List>
+              {templates.map((template) => (
+                <ListItem key={template.id} button sx={{ display: "flex", justifyContent: "space-between" }}>
+                  <ListItemText
+                    primary={`Game: ${template.game_name || "Unknown Game"}`}
+                  />
+                  <Button
+                    variant="outlined"
+                    size ="small"
+                    onClick={() => LoadTemplate(template.id)}
+                  >
+                    Load
+                  </Button>
+                </ListItem>
+              ))}
+            </List>
+          </DialogContent>
+        </Dialog>
       </Box>
     </>
   );

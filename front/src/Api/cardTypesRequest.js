@@ -36,3 +36,7 @@ export async function updateCardTypeRequest(id, data) {
     'Content-Type': 'application/json'
   });
 }
+
+export async function getCardTypeTemplatesRequest() {
+  return await baseRequest('cardTypes/templates', 'GET');
+}

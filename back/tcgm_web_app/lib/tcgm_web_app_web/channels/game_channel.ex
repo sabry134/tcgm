@@ -23,8 +23,8 @@ defmodule TcgmWebAppWeb.GameChannel do
     * `draw_card` - Draws a card.
     * `insert_card` - Inserts a card.
   """
-  def handle_in("join_room", %{"player_id" => player_id}, socket) do
-    TcgmWebApp.Game.GameServer.join_room(socket.assigns.room_id, player_id)
+  def handle_in("join_room", %{"player_id" => player_id, "game_id" => game_id}, socket) do
+    TcgmWebApp.Game.GameServer.join_room(socket.assigns.room_id, player_id, game_id)
     broadcast!(socket, "game_update", %{state: TcgmWebApp.Game.GameServer.get_state(socket.assigns.room_id)})
     {:noreply, socket}
   end

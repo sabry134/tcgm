@@ -63,6 +63,15 @@ defmodule TcgmWebApp.GameRules.GameRules do
     |> Repo.all()
   end
 
+  def get_game_rule_by_game_id(game_id) do
+    from(gr in GameRule,
+      where: gr.game_id == ^game_id,
+      limit: 1,
+      select: gr
+    )
+    |> Repo.one()
+  end
+
   @doc """
     Retrieves game rules with true public_template.
   """

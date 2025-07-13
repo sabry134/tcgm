@@ -102,7 +102,7 @@ const RuleEditor = () => {
   const handleCreateRule = async () => {
 
     const gameId = localStorage.getItem("gameSelected");
-    if (!gameId) return alert("Game ID not found");
+    if (!gameId) return alert("Game not found");
 
     try {
       const gameRuleRes = await fetch(`${API_BASE}/api/gameRules`, {

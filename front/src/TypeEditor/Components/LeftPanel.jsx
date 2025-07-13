@@ -6,7 +6,7 @@ import {
 } from '../../Api/cardTypesRequest'
 import CheckIcon from '@mui/icons-material/Check'
 import './LeftPanel.css'
-import { TCGMButton } from '../../Components/RawComponents/TCGMButton/TCGMButton'
+import { TCGMButton } from '../../Components/RawComponents/TCGMButton'
 import { getCardTypesPropertiesbyTypeRequest } from '../../Api/cardTypesPropertiesRequest'
 
 export class LeftPanel extends Component {
@@ -134,7 +134,10 @@ export class LeftPanel extends Component {
           borderRadius: 0
         }}
       >
-        <TCGMButton onClick={this.props.popupCallback}>Add Type</TCGMButton>
+        <TCGMButton
+          onClick={this.props.popupCallback}
+          text='Add Type'
+        />
 
         <div className='titleList'> Type List </div>
         <ul className='typeList'>

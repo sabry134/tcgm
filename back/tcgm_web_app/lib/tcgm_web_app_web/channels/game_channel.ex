@@ -23,8 +23,8 @@ defmodule TcgmWebAppWeb.GameChannel do
     * `draw_card` - Draws a card.
     * `insert_card` - Inserts a card.
   """
-  def handle_in("join_room", %{"player_id" => player_id}, socket) do
-    TcgmWebApp.Game.GameServer.join_room(socket.assigns.room_id, player_id)
+  def handle_in("join_room", %{"player_id" => player_id, "game_id" => game_id}, socket) do
+    TcgmWebApp.Game.GameServer.join_room(socket.assigns.room_id, player_id, game_id)
     broadcast!(socket, "game_update", %{state: TcgmWebApp.Game.GameServer.get_state(socket.assigns.room_id)})
     {:noreply, socket}
   end
@@ -82,9 +82,23 @@ defmodule TcgmWebAppWeb.GameChannel do
     broadcast!(socket, "game_update", %{state: TcgmWebApp.Game.GameServer.get_state(socket.assigns.room_id)})
     {:noreply, socket}
   end
+
   def handle_in("shuffle_card", %{"player_id" => player_id, "location" => location}, socket) do
     TcgmWebApp.Game.GameServer.shuffle_card(socket.assigns.room_id, player_id, location)
     broadcast!(socket, "game_update", %{state: TcgmWebApp.Game.GameServer.get_state(socket.assigns.room_id)})
+    {:noreply, socket}
+  end
+
+  def handle_in("get_chat", _params, socket) do
+    chat = TcgmWebApp.Game.GameServer.get_chat(socket.assigns.room_id)
+    push(socket, "chat_update", %{chat: chat})
+    {:noreply, socket}
+  end
+
+  def handle_in("add_chat_message", %{"player_id" => player_id, "message" => message}, socket) do
+    TcgmWebApp.Game.GameServer.add_chat_message(socket.assigns.room_id, player_id, message)
+    chat = TcgmWebApp.Game.GameServer.get_chat(socket.assigns.room_id)
+    broadcast!(socket, "chat_update", %{chat: chat})
     {:noreply, socket}
   end
 end

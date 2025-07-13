@@ -1,9 +1,9 @@
-import { Paper } from '@mui/material'
 import React, { Component } from 'react'
-import './LeftPanel.css'
-import { TCGMButton } from '../../Components/RawComponents/TCGMButton/TCGMButton'
+import { TCGMButton } from '../../Components/RawComponents/TCGMButton'
+import { SidePanel } from "../../Components/RawComponents/SidePanel";
+
 export class LeftPanel extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     this.state = {
       createDeckInput: {
@@ -13,7 +13,8 @@ export class LeftPanel extends Component {
     }
     this.popupCallback = props.popupCallback
   }
-  createGame () {
+
+  createGame() {
     const apiUrl = this.baseApiUrl + 'card_collections'
     console.log(apiUrl, "Api URL when creating deck")
 
@@ -45,7 +46,7 @@ export class LeftPanel extends Component {
       })
   }
 
-  handleCreateDeckInput (event, key) {
+  handleCreateDeckInput(event, key) {
     const newValue = event.target.value
     const newDeck = {
       name: key === 'name' ? newValue : this.state.createDeckInput.name,
@@ -58,22 +59,19 @@ export class LeftPanel extends Component {
     this.setState({ createDeckInput: newDeck })
   }
 
-  handleCreateDeckClick (event) {}
+  handleCreateDeckClick(event) {
+  }
 
-  render () {
+  render() {
     return (
-      <Paper
-        className='sidebar'
-        sx={{
-          width: 250,
-          p: 2,
-          bgcolor: '#5d3a00',
-          color: 'white',
-          borderRadius: 0
-        }}
-      >
-        <TCGMButton onClick={this.popupCallback}>Create Deck</TCGMButton>
-      </Paper>
+      <SidePanel>
+
+        <TCGMButton
+          onClick={this.popupCallback}
+          text="Create Deck"
+        />
+
+      </SidePanel>
     )
   }
 }

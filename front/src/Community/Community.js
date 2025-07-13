@@ -2,11 +2,11 @@ import React, { useRef, useState } from "react";
 import { Box, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
-import { CommunityGamePicker } from "./Components/CommunityGamePicker/CommunityGamePicker";
+import { CommunityGamePicker } from "./Component/CommunityGamePicker";
 import { Popup } from "../Components/Popup/Popup";
 import { createGameRequest, getGameRequest } from "../Api/gamesRequest";
 import { SidePanel } from "../Components/RawComponents/SidePanel";
-import { TCGMButton } from "../Components/RawComponents/TCGMButton/TCGMButton";
+import { TCGMButton } from "../Components/RawComponents/TCGMButton";
 
 const Community = () => {
   const navigate = useNavigate();
@@ -66,9 +66,10 @@ const onClickCreate = (data) => {
 
         <SidePanel>
 
-          <TCGMButton onClick={openPopup}>
-            Create Game
-          </TCGMButton>
+          <TCGMButton
+            onClick={openPopup}
+            text={"Create Game"}
+          />
 
         </SidePanel>
 
@@ -94,8 +95,6 @@ const onClickCreate = (data) => {
           <CommunityGamePicker/>
 
         </Box>
-
-        <SidePanel/>
 
       </Stack>
     </Box>

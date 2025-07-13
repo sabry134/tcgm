@@ -198,4 +198,22 @@ defmodule TcgmWebAppWeb.CardCollectionController do
     card_collections = CardCollections.get_card_collections_by_user_id_and_game_id(user_id, game_id)
     json(conn, card_collections)
   end
+
+  swagger_path :get_card_collection_templates do
+    get("/card_collections/templates")
+    description("Get all public card collections")
+    response(code(:ok), "Success")
+    response(code(:not_found), "No public card collections found")
+  end
+
+  def get_card_collection_templates(conn, _params) do
+    case CardCollections.get_card_collection_templates() do
+      [] ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "No public card collections found"})
+      card_collections ->
+        json(conn, card_collections)
+    end
+  end
 end

@@ -284,4 +284,25 @@ defmodule TcgmWebAppWeb.BoardController do
     BoardZones.delete_board_zone(board_zone)
     send_resp(conn, :no_content, "")
   end
+
+  swagger_path :get_board_templates do
+    get("/boards/templates")
+    description("Get all public templates for boards")
+    response(code(:ok), "Success")
+  end
+
+  def get_board_templates(conn, _params) do
+    case Boards.get_board_templates() do
+      [] ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{})
+      boards ->
+        json(conn, boards)
+      _ ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(%{error: "Could not retrieve public template boards"})
+    end
+  end
 end

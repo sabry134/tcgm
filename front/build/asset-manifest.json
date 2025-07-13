@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.18c81d36.css",
-    "main.js": "/static/js/main.63c3b7c7.js",
+    "main.js": "/static/js/main.b3a11975.js",
     "static/js/488.93b463ad.chunk.js": "/static/js/488.93b463ad.chunk.js",
     "static/media/libre-baskerville-latin-400-normal.woff2": "/static/media/libre-baskerville-latin-400-normal.023e192311fcda1965f6.woff2",
     "static/media/TCGMlogo.png": "/static/media/TCGMlogo.80b90d770302b4f54ed2.png",
@@ -10,11 +10,11 @@
     "static/media/libre-baskerville-latin-ext-400-normal.woff": "/static/media/libre-baskerville-latin-ext-400-normal.d9f55217775e664a9b36.woff",
     "index.html": "/index.html",
     "main.18c81d36.css.map": "/static/css/main.18c81d36.css.map",
-    "main.63c3b7c7.js.map": "/static/js/main.63c3b7c7.js.map",
+    "main.b3a11975.js.map": "/static/js/main.b3a11975.js.map",
     "488.93b463ad.chunk.js.map": "/static/js/488.93b463ad.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.18c81d36.css",
-    "static/js/main.63c3b7c7.js"
+    "static/js/main.b3a11975.js"
   ]
 }

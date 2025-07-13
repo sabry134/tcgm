@@ -41,7 +41,6 @@ export class TCGMCard extends Component {
                 }
                 return { ...response[tmpIndex], value: value.value }
               })
-              console.log(newPropertiesData)
               this.setState({ cardData: data, properties: newPropertiesData })
             }
           )

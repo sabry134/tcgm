@@ -4,6 +4,27 @@ import JsonToForm from '../../CustomizationForm/JsonToForm'
 import txt from '../Data/TestBackTypes.json'
 
 export class RightPanel extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      selectedCard:
+        JSON.parse(localStorage.getItem('currentEditedCard')) || null
+    }
+  }
+
+  componentDidMount () {
+    window.addEventListener('storage', this.handleStorageChange)
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('storage', this.handleStorageChange)
+  }
+
+  handleStorageChange = () => {
+    const updatedCard = JSON.parse(localStorage.getItem('currentEditedCard'))
+    this.setState({ selectedCard: updatedCard })
+  }
+
   render () {
     return (
       <Paper

@@ -10,21 +10,33 @@ export class PropertiesArray extends Component {
       data: []
     }
   }
+
   getValueByPath (obj, path) {
     if (!path) return ''
     return path.split('.').reduce((acc, part) => acc && acc[part], obj)
   }
-  componentDidMount (prevProps) {
-    this.setState({
-      data: this.getValueByPath(
-        JSON.parse(
-          localStorage.getItem(
-            this.state.localStorageName ?? 'currentEditedCard'
-          )
-        ),
-        this.props.name
-      )
-    })
+
+  componentDidMount () {
+    this.loadData()
+    window.addEventListener('storage', this.handleStorageChange)
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('storage', this.handleStorageChange)
+  }
+
+  handleStorageChange = () => {
+    this.loadData()
+  }
+
+  loadData = () => {
+    const data = this.getValueByPath(
+      JSON.parse(
+        localStorage.getItem(this.state.localStorageName ?? 'currentEditedCard')
+      ),
+      this.props.name
+    )
+    this.setState({ data })
   }
 
   setValueByPath (obj, path, value, index) {
@@ -37,21 +49,20 @@ export class PropertiesArray extends Component {
 
   handleChange = (event, index) => {
     const newValue = event.target.value
-    this.state.data[index].value = newValue
-    this.setState({ data: this.state.data })
+    const updatedData = [...this.state.data]
+    updatedData[index].value = newValue
+    this.setState({ data: updatedData })
 
-    // Send update to backend (or localStorage for temporary saving)
+    // Update localStorage
     this.updateJsonFile(newValue, index)
   }
 
-  // Simulating JSON file update
   updateJsonFile = (newValue, index) => {
     const storedCard = localStorage.getItem(
       this.props.localStorageName ?? 'currentEditedCard'
     )
     const parsedCard = JSON.parse(storedCard)
     this.setValueByPath(parsedCard, this.props.name, newValue, index)
-    console.log(parsedCard)
     localStorage.setItem(
       this.props.localStorageName ?? 'currentEditedCard',
       JSON.stringify(parsedCard)

@@ -6,7 +6,6 @@ import './Editor.css'
 import { TCGMBox } from './Properties/TCGMBox'
 import { CardTypeDisplay } from './CardTypeDisplay'
 
-// TODO(): when back is done changing properties put back those default properties
 const defaultProperties = {
   property_name: 'Property',
   cardtype_id: '',

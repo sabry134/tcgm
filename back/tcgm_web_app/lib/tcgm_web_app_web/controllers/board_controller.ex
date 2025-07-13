@@ -299,10 +299,7 @@ defmodule TcgmWebAppWeb.BoardController do
         |> json(%{})
       boards ->
         json(conn, boards)
-      _ ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(%{error: "Could not retrieve public template boards"})
     end
   end
+
 end

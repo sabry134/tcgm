@@ -51,7 +51,7 @@ export class CardPicker extends FormComponnent {
           onOpen={this.fetchType}
         >
           <MenuItem key={'new'} value={0}>
-            ➕ New Card{' '}
+            ➕ New Card
           </MenuItem>
           {this.state.cards.length > 0 ? (
             this.state.cards.map((card, index) => (

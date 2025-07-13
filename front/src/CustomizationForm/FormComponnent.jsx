@@ -8,6 +8,7 @@ export class FormComponnent extends Component {
   }
 
   getValueByPath (obj, path) {
+    if (!path) return ''
     return path.split('.').reduce((acc, part) => acc && acc[part], obj)
   }
 

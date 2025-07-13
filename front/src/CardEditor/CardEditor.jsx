@@ -20,10 +20,10 @@ const CardEditor = () => {
 
   return (
     <Box display="flex" flexDirection="column" height="100vh">
-      <MainNavigationBar navigate={navigate}/>
+      <MainNavigationBar navigate={navigate} />
 
       <Box display="flex" flexGrow={1} bgcolor="#fff">
-        <LeftPanel/>
+        <LeftPanel />
 
         <Box
           className="main-area"
@@ -31,10 +31,10 @@ const CardEditor = () => {
           bgcolor="#c4c4c4"
           position="relative"
         >
-          <TCGMCard/>
+          <TCGMCard />
         </Box>
 
-        <RightPanel/>
+        <RightPanel />
       </Box>
     </Box>
   );

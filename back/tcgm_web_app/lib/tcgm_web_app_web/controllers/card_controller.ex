@@ -8,6 +8,8 @@ defmodule TcgmWebAppWeb.CardController do
   alias TcgmWebApp.CardProperties.CardProperties
   alias TcgmWebApp.CardTypeProperties.CardTypeProperties
   alias TcgmWebAppWeb.Schemas
+  alias TcgmWebApp.Helpers
+  alias TcgmWebApp.Repo
 
   def swagger_definitions, do: Schemas.swagger_definitions()
 
@@ -151,42 +153,49 @@ defmodule TcgmWebAppWeb.CardController do
   end
 
   def create_card_with_properties(conn, %{"card" => card_params, "properties" => properties}) do
-    case Cards.create_card(card_params) do
-      {:ok, card} ->
-        properties = Enum.map(properties, fn property ->
-          %{
-            value_string: property["value_string"],
-            value_number: property["value_number"],
-            value_boolean: property["value_boolean"],
-            cardtype_property_id: property["cardtype_property_id"],
-            card_id: card.id
-          }
-        end)
+    Repo.transaction(fn ->
+      case Cards.create_card(card_params) do
+        {:ok, card} ->
+          properties = Enum.map(properties, fn property ->
+            %{
+              value_string: property["value_string"],
+              value_number: property["value_number"],
+              value_boolean: property["value_boolean"],
+              cardtype_property_id: property["cardtype_property_id"],
+              card_id: card.id
+            }
+          end)
 
-        case Enum.reduce_while(properties, {:ok, []}, fn property, {:ok, acc} ->
-              case CardProperties.create_card_property(property) do
-                 {:ok, card_property} ->
-                   {:cont, {:ok, [card_property | acc]}}
+          case Enum.reduce_while(properties, {:ok, []}, fn property, {:ok, acc} ->
+            case CardProperties.create_card_property(property) do
+              {:ok, card_property} ->
+                {:cont, {:ok, [card_property | acc]}}
 
-                 {:error, changeset} ->
-                   {:halt, {:error, changeset}}
-               end
-             end) do
-          {:ok, card_properties} ->
-            conn
-            |> put_status(:created)
-            |> json(%{card: card, properties: Enum.reverse(card_properties)})
+              {:error, %Ecto.Changeset{} = changeset} ->
+                Repo.rollback(%{error: "Failed to create one or more card properties", details: changeset.errors})
+            end
+          end) do
+            {:ok, card_properties} ->
+              {:ok, %{card: card, properties: Enum.reverse(card_properties)}}
 
-          {:error, %Ecto.Changeset{} = changeset} ->
-            conn
-            |> put_status(:unprocessable_entity)
-            |> json(%{error: "Failed to create one or more card properties", details: changeset})
-        end
+            {:error, error_details} ->
+              Repo.rollback(error_details)
+          end
 
-      {:error, %Ecto.Changeset{} = changeset} ->
+        {:error, %Ecto.Changeset{} = changeset} ->
+          Repo.rollback(%{error: "Failed to create card", details: changeset.errors})
+      end
+    end)
+    |> case do
+      {:ok, result} ->
+        conn
+        |> put_status(:created)
+        |> json(result)
+
+      {:error, error_details} ->
         conn
         |> put_status(:unprocessable_entity)
-        |> json(%{error: "Failed to create card", details: changeset})
+        |> json(error_details)
     end
   end
 
@@ -209,9 +218,18 @@ defmodule TcgmWebAppWeb.CardController do
       cards when is_list(cards) ->
         cards_with_properties = Enum.map(cards, fn card ->
           properties = CardProperties.get_card_properties_by_card_id(card.id)
+
           clean_properties = Enum.map(properties, fn property ->
-            get_clean_property(property)
+            case property do
+              %Ecto.Changeset{} ->
+                # Handle invalid changeset
+                %{error: "Invalid property", details: property.errors}
+
+              _ ->
+                get_clean_property(property)
+            end
           end)
+
           card_map =
             card
             |> Map.from_struct()

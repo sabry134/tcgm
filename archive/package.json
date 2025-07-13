@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/sabry134/EIP_TCGM#readme",
   "devDependencies": {
-    "electron": "^33.2.0",
+    "electron": "^34.0.0",
     "mocha": "^10.8.2",
     "spectron": "^19.0.0"
   },

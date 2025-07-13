@@ -13,11 +13,15 @@ defmodule TcgmWebAppWeb.Router do
     plug :cors_plug
   end
 
+  pipeline :auth do
+    plug TcgmWebAppWeb.AuthPipeline
+  end
+
+
   scope "/api", TcgmWebAppWeb do
     pipe_through :api
 
-    resources "/users", UserController, only: [:index, :show, :create, :update]
-    delete "/users/delete/:user_id", UserController, :delete_user
+    post "/users", UserController, :create
     post "/users/login", UserController, :login
 
     resources "/games", GameController, only: [:index, :show, :create, :update]
@@ -96,6 +100,12 @@ defmodule TcgmWebAppWeb.Router do
     get "/hello", HelloController, :index
   end
 
+  scope "/api", TcgmWebAppWeb do
+    pipe_through [:api, :auth]
+
+    resources "/users", UserController, only: [:index, :show, :update]
+    delete "/users/delete/:user_id", UserController, :delete_user
+  end
   def swagger_info do
     %{
       schemes: ["http", "https"],

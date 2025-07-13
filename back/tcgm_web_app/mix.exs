@@ -69,7 +69,8 @@ defmodule TcgmWebApp.MixProject do
       {:ex_json_schema, "~> 0.7.0"},
       {:ex_doc, "~> 0.30", only: :dev, runtime: false},
       {:excoveralls, "~> 0.17", only: [:test], runtime: false},
-      {:pbkdf2_elixir, "~> 2.3"}
+      {:pbkdf2_elixir, "~> 2.3"},
+      {:guardian, "~> 2.0"}
     ]
   end
 

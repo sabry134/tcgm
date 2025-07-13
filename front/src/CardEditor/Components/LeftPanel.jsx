@@ -1,4 +1,5 @@
-import { Button, Paper, TextField } from '@mui/material'
+import { Button, Paper, TextField, Typography } from '@mui/material'
+import CheckIcon from '@mui/icons-material/Check'
 import React, { Component } from 'react'
 import { CardPicker } from './CardPicker'
 import { createCardTypeRequest } from '../../Api/cardTypesRequest'
@@ -24,7 +25,8 @@ export class LeftPanel extends Component {
         name: '',
         description: ''
       },
-      cardList: []
+      cardList: [],
+      selectedCard: 0 // Track the selected card
     }
   }
 
@@ -48,19 +50,6 @@ export class LeftPanel extends Component {
         }
       }).then(data => {
         console.log(data)
-      })
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  saveCard () {
-    const card = localStorage.getItem('currentEditedCard')
-    const storedId = localStorage.getItem('editIdPick')
-    const gameId = localStorage.getItem('gameSelected')
-    try {
-      saveCardRequest(storedId, gameId, JSON.parse(card)).then(data => {
-        this.getCard()
       })
     } catch (error) {
       console.log(error)
@@ -102,6 +91,13 @@ export class LeftPanel extends Component {
     window.dispatchEvent(new Event('storage'))
   }
 
+  selectCard (index) {
+    const selectedCard = this.state.cardList[index]
+    localStorage.setItem('editIdPick', selectedCard.id)
+    this.setState({ selectedCard: index })
+    this.loadCard(selectedCard)
+  }
+
   render () {
     return (
       <Paper
@@ -114,30 +110,31 @@ export class LeftPanel extends Component {
           borderRadius: 0
         }}
       >
-        <CardPicker />
-        <Button
-          onClick={event => this.saveCard()}
-          sx={{ color: 'white', paddingBottom: 5 }}
-        >
-          Save Card
-        </Button>
-
         <div style={{ marginTop: 20 }}>
-          <h3>Cards List:</h3>
-          {this.state.cardList.length > 0 ? (
-            this.state.cardList.map((card, index) => (
-              <Button
-                key={index}
-                variant='contained'
-                onClick={event => this.loadCard(card)}
-                sx={{ bgcolor: 'white', color: '#5d3a00', margin: '5px 0' }}
-              >
-                {card.name}
-              </Button>
-            ))
-          ) : (
-            <p>No cards available.</p>
-          )}
+          <div className='titleList'> Card List </div>{' '}
+          {/* Add title for Card List */}
+          <ul className='typeList'>
+            {this.state.cardList.map((card, index) => (
+              <div key={index} className='itemList'>
+                <div
+                  className={'selector'}
+                  onClick={event => this.selectCard(index)}
+                >
+                  <Typography
+                    color={
+                      this.state.selectedCard === index ? '#FFF600' : 'white'
+                    }
+                  >
+                    {card.name}
+                  </Typography>
+                  {this.state.selectedCard === index && (
+                    <CheckIcon htmlColor='#FFF600' />
+                  )}
+                </div>
+                <div className='separator'></div>
+              </div>
+            ))}
+          </ul>
         </div>
       </Paper>
     )

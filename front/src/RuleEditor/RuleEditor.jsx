@@ -14,7 +14,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 
-const API_BASE = "http://localhost:4000";
+const API_BASE = "http://79.137.11.227:4000";
 
 const styles = {
   navbar: {

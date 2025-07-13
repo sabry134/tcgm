@@ -3,7 +3,7 @@ import CardZone from "./CardZone";
 import "../Room.css";
 import { Box } from "@mui/material";
 
-const API_BASE = "http://localhost:4000";
+const API_BASE = "http://79.137.11.227:4000";
 
 const Board = () => {
   const [tableBackground, setTableBackground] = useState(null);

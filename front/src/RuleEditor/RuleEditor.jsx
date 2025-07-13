@@ -40,6 +40,49 @@ const RuleEditor = () => {
   const [newRuleValue, setNewRuleValue] = useState(0);
   const [expandedRuleId, setExpandedRuleId] = useState(null);
   const [ruleEdits, setRuleEdits] = useState({});
+  const [newPropInputs, setNewPropInputs] = useState({});
+
+
+  const handleNewPropInput = (ruleId, field, value) => {
+    setNewPropInputs((prev) => ({
+      ...prev,
+      [ruleId]: {
+        ...prev[ruleId],
+        [field]: value,
+      },
+    }));
+  };
+
+
+  const handleAddPlayerProperty = (ruleId) => {
+    const inputs = newPropInputs[ruleId];
+    if (!inputs?.name || isNaN(inputs.value))
+
+    setRuleEdits((prev) => {
+      const existingProps = prev[ruleId]?.playerProps || [];
+      return {
+        ...prev,
+        [ruleId]: {
+          ...prev[ruleId],
+          playerProps: [
+            ...existingProps,
+            {
+              id: `new-${Date.now()}`,
+              property_name: inputs.name,
+              value: Number(inputs.value),
+              isNew: true,
+            },
+          ],
+        },
+      };
+    });
+
+    setNewPropInputs((prev) => ({
+      ...prev,
+      [ruleId]: { name: "", value: 0 },
+    }));
+  };
+
 
   useEffect(() => {
     fetchRules();
@@ -57,49 +100,49 @@ const RuleEditor = () => {
   };
 
   const handleCreateRule = async () => {
-    if (!newRuleName) return alert("Rule name cannot be empty");
+
     const gameId = localStorage.getItem("gameSelected");
     if (!gameId) return alert("Game ID not found");
 
     try {
-      const ruleRes = await fetch(`${API_BASE}/api/rules`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          rule: { rule_name: newRuleName, value: newRuleValue, game_rule_id: null },
-        }),
-      });
-      const ruleData = await ruleRes.json();
-      if (!ruleRes.ok) throw new Error("Failed to create rule");
-
       const gameRuleRes = await fetch(`${API_BASE}/api/gameRules`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           gameRule: {
-            starting_hand_size: 5,
-            max_deck_size: 60,
-            max_hand_size: 7,
-            draw_per_turn: 1,
+            starting_hand_size: 0,
+            min_deck_size: 0,
+            max_deck_size: 0,
+            max_hand_size: 0,
+            draw_per_turn: 0,
             game_id: parseInt(gameId),
           },
         }),
       });
+
       const gameRuleData = await gameRuleRes.json();
       if (!gameRuleRes.ok) throw new Error("Failed to create game rule");
 
-      await fetch(`${API_BASE}/api/rules/${ruleData.id}`, {
-        method: "PUT",
+      const ruleRes = await fetch(`${API_BASE}/api/rules`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          rule: { rule_name: newRuleName, value: newRuleValue, game_rule_id: gameRuleData.id },
+          rule: {
+            rule_name: newRuleName,
+            value: newRuleValue,
+            game_rule_id: gameRuleData.id,
+          },
         }),
       });
 
+      const ruleData = await ruleRes.json();
+      if (!ruleRes.ok) throw new Error("Failed to create rule");
+
       const defaultProps = [
-        { name: "health", value: 100 },
-        { name: "power", value: 10 },
+        { name: "health", value: 0 },
+        { name: "power", value: 0 },
       ];
+
       for (const prop of defaultProps) {
         await fetch(`${API_BASE}/api/playerProperties`, {
           method: "POST",
@@ -118,9 +161,9 @@ const RuleEditor = () => {
       setNewRuleValue(0);
       fetchRules();
     } catch (error) {
-      alert(error.message);
     }
   };
+
 
   const handleDeleteRule = async (ruleId) => {
     if (!window.confirm("Are you sure you want to delete this rule?")) return;
@@ -163,7 +206,7 @@ const RuleEditor = () => {
 
   const handleSaveEdit = async (ruleId) => {
     const edit = ruleEdits[ruleId];
-    if (!edit) return alert("Nothing to save");
+
 
     try {
       const gameRuleId = rules.find((r) => r.id === ruleId).game_rule_id;
@@ -175,16 +218,25 @@ const RuleEditor = () => {
       });
 
       for (const prop of edit.playerProps) {
-        await fetch(`${API_BASE}/api/playerProperties/${prop.id}`, {
-          method: "PUT",
+        const isNew = prop.isNew || typeof prop.id === "string";
+        const url = isNew
+          ? `${API_BASE}/api/playerProperties`
+          : `${API_BASE}/api/playerProperties/${prop.id}`;
+
+        await fetch(url, {
+          method: isNew ? "POST" : "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            playerProperty: { property_name: prop.property_name, value: prop.value },
+            playerProperty: {
+              property_name: prop.property_name,
+              value: prop.value,
+              game_rule_id: gameRuleId,
+            },
           }),
         });
       }
 
-      alert("Saved successfully.");
+
       fetchRules();
       setExpandedRuleId(null);
     } catch {
@@ -226,12 +278,10 @@ const RuleEditor = () => {
 
   return (
     <Box sx={{ backgroundColor: "#111", minHeight: "100vh", pb: 4 }}>
-      {/* Navbar */}
       <Box sx={styles.navbar}>
         <Typography sx={styles.navText}>Rule Manager</Typography>
       </Box>
 
-      {/* Create Rule Card */}
       <Box
         sx={{
           display: "flex",
@@ -271,7 +321,7 @@ const RuleEditor = () => {
               sx={{ mb: 2 }}
               InputLabelProps={{ style: { color: brownLight } }}
               inputProps={{ style: { color: greyText } }}
-              
+
             />
             <TextField
               label="Rule Value"
@@ -318,7 +368,6 @@ const RuleEditor = () => {
         </Card>
       </Box>
 
-      {/* Rules List */}
       <Box
         sx={{
           maxWidth: 600,
@@ -383,41 +432,43 @@ const RuleEditor = () => {
                   >
                     Game Rule
                   </Typography>
-                  {Object.entries(ruleEdits[rule.id].gameRule).map(
-                    ([key, val]) =>
-                      key !== "id" &&
-                      key !== "game_id" && (
-                        <TextField
-                          key={key}
-                          label={toTitleCase(key)}
-                          value={val}
-                          type="number"
-                          onChange={(e) =>
-                            updateGameRuleField(rule.id, key, e.target.value)
-                          }
-                          fullWidth
-                          sx={{
-                            mb: 1,
-                            "& .MuiOutlinedInput-root": {
-                              color: greyText,
-                              "& fieldset": {
-                                borderColor: brown,
+                  {ruleEdits[rule.id]?.gameRule &&
+                    Object.entries(ruleEdits[rule.id].gameRule).map(
+                      ([key, val]) =>
+                        key !== "id" &&
+                        key !== "game_id" && (
+                          <TextField
+                            key={key}
+                            label={toTitleCase(key)}
+                            value={val}
+                            type="number"
+                            onChange={(e) =>
+                              updateGameRuleField(rule.id, key, e.target.value)
+                            }
+                            fullWidth
+                            sx={{
+                              mb: 1,
+                              "& .MuiOutlinedInput-root": {
+                                color: greyText,
+                                "& fieldset": {
+                                  borderColor: brown,
+                                },
+                                "&:hover fieldset": {
+                                  borderColor: brownLight,
+                                },
+                                "&.Mui-focused fieldset": {
+                                  borderColor: brownLight,
+                                },
                               },
-                              "&:hover fieldset": {
-                                borderColor: brownLight,
+                              "& .MuiInputLabel-root": {
+                                color: brownLight,
                               },
-                              "&.Mui-focused fieldset": {
-                                borderColor: brownLight,
-                              },
-                            },
-                            "& .MuiInputLabel-root": {
-                              color: brownLight,
-                            },
-                          }}
-                          variant="outlined"
-                        />
-                      )
-                  )}
+                            }}
+                            variant="outlined"
+                          />
+                        )
+                    )}
+
 
                   <Typography
                     sx={{ fontWeight: "bold", mt: 3, mb: 1, color: brownLight }}
@@ -455,6 +506,46 @@ const RuleEditor = () => {
                       variant="outlined"
                     />
                   ))}
+
+                  {/* Add new property fields */}
+                  <Box sx={{ display: "flex", gap: 1, mt: 2 }}>
+                    <TextField
+                      label="Property Name"
+                      value={newPropInputs[rule.id]?.name || ""}
+                      onChange={(e) =>
+                        handleNewPropInput(rule.id, "name", e.target.value)
+                      }
+                      sx={{ flex: 1 }}
+                      variant="outlined"
+                      InputLabelProps={{ style: { color: brownLight } }}
+                      inputProps={{ style: { color: greyText } }}
+                    />
+                    <TextField
+                      label="Value"
+                      type="number"
+                      value={newPropInputs[rule.id]?.value || ""}
+                      onChange={(e) =>
+                        handleNewPropInput(rule.id, "value", e.target.value)
+                      }
+                      sx={{ width: 100 }}
+                      variant="outlined"
+                      InputLabelProps={{ style: { color: brownLight } }}
+                      inputProps={{ style: { color: greyText } }}
+                    />
+                    <Button
+                      variant="contained"
+                      onClick={() => handleAddPlayerProperty(rule.id)}
+                      sx={{
+                        bgcolor: brown,
+                        "&:hover": { bgcolor: brownLight },
+                        color: greyText,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Add
+                    </Button>
+                  </Box>
+
 
                   <Button
                     variant="contained"

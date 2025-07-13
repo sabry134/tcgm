@@ -25,7 +25,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "build:front": "cd front && npm run build",
-    "deploy": "npm run build:front && git subtree push --prefix front/build origin gh-pages",
+    "deploy": "cd front && npm run build && cd .. && git subtree push --prefix front/build origin gh-pages",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

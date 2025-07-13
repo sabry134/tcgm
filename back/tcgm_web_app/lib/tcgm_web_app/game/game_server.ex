@@ -1,6 +1,5 @@
 defmodule TcgmWebApp.Game.GameServer do
   use GenServer
-  alias TcgmWebApp.Repo
 
   alias TcgmWebApp.Game.GameLogic
   alias TcgmWebApp.Game.GameConfig

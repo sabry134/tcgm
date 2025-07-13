@@ -124,10 +124,6 @@ defmodule TcgmWebAppWeb.GameRuleController do
         |> json(%{})
       game_rules ->
         json(conn, game_rules)
-      _ ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(%{error: "Could not retrieve public template game rules"})
     end
   end
 

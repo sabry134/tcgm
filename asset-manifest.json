@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/tcgm/static/css/main.3d8c18d4.css",
-    "main.js": "/tcgm/static/js/main.10e8d6eb.js",
+    "main.js": "/tcgm/static/js/main.5e2eeb7b.js",
     "static/js/488.93b463ad.chunk.js": "/tcgm/static/js/488.93b463ad.chunk.js",
     "static/media/libre-baskerville-latin-400-normal.woff2": "/tcgm/static/media/libre-baskerville-latin-400-normal.023e192311fcda1965f6.woff2",
     "static/media/TCGMlogo.png": "/tcgm/static/media/TCGMlogo.80b90d770302b4f54ed2.png",
@@ -10,11 +10,11 @@
     "static/media/libre-baskerville-latin-ext-400-normal.woff": "/tcgm/static/media/libre-baskerville-latin-ext-400-normal.d9f55217775e664a9b36.woff",
     "index.html": "/tcgm/index.html",
     "main.3d8c18d4.css.map": "/tcgm/static/css/main.3d8c18d4.css.map",
-    "main.10e8d6eb.js.map": "/tcgm/static/js/main.10e8d6eb.js.map",
+    "main.5e2eeb7b.js.map": "/tcgm/static/js/main.5e2eeb7b.js.map",
     "488.93b463ad.chunk.js.map": "/tcgm/static/js/488.93b463ad.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.3d8c18d4.css",
-    "static/js/main.10e8d6eb.js"
+    "static/js/main.5e2eeb7b.js"
   ]
 }

@@ -8,6 +8,7 @@ import {
   getCardsByGameRequest,
   getCardsByGameWithPropertiesRequest
 } from '../../Api/cardsRequest'
+import defaultData from '../Data/TestBack.json'
 
 // TODO(): add new create card button
 // TODO(): change right pannel to only accept mutable properties change and name of card
@@ -32,10 +33,19 @@ export class LeftPanel extends Component {
 
   componentDidMount () {
     this.getCard()
+
+    // Add storage event listener
+    this.storageListener = () => {
+      this.getCard(false) // Reload cards when storage changes
+    }
+    window.addEventListener('newCardCreated', this.storageListener)
   }
 
   componentWillUnmount () {
     localStorage.removeItem('editIdPick')
+
+    // Remove storage event listener
+    window.removeEventListener('newCardCreated', this.storageListener)
   }
 
   createCardType () {
@@ -56,7 +66,20 @@ export class LeftPanel extends Component {
     }
   }
 
-  getCard () {
+  saveCard () {
+    const card = localStorage.getItem('currentEditedCard')
+    const storedId = localStorage.getItem('editIdPick')
+    const gameId = localStorage.getItem('gameSelected')
+    try {
+      saveCardRequest(storedId, gameId, JSON.parse(card)).then(data => {
+        this.getCard()
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  getCard (reloadPickedCard = true) {
     const gameSelected = localStorage.getItem('gameSelected')
 
     try {
@@ -64,9 +87,13 @@ export class LeftPanel extends Component {
         if (!data) {
           return []
         }
-        this.setState({ cardList: data })
-        if (data.length > 0) {
+
+        if (data.length > 0 && reloadPickedCard) {
+          this.setState({ cardList: data })
           this.loadCard(data[0])
+        }
+        if (!reloadPickedCard) {
+          this.setState({ cardList: data, selectedCard: data.length - 1 }) // Select the last card by default
         }
         return data
       })
@@ -92,6 +119,13 @@ export class LeftPanel extends Component {
   }
 
   selectCard (index) {
+    if (index === -1) {
+      this.setState({ selectedCard: -1 })
+      localStorage.removeItem('editIdPick')
+      localStorage.setItem('currentEditedCard', JSON.stringify(defaultData))
+      window.dispatchEvent(new Event('storage'))
+      return
+    }
     const selectedCard = this.state.cardList[index]
     localStorage.setItem('editIdPick', selectedCard.id)
     this.setState({ selectedCard: index })
@@ -134,6 +168,22 @@ export class LeftPanel extends Component {
                 <div className='separator'></div>
               </div>
             ))}
+            <div className='itemList'>
+              <div
+                className={'selector'}
+                onClick={event => this.selectCard(-1)}
+              >
+                <Typography
+                  color={this.state.selectedCard === -1 ? '#FFF600' : 'white'}
+                >
+                  + Create New Card
+                </Typography>
+                {this.state.selectedCard === -1 && (
+                  <CheckIcon htmlColor='#FFF600' />
+                )}
+              </div>
+              <div className='separator'></div>
+            </div>
           </ul>
         </div>
       </Paper>

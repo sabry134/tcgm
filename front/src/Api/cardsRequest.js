@@ -46,13 +46,16 @@ export async function saveCardRequest(storedId, game_id, data) {
       });
     } else {
       baseRequest('/cardProperties/card/' + storedId, 'GET').then((response) => {
-        response.forEach((element, index) => {
+        const reversedResponse = [...response].reverse();
+
+        reversedResponse.forEach((element, index) => {
+          const size = data.properties.length - 1
           baseRequest('cardProperties/' + element.id, 'PUT', {
             "cardProperty": {
               ...element,
-              value_string: typeof data.properties[index].value === "string" ? data.properties[index].value : null,
-              value_number: typeof data.properties[index].value === "number" ? data.properties[index].value : null,
-              value_boolean: typeof data.properties[index].value === "boolean" ? data.properties[index].value : null,
+              value_string: typeof data.properties[size - index].value === "string" ? data.properties[size - index].value : null,
+              value_number: typeof data.properties[size - index].value === "number" ? data.properties[size - index].value : null,
+              value_boolean: typeof data.properties[size - index].value === "boolean" ? data.properties[size - index].value : null,
             }
           }, {
             'Content-Type': 'application/json'

@@ -8,24 +8,66 @@ import {
   saveCardRequest
 } from '../../Api/cardsRequest'
 
-function saveCard () {
-  console.log('TEST SAVE')
+function loadCard (card, isCreate = false) {
+  localStorage.setItem('currentEditedCard', JSON.stringify(card))
+  localStorage.setItem('editIdPick', card.id)
+  window.dispatchEvent(new Event('storage'))
+  if (isCreate) {
+    window.dispatchEvent(new Event('newCardCreated'))
+  }
+}
 
+function getCard (id = -1) {
+  const gameSelected = localStorage.getItem('gameSelected')
+
+  try {
+    getCardsByGameWithPropertiesRequest(gameSelected).then(data => {
+      if (!data) {
+        return []
+      }
+      if (data.length > 0) {
+        let index = 0 // Default to the first card
+        if (id !== -1) {
+          index = data.findIndex(card => card.id === id) // Find the index of the card with the specified id
+          if (index === -1) {
+            console.log(
+              `Card with id ${id} not found, defaulting to the first card.`
+            )
+            index = 0
+          }
+          loadCard(data[index]) // Load the card at the found index
+        } else {
+          index = data.length - 1
+          loadCard(data[index], true) // Load the last card if no id is specified
+        }
+      }
+      return data
+    })
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+function saveCard () {
   const card = localStorage.getItem('currentEditedCard')
   const gameId = localStorage.getItem('gameSelected')
   try {
-    saveCardRequest(0, gameId, JSON.parse(card)).then(data => {})
+    saveCardRequest(0, gameId, JSON.parse(card)).then(data => {
+      getCard()
+    })
   } catch (error) {
     console.log(error)
   }
 }
 
 function editCard () {
-  console.log('TEST EDIT')
   const card = localStorage.getItem('currentEditedCard')
   const gameId = localStorage.getItem('gameSelected')
+  const currentCard = JSON.parse(localStorage.getItem('currentEditedCard'))
   try {
-    saveCardRequest(1, gameId, JSON.parse(card)).then(data => {})
+    saveCardRequest(currentCard.id, gameId, JSON.parse(card)).then(data => {
+      getCard(currentCard.id)
+    })
   } catch (error) {
     console.log(error)
   }

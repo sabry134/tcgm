@@ -19,6 +19,18 @@ const CardEditor = () => {
     }
   }, [])
 
+  const saveNewCard = () => {
+    console.log('Save new card logic here')
+  }
+
+  const saveEditedCard = () => {
+    console.log('Save edited card logic here')
+  }
+
+  const deleteCard = () => {
+    console.log('Delete card logic here')
+  }
+
   return (
     <Box display='flex' flexDirection='column' height='100vh'>
       <MainNavigationBar navigate={navigate} />
@@ -31,7 +43,11 @@ const CardEditor = () => {
           bgcolor='#c4c4c4'
           position='relative'
         >
-          <CardEditorStagnantUI />
+          <CardEditorStagnantUI
+            saveNewCard={saveNewCard}
+            saveEditedCard={saveEditedCard}
+            deleteCard={deleteCard}
+          />
           <TCGMCard />
         </Box>
         <RightPanel />

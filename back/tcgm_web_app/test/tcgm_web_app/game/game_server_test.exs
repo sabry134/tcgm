@@ -151,6 +151,14 @@ defmodule TcgmWebApp.Game.GameServerTest do
     assert state.players[user.username]["caster"] == []
   end
 
+  test "players can leave a room", %{room_id: room_id, game: game, user: user} do
+    {:ok, state_before} = GameServer.join_room(room_id, user.username, game.id)
+    assert Map.has_key?(state_before.players, user.username)
+
+    {:ok, state_after} = GameServer.leave_room(room_id, user.username)
+    refute Map.has_key?(state_after.players, user.username)
+  end
+
   test "card can be inserted to location", %{room_id: room_id, game: game, user: user} do
     GameServer.join_room(room_id, user.username, game.id)
 

@@ -148,15 +148,4 @@ defmodule TcgmWebAppWeb.RoomControllerTest do
       }
     }
   end
-
-  test "players can leave a room", %{room_id: room_id, game: game, user: user} do
-    GameServer.join_room(room_id, user.username, game.id)
-    state_before = GameServer.get_state(room_id)
-    assert Map.has_key?(state_before.players, user.username)
-
-    :ok = GameServer.leave_room(room_id, user.username)
-
-    state_after = GameServer.get_state(room_id)
-    refute Map.has_key?(state_after.players, user.username)
-  end
 end

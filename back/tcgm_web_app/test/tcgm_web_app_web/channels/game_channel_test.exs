@@ -159,10 +159,9 @@ defmodule TcgmWebAppWeb.GameChannelTest do
     state_before = GameServer.get_state(room_id)
     assert Map.has_key?(state_before.players, user.username)
 
-    :ok = GameServer.leave_room(room_id, user.username)
+    {:ok, state} = GameServer.leave_room(room_id, user.username)
 
-    state_after = GameServer.get_state(room_id)
-    refute Map.has_key?(state_after.players, user.username)
+    refute Map.has_key?(state.players, user.username)
   end
 
   test "multiple players can join room channel", %{socket: socket, socket2: socket2, room_id: room_id, game: game, user: user, user2: user2} do
@@ -448,5 +447,19 @@ defmodule TcgmWebAppWeb.GameChannelTest do
       msg[:message] == "Hi there!" and
       Map.has_key?(msg, :timestamp)
     end)
+  end
+
+  test "removes player from room on socket disconnect", %{socket: socket, user: user, room_id: room_id, game: game} do
+    Process.flag(:trap_exit, true)
+    {:ok, _, socket} = subscribe_and_join(socket, GameChannel, "room:" <> room_id, %{})
+    Phoenix.ChannelTest.push(socket, "join_room", %{"player_id" => user.username, "game_id" => game.id})
+    assert_broadcast "game_update", %{state: _state}
+    ref = Process.monitor(socket.channel_pid)
+    Phoenix.ChannelTest.close(socket)
+    assert_receive {:DOWN, ^ref, :process, _pid, _reason}
+
+    # check the player has good been disconected
+    assert_broadcast "game_update", %{state: state_after}
+    refute Map.has_key?(state_after.players, user.username)
   end
 end

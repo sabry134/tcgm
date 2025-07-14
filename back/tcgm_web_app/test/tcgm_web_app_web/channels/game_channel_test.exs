@@ -146,10 +146,8 @@ defmodule TcgmWebAppWeb.GameChannelTest do
   test "players can join room channel", %{socket: socket, room_id: room_id, game: game, user: user} do
     {:ok, _, socket} = subscribe_and_join(socket, GameChannel, "room:" <> room_id, %{})
     assert socket.assigns.room_id == room_id
-
-    Phoenix.ChannelTest.push(socket, "join_room", %{"player_id" => user.username, "game_id" => game.id})
-    assert_broadcast("game_update", %{state: state})
-
+    ref = Phoenix.ChannelTest.push(socket, "join_room", %{"player_id" => user.username, "game_id" => game.id})
+    assert_broadcast "game_update", %{state: state}
     assert Map.has_key?(state.players, user.username)
   end
 

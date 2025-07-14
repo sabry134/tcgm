@@ -145,7 +145,7 @@ defmodule TcgmWebApp.Game.GameServer do
         new_players = Map.put(state.players, player_id, player_data)
         new_state = %{state | players: new_players, turn: player_id}
 
-        {:reply, :ok, new_state}
+        {:reply, {:ok, new_state}, new_state}
     end
   end
 

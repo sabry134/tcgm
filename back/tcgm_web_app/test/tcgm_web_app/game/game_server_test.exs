@@ -140,9 +140,9 @@ defmodule TcgmWebApp.Game.GameServerTest do
   end
 
   test "players can join a room", %{room_id: room_id, game: game, user: user} do
-    assert :ok = GameServer.join_room(room_id, user.username, game.id)
+    {:ok, state} = GameServer.join_room(room_id, user.username, game.id)
 
-    state = GameServer.get_state(room_id)
+    #state = GameServer.get_state(room_id)
     assert Map.has_key?(state.players, user.username)
     assert state.players[user.username]["hand"] == []
     assert state.players[user.username]["field"] == []

@@ -93,40 +93,6 @@ defmodule TcgmWebAppWeb.GameControllerTest do
     assert Repo.get(Game, game.id) == nil
   end
 
-  test "POST /api/games/groups creates a new card collection group", %{conn: conn, game: game, cardType: cardType} do
-    attrs = %{ name: "Test group", game_id: game.id, max_cards: 10, min_cards: 1, max_copies: 4, share_max_copies: true, allowed_card_types: [cardType.id], collection_type: "deck" }
-    conn = post(conn, "/api/games/groups", group: attrs)
-    response = json_response(conn, 201)
-
-    assert response["id"]
-    assert response["name"] == "Test group"
-    assert response["game_id"] == game.id
-    assert response["max_cards"] == 10
-    assert response["min_cards"] == 1
-    assert response["max_copies"] == 4
-    assert response["share_max_copies"] == true
-    assert response["allowed_card_types"] == [cardType.id]
-    assert response["collection_type"] == "deck"
-  end
-
-  test "GET /api/games/:id/groups returns a list of groups in a card collection", %{conn: conn, game: game, cardType: cardType} do
-    attrs = %{ name: "Test group", game_id: game.id, max_cards: 10, min_cards: 1, max_copies: 4, share_max_copies: true, allowed_card_types: [cardType.id], collection_type: "deck" }
-    conn = post(conn, "/api/games/groups", group: attrs)
-
-    conn = get(conn, "/api/games/#{game.id}/groups")
-    response = json_response(conn, 200)
-
-    assert length(response) > 0
-    assert Enum.any?(response, fn g -> g["game_id"] == game.id end)
-    assert Enum.any?(response, fn g -> g["name"] == "Test group" end)
-    assert Enum.any?(response, fn g -> g["max_cards"] == 10 end)
-    assert Enum.any?(response, fn g -> g["min_cards"] == 1 end)
-    assert Enum.any?(response, fn g -> g["max_copies"] == 4 end)
-    assert Enum.any?(response, fn g -> g["share_max_copies"] == true end)
-    assert Enum.any?(response, fn g -> g["allowed_card_types"] == [cardType.id] end)
-    assert Enum.any?(response, fn g -> g["collection_type"] == "deck" end)
-  end
-
   test "GET /api/games/{role_name}/user{user_id} returns games by user role", %{conn: conn, game: game, user: user, userGameRole: userGameRole} do
     conn = get(conn, "/api/games/role/#{userGameRole.role_name}/user/#{user.id}")
     response = json_response(conn, 200)

@@ -157,7 +157,7 @@ defmodule TcgmWebApp.Game.GameServer do
     if Map.has_key?(state.players, player_id) do
       new_players = Map.delete(state.players, player_id)
       new_state = %{state | players: new_players}
-      {:reply, :ok, new_state}
+      {:reply, {:ok, new_state}, new_state}
     else
       {:reply, {:error, :not_found}, state}
     end

@@ -33,7 +33,7 @@ const styles = {
 };
 
 const MAX_NAME_LENGTH = 30;
-const API_BASE = "http://79.137.11.227:4000";
+const API_BASE = "http://localhost:4000";
 
 const BoardEditor = () => {
   const navigate = useNavigate();

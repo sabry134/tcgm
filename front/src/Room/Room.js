@@ -10,7 +10,7 @@ import CardZone from "./Componnent/CardZone";
 import ContextMenu from "./Componnent/ContextMenu"; // Import the context menu component
 import CardModal from "./Componnent/CardModal";
 
-const API_BASE = "http://79.137.11.227:4000";
+const API_BASE = "http://localhost:4000";
 
 const Room = () => {
   const navigate = useNavigate();

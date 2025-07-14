@@ -3,7 +3,7 @@ import CardZone from "./CardZone";
 import "../Room.css";
 import { Box } from "@mui/material";
 
-const API_BASE = "https://interracial-volunteer-sacramento-do.trycloudflare.com";
+const API_BASE = "https://localhost:4000";
 
 const Board = () => {
   const [tableBackground, setTableBackground] = useState(null);

@@ -29,7 +29,9 @@ defmodule TcgmWebAppWeb.CardCollectionGroupController do
 
   def show(conn, %{"id" => id}) do
     group = CardCollectionGroups.get_card_collection_group!(id)
-    json(conn, group)
+    conn
+    |> put_status(:ok)
+    |>  json(group)
   end
 
   swagger_path :create_card_collection_group do
@@ -103,12 +105,16 @@ defmodule TcgmWebAppWeb.CardCollectionGroupController do
     case CardCollectionGroups.get_card_collection_groups_by_game_id(game_id) do
       card_collection_groups ->
         case card_collection_groups do
-          [] -> send_resp(conn, :not_found, "No card collection groups found for this game")
-          _ -> json(conn, card_collection_groups)
+          [] -> conn
+            |> put_status(:not_found)
+            |> json(%{error: "No card collection groups found for game #{game_id}"})
+          _ -> conn
+            |> put_status(:ok)
+            |> json(card_collection_groups)
         end
-        json(conn, card_collection_groups)
-      {:error, :not_found} ->
-        send_resp(conn, :not_found, "Game not found")
+        conn
+        |> put_status(:ok)
+        |> json(card_collection_groups)
     end
   end
 
@@ -125,12 +131,16 @@ defmodule TcgmWebAppWeb.CardCollectionGroupController do
     case CardCollectionGroups.get_card_collection_id_by_game_id_and_collection_type(game_id, collection_type) do
       card_collection_group ->
         case card_collection_group do
-          nil -> send_resp(conn, :not_found, "Card collection group with type #{collection_type} not found for game #{game_id}")
-          _ -> json(conn, card_collection_group)
+          nil -> conn
+            |> put_status(:not_found)
+            |> json(%{error: "No card collection group found for game #{game_id} with collection type #{collection_type}"})
+          _ -> conn
+            |> put_status(:ok)
+            |> json(card_collection_group)
         end
-        json(conn, card_collection_group)
-      {:error, :not_found} ->
-        send_resp(conn, :not_found, "Card collection group not found")
+        conn
+        |> put_status(:ok)
+        |> json(card_collection_group)
     end
   end
 
@@ -146,6 +156,8 @@ defmodule TcgmWebAppWeb.CardCollectionGroupController do
       %{"name" => "set"},
       %{"name" => "collection"},
     ]
-    json(conn, collection_types)
+    conn
+    |> put_status(:ok)
+    |> json(collection_types)
   end
 end

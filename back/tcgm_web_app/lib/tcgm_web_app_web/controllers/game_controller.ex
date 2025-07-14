@@ -4,7 +4,6 @@ defmodule TcgmWebAppWeb.GameController do
   use PhoenixSwagger
 
   alias TcgmWebApp.Games.Games
-  alias TcgmWebApp.CardCollectionGroups.CardCollectionGroups
   alias TcgmWebApp.UserGameRoles.UserGameRoles
   alias TcgmWebAppWeb.Helpers
   alias TcgmWebAppWeb.Schemas
@@ -102,54 +101,6 @@ defmodule TcgmWebAppWeb.GameController do
 
     Games.delete_game!(game)
     send_resp(conn, :no_content, "")
-  end
-
-  swagger_path :create_card_collection_group do
-    post("/game/card_collection_groups")
-    description("Create a new card collection group")
-    parameter(:body, :body, Schema.ref(:CardCollectionGroupRequest), "Card Collection group request payload", required: true)
-    response(code(:created), "Card Collection group created")
-    response(code(:unprocessable_entity), "Invalid parameters")
-  end
-
-  def create_card_collection_group(conn, %{"group" => group_params}) do
-    case CardCollectionGroups.create_card_collection_group(group_params) do
-      {:ok, card_collection_group} ->
-        conn
-        |> put_status(:created)
-        |> json(card_collection_group)
-      {:error, %Ecto.Changeset{} = changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(changeset)
-    end
-  end
-
-  swagger_path :get_card_collection_groups_by_game_id do
-    get("/game/{game_id}/card_collection_groups")
-    description("Get card collection groups by game ID")
-    parameter("game_id", :path, :integer, "Game ID", required: true)
-    response(code(:ok), "Success")
-    response(code(:not_found), "Game not found")
-  end
-
-  def get_card_collection_groups_by_game_id(conn, %{"game_id" => game_id}) do
-    card_collection_groups = CardCollectionGroups.get_card_collection_groups_by_game_id(game_id)
-    json(conn, card_collection_groups)
-  end
-
-  swagger_path :get_card_collection_group_by_game_id_and_collection_type do
-    get("/game/{game_id}/card_collection_groups/{collection_type}")
-    description("Get card collection group by game ID and collection type")
-    parameter("game_id", :path, :integer, "Game ID", required: true)
-    parameter("collection_type", :path, :string, "Collection Type", required: true)
-    response(code(:ok), "Success")
-    response(code(:not_found), "Game not found")
-  end
-
-  def get_card_collection_group_by_game_id_and_collection_type(conn, %{"game_id" => game_id, "collection_type" => collection_type}) do
-    card_collection_group = CardCollectionGroups.get_card_collection_id_by_game_id_and_collection_type(game_id, collection_type)
-    json(conn, card_collection_group)
   end
 
   swagger_path :get_games_by_role_and_user_id do

@@ -27,9 +27,6 @@ defmodule TcgmWebAppWeb.Router do
     resources "/games", GameController, only: [:index, :show, :create, :update]
     delete "/games/delete/:game_id", GameController, :delete_game
     get "/games/name/:name", GameController, :get_game_by_name
-    post "/games/groups", GameController, :create_card_collection_group
-    get "/games/:game_id/groups", GameController, :get_card_collection_groups_by_game_id
-    get "/games/:game_id/groups/:collection_type", GameController, :get_card_collection_group_by_game_id_and_collection_type
     get "/games/role/:role_name/user/:user_id", GameController, :get_games_by_role_and_user_id
     get "/games/:game_id/user/:user_id/roles", GameController, :get_user_roles_for_game
     post "/games/:game_id/user/:user_id/role", GameController, :grant_role_to_user
@@ -73,6 +70,12 @@ defmodule TcgmWebAppWeb.Router do
     get "/card_collections/user/:user_id", CardCollectionController, :get_card_collections_by_user_id
     get "/card_collections/user/:user_id/game/:game_id", CardCollectionController, :get_card_collections_by_user_id_and_game_id
     get "/card_collections/active/:game_id/:type", CardCollectionController, :get_active_card_collection_by_game_id_and_type
+
+    get "/card_collection_groups/card_collection_types", CardCollectionGroupController, :get_card_collection_types
+    resources "/card_collection_groups", CardCollectionGroupController, only: [:index, :show, :create, :update]
+    delete "/card_collection_groups/delete/:card_collection_group_id", CardCollectionGroupController, :delete_card_collection_group
+    get "/card_collection_groups/game/:game_id", CardCollectionGroupController, :get_card_collection_groups_by_game_id
+    get "/card_collection_groups/game/:game_id/type/:collection_type", CardCollectionGroupController, :get_card_collection_group_by_game_id_and_collection_type
 
     get "/boards/templates", BoardController, :get_board_templates
     resources "/boards", BoardController, only: [:index, :show, :create, :update]

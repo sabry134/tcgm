@@ -1,6 +1,6 @@
 let baseApiUrl = process.env.REACT_APP_API_URL;
 if (!baseApiUrl) {
-  baseApiUrl = "http://localhost:4000/api/"
+  baseApiUrl = "https://interracial-volunteer-sacramento-do.trycloudflare.com/api/"
 }
 
 export async function baseRequest(endpoint, method = "GET", data = null, headers = {}) {

@@ -33,7 +33,7 @@ const styles = {
 };
 
 const MAX_NAME_LENGTH = 30;
-const API_BASE = "http://localhost:4000";
+const API_BASE = "https://interracial-volunteer-sacramento-do.trycloudflare.com";
 
 const BoardEditor = () => {
   const navigate = useNavigate();

@@ -14,7 +14,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 
-const API_BASE = "http://localhost:4000";
+const API_BASE = "https://interracial-volunteer-sacramento-do.trycloudflare.com";
 
 const styles = {
   navbar: {
@@ -102,7 +102,7 @@ const RuleEditor = () => {
   const handleCreateRule = async () => {
 
     const gameId = localStorage.getItem("gameSelected");
-    if (!gameId) return alert("Game ID not found");
+    if (!gameId) return alert("Game not found");
 
     try {
       const gameRuleRes = await fetch(`${API_BASE}/api/gameRules`, {

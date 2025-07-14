@@ -1,6 +1,7 @@
 {
   "name": "jcce",
   "version": "0.1.0",
+  "homepage": "https://sabry134.github.io/tcgm",
   "private": true,
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -24,6 +25,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "deploy": "npm run build && cd .. && git subtree push --prefix front/build origin gh-pages",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

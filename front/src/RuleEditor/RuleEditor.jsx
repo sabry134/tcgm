@@ -112,8 +112,6 @@ const RuleEditor = () => {
         body: JSON.stringify({
           gameRule: {
             starting_hand_size: 0,
-            min_deck_size: 0,
-            max_deck_size: 0,
             max_hand_size: 0,
             draw_per_turn: 0,
             game_id: parseInt(gameId)

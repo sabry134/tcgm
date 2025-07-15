@@ -3,12 +3,16 @@ import CardZone from "./CardZone";
 import "../Room.css";
 import { Box } from "@mui/material";
 
-const API_BASE = "https://interracial-volunteer-sacramento-do.trycloudflare.com";
+
 
 const Board = () => {
   const [tableBackground, setTableBackground] = useState(null);
   const [board, setBoard] = useState(null);
   const [zones, setZones] = useState([]);
+  let API_BASE = process.env.REACT_APP_API_URL
+  if (!API_BASE) {
+    API_BASE = 'http://localhost:4000/api/'
+  }
 
   useEffect(() => {
     const fetchBoardWithZones = async () => {
@@ -16,7 +20,7 @@ const Board = () => {
       if (!boardId) return;
 
       try {
-        const res = await fetch(`${API_BASE}/api/boards/with_zones/${boardId}`);
+        const res = await fetch(`${API_BASE}boards/with_zones/${boardId}`);
         if (!res.ok) throw new Error("Failed to fetch board with zones");
 
         const data = await res.json();
@@ -80,8 +84,8 @@ const Board = () => {
           }}
           opponentStyle={{}} // Customize if needed
           hoverStyle={{ backgroundColor: "rgba(255,255,255,0.1)" }}
-          handleZoneClick={() => {}}
-          handleCardClick={() => {}}
+          handleZoneClick={() => { }}
+          handleCardClick={() => { }}
           selectedCard={null}
           cardBackImage={null}
           hidden={false}

@@ -43,6 +43,11 @@ const GameMainPage = () => {
             text={"Manage Card Collections"}
             altText={"Edit collections"}
           />
+          <TCGMButton
+            onClick={() => navigate(ROUTES.RULE_EDITOR)}
+            text={"Define Game Rules"}
+            altText={"Set up rules"}
+          />
         </>
       }
     />

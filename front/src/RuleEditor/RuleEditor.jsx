@@ -17,14 +17,14 @@ import CreditCardIcon from '@mui/icons-material/CreditCard'
 const styles = {
   navbar: {
     backgroundColor: '#5d3a00',
-    color: '#eee',
+    color: '#fff',
     padding: '10px',
     display: 'flex',
     justifyContent: 'space-around',
     userSelect: 'none'
   },
   navButton: { borderRadius: 0, userSelect: 'none' },
-  navText: { color: '#eee', fontSize: '1.25rem', userSelect: 'none' }
+  navText: { color: '#fff', fontSize: '1.25rem', userSelect: 'none' }
 }
 
 const toTitleCase = str =>
@@ -159,7 +159,7 @@ const RuleEditor = () => {
       setNewRuleName('')
       setNewRuleValue(0)
       fetchRules()
-    } catch (error) {}
+    } catch (error) { }
   }
 
   const handleDeleteRule = async ruleId => {
@@ -272,13 +272,15 @@ const RuleEditor = () => {
 
   const brown = '#5d3a00'
   const brownLight = '#7a541c'
-  const greyText = '#ccc'
-  const greyBorder = '#444'
+  const whiteText = '#fff'
+  const whiteBorder = '#fff'
 
   return (
-    <Box sx={{ backgroundColor: '#111', minHeight: '100vh', pb: 4 }}>
-      <Box sx={styles.navbar}>
-        <Typography sx={styles.navText}>Rule Manager</Typography>
+    <Box sx={{ backgroundColor: '#fff', minHeight: '100vh', pb: 4 }}>
+      <Box sx={{ ...styles.navbar, backgroundColor: brown, color: whiteText }}>
+        <Typography sx={{ color: whiteText, fontSize: '1.25rem', userSelect: 'none' }}>
+          Rule Manager
+        </Typography>
       </Box>
 
       <Box
@@ -292,70 +294,88 @@ const RuleEditor = () => {
       >
         <Card
           sx={{
-            width: 400,
-            backgroundColor: '#222',
-            color: greyText,
-            border: `1px solid ${brown}`,
-            boxShadow: `0px 4px 15px ${brownLight}`,
-            p: 3
+            backgroundColor: brown,
+            color: whiteText,
+            border: `1px solid ${whiteBorder}`,
+            boxShadow: `0px 4px 12px ${brownLight}`,
+            p: 3,
+            width: 400
           }}
         >
           <CardContent>
-            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-              <CreditCardIcon sx={{ fontSize: 40, color: brown }} />
-            </Box>
-
             <Typography
-              variant='h6'
-              sx={{ mb: 1, textAlign: 'center', color: brownLight }}
+              variant="h6"
+              sx={{ textAlign: 'center', color: whiteText, mb: 2 }}
             >
               Add New Rule
             </Typography>
+
             <TextField
-              label='Rule Name'
+              label="Rule Name"
               fullWidth
-              variant='outlined'
+              variant="outlined"
               value={newRuleName}
               onChange={e => setNewRuleName(e.target.value)}
-              sx={{ mb: 2 }}
-              InputLabelProps={{ style: { color: brownLight } }}
-              inputProps={{ style: { color: greyText } }}
-            />
-            <TextField
-              label='Rule Value'
-              fullWidth
-              variant='outlined'
-              type='number'
-              value={newRuleValue}
-              onChange={e => setNewRuleValue(Number(e.target.value))}
-              InputLabelProps={{ style: { color: brownLight } }}
-              inputProps={{ style: { color: greyText } }}
               sx={{
                 mb: 2,
                 '& .MuiOutlinedInput-root': {
-                  color: greyText,
+                  color: whiteText,
                   '& fieldset': {
-                    borderColor: brown
+                    borderColor: whiteBorder
                   },
                   '&:hover fieldset': {
-                    borderColor: brownLight
+                    borderColor: whiteBorder
                   },
                   '&.Mui-focused fieldset': {
-                    borderColor: brownLight
+                    borderColor: whiteBorder
                   }
                 },
                 '& .MuiInputLabel-root': {
-                  color: brownLight
+                  color: whiteText
+                },
+                '& .MuiInputBase-input': {
+                  color: whiteText
                 }
               }}
             />
+            <TextField
+              label="Rule Value"
+              fullWidth
+              variant="outlined"
+              type="number"
+              value={newRuleValue}
+              onChange={e => setNewRuleValue(Number(e.target.value))}
+              sx={{
+                mb: 2,
+                '& .MuiOutlinedInput-root': {
+                  color: whiteText,
+                  '& fieldset': {
+                    borderColor: whiteBorder
+                  },
+                  '&:hover fieldset': {
+                    borderColor: whiteBorder
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: whiteBorder
+                  }
+                },
+                '& .MuiInputLabel-root': {
+                  color: whiteText
+                },
+                '& .MuiInputBase-input': {
+                  color: whiteText
+                }
+              }}
+            />
+
             <Button
-              variant='contained'
+              variant="contained"
               fullWidth
               onClick={handleCreateRule}
               sx={{
+                mt: 1,
                 bgcolor: brown,
-                color: greyText,
+                color: whiteText,
                 fontWeight: 'bold',
                 '&:hover': { bgcolor: brownLight }
               }}
@@ -377,12 +397,12 @@ const RuleEditor = () => {
           <Card
             key={rule.id}
             sx={{
-              backgroundColor: '#222',
-              color: greyText,
+              backgroundColor: brown,
+              color: whiteText,
               mb: 3,
               border:
                 expandedRuleId === rule.id
-                  ? `1px solid ${brownLight}`
+                  ? `1px solid ${whiteBorder}`
                   : `1px solid transparent`,
               boxShadow:
                 expandedRuleId === rule.id ? `0 0 12px ${brownLight}` : 'none',
@@ -397,53 +417,50 @@ const RuleEditor = () => {
                 alignItems: 'center'
               }}
             >
-              <Typography variant='h6' sx={{ userSelect: 'none' }}>
+              <Typography variant="h6" sx={{ userSelect: 'none', color: whiteText }}>
                 {rule.rule_name} — {rule.value}
               </Typography>
               <Box>
                 <IconButton
-                  color='inherit'
+                  color="inherit"
                   onClick={() => toggleExpand(rule.id)}
-                  size='large'
+                  size="large"
                   aria-label={`Edit ${rule.rule_name}`}
-                  sx={{ color: brownLight }}
+                  sx={{ color: whiteText }}
                 >
                   <EditIcon />
                 </IconButton>
                 <IconButton
-                  color='inherit'
+                  color="inherit"
                   onClick={() => handleDeleteRule(rule.id)}
-                  size='large'
+                  size="large"
                   aria-label={`Delete ${rule.rule_name}`}
-                  sx={{ color: '#aa2222' }}
+                  sx={{ color: '#ff6666' }}
                 >
                   <DeleteIcon />
                 </IconButton>
               </Box>
             </Box>
 
-            <Collapse
-              in={expandedRuleId === rule.id}
-              timeout='auto'
-              unmountOnExit
-            >
+            <Collapse in={expandedRuleId === rule.id} timeout="auto" unmountOnExit>
               {ruleEdits[rule.id] && (
                 <Box sx={{ mt: 3 }}>
-                  <Typography
-                    sx={{ fontWeight: 'bold', mb: 1, color: brownLight }}
-                  >
+                  <Typography sx={{ fontWeight: 'bold', mb: 1, color: whiteText }}>
                     Game Rule
                   </Typography>
                   {ruleEdits[rule.id]?.gameRule &&
                     Object.entries(ruleEdits[rule.id].gameRule).map(
                       ([key, val]) =>
                         key !== 'id' &&
-                        key !== 'game_id' && (
+                        key !== 'game_id' &&
+                        key !== 'public_template' &&
+                        key !== 'inserted_at' &&
+                        key !== 'updated_at' && (
                           <TextField
                             key={key}
                             label={toTitleCase(key)}
                             value={val}
-                            type='number'
+                            type="number"
                             onChange={e =>
                               updateGameRuleField(rule.id, key, e.target.value)
                             }
@@ -451,29 +468,31 @@ const RuleEditor = () => {
                             sx={{
                               mb: 1,
                               '& .MuiOutlinedInput-root': {
-                                color: greyText,
+                                color: whiteText,
                                 '& fieldset': {
-                                  borderColor: brown
+                                  borderColor: whiteBorder
                                 },
                                 '&:hover fieldset': {
-                                  borderColor: brownLight
+                                  borderColor: whiteBorder
                                 },
                                 '&.Mui-focused fieldset': {
-                                  borderColor: brownLight
+                                  borderColor: whiteBorder
                                 }
                               },
                               '& .MuiInputLabel-root': {
-                                color: brownLight
+                                color: whiteText
+                              },
+                              '& .MuiInputBase-input': {
+                                color: whiteText
                               }
                             }}
-                            variant='outlined'
+                            variant="outlined"
                           />
                         )
                     )}
 
-                  <Typography
-                    sx={{ fontWeight: 'bold', mt: 3, mb: 1, color: brownLight }}
-                  >
+
+                  <Typography sx={{ fontWeight: 'bold', mt: 3, mb: 1, color: whiteText }}>
                     Player Properties
                   </Typography>
                   {ruleEdits[rule.id].playerProps.map((prop, idx) => (
@@ -481,7 +500,7 @@ const RuleEditor = () => {
                       key={prop.id}
                       label={toTitleCase(prop.property_name)}
                       value={prop.value}
-                      type='number'
+                      type="number"
                       onChange={e =>
                         updatePlayerPropField(rule.id, idx, e.target.value)
                       }
@@ -489,57 +508,59 @@ const RuleEditor = () => {
                       sx={{
                         mb: 1,
                         '& .MuiOutlinedInput-root': {
-                          color: greyText,
+                          color: whiteText,
                           '& fieldset': {
-                            borderColor: brown
+                            borderColor: whiteBorder
                           },
                           '&:hover fieldset': {
-                            borderColor: brownLight
+                            borderColor: whiteBorder
                           },
                           '&.Mui-focused fieldset': {
-                            borderColor: brownLight
+                            borderColor: whiteBorder
                           }
                         },
                         '& .MuiInputLabel-root': {
-                          color: brownLight
+                          color: whiteText
+                        },
+                        '& .MuiInputBase-input': {
+                          color: whiteText
                         }
                       }}
-                      variant='outlined'
+                      variant="outlined"
                     />
                   ))}
 
-                  {/* Add new property fields */}
                   <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
                     <TextField
-                      label='Property Name'
+                      label="Property Name"
                       value={newPropInputs[rule.id]?.name || ''}
                       onChange={e =>
                         handleNewPropInput(rule.id, 'name', e.target.value)
                       }
                       sx={{ flex: 1 }}
-                      variant='outlined'
-                      InputLabelProps={{ style: { color: brownLight } }}
-                      inputProps={{ style: { color: greyText } }}
+                      variant="outlined"
+                      InputLabelProps={{ style: { color: whiteText } }}
+                      inputProps={{ style: { color: whiteText } }}
                     />
                     <TextField
-                      label='Value'
-                      type='number'
+                      label="Value"
+                      type="number"
                       value={newPropInputs[rule.id]?.value || ''}
                       onChange={e =>
                         handleNewPropInput(rule.id, 'value', e.target.value)
                       }
                       sx={{ width: 100 }}
-                      variant='outlined'
-                      InputLabelProps={{ style: { color: brownLight } }}
-                      inputProps={{ style: { color: greyText } }}
+                      variant="outlined"
+                      InputLabelProps={{ style: { color: whiteText } }}
+                      inputProps={{ style: { color: whiteText } }}
                     />
                     <Button
-                      variant='contained'
+                      variant="contained"
                       onClick={() => handleAddPlayerProperty(rule.id)}
                       sx={{
                         bgcolor: brown,
                         '&:hover': { bgcolor: brownLight },
-                        color: greyText,
+                        color: whiteText,
                         fontWeight: 'bold'
                       }}
                     >
@@ -548,14 +569,14 @@ const RuleEditor = () => {
                   </Box>
 
                   <Button
-                    variant='contained'
+                    variant="contained"
                     startIcon={<SaveIcon />}
                     onClick={() => handleSaveEdit(rule.id)}
                     fullWidth
                     sx={{
                       mt: 2,
                       bgcolor: brown,
-                      color: greyText,
+                      color: whiteText,
                       fontWeight: 'bold',
                       '&:hover': { bgcolor: brownLight }
                     }}

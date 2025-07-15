@@ -71,8 +71,6 @@ defmodule TcgmWebAppWeb.GameRuleControllerTest do
     assert Enum.any?(response, fn gr -> gr["id"] == game_rule.id end)
     assert Enum.any?(response, fn gr -> gr["game_id"] == game_rule.game_id end)
     assert Enum.any?(response, fn gr -> gr["starting_hand_size"] == game_rule.starting_hand_size end)
-    assert Enum.any?(response, fn gr -> gr["min_deck_size"] == game_rule.min_deck_size end)
-    assert Enum.any?(response, fn gr -> gr["max_deck_size"] == game_rule.max_deck_size end)
     assert Enum.any?(response, fn gr -> gr["max_hand_size"] == game_rule.max_hand_size end)
     assert Enum.any?(response, fn gr -> gr["draw_per_turn"] == game_rule.draw_per_turn end)
   end
@@ -84,8 +82,6 @@ defmodule TcgmWebAppWeb.GameRuleControllerTest do
     assert response["id"] == game_rule.id
     assert response["game_id"] == game_rule.game_id
     assert response["starting_hand_size"] == game_rule.starting_hand_size
-    assert response["min_deck_size"] == game_rule.min_deck_size
-    assert response["max_deck_size"] == game_rule.max_deck_size
     assert response["max_hand_size"] == game_rule.max_hand_size
     assert response["draw_per_turn"] == game_rule.draw_per_turn
   end
@@ -95,8 +91,6 @@ defmodule TcgmWebAppWeb.GameRuleControllerTest do
       "gameRule" => %{
         "game_id" => game2.id,
         "starting_hand_size" => 4,
-        "min_deck_size" => 5,
-        "max_deck_size" => 6,
         "max_hand_size" => 9,
         "draw_per_turn" => 10
       }
@@ -105,8 +99,6 @@ defmodule TcgmWebAppWeb.GameRuleControllerTest do
 
     assert response["game_id"] == game2.id
     assert response["starting_hand_size"] == 4
-    assert response["min_deck_size"] == 5
-    assert response["max_deck_size"] == 6
     assert response["max_hand_size"] == 9
     assert response["draw_per_turn"] == 10
   end
@@ -115,8 +107,6 @@ defmodule TcgmWebAppWeb.GameRuleControllerTest do
     conn = put(conn, "/api/gameRules/#{game_rule.id}", %{
       "gameRule" => %{
         "starting_hand_size" => 4,
-        "min_deck_size" => 5,
-        "max_deck_size" => 6,
         "max_hand_size" => 9,
         "draw_per_turn" => 10
       }
@@ -125,8 +115,6 @@ defmodule TcgmWebAppWeb.GameRuleControllerTest do
 
     assert response["id"] == game_rule.id
     assert response["starting_hand_size"] == 4
-    assert response["min_deck_size"] == 5
-    assert response["max_deck_size"] == 6
     assert response["max_hand_size"] == 9
     assert response["draw_per_turn"] == 10
   end
@@ -148,8 +136,6 @@ defmodule TcgmWebAppWeb.GameRuleControllerTest do
     assert Enum.any?(response, fn gr -> gr["id"] == game_rule.id end)
     assert Enum.any?(response, fn gr -> gr["game_id"] == game_rule.game_id end)
     assert Enum.any?(response, fn gr -> gr["starting_hand_size"] == game_rule.starting_hand_size end)
-    assert Enum.any?(response, fn gr -> gr["min_deck_size"] == game_rule.min_deck_size end)
-    assert Enum.any?(response, fn gr -> gr["max_deck_size"] == game_rule.max_deck_size end)
     assert Enum.any?(response, fn gr -> gr["max_hand_size"] == game_rule.max_hand_size end)
     assert Enum.any?(response, fn gr -> gr["draw_per_turn"] == game_rule.draw_per_turn end)
   end

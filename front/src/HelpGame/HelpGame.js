@@ -38,10 +38,6 @@ const HelpGame = () => {
     }
   }, [scenes]);
 
-  useEffect(() => {
-    document.title = "JCCE";
-  }, []);
-
   return (
     <Box display="flex" flexDirection="column" height="100vh">
 

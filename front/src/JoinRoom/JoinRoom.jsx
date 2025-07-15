@@ -59,10 +59,6 @@ const JoinRoom = () => {
     }
   }, [scenes])
 
-  useEffect(() => {
-    document.title = 'JCCE'
-  }, [])
-
   const joinRoom = async navigate => {
     try {
       weakResetConnection()

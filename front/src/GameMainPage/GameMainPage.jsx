@@ -14,7 +14,7 @@ const GameMainPage = () => {
       topBar={
         <>
           <TopBarButton
-            event={() => navigate(ROUTES.HOME)}
+            event={() => navigate(ROUTES.COMMUNITY)}
             altText={"Return to community page"}
             svgComponent={Home}
           />

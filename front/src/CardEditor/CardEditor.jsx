@@ -12,8 +12,6 @@ const CardEditor = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
-    document.title = 'JCCE'
-
     if (!localStorage.getItem('currentEditedCard')) {
       localStorage.setItem('currentEditedCard', JSON.stringify(defaultData))
     }

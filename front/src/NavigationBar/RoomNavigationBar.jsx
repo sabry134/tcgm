@@ -4,7 +4,8 @@ import { Home, Chat as ChatIcon } from '@mui/icons-material'
 import { NavbarButton, NavbarSmallButton } from './Components/navbarButton'
 import { Box, Button, Popover, TextField, Typography } from '@mui/material'
 import LinkIcon from '@mui/icons-material/Link'
-import { useChannel } from '../ChannelContext' // Import the context hook
+import { useChannel } from '../ChannelContext'
+import { ROUTES } from "../Routes/routes"; // Import the context hook
 
 export const RoomNavigationBar = ({ roomId }) => {
   const navigate = useNavigate()
@@ -101,7 +102,7 @@ export const RoomNavigationBar = ({ roomId }) => {
 
   const returnHome = () => {
     localStorage.removeItem('room_id')
-    navigate('/')
+    navigate(ROUTES.COMMUNITY)
   }
 
   return (
@@ -121,7 +122,7 @@ export const RoomNavigationBar = ({ roomId }) => {
           svgComponent={Home}
         />
         <NavbarButton
-          event={() => navigate('/help-game')}
+          event={() => navigate(ROUTES.HELP_GAME)}
           altText='Help game'
           buttonText='Help'
         />
@@ -164,7 +165,13 @@ export const RoomNavigationBar = ({ roomId }) => {
             value={roomId}
             variant='standard'
             sx={{ flex: 1, '& .MuiInputBase-input': { color: 'white' } }}
-            InputProps={{ readOnly: true }}
+            slotProps={
+              {
+                input: {
+                  readOnly: true,
+                }
+              }
+            }
           />
           <Button onClick={handleCopy} sx={{ color: 'white' }}>
             {copyButtonText}

@@ -5,7 +5,7 @@ import { RightPanel } from './Components/RightPanel'
 import { Editor } from './Components/Editor'
 import { useNavigate } from 'react-router-dom'
 import { MainNavigationBar } from '../NavigationBar/MainNavigationBar'
-import { Popup } from "../Components/Popup/Popup";
+import { TCGMPopup } from "../Components/RawComponents/TCGMPopup";
 import { createCardTypeRequest } from "../Api/cardTypesRequest";
 
 const TypeEditor = () => {
@@ -52,7 +52,7 @@ const TypeEditor = () => {
         >
           <Editor />
         </Box>
-        <Popup
+        <TCGMPopup
           id={id}
           open={open}
           anchorEl={anchor}

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { TCGMButton } from '../../Components/RawComponents/TCGMButton'
-import { SidePanel } from "../../Components/RawComponents/SidePanel";
+import { SidePanel } from "../../Components/Layouts/SidePanel";
 
 export class LeftPanel extends Component {
   constructor(props) {

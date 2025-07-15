@@ -1,33 +1,46 @@
-import { Box } from "@mui/material";
-import { MainNavigationBar } from "../NavigationBar/MainNavigationBar";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { LeftPanel } from "./Component/LeftPanel";
-import { RightPanel } from "./Component/RightPanel";
+import { BaseLayout } from "../Components/Layouts/BaseLayout";
+import { TCGMButton } from "../Components/RawComponents/TCGMButton";
+import { TopBarButton } from "../Components/TopBar/TopBarButton";
+import { ROUTES } from "../Routes/routes";
+import { Home } from "@mui/icons-material";
 
 const GameMainPage = () => {
   const navigate = useNavigate(); // Initialize useNavigate hook
 
   return (
-    <Box display="flex" flexDirection="column" height="100vh">
-      <MainNavigationBar navigate={navigate} />
+    <BaseLayout
+      topBar={
+        <>
+          <TopBarButton
+            event={() => navigate(ROUTES.HOME)}
+            altText={"Return to community page"}
+            svgComponent={Home}
+          />
+        </>
+      }
 
-      <Box display="flex" flexGrow={1} bgcolor="#fff">
-
-        <LeftPanel />
-
-        <Box
-          className="main-area"
-          flexGrow={1}
-          bgcolor="#c4c4c4"
-          position="relative"
-        >
-        </Box>
-
-        <RightPanel />
-
-      </Box>
-    </Box>
+      leftPanel={
+        <>
+          <TCGMButton
+            onClick={() => navigate(ROUTES.CARD_EDITOR)}
+            text={"Create & Customize Cards"}
+            altText={"Edit cards"}
+          />
+          <TCGMButton
+            onClick={() => navigate(ROUTES.BOARD_EDITOR)}
+            text={"Design the Play Area"}
+            altText={"Edit board"}
+          />
+          <TCGMButton
+            onClick={() => navigate(ROUTES.TYPE_EDITOR)}
+            text={"Set up Card Types and Behaviors"}
+            altText={"Edit types"}
+          />
+        </>
+      }
+    />
   );
 }
 

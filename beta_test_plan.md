@@ -4,21 +4,17 @@
 
 Below are the essential features that must be available for beta testing, along with any changes made since the initial Tech3 Action Plan.
 
-| **Feature Name** | **Description** | **Priority (High/Medium/Low)** | **Changes Since Tech3** |
-| --- | --- | --- | --- |
-| Community | Access the TCG created by the user and the TCGM community. The creator of a game should be able to choose the privacy level of its creation. | High | Added an info page for each game.
-Added privacy setting for games.
- |
-| Card Editor | Create, edit, and manage cards with custom stats and visuals. | High | Added full card creation and edition. With customiable attributes and design |
-| Board Editor | Customize game board layout (zones, rows, etc.). | High | Full board customization, adding custom zones wuth images and shapes with simmetry for 1v1 gameplay. |
-| Card Layout Editor | Define card types and behaviors (e.g., spells, creatures). | High | Card layout customization linked to each individual card type in a game. This layout will be applied to each card of the chosen card type. |
-| Templates | Pre-configured templates for faster game creation. | High | Pre-configured game configurations for card types, effects and rules so the user can create and play quickly. |
-| Play Mode Manual | Multiplayer testing of games. where every action is made by the player. | High | Added multiplayer lobby’s creation and joining.
-Added ability to launch game and move card from zone to zone.
-Added ability to put counters on cards |
-| User Manual | Documentation on engine usage and feature explanations. | Medium | Detailed user manual to create a new game from scratch and play it on manual mode. |
-| Rules Editor | Define game rules and win conditions through a scripting and logic interface. | Low | Ability to customize gameplay actions and rules which will be applied in game. |
-| Play Mode Automatic | Multiplayer testing of games. Rules are applied automatically by the server using the game from the user. | Low | Card effect automation and game mechanics handled automatically in game without needing specific user manipulations. |
+| **Feature Name** | **Description** | **Priority (High/Medium/Low)** | **Changes Since Tech3**                                                                                                                              |
+| --- | --- | --- |------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Community | Access the TCG created by the user and the TCGM community. The creator of a game should be able to choose the privacy level of its creation. | High | Added an info page for each game. <br/>Added privacy setting for games.                                                                              |
+| Card Editor | Create, edit, and manage cards with custom stats and visuals. | High | Added full card creation and edition. With customiable attributes and design                                                                         |
+| Board Editor | Customize game board layout (zones, rows, etc.). | High | Full board customization, adding custom zones wuth images and shapes with simmetry for 1v1 gameplay.                                                 |
+| Card Layout Editor | Define card types and behaviors (e.g., spells, creatures). | High | Card layout customization linked to each individual card type in a game. This layout will be applied to each card of the chosen card type.           |
+| Templates | Pre-configured templates for faster game creation. | High | Pre-configured game configurations for card types, effects and rules so the user can create and play quickly.                                        |
+| Play Mode Manual | Multiplayer testing of games. where every action is made by the player. | High | Added multiplayer lobby’s creation and joining. <br/>Added ability to launch game and move card from zone to zone. Added ability to put counters on cards |
+| User Manual | Documentation on engine usage and feature explanations. | Medium | Detailed user manual to create a new game from scratch and play it on manual mode.                                                                   |
+| Rules Editor | Define game rules and win conditions through a scripting and logic interface. | Low | Ability to customize gameplay actions and rules which will be applied in game.                                                                       |
+| Play Mode Automatic | Multiplayer testing of games. Rules are applied automatically by the server using the game from the user. | Low | Card effect automation and game mechanics handled automatically in game without needing specific user manipulations.                                 |
 
 ---
 
@@ -26,11 +22,10 @@ Added ability to put counters on cards |
 
 ### **2.1 User Roles**
 
-| **Role Name** | **Description** |
-| --- | --- |
-| Player | Play with others users with a chosen TCG open to public. |
-| Designer | Access to card/rule/type editors and play mode to design and test new TCGs.
-Can choose to set the TCG to public or private. |
+| **Role Name** | **Description**                                                                                                             |
+| --- |-----------------------------------------------------------------------------------------------------------------------------|
+| Player | Play with others users with a chosen TCG open to public.                                                                    |
+| Designer | Access to card/rule/type editors and play mode to design and test new TCGs. <br/>Can choose to set the TCG to public or private. |
 
 ### **2.2 Test Scenarios**
 

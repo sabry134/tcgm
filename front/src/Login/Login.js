@@ -34,7 +34,8 @@ const Login = () => {
         },
       });
       console.log("Login success:", response.data);
-      localStorage.setItem("userId", response.data.user.id)
+      localStorage.setItem("accessToken", response.data.token);
+      localStorage.setItem("userId", response.data.user.id);
       navigate(ROUTES.COMMUNITY)
     } catch (err) {
       console.error("Login error:", err);

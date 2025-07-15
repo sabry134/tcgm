@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useEffect } from 'react'
 import { Grid2, Box } from '@mui/material'
 import { GameBox } from './GameBox'
 import { getGamesRequest } from '../../Api/gamesRequest'
@@ -9,6 +9,10 @@ export class CommunityGamePicker extends Component {
     this.state = {
       gameList: []
     }
+  }
+
+  useEffect () {
+    this.getGames()
   }
 
   componentDidMount () {

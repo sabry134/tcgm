@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useEffect } from 'react'
 import { Grid2, Box } from '@mui/material'
 import { DeckBox } from './DeckBox'
 import { getCollectionsByUserAndGameRequest } from '../../Api/collectionsRequest'
@@ -9,6 +9,10 @@ export class DeckPicker extends Component {
     this.state = {
       deckList: []
     }
+  }
+
+  useEffect () {
+    this.getDecks()
   }
 
   componentDidMount () {

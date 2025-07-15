@@ -17,7 +17,7 @@ export class DeckPicker extends Component {
 
   async getDecks () {
     try {
-      const userId = localStorage.getItem('userId')
+      const userId = localStorage.getItem('userSelected')
       const gameId = localStorage.getItem('gameSelected')
       const data = await getCollectionsByUserAndGameRequest(userId, gameId)
       console.log('Decks:', data)

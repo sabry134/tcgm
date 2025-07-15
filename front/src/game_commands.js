@@ -64,3 +64,49 @@ export const callMoveCard = (channel, playerId, card, source, dest) => {
   }
   return false;
 };
+
+export const updateCard = (channel, playerId, location, card, key, value) => {
+  console.log("updateCard called with channel:", channel, "playerId:", playerId, "card:", card);
+  if (channel && playerId) {
+    channel.push("update_card", { player_id: playerId, location: location, card: card, key: key, value: value })
+      .receive("ok", response => {
+        console.log("update_card", response);
+        return true;
+      })
+      .receive("error", response => {
+        console.error("Error updating card:", response);
+        return false;
+      });
+  }
+  return false;
+}
+
+export const shuffleCard = (channel, playerId, location) => {
+  if (channel && playerId) {
+    channel.push("shuffle_card", { player_id: playerId, location: location })
+      .receive("ok", response => {
+        console.log("shuffle_card", response);
+        return true;
+      })
+      .receive("error", response => {
+        console.error("Error shuffling card:", response);
+        return false;
+      });
+  }
+  return false;
+}
+
+export const passTurn = (channel, playerId) => {
+  if (channel && playerId) {
+    channel.push("pass_turn", { player_id: playerId })
+      .receive("ok", response => {
+        console.log("pass_turn", response);
+        return true;
+      })
+      .receive("error", response => {
+        console.error("Error passingTurn:", response);
+        return false;
+      });
+  }
+  return false;
+}

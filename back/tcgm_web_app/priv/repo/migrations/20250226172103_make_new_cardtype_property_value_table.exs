@@ -15,8 +15,8 @@ defmodule TcgmWebApp.Repo.Migrations.MakeNewCardtypeProperty do
       add :position_x, :integer, null: false
       add :position_y, :integer, null: false
       add :rotation, :integer, null: false
-      add :scale_x, :integer, null: false
-      add :scale_y, :integer, null: false
+      add :scale_x, :float, null: false
+      add :scale_y, :float, null: false
       add :border_width, :integer, null: false
       add :border_color, :string, null: false
       add :border_radius, :string, null: false

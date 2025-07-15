@@ -12,6 +12,7 @@ import {
   getCardTypesPropertiesbyTypeRequest,
   editCardTypesPropertyByIdRequest
 } from '../../Api/cardTypesPropertiesRequest'
+
 const StagnantUI = ({ createNewComponnent }) => {
   const [open, setOpen] = useState(false)
   const [tool, setTool] = useState(0)
@@ -27,7 +28,7 @@ const StagnantUI = ({ createNewComponnent }) => {
 
   const addBox = event => {
     setOpen(!open)
-    createNewComponnent('box')
+    createNewComponnent('text')
   }
 
   const selectButton = event => {
@@ -60,7 +61,13 @@ const StagnantUI = ({ createNewComponnent }) => {
             continue
           }
 
-          if (data && !shallowEqualObject(tmpProperties[i], data[i])) {
+          if (
+            data &&
+            !shallowEqualObject(
+              JSON.stringify(tmpProperties[i]),
+              JSON.stringify(data[i])
+            )
+          ) {
             editCardTypesPropertyByIdRequest(
               tmpProperties[i],
               tmpProperties[i].id

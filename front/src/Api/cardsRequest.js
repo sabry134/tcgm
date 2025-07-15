@@ -1,4 +1,5 @@
 import { baseRequest } from "./baseRequest";
+import { getCardTypesPropertiesbyTypeRequest } from "./cardTypesPropertiesRequest";
 
 export async function getCardRequest() {
   return await baseRequest('cards', 'GET', null, {});
@@ -17,18 +18,60 @@ export async function getCardRequest() {
 //   "game_id": 0
 //   "card_type_id": 0
 // }
-export async function saveCardRequest(storedId, game_id, data) {
-  data.card.game_id = game_id;
 
-  if (!storedId || storedId === "0") {
-    return await baseRequest('cards', 'POST', data, {
-      'Content-Type': 'application/json'
-    });
-  } else {
-    return await baseRequest('cards/' + storedId, 'PUT', data, {
-      'Content-Type': 'application/json'
-    });
-  }
+function adddMutablePropertiesFromProperties(typeProperties) {
+  let tmpProperties = typeProperties.filter((value, index) => value.mutable);
+  return tmpProperties.map((value, index) => {
+    console.log(value);
+    return {
+      "name": value.property_name,
+      "value_string": typeof value.value === "string" ? value.value : null,
+      "value_number": typeof value.value === "number" ? value.value : null,
+      "value_boolean": typeof value.value === "boolean" ? value.value : null,
+      "cardtype_property_id": value.id
+    };
+  });
+}
+
+export async function saveCardRequest(storedId, game_id, data) {
+  data.game_id = game_id;
+  await getCardTypesPropertiesbyTypeRequest(data.card_type_id).then((properties) => {
+    if (!storedId || storedId === "0") {
+      delete data["properties"]
+      return baseRequest('cards/with_properties', 'POST', {
+        "card": data,
+        "properties": adddMutablePropertiesFromProperties(properties),
+      }, {
+        'Content-Type': 'application/json'
+      });
+    } else {
+      baseRequest('/cardProperties/card/' + storedId, 'GET').then((response) => {
+        const reversedResponse = [...response].reverse();
+
+        reversedResponse.forEach((element, index) => {
+          const size = data.properties.length - 1
+          baseRequest('cardProperties/' + element.id, 'PUT', {
+            "cardProperty": {
+              ...element,
+              value_string: typeof data.properties[size - index].value === "string" ? data.properties[size - index].value : null,
+              value_number: typeof data.properties[size - index].value === "number" ? data.properties[size - index].value : null,
+              value_boolean: typeof data.properties[size - index].value === "boolean" ? data.properties[size - index].value : null,
+            }
+          }, {
+            'Content-Type': 'application/json'
+          });
+        });
+      })
+
+      return baseRequest('cards/' + storedId, 'PUT', {
+        "card": data
+      }, {
+        'Content-Type': 'application/json'
+      });
+    }
+  })
+
+
 }
 
 export async function getCardsByGameRequest(gameId) {

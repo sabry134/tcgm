@@ -26,7 +26,7 @@ defmodule TcgmWebApp.CardCollectionGroups.CardCollectionGroups do
   @doc """
     Retrieves all card collection groups.
   """
-  def list_card_collection_groups do
+  def list_card_collection_groups() do
     Repo.all(CardCollectionGroup)
   end
 

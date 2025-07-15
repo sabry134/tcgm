@@ -23,8 +23,8 @@ defmodule TcgmWebApp.CardTypeProperties.CardTypeProperty do
     field :position_x, :integer
     field :position_y, :integer
     field :rotation, :integer
-    field :scale_x, :integer
-    field :scale_y, :integer
+    field :scale_x, :float
+    field :scale_y, :float
     field :border_width, :integer
     field :border_color, :string
     field :border_radius, :integer

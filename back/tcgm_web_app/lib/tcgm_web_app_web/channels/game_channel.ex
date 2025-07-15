@@ -1,5 +1,6 @@
 defmodule TcgmWebAppWeb.GameChannel do
   use Phoenix.Channel
+  require Logger
 
   @moduledoc """
     This module is responsible for handling game channels.
@@ -23,10 +24,17 @@ defmodule TcgmWebAppWeb.GameChannel do
     * `draw_card` - Draws a card.
     * `insert_card` - Inserts a card.
   """
-  def handle_in("join_room", %{"player_id" => player_id}, socket) do
-    TcgmWebApp.Game.GameServer.join_room(socket.assigns.room_id, player_id)
-    broadcast!(socket, "game_update", %{state: TcgmWebApp.Game.GameServer.get_state(socket.assigns.room_id)})
-    {:noreply, socket}
+  def handle_in("join_room", %{"player_id" => player_id, "game_id" => game_id}, socket) do
+    case TcgmWebApp.Game.GameServer.join_room(socket.assigns.room_id, player_id, game_id) do
+    {:ok, state} ->
+      socket = assign(socket, :player_id, player_id)
+      broadcast!(socket, "game_update", %{state: state})
+      {:noreply, socket}
+
+    {:error, reason} ->
+      push(socket, "join_error", %{error: reason})
+      {:noreply, socket}
+    end
   end
 
   def handle_in("leave_room", %{"player_id" => player_id}, socket) do
@@ -100,5 +108,15 @@ defmodule TcgmWebAppWeb.GameChannel do
     chat = TcgmWebApp.Game.GameServer.get_chat(socket.assigns.room_id)
     broadcast!(socket, "chat_update", %{chat: chat})
     {:noreply, socket}
+  end
+
+  def terminate(reason, socket) do
+    room_id = socket.assigns[:room_id]
+    player_id = socket.assigns[:player_id]
+    if player_id && room_id do
+      {:ok, state} = TcgmWebApp.Game.GameServer.leave_room(room_id, player_id)
+      broadcast!(socket, "game_update", %{state: state})
+    end
+    :ok
   end
 end

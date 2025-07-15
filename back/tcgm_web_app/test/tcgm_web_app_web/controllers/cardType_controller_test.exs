@@ -11,7 +11,7 @@ defmodule TcgmWebAppWeb.CardTypeControllerTest do
     |> Repo.insert!()
 
     cardType = %CardType{}
-    |> CardType.changeset(%{ name: "Test cardType", game_id: game.id })
+    |> CardType.changeset(%{ name: "Test cardType", game_id: game.id, public_template: true })
     |> Repo.insert!()
 
     {:ok, cardType: cardType, game: game}
@@ -90,6 +90,15 @@ defmodule TcgmWebAppWeb.CardTypeControllerTest do
     assert response["cardType_properties"] |> Enum.any?(fn p -> p["property_name"] == cardtype_property2[:property_name] end)
 
     assert Repo.get_by(CardType, name: attrs[:name])
+  end
+
+  test "GET /api/cardTypes/templates returns card type templates", %{conn: conn} do
+    conn = get(conn, "/api/cardTypes/templates")
+    response = json_response(conn, 200)
+
+    assert is_list(response)
+    assert length(response) > 0
+    assert Enum.all?(response, fn template -> Map.has_key?(template, "id") end)
   end
 
 end

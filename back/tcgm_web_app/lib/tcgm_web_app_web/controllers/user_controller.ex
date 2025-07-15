@@ -16,6 +16,7 @@ defmodule TcgmWebAppWeb.UserController do
   end
 
   def index(conn, _params) do
+    _user = Guardian.Plug.current_resource(conn)
     users = Accounts.list_users()
     json(conn, users)
   end
@@ -29,8 +30,15 @@ defmodule TcgmWebAppWeb.UserController do
   end
 
   def show(conn, %{"id" => id}) do
-    user = Accounts.get_user!(id)
-    json(conn, user)
+  current_user = Guardian.Plug.current_resource(conn)
+
+  if to_string(current_user.id) == id do
+    json(conn, current_user)
+  else
+    conn
+    |> put_status(:forbidden)
+    |> json(%{error: "Access denied"})
+  end
   end
 
   swagger_path :create do
@@ -44,9 +52,10 @@ defmodule TcgmWebAppWeb.UserController do
   def create(conn, %{"user" => user_params}) do
     case Accounts.create_user(user_params) do
       {:ok, user} ->
+        {:ok, token, _claims} = TcgmWebApp.Guardian.encode_and_sign(user)
         conn
         |> put_status(:created)
-        |> json(user)
+        |> json(%{user: user, token: token})
       {:error, %Ecto.Changeset{} = changeset} ->
         conn
         |> put_status(:unprocessable_entity)
@@ -84,16 +93,24 @@ defmodule TcgmWebAppWeb.UserController do
   end
 
   def delete_user(conn, %{"user_id" => id}) do
-    user = Accounts.get_user!(id)
+    current_user = Guardian.Plug.current_resource(conn)
 
-    case Accounts.delete_user!(user) do
-      {:ok, _user} ->
-        send_resp(conn, :no_content, "")
+    if to_string(current_user.id) != id do
+      conn
+      |> put_status(:forbidden)
+      |> json(%{error: "Access denied"})
+    else
+      user = Accounts.get_user!(id)
 
-      {:error, _reason} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> json(%{errors: "Could not delete user"})
+      case Accounts.delete_user!(user) do
+        {:ok, _user} ->
+          send_resp(conn, :no_content, "")
+
+        {:error, _reason} ->
+          conn
+          |> put_status(:unprocessable_entity)
+          |> json(%{errors: "Could not delete user"})
+      end
     end
   end
 
@@ -108,9 +125,10 @@ defmodule TcgmWebAppWeb.UserController do
   def login(conn, %{"user" => user_params}) do
     case Accounts.authenticate_user(user_params) do
       {:ok, user} ->
+        {:ok, token, _claims} = TcgmWebApp.Guardian.encode_and_sign(user)
         conn
         |> put_status(:ok)
-        |> json(user)
+        |> json(%{user: user, token: token})
       {:error, _reason} ->
         conn
         |> put_status(:unauthorized)

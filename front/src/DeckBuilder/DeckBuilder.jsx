@@ -17,7 +17,6 @@ const DeckBuilder = () => {
   const [allCards, setAllCards] = useState([]);
   const [filteredCards, setFilteredCards] = useState(mockCards);
   const [hoveredCard, setHoveredCard] = useState(null);
-  const [gotCards, setGotCards] = useState(false);
 
   async function getCardsWithProperties() {
     try {
@@ -43,7 +42,6 @@ const DeckBuilder = () => {
         }
       });
       setDeck(deckData);
-      setGotCards(true);
     } catch (error) {
       console.error('Error fetching deck cards:', error);
     }
@@ -113,13 +111,12 @@ const DeckBuilder = () => {
           break;
         }
       }
-      const group = deckGroups.find(g => g.name === groupName);
       if (deck[groupName]) {
         const index = deck[groupName].findIndex(c => c.id === cardToRemove.id);
         if (index !== -1) {
-          const newCasters = [...deck[groupName]];
-          newCasters.splice(index, 1);
-          setDeck(prev => ({ ...prev, [groupName]: newCasters }));
+          const newDeck = [...deck[groupName]];
+          newDeck.splice(index, 1);
+          setDeck(prev => ({ ...prev, [groupName]: newDeck }));
         }
       }
     });

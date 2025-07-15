@@ -7,8 +7,9 @@ export class NumberInput extends FormComponnent {
     const value = event.target.value
     if (value === '' || /^\-?[0-9]*\.?[0-9]*$/.test(value)) {
       this.setState({ inputValue: value })
+      if (value.slice(-1) !== '.') this.updateJsonFile(parseFloat(value))
+      else this.updateJsonFile(value)
     }
-    this.updateJsonFile(value)
   }
 
   render () {

@@ -1,21 +1,21 @@
 {
-    "Name": "text",
-    "Type": "cardType",
-    "Properties": {
-        "Color": "color",
-        "Mana": "number",
-        "Growth": "number",
-        "Health": "number"
-    },
-    "Effects": [
-        {
-            "Type": "effectType",
-            "Action": "action",
-            "Action_params": "params",
-            "Cost": "number"
-        }
-    ],
-    "Text": "text",
-    "Image": "path",
-    "DisplayColor": "color"
+  "Name": "text",
+  "Type": "cardType",
+  "Properties": {
+    "Color": "color",
+    "Mana": "number",
+    "Growth": "number",
+    "Health": "number"
+  },
+  "Effects": [
+    {
+      "Type": "effectType",
+      "Action": "action",
+      "Action_params": "params",
+      "Cost": "number"
+    }
+  ],
+  "Text": "text",
+  "Image": "path",
+  "DisplayColor": "color"
 }

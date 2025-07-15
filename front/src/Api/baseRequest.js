@@ -2,6 +2,7 @@ let baseApiUrl = process.env.REACT_APP_API_URL;
 if (!baseApiUrl) {
   baseApiUrl = "http://localhost:4000/api/"
 }
+console.log('api_base', baseApiUrl)
 
 export async function baseRequest(endpoint, method = "GET", data = null, headers = {}) {
   const options = {

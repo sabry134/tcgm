@@ -57,8 +57,7 @@ const CardCollectionEditor = () => {
   }, []);
 
   async function fetchItems() {
-    //const game_id = localStorage.getItem("gameSelected");
-    const game_id = 527; // For testing purposes, replace with actual game ID
+    const game_id = localStorage.getItem("gameSelected");
     if (!game_id) {
       console.error("Game ID not found in local storage");
       return;
@@ -98,8 +97,7 @@ const CardCollectionEditor = () => {
 
   async function fetchCardTypes() {
     try {
-      //const game_id = localStorage.getItem("gameSelected");
-      const game_id = 527; // For testing purposes, replace with actual game ID
+      const game_id = localStorage.getItem("gameSelected");
       if (!game_id) {
         console.error("Game ID not found in local storage");
         return;
@@ -149,8 +147,8 @@ const CardCollectionEditor = () => {
   };
 
   const handleSubmit = async () => {
-    // const game_id = localStorage.getItem("gameSelected");
-    currentItem.game_id = 527; // For testing purposes, replace with actual game ID
+    const game_id = localStorage.getItem("gameSelected");
+    currentItem.game_id = game_id;
     const submission = {
       group: currentItem,
     }

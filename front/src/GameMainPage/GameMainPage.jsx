@@ -38,6 +38,11 @@ const GameMainPage = () => {
             text={"Set up Card Types and Behaviors"}
             altText={"Edit types"}
           />
+          <TCGMButton
+            onClick={() => navigate(ROUTES.CARD_COLLECTION_EDITOR)}
+            text={"Manage Card Collections"}
+            altText={"Edit collections"}
+          />
         </>
       }
     />

@@ -10,11 +10,10 @@ import {
 
 function loadCard (card, isCreate = false) {
   localStorage.setItem('currentEditedCard', JSON.stringify(card))
+  console.log(card, card.id)
   localStorage.setItem('editIdPick', card.id)
   window.dispatchEvent(new Event('storage'))
-  if (isCreate) {
-    window.dispatchEvent(new Event('newCardCreated'))
-  }
+  window.dispatchEvent(new Event('newCardCreated'))
 }
 
 function getCard (id = -1) {
@@ -25,6 +24,7 @@ function getCard (id = -1) {
       if (!data) {
         return []
       }
+      console.log(data)
       if (data.length > 0) {
         let index = 0 // Default to the first card
         if (id !== -1) {

@@ -44,16 +44,14 @@ export class FormComponnent extends Component {
   componentDidMount () {
     this.componentDidMountHandle()
   }
-
-  // Remove componentDidUpdate to prevent infinite loops
-  // The component will re-render when props change naturally
-
-  shouldComponentUpdate (nextProps, nextState) {
-    // Component should update if state or props have changed
-    return (
-      !shallowEqual(this.state, nextState) ||
-      !shallowEqual(this.props, nextProps)
-    )
+  componentDidUpdate () {
+    this.setState(prevState => {
+      const currentValue = this.getInitialValue()
+      if (!shallowEqual(prevState.inputValue, currentValue)) {
+        return { inputValue: currentValue }
+      }
+      return null
+    })
   }
 
   // Handle input change and update state

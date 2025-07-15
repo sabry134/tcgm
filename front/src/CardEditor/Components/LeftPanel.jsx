@@ -93,7 +93,12 @@ export class LeftPanel extends Component {
           this.loadCard(data[0])
         }
         if (!reloadPickedCard) {
-          this.setState({ cardList: data, selectedCard: data.length - 1 }) // Select the last card by default
+          this.setState({
+            cardList: data,
+            selectedCard: data.findIndex(
+              card => JSON.parse(localStorage.getItem('editIdPick')) === card.id
+            )
+          })
         }
         return data
       })

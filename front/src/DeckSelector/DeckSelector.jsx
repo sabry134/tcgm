@@ -43,6 +43,11 @@ const DeckSelector = () => {
     }
   }
 
+  const refreshPage = () => {
+    window.location.reload();
+    closePopup();
+  };
+
   return (
     <Box display="flex" flexDirection="column" height="100vh">
       <JoinRoomNavigationBar navigate={navigate}/>
@@ -59,7 +64,7 @@ const DeckSelector = () => {
             id={id}
             open={open}
             anchorEl={anchor}
-            closeCallback={closePopup}
+            closeCallback={refreshPage}
             receivedCallback={async (data) => {createDeck(data)}}
             title={"Create Deck"}
             inputName={["Name"]}

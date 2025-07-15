@@ -35,6 +35,12 @@ const Community = () => {
       });
   };
 
+  const refreshPage = () => {
+    console.log("Refreshing page...");
+
+    window.location.reload();
+    closePopup();
+  }
 
   const open = Boolean(anchor);
   const id = open ? 'simple-popper' : undefined;
@@ -64,7 +70,7 @@ const Community = () => {
             id={id}
             open={open}
             anchorEl={anchor}
-            closeCallback={closePopup}
+            closeCallback={refreshPage}
             receivedCallback={(data) => onClickCreate(data)}
             title={"Create Game"}
             inputName={["Name", "Description"]}

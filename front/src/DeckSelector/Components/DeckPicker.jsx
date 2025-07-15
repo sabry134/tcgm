@@ -11,17 +11,20 @@ export class DeckPicker extends Component {
     }
   }
 
-  useEffect () {
-    this.getDecks()
-  }
-
   componentDidMount () {
     if (this.state.deckList.length === 0) this.getDecks()
+    window.addEventListener('refreshDecks', () => {
+      this.getDecks()
+    })
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('refreshDecks', this.getDecks)
   }
 
   async getDecks () {
     try {
-      const userId = localStorage.getItem('userSelected')
+      const userId = localStorage.getItem('userId')
       const gameId = localStorage.getItem('gameSelected')
       const data = await getCollectionsByUserAndGameRequest(userId, gameId)
       console.log('Decks:', data)

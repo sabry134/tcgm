@@ -3,10 +3,7 @@ import { Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { JoinRoomNavigationBar } from "../NavigationBar/JoinRoomNavigationBar";
 import { LeftPanel } from "./Components/LeftPanel";
-import { RightPanel } from "./Components/RightPanel";
 import { DeckPicker } from "./Components/DeckPicker";
-import { Popup } from "../Components/Popup/Popup";
-import { create } from "lodash";
 import { createCollectionRequest } from "../Api/collectionsRequest";
 import { TCGMPopup } from "../Components/RawComponents/TCGMPopup";
 

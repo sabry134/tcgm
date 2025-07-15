@@ -29,7 +29,7 @@ const Login = () => {
   }
   const handleLogin = async () => {
     try {
-      const response = await axios.post(API_BASE + "login", {
+      const response = await axios.post(API_BASE + "users/login", {
         user: {
           username,
           password,

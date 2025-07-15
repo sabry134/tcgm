@@ -4,7 +4,6 @@ import "../Room.css";
 import { Box } from "@mui/material";
 
 
-
 const Board = () => {
   const [tableBackground, setTableBackground] = useState(null);
   const [board, setBoard] = useState(null);

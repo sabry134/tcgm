@@ -104,7 +104,7 @@ const JoinRoom = () => {
           10
         )
         const newCounter = currentCounter + 1
-        const newUsername = `Player ${newCounter}`
+        const newUsername = localStorage.getItem('userId')
         localStorage.setItem('playerCounter', newCounter.toString())
         localStorage.setItem('playerUsername', newUsername)
         try {

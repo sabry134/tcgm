@@ -30,6 +30,16 @@ export class CardTypeDisplay extends Component {
           />
         )
       }
+      case 'number': {
+        return (
+          <TCGMTextField
+            data={value}
+            selected={selected}
+            positionX={selected ? this.props.position_x : value.position_x}
+            positionY={selected ? this.props.position_y : value.position_y}
+          />
+        )
+      }
       default: {
         return <Box />
       }

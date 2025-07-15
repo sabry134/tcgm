@@ -1,6 +1,7 @@
 import { Component } from 'react'
 import { CardTypeDisplay } from '../../TypeEditor/Components/CardTypeDisplay'
 import { getCardTypesPropertiesbyTypeRequest } from '../../Api/cardTypesPropertiesRequest'
+import { baseRequest } from '../../Api/baseRequest'
 
 export class TCGMCard extends Component {
   constructor (props) {
@@ -28,20 +29,26 @@ export class TCGMCard extends Component {
         try {
           getCardTypesPropertiesbyTypeRequest(data.card_type_id).then(
             response => {
-              let tmpIndex = -1
-              const newPropertiesData = data.properties.map((value, index) => {
-                if (response[tmpIndex + 1].mutable) {
-                  tmpIndex++
+              baseRequest('/cardProperties/card/' + data.id, 'GET').then(
+                cardProperties => {
+                  const newPropertiesData = cardProperties?.map(
+                    (value, index) => {
+                      const newIndex = response.findIndex(
+                        (respvalue, respIndex) =>
+                          value.cardtype_property_id === respvalue.id
+                      )
+                      return {
+                        ...response[newIndex],
+                        value: data.properties[index].value
+                      }
+                    }
+                  )
+                  this.setState({
+                    cardData: data,
+                    properties: newPropertiesData
+                  })
                 }
-                while (
-                  !response[tmpIndex].mutable &&
-                  tmpIndex < response.length
-                ) {
-                  tmpIndex++
-                }
-                return { ...response[tmpIndex], value: value.value }
-              })
-              this.setState({ cardData: data, properties: newPropertiesData })
+              )
             }
           )
         } catch (error) {

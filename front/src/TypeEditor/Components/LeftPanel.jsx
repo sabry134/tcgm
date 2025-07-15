@@ -134,10 +134,7 @@ export class LeftPanel extends Component {
           borderRadius: 0
         }}
       >
-        <TCGMButton
-          onClick={this.props.popupCallback}
-          text='Add Type'
-        />
+        <TCGMButton onClick={this.props.popupCallback} text='Add Type' />
 
         <div className='titleList'> Type List </div>
         <ul className='typeList'>
@@ -188,7 +185,6 @@ export class LeftPanel extends Component {
             </div>
           ))}
         </ul>
-
       </Paper>
     )
   }

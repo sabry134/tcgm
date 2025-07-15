@@ -3,13 +3,13 @@ import React, { Component } from 'react'
 import './GameBox.css'
 import { useNavigate } from 'react-router-dom'
 import logo from '../../Assets/TCGMlogo.png'
-import { ROUTES } from "../../Routes/routes";
+import { ROUTES } from '../../Routes/routes'
 
 const height = '120px'
 const width = '140px'
 
 export class GameBox extends Component {
-  constructor(props) {
+  constructor (props) {
     super(props)
 
     this.state = {
@@ -28,14 +28,14 @@ export class GameBox extends Component {
 
   // handleGameClick = event => {}
 
-  render() {
+  render () {
     return (
       <div
         className='selection'
         onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
       >
-        <Deck checked={this.state.checked} gameId={this.game.id}/>
+        <Deck checked={this.state.checked} gameId={this.game.id} />
         <Typography variant='h5' gutterBottom>
           {this.game.name}
         </Typography>
@@ -62,13 +62,13 @@ const Deck = ({ checked, gameId }) => {
   return (
     <Box className='game'>
       <Box className={!checked ? 'cube bottomCubeAnimation' : 'cube'}>
-        <Box className='face front leftSide'/>
-        <Box className='face front rightSide'/>
-        <Box className='face front bottomSide'/>
+        <Box className='face front leftSide' />
+        <Box className='face front rightSide' />
+        <Box className='face front bottomSide' />
 
-        <Box className='face right'/>
-        <Box className='face left'/>
-        <Box className='face back'/>
+        <Box className='face right' />
+        <Box className='face left' />
+        <Box className='face back' />
       </Box>
       {!checked && (
         <Box className='middle' display={'flex'} flexDirection={'column'}>
@@ -94,7 +94,7 @@ const Deck = ({ checked, gameId }) => {
 
       <Box className={!checked ? 'cube topCubeAnimation' : 'cube'}>
         <Box className='face front'>
-          <img width={width} height={height} alt='TCGM' src={logo}/>
+          <img width={width} height={height} alt='TCGM' src={logo} />
         </Box>
         <Box className='face right'></Box>
         <Box className='face top'></Box>

@@ -4,6 +4,7 @@ import './GameBox.css'
 import { useNavigate } from 'react-router-dom'
 import logo from '../../Assets/TCGMlogo.png'
 import { ROUTES } from "../../Routes/routes";
+import { updateCollectionRequest } from '../../Api/collectionsRequest'
 
 const height = '120px'
 const width = '140px'
@@ -55,7 +56,7 @@ const Deck = ({ checked, deckId }) => {
   }
 
   const handleClickButton = () => {
-    //navigate(ROUTES.JOIN)
+    updateCollectionRequest(deckId, { active : true })
   }
 
   return (
@@ -86,7 +87,7 @@ const Deck = ({ checked, deckId }) => {
             className='button'
             onClick={handleClickButton}
           >
-            Play
+            Set deck
           </Button>
         </Box>
       )}

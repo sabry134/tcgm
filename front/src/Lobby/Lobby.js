@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Lobby.css"
 import { Socket } from "phoenix";
-import { callSetDeck } from "../game_commands";
+import { callSetDeck, callStartGame } from "../game_commands";
 import { useNavigate } from "react-router-dom";
 import { useChannel } from "../ChannelContext"; // Import the context hook
 import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
@@ -150,6 +150,7 @@ const Lobby = () => {
   }
 
   const handleLaunch = () => {
+    callStartGame(channel, localStorage.getItem("gameSelected"))
     navigate(ROUTES.ROOM);
   }
 
@@ -164,7 +165,7 @@ const Lobby = () => {
   }
 
   return <div className="lobbyContainer">
-    <RoomNavigationBar roomId={gameState.id}/>
+    <RoomNavigationBar roomId={gameState.id} />
     <div className="center">
       <div className="lobby">
         <div className="playerListContainer">

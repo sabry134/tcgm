@@ -29,6 +29,11 @@ export const ListEditorsAddOn = ({ toggleDisplay }) => {
         altText={'Edit type'}
         buttonText={'Type Editor'}
       />
+      <NavbarButton
+        event={() => navigate(ROUTES.CARD_COLLECTION_EDITOR)}
+        altText={'Edit collections'}
+        buttonText={'Collection Editor'}
+      />
     </>
   )
 }

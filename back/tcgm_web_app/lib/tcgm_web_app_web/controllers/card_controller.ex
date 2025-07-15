@@ -176,7 +176,7 @@ defmodule TcgmWebAppWeb.CardController do
             end
           end) do
             {:ok, card_properties} ->
-              {:ok, %{card: card, properties: Enum.reverse(card_properties)}}
+              %{card: card, properties: Enum.reverse(card_properties)}
 
             {:error, error_details} ->
               Repo.rollback(error_details)
@@ -187,10 +187,10 @@ defmodule TcgmWebAppWeb.CardController do
       end
     end)
     |> case do
-      {:ok, result} ->
+      {:ok, %{card: card, properties: properties}} ->
         conn
         |> put_status(:created)
-        |> json(result)
+        |> json(%{card: card, properties: properties})
 
       {:error, error_details} ->
         conn

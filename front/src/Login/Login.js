@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Button,
   Typography,
@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ROUTES } from "../Routes/routes";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -20,9 +21,6 @@ const Login = () => {
   const [repeatPassword, setRepeatPassword] = useState("");
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    document.title = "JCCE";
-  }, []);
   let API_BASE = process.env.REACT_APP_API_URL
   if (!API_BASE) {
     API_BASE = 'http://localhost:4000/api/'
@@ -36,7 +34,7 @@ const Login = () => {
         },
       });
       console.log("Login success:", response.data);
-      navigate("/");
+      navigate(ROUTES.COMMUNITY)
     } catch (err) {
       console.error("Login error:", err);
       setError("Invalid username or password");
@@ -58,7 +56,7 @@ const Login = () => {
         },
       });
       console.log("Register success:", response.data);
-      navigate("/");
+      navigate(ROUTES.COMMUNITY);
     } catch (err) {
       console.error("Register error:", err);
       const message =
@@ -71,20 +69,6 @@ const Login = () => {
 
   return (
     <Box display="flex" flexDirection="column" height="100vh">
-      <Box sx={styles.navbar}>
-        <Button onClick={() => navigate("/")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>🌟 Home</Typography>
-        </Button>
-        <Button onClick={() => navigate("/documentation")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>📜 Documentation</Typography>
-        </Button>
-        <Button onClick={() => navigate("/forum")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>🖼️ Forum</Typography>
-        </Button>
-        <Button onClick={() => navigate("/community")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>🌍 Community</Typography>
-        </Button>
-      </Box>
 
       <Box sx={styles.container}>
         <Box sx={styles.formContainer}>

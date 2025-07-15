@@ -29,7 +29,7 @@ export class TCGMCard extends Component {
           getCardTypesPropertiesbyTypeRequest(data.card_type_id).then(
             response => {
               let tmpIndex = -1
-              const newPropertiesData = data.properties.map((value, index) => {
+              const newPropertiesData = data.properties?.map((value, index) => {
                 if (response[tmpIndex + 1].mutable) {
                   tmpIndex++
                 }

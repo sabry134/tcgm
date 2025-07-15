@@ -78,7 +78,7 @@ export class PropertiesArray extends Component {
           borderRadius: '5px'
         }}
       >
-        {this.state.data.map((property, index) => (
+        {this.state.data && this.state.data.map((property, index) => (
           <div
             key={index}
             style={{

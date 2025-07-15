@@ -137,9 +137,26 @@ export class Editor extends Component {
 
   createNewComponnent = type => {
     const typeId = localStorage.getItem('currentTypeSelected')
-    let newProperties = defaultProperties
+    let newProperties = { ...defaultProperties } // Clone defaultProperties
     newProperties.cardtype_id = typeId
     newProperties.type = type
+
+    switch (type) {
+      case 'number':
+        newProperties.value = 0
+        break // Prevent fall-through
+      case 'image':
+        newProperties.value = 'Image URL'
+        break // Prevent fall-through
+      case 'text':
+        newProperties.value = 'Text'
+        break // Prevent fall-through
+      case 'box':
+        newProperties.value = null
+        break // Prevent fall-through
+      default:
+        console.error(`Unknown type: ${type}`)
+    }
 
     this.setState(prevState => {
       const tmpProperties = [...prevState.properties, newProperties]

@@ -30,6 +30,15 @@ const StagnantUI = ({ createNewComponnent }) => {
     setOpen(!open)
     createNewComponnent('text')
   }
+  const addImage = event => {
+    setOpen(!open)
+    createNewComponnent('image')
+  }
+
+  const addNum = event => {
+    setOpen(!open)
+    createNewComponnent('number')
+  }
 
   const selectButton = event => {
     localStorage.setItem('editTool', 'select')
@@ -104,6 +113,8 @@ const StagnantUI = ({ createNewComponnent }) => {
           <div className='subAddMenu'>
             <MenuItem onClick={addText}> Text Field </MenuItem>
             <MenuItem onClick={addBox}> Box </MenuItem>
+            <MenuItem onClick={addNum}> Number </MenuItem>
+            <MenuItem onClick={addImage}> Image </MenuItem>
           </div>
         </Popper>
         <div className='roundButton' onClick={deleteButton}>

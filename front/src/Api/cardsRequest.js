@@ -22,11 +22,10 @@ export async function getCardRequest() {
 function adddMutablePropertiesFromProperties(typeProperties) {
   let tmpProperties = typeProperties.filter((value, index) => value.mutable);
   return tmpProperties.map((value, index) => {
-    console.log(value);
     return {
       "name": value.property_name,
       "value_string": typeof value.value === "string" ? value.value : null,
-      "value_number": typeof value.value === "number" ? value.value : null,
+      "value_number": value.type === "number" ? value.value : null,
       "value_boolean": typeof value.value === "boolean" ? value.value : null,
       "cardtype_property_id": value.id
     };
@@ -46,16 +45,15 @@ export async function saveCardRequest(storedId, game_id, data) {
       });
     } else {
       baseRequest('/cardProperties/card/' + storedId, 'GET').then((response) => {
-        const reversedResponse = [...response].reverse();
 
-        reversedResponse.forEach((element, index) => {
-          const size = data.properties.length - 1
+        response.forEach((element, index) => {
+          const newIndex = data.properties.findIndex((property) => property.id === element.id);
           baseRequest('cardProperties/' + element.id, 'PUT', {
             "cardProperty": {
               ...element,
-              value_string: typeof data.properties[size - index].value === "string" ? data.properties[size - index].value : null,
-              value_number: typeof data.properties[size - index].value === "number" ? data.properties[size - index].value : null,
-              value_boolean: typeof data.properties[size - index].value === "boolean" ? data.properties[size - index].value : null,
+              value_string: typeof data.properties[newIndex].value === "string" ? data.properties[newIndex].value : null,
+              value_number: typeof data.properties[newIndex].value === "number" ? data.properties[newIndex].value : null,
+              value_boolean: typeof data.properties[newIndex].value === "boolean" ? data.properties[newIndex].value : null,
             }
           }, {
             'Content-Type': 'application/json'
@@ -83,7 +81,8 @@ export async function getCardByIdRequest(id) {
 }
 
 export async function getCardsByGameWithPropertiesRequest(gameId) {
-  return await baseRequest(`cards/game/${gameId}/with_properties`, 'GET');
+  const response = await baseRequest(`cards/game/${gameId}/with_properties`, 'GET');
+  return response
 }
 
 export async function getCardCardType(cardId) {

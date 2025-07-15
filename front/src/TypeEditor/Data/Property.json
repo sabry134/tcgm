@@ -2,7 +2,7 @@
   "property_name": "text",
   "cardtype_id": "none",
   "type": "none",
-  "value": "text",
+  "value": "value",
   "variant": "variant",
   "mutable": "boolean",
   "width": "number",

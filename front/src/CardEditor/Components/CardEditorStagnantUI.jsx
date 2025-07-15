@@ -24,7 +24,6 @@ function getCard (id = -1) {
       if (!data) {
         return []
       }
-      console.log(data)
       if (data.length > 0) {
         let index = 0 // Default to the first card
         if (id !== -1) {

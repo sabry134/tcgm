@@ -49,6 +49,17 @@ const switchForm = (value, key, predecessor, localStorageName) => {
       return <CustomCheckbox name={path} localStorageName={localStorageName} />;
     case "propertiesArray":
       return <PropertiesArray name={path} localStorageName={localStorageName} />
+    case "value":
+      switch (JSON.parse(localStorage.getItem(localStorageName)).type) {
+        case "text":
+          return <CustomInput name={path} localStorageName={localStorageName} />
+        case "number":
+          return <NumberInput name={path} localStorageName={localStorageName} />
+        case "boolean":
+          return <CustomCheckbox name={path} localStorageName={localStorageName} />;
+        default:
+          break
+      }
     case "params":
       break;
     case "path":

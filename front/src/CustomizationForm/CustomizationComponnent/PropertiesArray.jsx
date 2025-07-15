@@ -78,49 +78,58 @@ export class PropertiesArray extends Component {
           borderRadius: '5px'
         }}
       >
-        {this.state.data && this.state.data.map((property, index) => (
-          <div
-            key={index}
-            style={{
-              marginBottom: '10px',
-              paddingBottom: '10px'
-            }}
-          >
-            <div>
-              <span style={{ marginLeft: '10px' }}>{property.name}</span>
+        {this.state.data &&
+          this.state.data.map((property, index) => (
+            <div
+              key={index}
+              style={{
+                marginBottom: '10px',
+                paddingBottom: '10px'
+              }}
+            >
+              <div>
+                <span style={{ marginLeft: '10px' }}>{property.name}</span>
+              </div>
+              <div>
+                {(() => {
+                  switch (true) {
+                    case typeof property.value === 'string':
+                      return (
+                        <input
+                          className='customInput'
+                          id='standard-basic'
+                          variant='standard'
+                          value={property.value}
+                          onChange={event =>
+                            this.handleChange(event, index, 'value_string')
+                          }
+                        />
+                      )
+                    case property.data_type === 'number':
+                      return (
+                        <input
+                          className='customInput'
+                          id='standard-basic'
+                          variant='standard'
+                          value={property.value}
+                          onChange={event =>
+                            this.handleChange(event, index, 'value_number')
+                          }
+                        />
+                      )
+
+                    case typeof property.value_boolean === 'boolean':
+                      return null
+                    //   <CustomCheckbox
+                    //      name={path} localStorageName={localStorageName}
+                    //   />
+                    default:
+                      return null
+                  }
+                })()}
+              </div>
             </div>
-            <div>
-              {(() => {
-                switch (true) {
-                  case typeof property.value === 'string':
-                    return (
-                      <input
-                        className='customInput'
-                        id='standard-basic'
-                        variant='standard'
-                        value={property.value}
-                        onChange={event =>
-                          this.handleChange(event, index, 'value_string')
-                        }
-                      />
-                    )
-                  case typeof property.value_number === 'number':
-                    return null
-                  //   <NumberInput
-                  //      name={path} localStorageName={localStorageName}
-                  //   />
-                  case typeof property.value_boolean === 'boolean':
-                    return null
-                  //   <CustomCheckbox
-                  //      name={path} localStorageName={localStorageName}
-                  //   />
-                  default:
-                    return null
-                }
-              })()}
-            </div>
-          </div>
-        ))}
+          ))}
       </div>
     )
   }

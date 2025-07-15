@@ -35,7 +35,10 @@ export class Popup extends Component {
     this.receivedCallback = props.receivedCallback;
     this.title = props.title;
     this.nameList = props.inputName;
-    this.inputFields = [];
+    this.inputFields = new Array(this.nameList.length).fill(""); // initialize with empty strings
+
+    this.onChangeInput = this.onChangeInput.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
   }
 
   onChangeInput = (event, index) => {
@@ -43,10 +46,11 @@ export class Popup extends Component {
   }
 
   onSubmit = () => {
+    console.log("Submitting:", this.inputFields); // DEBUG
     if (this.receivedCallback) {
-      this.receivedCallback(this.inputFields)
+      this.receivedCallback(this.inputFields);
     }
-    this.closeCallback()
+    this.closeCallback();
   }
 
   render() {

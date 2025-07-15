@@ -6,6 +6,8 @@ import { LeftPanel } from "./Components/LeftPanel";
 import { RightPanel } from "./Components/RightPanel";
 import { DeckPicker } from "./Components/DeckPicker";
 import { Popup } from "../Components/Popup/Popup";
+import { create } from "lodash";
+import { createCollectionRequest } from "../Api/collectionsRequest";
 
 const DeckSelector = () => {
   const navigate = useNavigate();
@@ -22,6 +24,26 @@ const DeckSelector = () => {
 
   const open = Boolean(anchor);
   const id = open ? 'simple-popper' : undefined;
+
+  const createDeck = async (data) => {
+    const deckCreationData = {
+      card_collection : {
+        name: data[0],
+        quantity : 1,
+        game_id: localStorage.getItem("gameSelected"),
+        user_id: localStorage.getItem("userSelected"),
+        type: "deck",
+        active: false
+      }
+    };
+    const response = await createCollectionRequest(deckCreationData);
+    if (response.status === 201) {
+      console.log("Deck created successfully:", response.data);
+    }
+    else {
+      console.error("Error creating deck:", response);
+    }
+  }
 
   return (
     <Box display="flex" flexDirection="column" height="100vh">
@@ -40,7 +62,7 @@ const DeckSelector = () => {
             open={open}
             anchorEl={anchor}
             closeCallback={closePopup}
-            receivedCallback={(data) => {}}
+            receivedCallback={async (data) => {createDeck(data)}}
             title={"Create Deck"}
             inputName={["Name"]}
           />

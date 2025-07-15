@@ -12,7 +12,7 @@ export const JoinRoomNavigationBar = () => {
 
   const returnHome = () => {
     resetConnection()
-    navigate(ROUTES.HOME)
+    navigate(ROUTES.COMMUNITY)
   }
 
   return (

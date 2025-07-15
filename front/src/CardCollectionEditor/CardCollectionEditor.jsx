@@ -94,7 +94,7 @@ const CardCollectionEditor = () => {
     } catch (error) {
       console.error("Error fetching collection types:", error);
     }
-  };
+  }
 
   async function fetchCardTypes() {
     try {
@@ -114,7 +114,7 @@ const CardCollectionEditor = () => {
       console.error("Error fetching card types:", error);
       return;
     }
-  };
+  }
 
   const openModal = async (item = {
     id: null,
@@ -175,7 +175,7 @@ const CardCollectionEditor = () => {
       topBar={
         <>
           <TopBarButton
-            event={() => navigate(ROUTES.HOME)}
+            event={() => navigate(ROUTES.COMMUNITY)}
             altText={"Return to community page"}
             svgComponent={Home}
           />

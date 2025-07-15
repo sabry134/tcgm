@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import GameMainPage from "../GameMainPage/GameMainPage";
 import CardEditor from "../CardEditor/CardEditor";
 import TypeEditor from "../TypeEditor/TypeEditor";
@@ -24,7 +24,9 @@ export class AppRoutes extends React.Component {
     return (
       <Router>
         <Routes>
-          <Route path={ROUTES.HOME} element={<Community/>}/>
+          <Route path={ROUTES.HOME} element={<Navigate to={ROUTES.LOGIN} />} />
+          <Route path={ROUTES.LOGIN} element={<Login/>}/>
+          <Route path={ROUTES.COMMUNITY} element={<Community/>}/>
 
           <Route path={ROUTES.GAME_MAIN_PAGE} element={<GameMainPage/>}/>
           <Route path={ROUTES.CARD_EDITOR} element={<CardEditor/>}/>
@@ -40,7 +42,6 @@ export class AppRoutes extends React.Component {
           <Route path={ROUTES.RULE_EDITOR} element={<RuleEditor/>}/>
 
           <Route path={ROUTES.ROOM} element={<Room/>}/>
-          <Route path={ROUTES.LOGIN} element={<Login/>}/>
           <Route path={ROUTES.HELP_GAME} element={<HelpGame/>}/>
         </Routes>
       </Router>

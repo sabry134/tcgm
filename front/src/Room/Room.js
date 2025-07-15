@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { callDrawCard, callMoveCard } from "../game_commands";
 import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
-import CardInfo from "./Componnent/CardInfo";
 import "./Room.css";
 import { DndContext } from '@dnd-kit/core';
-import { useChannel } from "../ChannelContext"; // Import the context hook
+import { useChannel } from "../ChannelContext";
 import CardZone from "./Componnent/CardZone";
-import ContextMenu from "./Componnent/ContextMenu"; // Import the context menu component
+import ContextMenu from "./Componnent/ContextMenu";
 import CardModal from "./Componnent/CardModal";
+import { ROUTES } from "../Routes/routes";
 
 
 const Room = () => {
@@ -51,14 +51,14 @@ const Room = () => {
       return;
     if (!channel) {
       console.error("No Channel Found");
-      navigate("/join");
+      navigate(ROUTES.JOIN);
       return;
     }
 
     const storedPlayerId = localStorage.getItem("playerUsername");
     if (!storedPlayerId) {
       console.error("No player ID found");
-      navigate("/join");
+      navigate(ROUTES.JOIN);
       return;
     }
 

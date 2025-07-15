@@ -8,7 +8,6 @@ defmodule TcgmWebAppWeb.CardController do
   alias TcgmWebApp.CardProperties.CardProperties
   alias TcgmWebApp.CardTypeProperties.CardTypeProperties
   alias TcgmWebAppWeb.Schemas
-  alias TcgmWebApp.Helpers
   alias TcgmWebApp.Repo
 
   def swagger_definitions, do: Schemas.swagger_definitions()
@@ -255,20 +254,26 @@ defmodule TcgmWebAppWeb.CardController do
     case cardTypeProperty.type do
       "text" ->
         %{
+          id: property.id,
           name: cardTypeProperty.property_name,
           value: property.value_string,
+          data_type: "text"
         }
 
       "number" ->
         %{
+          id: property.id,
           name: cardTypeProperty.property_name,
           value: property.value_number,
+          data_type: "number"
         }
 
       "boolean" ->
         %{
+          id: property.id,
           name: cardTypeProperty.property_name,
           value: property.value_boolean,
+          data_type: "boolean"
         }
     end
   end

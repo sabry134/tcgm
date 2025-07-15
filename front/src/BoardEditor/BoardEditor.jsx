@@ -305,10 +305,6 @@ const BoardEditor = () => {
   }, [selectedScene])
 
   useEffect(() => {
-    document.title = 'JCCE'
-  }, [])
-
-  useEffect(() => {
     if (selectedZone) {
       setInputs({
         name: selectedZone.name,

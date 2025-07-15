@@ -110,3 +110,18 @@ export const passTurn = (channel, playerId) => {
   }
   return false;
 }
+
+export const callStartGame = (channel, gameId) => {
+  if (channel && gameId) {
+    channel.push("start_game", { game_id: gameId })
+      .receive("ok", response => {
+        console.log("start_game", response);
+        return true;
+      })
+      .receive("error", response => {
+        console.error("Error starting game:", response);
+        return false;
+      });
+  }
+  return false;
+}

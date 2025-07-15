@@ -56,7 +56,8 @@ const Deck = ({ checked, deckId }) => {
   }
 
   const handleClickButton = () => {
-    updateCollectionRequest(deckId, { active : true })
+    console.log("Setting deck as active:", deckId);
+    updateCollectionRequest(deckId, { card_collection: {active : true, game_id : localStorage.getItem("gameSelected"), type : "deck" } })
   }
 
   return (

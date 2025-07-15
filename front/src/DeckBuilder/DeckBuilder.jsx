@@ -9,7 +9,7 @@ import './Components/styles.css';
 import { getCardsByGameWithPropertiesRequest } from '../Api/cardsRequest';
 import { saveCollectionWithCardsRequest, getCardsInCollectionRequest } from '../Api/collectionsRequest';
 import { getCardCardType } from '../Api/cardsRequest';
-import { getGroupsForCollectionType } from '../Api/gamesRequest';
+import { getCardCollectionGroupsForGameWithTypeRequest } from '../Api/cardCollectionGroupRequests';
 
 const DeckBuilder = () => {
   const [deck, setDeck] = useState({});
@@ -55,7 +55,7 @@ const DeckBuilder = () => {
 
         // Fetch deck groups and initialize the deck
         const gameId = localStorage.getItem('gameSelected');
-        const groupsResponse = await getGroupsForCollectionType(gameId, 'deck');
+        const groupsResponse = await getCardCollectionGroupsForGameWithTypeRequest(gameId, 'deck');
         setDeckGroups(groupsResponse);
 
         const initialDeck = {};

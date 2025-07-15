@@ -30,17 +30,13 @@ const Community = () => {
       .then((game) => {
         console.log("Game details:", game);
       })
+      .then(() => {
+        window.location.reload();
+      })
       .catch((error) => {
         console.error("Error creating or fetching game:", error);
       });
   };
-
-  const refreshPage = () => {
-    console.log("Refreshing page...");
-
-    window.location.reload();
-    closePopup();
-  }
 
   const open = Boolean(anchor);
   const id = open ? 'simple-popper' : undefined;
@@ -70,7 +66,7 @@ const Community = () => {
             id={id}
             open={open}
             anchorEl={anchor}
-            closeCallback={refreshPage}
+            closeCallback={closePopup}
             receivedCallback={(data) => onClickCreate(data)}
             title={"Create Game"}
             inputName={["Name", "Description"]}

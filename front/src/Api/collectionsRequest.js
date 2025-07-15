@@ -36,7 +36,7 @@ export async function getCardsInCollectionRequest(id) {
 // }
 
 export async function updateCollectionRequest(id, data) {
-    return await baseRequest(`card_collections/${id}/cards`, 'PUT', data, {
+    return await baseRequest(`card_collections/${id}`, 'PUT', data, {
         'Content-Type': 'application/json'
     });
 }

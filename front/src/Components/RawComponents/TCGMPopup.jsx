@@ -46,7 +46,6 @@ export class TCGMPopup extends Component {
   }
 
   onSubmit = () => {
-    console.log("Submitting:", this.inputFields); // DEBUG
     if (this.receivedCallback) {
       this.receivedCallback(this.inputFields);
     }

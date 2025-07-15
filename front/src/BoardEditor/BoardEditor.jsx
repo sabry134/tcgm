@@ -28,8 +28,16 @@ const styles = {
     justifyContent: 'space-around',
     userSelect: 'none'
   },
-  navButton: { borderRadius: 0, userSelect: 'none' },
-  navText: { color: 'white', fontSize: '1.25rem', userSelect: 'none' }
+  navText: { color: 'white', fontSize: '1.25rem', userSelect: 'none' },
+  navButton: {
+    borderRadius: 0,
+    userSelect: 'none',
+    color: 'white',
+    backgroundColor: 'transparent',
+    '&:hover': {
+      backgroundColor: 'rgba(255, 255, 255, 0.1)'
+    }
+  },
 }
 
 const MAX_NAME_LENGTH = 30
@@ -725,7 +733,7 @@ const BoardEditor = () => {
           sx={{
             flex: 1,
             position: 'relative',
-            backgroundColor: '#333',
+            backgroundColor: '#2c1c02ff',
             backgroundImage: tableBackground
               ? `url(${tableBackground})`
               : 'none',
@@ -768,7 +776,7 @@ const BoardEditor = () => {
           ))}
         </Box>
 
-        <Box sx={{ width: 300, p: 2, backgroundColor: '#222', color: '#fff' }}>
+        <Box sx={{ width: 300, p: 2, backgroundColor: '#1a1001ff', color: '#fff' }}>
           <Button variant='outlined' component='label' fullWidth>
             Upload Table Background
             <input
@@ -803,16 +811,35 @@ const BoardEditor = () => {
             <TextField
               key={field}
               label={field}
-              variant='outlined'
-              size='small'
+              variant="outlined"
+              size="small"
               type={field === 'name' ? 'text' : 'number'}
               value={inputs[field]}
               onChange={e => handleInputChange(field, e.target.value)}
               disabled={!selectedZoneId}
               fullWidth
-              margin='dense'
+              margin="dense"
+              sx={{
+                '& .MuiInputBase-root': {
+                  color: '#fff',
+                  backgroundColor: '#222',
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#fff'
+                },
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#555'
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#888'
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#aaa'
+                }
+              }}
             />
           ))}
+
 
           <FormControlLabel
             control={

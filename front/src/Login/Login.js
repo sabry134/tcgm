@@ -23,10 +23,13 @@ const Login = () => {
   useEffect(() => {
     document.title = "JCCE";
   }, []);
-
+  let API_BASE = process.env.REACT_APP_API_URL
+  if (!API_BASE) {
+    API_BASE = 'http://localhost:4000/api/'
+  }
   const handleLogin = async () => {
     try {
-      const response = await axios.post("http://localhost:4000/api/users/login", {
+      const response = await axios.post(API_BASE + "users/login", {
         user: {
           username,
           password,
@@ -47,7 +50,7 @@ const Login = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:4000/api/users", {
+      const response = await axios.post(API_BASE + "users", {
         user: {
           username,
           email,

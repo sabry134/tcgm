@@ -10,9 +10,13 @@ import CardZone from "./Componnent/CardZone";
 import ContextMenu from "./Componnent/ContextMenu"; // Import the context menu component
 import CardModal from "./Componnent/CardModal";
 
-const API_BASE = "https://localhost:4000";
 
 const Room = () => {
+  let API_BASE = process.env.REACT_APP_API_URL
+  if (!API_BASE) {
+    API_BASE = 'http://localhost:4000/api/'
+  }
+
   const navigate = useNavigate();
   const { channel, gameState } = useChannel();
   const connectionRef = useRef({ isMounted: false });
@@ -73,7 +77,7 @@ const Room = () => {
       if (!boardId) return;
 
       try {
-        const res = await fetch(`${API_BASE}/api/boards/with_zones/${boardId}`);
+        const res = await fetch(`${API_BASE}boards/with_zones/${boardId}`);
         if (!res.ok) throw new Error("Failed to fetch board with zones");
 
         const data = await res.json();

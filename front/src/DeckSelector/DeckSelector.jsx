@@ -29,24 +29,22 @@ const DeckSelector = () => {
         name: data[0],
         quantity : 1,
         game_id: localStorage.getItem("gameSelected"),
-        user_id: localStorage.getItem("userSelected"),
+        user_id: localStorage.getItem("userId"),
         type: "deck",
         active: false
       }
     };
-    const response = await createCollectionRequest(deckCreationData);
-    if (response.status === 201) {
-      console.log("Deck created successfully:", response.data);
-    }
-    else {
-      console.error("Error creating deck:", response);
-    }
+    createCollectionRequest(deckCreationData)
+    .then(() => {
+      console.log("Deck created successfully");
+    })
+    .then(() => {
+      window.dispatchEvent(new Event('refreshDecks'));
+    })
+    .catch((error) => {
+      console.error("Error creating deck:", error);
+    });
   }
-
-  const refreshPage = () => {
-    window.location.reload();
-    closePopup();
-  };
 
   return (
     <Box display="flex" flexDirection="column" height="100vh">
@@ -64,7 +62,7 @@ const DeckSelector = () => {
             id={id}
             open={open}
             anchorEl={anchor}
-            closeCallback={refreshPage}
+            closeCallback={closePopup}
             receivedCallback={async (data) => {createDeck(data)}}
             title={"Create Deck"}
             inputName={["Name"]}

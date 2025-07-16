@@ -20,6 +20,8 @@ import {
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+
 
 const styles = {
   navbar: {
@@ -178,43 +180,43 @@ const RuleEditor = () => {
     }))
   }
 
-const saveGameRule = async () => {
-  try {
-    let res;
-    let updatedGameRule = { ...gameRule };
+  const saveGameRule = async () => {
+    try {
+      let res;
+      let updatedGameRule = { ...gameRule };
 
-    if (!gameRule.id) {
-      res = await fetch(`${API_BASE}gameRules`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          gameRule: {
-            ...gameRule,
-            game_id: parseInt(gameId)
-          }
-        })
-      });
+      if (!gameRule.id) {
+        res = await fetch(`${API_BASE}gameRules`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            gameRule: {
+              ...gameRule,
+              game_id: parseInt(gameId)
+            }
+          })
+        });
 
-      if (!res.ok) throw new Error('Failed to create game rule');
-      const newGameRule = await res.json();
+        if (!res.ok) throw new Error('Failed to create game rule');
+        const newGameRule = await res.json();
 
-      setGameRule(newGameRule);
-      updatedGameRule = newGameRule;
-    } else {
-      res = await fetch(`${API_BASE}gameRules/${gameRule.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ gameRule })
-      });
+        setGameRule(newGameRule);
+        updatedGameRule = newGameRule;
+      } else {
+        res = await fetch(`${API_BASE}gameRules/${gameRule.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ gameRule })
+        });
 
-      if (!res.ok) throw new Error('Failed to update game rule');
+        if (!res.ok) throw new Error('Failed to update game rule');
+      }
+
+      showSnackbar('Game Rule saved');
+    } catch (e) {
+      showSnackbar(e.message);
     }
-
-    showSnackbar('Game Rule saved');
-  } catch (e) {
-    showSnackbar(e.message);
-  }
-};
+  };
 
 
   const handleAddPlayerProperty = async () => {
@@ -416,15 +418,32 @@ const saveGameRule = async () => {
 
   return (
     <Box sx={{ backgroundColor: '#fff', minHeight: '100vh', pb: 4 }}>
-      <Box sx={styles.navbar}>
-        <Typography sx={{ fontSize: '1.25rem', color: 'white' }}>
+      <Box sx={{ ...styles.navbar, position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', px: 2 }}>
+        <Button
+          onClick={() => window.history.back()}
+          startIcon={<ArrowBackIcon />}
+          sx={{ color: 'white', borderColor: 'white' }}
+          variant="outlined"
+        >
+          Back
+        </Button>
+
+        <Typography
+          sx={{
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            fontSize: '1.25rem',
+            color: 'white',
+          }}
+        >
           Rule Manager
         </Typography>
       </Box>
 
+
       <Box sx={{ p: 3 }}>
         <Grid container spacing={3}>
-          {/* Game Rule */}
           <Grid item xs={12} md={4}>
             <Card sx={{ backgroundColor: brown, color: whiteText, p: 2 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
@@ -459,14 +478,11 @@ const saveGameRule = async () => {
             </Card>
           </Grid>
 
-          {/* Player Properties */}
           <Grid item xs={12} md={4}>
             <Card sx={{ backgroundColor: brown, color: whiteText, p: 2 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
                 Player Properties
               </Typography>
-
-              {/* Add new player property */}
               <Stack spacing={2} mb={3}>
                 <TextField
                   label="New Property Name"
@@ -559,7 +575,6 @@ const saveGameRule = async () => {
             </Card>
           </Grid>
 
-          {/* Custom Rules */}
           <Grid item xs={12} md={4}>
             <Card sx={{ backgroundColor: brown, color: whiteText, p: 2 }}>
               <Typography variant="h6" sx={{ mb: 2 }}>
@@ -659,7 +674,6 @@ const saveGameRule = async () => {
         </Grid>
       </Box>
 
-      {/* Snackbar for alerts */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
@@ -668,7 +682,6 @@ const saveGameRule = async () => {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       />
 
-      {/* Confirmation dialog */}
       <Dialog
         open={confirmDialog.open}
         onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))}

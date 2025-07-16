@@ -5,14 +5,21 @@ import {
   TextField,
   Typography,
   Card,
-  CardContent,
+  Grid,
+  Stack,
   IconButton,
-  Collapse
+  List,
+  ListItem,
+  ListItemText,
+  Snackbar,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions
 } from '@mui/material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
-import SaveIcon from '@mui/icons-material/Save'
-import CreditCardIcon from '@mui/icons-material/CreditCard'
 
 const styles = {
   navbar: {
@@ -22,89 +29,262 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-around',
     userSelect: 'none'
-  },
-  navButton: { borderRadius: 0, userSelect: 'none' },
-  navText: { color: '#fff', fontSize: '1.25rem', userSelect: 'none' }
+  }
 }
 
-const toTitleCase = str =>
-  str
-    .replace(/_/g, ' ')
-    .replace(
-      /\w\S*/g,
-      txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-    )
-
 const RuleEditor = () => {
-  let API_BASE = process.env.REACT_APP_API_URL
-  if (!API_BASE) {
-    API_BASE = 'http://localhost:4000/api/'
-  }
+  const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:4000/api/'
+  const brown = '#5d3a00'
+  const brownLight = '#7a541c'
+  const whiteText = '#fff'
 
-  const [rules, setRules] = useState([])
+  const [gameRule, setGameRule] = useState({
+    starting_hand_size: 0,
+    max_hand_size: 0,
+    draw_per_turn: 0,
+    id: null
+  })
+
+  const [playerProps, setPlayerProps] = useState([])
+  const [newPlayerPropName, setNewPlayerPropName] = useState('')
+  const [newPlayerPropValue, setNewPlayerPropValue] = useState(0)
+  const [editingPlayerPropId, setEditingPlayerPropId] = useState(null)
+  const [editingPlayerPropName, setEditingPlayerPropName] = useState('')
+  const [editingPlayerPropValue, setEditingPlayerPropValue] = useState(0)
+
+  const [customRules, setCustomRules] = useState([])
+
   const [newRuleName, setNewRuleName] = useState('')
   const [newRuleValue, setNewRuleValue] = useState(0)
-  const [expandedRuleId, setExpandedRuleId] = useState(null)
-  const [ruleEdits, setRuleEdits] = useState({})
-  const [newPropInputs, setNewPropInputs] = useState({})
 
-  const handleNewPropInput = (ruleId, field, value) => {
-    setNewPropInputs(prev => ({
-      ...prev,
-      [ruleId]: {
-        ...prev[ruleId],
-        [field]: value
-      }
-    }))
-  }
+  const [editingCustomRuleId, setEditingCustomRuleId] = useState(null)
+  const [editingCustomRuleName, setEditingCustomRuleName] = useState('')
+  const [editingCustomRuleValue, setEditingCustomRuleValue] = useState(0)
 
-  const handleAddPlayerProperty = ruleId => {
-    const inputs = newPropInputs[ruleId]
-    if (!inputs?.name || isNaN(inputs.value))
-      setRuleEdits(prev => {
-        const existingProps = prev[ruleId]?.playerProps || []
-        return {
-          ...prev,
-          [ruleId]: {
-            ...prev[ruleId],
-            playerProps: [
-              ...existingProps,
-              {
-                id: `new-${Date.now()}`,
-                property_name: inputs.name,
-                value: Number(inputs.value),
-                isNew: true
-              }
-            ]
-          }
-        }
-      })
+  const [snackbar, setSnackbar] = useState({ open: false, message: '' })
 
-    setNewPropInputs(prev => ({
-      ...prev,
-      [ruleId]: { name: '', value: 0 }
-    }))
-  }
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    title: '',
+    content: '',
+    onConfirm: null,
+    onCancel: null
+  })
 
-  useEffect(() => {
-    fetchRules()
-  }, [])
+  const gameId = localStorage.getItem('gameSelected')
 
-  const fetchRules = async () => {
+  const fetchAndSetPlayerProps = async () => {
     try {
-      const res = await fetch(`${API_BASE}rules`)
-      const data = await res.json()
-      setRules(data)
-      setExpandedRuleId(null)
-    } catch (e) {
-      console.error('Failed to fetch rules:', e)
+      const propsRes = await fetch(`${API_BASE}playerProperties`)
+      if (!propsRes.ok) {
+        throw new Error('Failed to fetch player properties')
+      }
+      const propsData = await propsRes.json()
+      if (Array.isArray(propsData) && gameRule.id) {
+        const filteredProps = propsData.filter(prop => prop.game_rule_id === gameRule.id)
+        setPlayerProps(filteredProps)
+      } else {
+        setPlayerProps([])
+      }
+    } catch (error) {
+      console.error(error)
+      setPlayerProps([])
     }
   }
 
-  const handleCreateRule = async () => {
-    const gameId = localStorage.getItem('gameSelected')
-    if (!gameId) return alert('Game not found')
+  const fetchCustomRules = async (currentGameRuleId) => {
+    try {
+      const rulesRes = await fetch(`${API_BASE}rules`)
+      const rulesData = await rulesRes.json()
+      const filteredCustomRules = rulesData.filter(
+        r => r.game_rule_id !== currentGameRuleId && r.game_rule_id !== null
+      )
+      setCustomRules(filteredCustomRules)
+    } catch (e) {
+      console.error('Failed to fetch custom rules', e)
+    }
+  }
 
+useEffect(() => {
+  if (!gameId) return;
+
+  const loadGameRule = async () => {
+    try {
+      const res = await fetch(`${API_BASE}gameRules/gameRule/${gameId}`);
+      const gameRulesData = await res.json();
+      if (gameRulesData.length > 0) {
+        const gr = gameRulesData[0];
+        setGameRule(gr);
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  loadGameRule();
+}, [gameId]);
+
+useEffect(() => {
+  if (!gameRule.id) return;
+
+  const fetchData = async () => {
+    try {
+      const propsRes = await fetch(`${API_BASE}playerProperties`);
+      const propsData = await propsRes.json();
+      const filteredProps = propsData.filter(p => p.game_rule_id === gameRule.id);
+      setPlayerProps(filteredProps);
+
+      const rulesRes = await fetch(`${API_BASE}rules`);
+      const rulesData = await rulesRes.json();
+      const filteredRules = rulesData.filter(r => r.game_rule_id !== gameRule.id && r.game_rule_id !== null);
+      setCustomRules(filteredRules);
+    } catch (e) {
+      console.error(e);
+      setPlayerProps([]);
+      setCustomRules([]);
+    }
+  };
+
+  fetchData();
+}, [gameRule.id]);
+
+
+  const showSnackbar = (message) => {
+    setSnackbar({ open: true, message })
+  }
+
+  const showConfirmDialog = ({ title, content, onConfirm, onCancel }) => {
+    setConfirmDialog({
+      open: true,
+      title,
+      content,
+      onConfirm: () => {
+        onConfirm()
+        setConfirmDialog(prev => ({ ...prev, open: false }))
+      },
+      onCancel: () => {
+        if (onCancel) onCancel()
+        setConfirmDialog(prev => ({ ...prev, open: false }))
+      }
+    })
+  }
+
+  const handleGameRuleChange = (field, val) => {
+    setGameRule(prev => ({
+      ...prev,
+      [field]: Number(val)
+    }))
+  }
+
+  const saveGameRule = async () => {
+    if (!gameRule.id) {
+      showSnackbar('Game Rule ID missing')
+      return
+    }
+    try {
+      const res = await fetch(`${API_BASE}gameRules/${gameRule.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ gameRule })
+      })
+      if (!res.ok) throw new Error('Failed to save game rule')
+      showSnackbar('Game Rule saved')
+    } catch (e) {
+      showSnackbar(e.message)
+    }
+  }
+
+  const handleAddPlayerProperty = async () => {
+    if (!newPlayerPropName.trim()) {
+      showSnackbar('Enter a property name')
+      return
+    }
+    try {
+      const res = await fetch(`${API_BASE}playerProperties`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          playerProperty: {
+            property_name: newPlayerPropName,
+            value: newPlayerPropValue,
+            game_rule_id: gameRule.id
+          }
+        })
+      })
+      if (!res.ok) throw new Error('Failed to add player property')
+
+      await fetchAndSetPlayerProps()
+
+      setNewPlayerPropName('')
+      setNewPlayerPropValue(0)
+      showSnackbar('Player property added')
+    } catch (e) {
+      showSnackbar(e.message)
+    }
+  }
+
+  const startEditPlayerProp = (prop) => {
+    setEditingPlayerPropId(prop.id)
+    setEditingPlayerPropName(prop.property_name)
+    setEditingPlayerPropValue(prop.value)
+  }
+
+  const cancelEditPlayerProp = () => {
+    setEditingPlayerPropId(null)
+    setEditingPlayerPropName('')
+    setEditingPlayerPropValue(0)
+  }
+
+  const saveEditedPlayerProp = async () => {
+    if (!editingPlayerPropName.trim()) {
+      showSnackbar('Property name cannot be empty')
+      return
+    }
+    try {
+      const res = await fetch(`${API_BASE}playerProperties/${editingPlayerPropId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          playerProperty: {
+            property_name: editingPlayerPropName,
+            value: editingPlayerPropValue,
+            game_rule_id: gameRule.id
+          }
+        })
+      })
+      if (!res.ok) throw new Error('Failed to update player property')
+
+      showSnackbar('Player property updated')
+      cancelEditPlayerProp()
+      fetchAndSetPlayerProps()
+    } catch (e) {
+      showSnackbar(e.message)
+    }
+  }
+
+  const deletePlayerProp = async (id) => {
+    showConfirmDialog({
+      title: 'Confirm Delete',
+      content: 'Are you sure you want to delete this player property?',
+      onConfirm: async () => {
+        try {
+          const res = await fetch(`${API_BASE}playerProperties/delete/${id}`, { method: 'DELETE' })
+          if (!res.ok) throw new Error('Failed to delete player property')
+
+          showSnackbar('Player property deleted')
+          fetchAndSetPlayerProps()
+        } catch (e) {
+          showSnackbar(e.message)
+        }
+      }
+    })
+  }
+
+  const handleCreateCustomRule = async () => {
+    if (!newRuleName.trim()) {
+      showSnackbar('Enter a custom rule name')
+      return
+    }
     try {
       const gameRuleRes = await fetch(`${API_BASE}gameRules`, {
         method: 'POST',
@@ -118,7 +298,6 @@ const RuleEditor = () => {
           }
         })
       })
-
       const gameRuleData = await gameRuleRes.json()
       if (!gameRuleRes.ok) throw new Error('Failed to create game rule')
 
@@ -133,462 +312,344 @@ const RuleEditor = () => {
           }
         })
       })
-
-      const ruleData = await ruleRes.json()
-      if (!ruleRes.ok) throw new Error('Failed to create rule')
-
-      const defaultProps = [
-        { name: 'health', value: 0 },
-        { name: 'power', value: 0 }
-      ]
-
-      for (const prop of defaultProps) {
-        await fetch(`${API_BASE}playerProperties`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            playerProperty: {
-              property_name: prop.name,
-              value: prop.value,
-              game_rule_id: gameRuleData.id
-            }
-          })
-        })
-      }
+      if (!ruleRes.ok) throw new Error('Failed to create custom rule')
 
       setNewRuleName('')
       setNewRuleValue(0)
-      fetchRules()
-    } catch (error) { }
-  }
-
-  const handleDeleteRule = async ruleId => {
-    if (!window.confirm('Are you sure you want to delete this rule?')) return
-    try {
-      await fetch(`${API_BASE}rules/delete/${ruleId}`, {
-        method: 'DELETE'
-      })
-      fetchRules()
+      showSnackbar('Custom rule added')
+      fetchCustomRules(gameRule.id)
     } catch (e) {
-      alert('Failed to delete rule')
+      showSnackbar(e.message)
     }
   }
 
-  const toggleExpand = async id => {
-    setExpandedRuleId(prev => (prev === id ? null : id))
-    if (expandedRuleId === id) return
-
-    const rule = rules.find(r => r.id === id)
-    if (!rule) return
-
-    try {
-      const gameRulesRes = await fetch(
-        `${API_BASE}gameRules/gameRule/${rule.game_rule_id}`
-      )
-      const gameRules = await gameRulesRes.json()
-      const gameRule = gameRules[0]
-
-      const playerPropsRes = await fetch(
-        `${API_BASE}playerProperties/playerProperty/${rule.game_rule_id}`
-      )
-      const playerProps = await playerPropsRes.json()
-
-      setRuleEdits(prev => ({
-        ...prev,
-        [id]: {
-          gameRule,
-          playerProps
-        }
-      }))
-    } catch {
-      alert('Failed to fetch rule details')
-    }
+  const startEditCustomRule = rule => {
+    setEditingCustomRuleId(rule.id)
+    setEditingCustomRuleName(rule.rule_name)
+    setEditingCustomRuleValue(rule.value)
   }
 
-  const handleSaveEdit = async ruleId => {
-    const edit = ruleEdits[ruleId]
+  const cancelEditCustomRule = () => {
+    setEditingCustomRuleId(null)
+    setEditingCustomRuleName('')
+    setEditingCustomRuleValue(0)
+  }
 
+  const saveEditedCustomRule = async () => {
+    if (!editingCustomRuleName.trim()) {
+      showSnackbar('Rule name cannot be empty')
+      return
+    }
     try {
-      const gameRuleId = rules.find(r => r.id === ruleId).game_rule_id
-
-      await fetch(`${API_BASE}gameRules/${gameRuleId}`, {
+      const res = await fetch(`${API_BASE}rules/${editingCustomRuleId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ gameRule: edit.gameRule })
-      })
-
-      for (const prop of edit.playerProps) {
-        const isNew = prop.isNew || typeof prop.id === 'string'
-        const url = isNew
-          ? `${API_BASE}playerProperties`
-          : `${API_BASE}playerProperties/${prop.id}`
-
-        await fetch(url, {
-          method: isNew ? 'POST' : 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            playerProperty: {
-              property_name: prop.property_name,
-              value: prop.value,
-              game_rule_id: gameRuleId
-            }
-          })
+        body: JSON.stringify({
+          rule: {
+            rule_name: editingCustomRuleName,
+            value: editingCustomRuleValue,
+            game_rule_id: gameRule.id
+          }
         })
-      }
+      })
+      if (!res.ok) throw new Error('Failed to update custom rule')
 
-      fetchRules()
-      setExpandedRuleId(null)
-    } catch {
-      alert('Failed to save edits')
+      showSnackbar('Custom rule updated')
+      cancelEditCustomRule()
+      fetchCustomRules(gameRule.id)
+    } catch (e) {
+      showSnackbar(e.message)
     }
   }
 
-  const updateGameRuleField = (ruleId, field, value) => {
-    setRuleEdits(prev => ({
-      ...prev,
-      [ruleId]: {
-        ...prev[ruleId],
-        gameRule: {
-          ...prev[ruleId].gameRule,
-          [field]: Number(value)
-        }
-      }
-    }))
-  }
+  const deleteCustomRule = async id => {
+    showConfirmDialog({
+      title: 'Confirm Delete',
+      content: 'Are you sure you want to delete this custom rule?',
+      onConfirm: async () => {
+        try {
+          const res = await fetch(`${API_BASE}rules/delete/${id}`, { method: 'DELETE' })
+          if (!res.ok) throw new Error('Failed to delete custom rule')
 
-  const updatePlayerPropField = (ruleId, index, value) => {
-    setRuleEdits(prev => {
-      const updatedProps = [...prev[ruleId].playerProps]
-      updatedProps[index] = { ...updatedProps[index], value: Number(value) }
-      return {
-        ...prev,
-        [ruleId]: {
-          ...prev[ruleId],
-          playerProps: updatedProps
+          showSnackbar('Custom rule deleted')
+          fetchCustomRules(gameRule.id)
+        } catch (e) {
+          showSnackbar(e.message)
         }
       }
     })
   }
 
-  const brown = '#5d3a00'
-  const brownLight = '#7a541c'
-  const whiteText = '#fff'
-  const whiteBorder = '#fff'
-
   return (
     <Box sx={{ backgroundColor: '#fff', minHeight: '100vh', pb: 4 }}>
-      <Box sx={{ ...styles.navbar, backgroundColor: brown, color: whiteText }}>
-        <Typography sx={{ color: whiteText, fontSize: '1.25rem', userSelect: 'none' }}>
+      <Box sx={styles.navbar}>
+        <Typography sx={{ fontSize: '1.25rem', color: 'white' }}>
           Rule Manager
         </Typography>
       </Box>
 
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          mt: 4,
-          mb: 4,
-          px: 2
-        }}
-      >
-        <Card
-          sx={{
-            backgroundColor: brown,
-            color: whiteText,
-            border: `1px solid ${whiteBorder}`,
-            boxShadow: `0px 4px 12px ${brownLight}`,
-            p: 3,
-            width: 400
-          }}
-        >
-          <CardContent>
-            <Typography
-              variant="h6"
-              sx={{ textAlign: 'center', color: whiteText, mb: 2 }}
-            >
-              Add New Rule
-            </Typography>
-
-            <TextField
-              label="Rule Name"
-              fullWidth
-              variant="outlined"
-              value={newRuleName}
-              onChange={e => setNewRuleName(e.target.value)}
-              sx={{
-                mb: 2,
-                '& .MuiOutlinedInput-root': {
-                  color: whiteText,
-                  '& fieldset': {
-                    borderColor: whiteBorder
-                  },
-                  '&:hover fieldset': {
-                    borderColor: whiteBorder
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: whiteBorder
-                  }
-                },
-                '& .MuiInputLabel-root': {
-                  color: whiteText
-                },
-                '& .MuiInputBase-input': {
-                  color: whiteText
-                }
-              }}
-            />
-            <TextField
-              label="Rule Value"
-              fullWidth
-              variant="outlined"
-              type="number"
-              value={newRuleValue}
-              onChange={e => setNewRuleValue(Number(e.target.value))}
-              sx={{
-                mb: 2,
-                '& .MuiOutlinedInput-root': {
-                  color: whiteText,
-                  '& fieldset': {
-                    borderColor: whiteBorder
-                  },
-                  '&:hover fieldset': {
-                    borderColor: whiteBorder
-                  },
-                  '&.Mui-focused fieldset': {
-                    borderColor: whiteBorder
-                  }
-                },
-                '& .MuiInputLabel-root': {
-                  color: whiteText
-                },
-                '& .MuiInputBase-input': {
-                  color: whiteText
-                }
-              }}
-            />
-
-            <Button
-              variant="contained"
-              fullWidth
-              onClick={handleCreateRule}
-              sx={{
-                mt: 1,
-                bgcolor: brown,
-                color: whiteText,
-                fontWeight: 'bold',
-                '&:hover': { bgcolor: brownLight }
-              }}
-            >
-              Create Rule
-            </Button>
-          </CardContent>
-        </Card>
-      </Box>
-
-      <Box
-        sx={{
-          maxWidth: 600,
-          mx: 'auto',
-          px: 2
-        }}
-      >
-        {rules.map(rule => (
-          <Card
-            key={rule.id}
-            sx={{
-              backgroundColor: brown,
-              color: whiteText,
-              mb: 3,
-              border:
-                expandedRuleId === rule.id
-                  ? `1px solid ${whiteBorder}`
-                  : `1px solid transparent`,
-              boxShadow:
-                expandedRuleId === rule.id ? `0 0 12px ${brownLight}` : 'none',
-              transition: 'all 0.3s ease',
-              p: 2
-            }}
-          >
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}
-            >
-              <Typography variant="h6" sx={{ userSelect: 'none', color: whiteText }}>
-                {rule.rule_name} — {rule.value}
+      <Box sx={{ p: 3 }}>
+        <Grid container spacing={3}>
+          {/* Game Rule */}
+          <Grid item xs={12} md={4}>
+            <Card sx={{ backgroundColor: brown, color: whiteText, p: 2 }}>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Game Rule
               </Typography>
-              <Box>
-                <IconButton
-                  color="inherit"
-                  onClick={() => toggleExpand(rule.id)}
-                  size="large"
-                  aria-label={`Edit ${rule.rule_name}`}
-                  sx={{ color: whiteText }}
+              <Stack spacing={2}>
+                <TextField
+                  label="Starting Hand Size"
+                  type="number"
+                  fullWidth
+                  value={gameRule.starting_hand_size}
+                  onChange={e => handleGameRuleChange('starting_hand_size', e.target.value)}
+                />
+                <TextField
+                  label="Max Hand Size"
+                  type="number"
+                  fullWidth
+                  value={gameRule.max_hand_size}
+                  onChange={e => handleGameRuleChange('max_hand_size', e.target.value)}
+                />
+                <TextField
+                  label="Draw Per Turn"
+                  type="number"
+                  fullWidth
+                  value={gameRule.draw_per_turn}
+                  onChange={e => handleGameRuleChange('draw_per_turn', e.target.value)}
+                />
+                <Button variant="contained" sx={{ bgcolor: brownLight }} onClick={saveGameRule}>
+                  Save Game Rule
+                </Button>
+              </Stack>
+            </Card>
+          </Grid>
+
+          {/* Player Properties */}
+          <Grid item xs={12} md={4}>
+            <Card sx={{ backgroundColor: brown, color: whiteText, p: 2 }}>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Player Properties
+              </Typography>
+
+              {/* Add new player property */}
+              <Stack spacing={2} mb={3}>
+                <TextField
+                  label="New Property Name"
+                  value={newPlayerPropName}
+                  onChange={e => setNewPlayerPropName(e.target.value)}
+                  fullWidth
+                />
+                <TextField
+                  label="Value"
+                  type="number"
+                  value={newPlayerPropValue}
+                  onChange={e => setNewPlayerPropValue(Number(e.target.value))}
+                  fullWidth
+                />
+                <Button
+                  variant="contained"
+                  fullWidth
+                  sx={{ bgcolor: brownLight }}
+                  onClick={handleAddPlayerProperty}
+                  disabled={!newPlayerPropName.trim()}
                 >
-                  <EditIcon />
-                </IconButton>
-                <IconButton
-                  color="inherit"
-                  onClick={() => handleDeleteRule(rule.id)}
-                  size="large"
-                  aria-label={`Delete ${rule.rule_name}`}
-                  sx={{ color: '#ff6666' }}
-                >
-                  <DeleteIcon />
-                </IconButton>
-              </Box>
-            </Box>
+                  Add Player Property
+                </Button>
+              </Stack>
 
-            <Collapse in={expandedRuleId === rule.id} timeout="auto" unmountOnExit>
-              {ruleEdits[rule.id] && (
-                <Box sx={{ mt: 3 }}>
-                  <Typography sx={{ fontWeight: 'bold', mb: 1, color: whiteText }}>
-                    Game Rule
-                  </Typography>
-                  {ruleEdits[rule.id]?.gameRule &&
-                    Object.entries(ruleEdits[rule.id].gameRule).map(
-                      ([key, val]) =>
-                        key !== 'id' &&
-                        key !== 'game_id' &&
-                        key !== 'public_template' &&
-                        key !== 'inserted_at' &&
-                        key !== 'updated_at' && (
-                          <TextField
-                            key={key}
-                            label={toTitleCase(key)}
-                            value={val}
-                            type="number"
-                            onChange={e =>
-                              updateGameRuleField(rule.id, key, e.target.value)
-                            }
-                            fullWidth
-                            sx={{
-                              mb: 1,
-                              '& .MuiOutlinedInput-root': {
-                                color: whiteText,
-                                '& fieldset': {
-                                  borderColor: whiteBorder
-                                },
-                                '&:hover fieldset': {
-                                  borderColor: whiteBorder
-                                },
-                                '&.Mui-focused fieldset': {
-                                  borderColor: whiteBorder
-                                }
-                              },
-                              '& .MuiInputLabel-root': {
-                                color: whiteText
-                              },
-                              '& .MuiInputBase-input': {
-                                color: whiteText
-                              }
-                            }}
-                            variant="outlined"
-                          />
-                        )
-                    )}
-
-
-                  <Typography sx={{ fontWeight: 'bold', mt: 3, mb: 1, color: whiteText }}>
-                    Player Properties
-                  </Typography>
-                  {ruleEdits[rule.id].playerProps.map((prop, idx) => (
-                    <TextField
+              <List sx={{ bgcolor: '#3f2f00', borderRadius: 1 }}>
+                {playerProps.map((prop) =>
+                  editingPlayerPropId === prop.id ? (
+                    <ListItem key={prop.id} sx={{ bgcolor: '#523f00' }}>
+                      <TextField
+                        label="Property Name"
+                        value={editingPlayerPropName}
+                        onChange={e => setEditingPlayerPropName(e.target.value)}
+                        sx={{ mr: 2, bgcolor: 'white', borderRadius: 1, flexGrow: 1 }}
+                        size="small"
+                      />
+                      <TextField
+                        label="Value"
+                        type="number"
+                        value={editingPlayerPropValue}
+                        onChange={e => setEditingPlayerPropValue(Number(e.target.value))}
+                        sx={{ mr: 2, bgcolor: 'white', borderRadius: 1, width: 100 }}
+                        size="small"
+                      />
+                      <Button
+                        variant="contained"
+                        onClick={saveEditedPlayerProp}
+                        sx={{ mr: 1 }}
+                        size="small"
+                      >
+                        Save
+                      </Button>
+                      <Button variant="outlined" onClick={cancelEditPlayerProp} size="small">
+                        Cancel
+                      </Button>
+                    </ListItem>
+                  ) : (
+                    <ListItem
                       key={prop.id}
-                      label={toTitleCase(prop.property_name)}
-                      value={prop.value}
-                      type="number"
-                      onChange={e =>
-                        updatePlayerPropField(rule.id, idx, e.target.value)
+                      secondaryAction={
+                        <>
+                          <IconButton
+                            edge="end"
+                            aria-label="edit"
+                            onClick={() => startEditPlayerProp(prop)}
+                            sx={{ color: whiteText }}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
+                            edge="end"
+                            aria-label="delete"
+                            onClick={() => deletePlayerProp(prop.id)}
+                            sx={{ color: '#ff6666' }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </>
                       }
-                      fullWidth
-                      sx={{
-                        mb: 1,
-                        '& .MuiOutlinedInput-root': {
-                          color: whiteText,
-                          '& fieldset': {
-                            borderColor: whiteBorder
-                          },
-                          '&:hover fieldset': {
-                            borderColor: whiteBorder
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: whiteBorder
-                          }
-                        },
-                        '& .MuiInputLabel-root': {
-                          color: whiteText
-                        },
-                        '& .MuiInputBase-input': {
-                          color: whiteText
-                        }
-                      }}
-                      variant="outlined"
-                    />
-                  ))}
-
-                  <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                    <TextField
-                      label="Property Name"
-                      value={newPropInputs[rule.id]?.name || ''}
-                      onChange={e =>
-                        handleNewPropInput(rule.id, 'name', e.target.value)
-                      }
-                      sx={{ flex: 1 }}
-                      variant="outlined"
-                      InputLabelProps={{ style: { color: whiteText } }}
-                      inputProps={{ style: { color: whiteText } }}
-                    />
-                    <TextField
-                      label="Value"
-                      type="number"
-                      value={newPropInputs[rule.id]?.value || ''}
-                      onChange={e =>
-                        handleNewPropInput(rule.id, 'value', e.target.value)
-                      }
-                      sx={{ width: 100 }}
-                      variant="outlined"
-                      InputLabelProps={{ style: { color: whiteText } }}
-                      inputProps={{ style: { color: whiteText } }}
-                    />
-                    <Button
-                      variant="contained"
-                      onClick={() => handleAddPlayerProperty(rule.id)}
-                      sx={{
-                        bgcolor: brown,
-                        '&:hover': { bgcolor: brownLight },
-                        color: whiteText,
-                        fontWeight: 'bold'
-                      }}
+                      sx={{ bgcolor: '#3f2f00', mb: 1, borderRadius: 1 }}
                     >
-                      Add
-                    </Button>
-                  </Box>
+                      <ListItemText
+                        primary={`${prop.property_name} — ${prop.value}`}
+                        primaryTypographyProps={{ color: whiteText }}
+                      />
+                    </ListItem>
+                  )
+                )}
+              </List>
+            </Card>
+          </Grid>
 
-                  <Button
-                    variant="contained"
-                    startIcon={<SaveIcon />}
-                    onClick={() => handleSaveEdit(rule.id)}
-                    fullWidth
-                    sx={{
-                      mt: 2,
-                      bgcolor: brown,
-                      color: whiteText,
-                      fontWeight: 'bold',
-                      '&:hover': { bgcolor: brownLight }
-                    }}
-                  >
-                    Save
-                  </Button>
-                </Box>
-              )}
-            </Collapse>
-          </Card>
-        ))}
+          {/* Custom Rules */}
+          <Grid item xs={12} md={4}>
+            <Card sx={{ backgroundColor: brown, color: whiteText, p: 2 }}>
+              <Typography variant="h6" sx={{ mb: 2 }}>
+                Custom Rules
+              </Typography>
+              <Stack spacing={2} mb={3}>
+                <TextField
+                  label="Custom Rule Name"
+                  value={newRuleName}
+                  onChange={e => setNewRuleName(e.target.value)}
+                  fullWidth
+                />
+                <TextField
+                  label="Value"
+                  type="number"
+                  value={newRuleValue}
+                  onChange={e => setNewRuleValue(Number(e.target.value))}
+                  fullWidth
+                />
+                <Button
+                  variant="contained"
+                  fullWidth
+                  sx={{ bgcolor: brownLight }}
+                  onClick={handleCreateCustomRule}
+                  disabled={!newRuleName.trim()}
+                >
+                  Add Custom Rule
+                </Button>
+              </Stack>
+
+              <List sx={{ bgcolor: '#3f2f00', borderRadius: 1 }}>
+                {customRules.map(rule =>
+                  editingCustomRuleId === rule.id ? (
+                    <ListItem key={rule.id} sx={{ bgcolor: '#523f00' }}>
+                      <TextField
+                        label="Rule Name"
+                        value={editingCustomRuleName}
+                        onChange={e => setEditingCustomRuleName(e.target.value)}
+                        sx={{ mr: 2, bgcolor: 'white', borderRadius: 1, flexGrow: 1 }}
+                        size="small"
+                      />
+                      <TextField
+                        label="Value"
+                        type="number"
+                        value={editingCustomRuleValue}
+                        onChange={e => setEditingCustomRuleValue(Number(e.target.value))}
+                        sx={{ mr: 2, bgcolor: 'white', borderRadius: 1, width: 100 }}
+                        size="small"
+                      />
+                      <Button
+                        variant="contained"
+                        onClick={saveEditedCustomRule}
+                        sx={{ mr: 1 }}
+                        size="small"
+                      >
+                        Save
+                      </Button>
+                      <Button variant="outlined" onClick={cancelEditCustomRule} size="small">
+                        Cancel
+                      </Button>
+                    </ListItem>
+                  ) : (
+                    <ListItem
+                      key={rule.id}
+                      secondaryAction={
+                        <>
+                          <IconButton
+                            edge="end"
+                            aria-label="edit"
+                            onClick={() => startEditCustomRule(rule)}
+                            sx={{ color: whiteText }}
+                          >
+                            <EditIcon />
+                          </IconButton>
+                          <IconButton
+                            edge="end"
+                            aria-label="delete"
+                            onClick={() => deleteCustomRule(rule.id)}
+                            sx={{ color: '#ff6666' }}
+                          >
+                            <DeleteIcon />
+                          </IconButton>
+                        </>
+                      }
+                      sx={{ bgcolor: '#3f2f00', mb: 1, borderRadius: 1 }}
+                    >
+                      <ListItemText
+                        primary={`${rule.rule_name} — ${rule.value}`}
+                        primaryTypographyProps={{ color: whiteText }}
+                      />
+                    </ListItem>
+                  )
+                )}
+              </List>
+            </Card>
+          </Grid>
+        </Grid>
       </Box>
+
+      {/* Snackbar for alerts */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={() => setSnackbar(prev => ({ ...prev, open: false }))}
+        message={snackbar.message}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      />
+
+      {/* Confirmation dialog */}
+      <Dialog
+        open={confirmDialog.open}
+        onClose={() => setConfirmDialog(prev => ({ ...prev, open: false }))}
+      >
+        <DialogTitle>{confirmDialog.title}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>{confirmDialog.content}</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={confirmDialog.onCancel || (() => setConfirmDialog(prev => ({ ...prev, open: false })))}>Cancel</Button>
+          <Button onClick={confirmDialog.onConfirm} autoFocus color="error">
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   )
 }

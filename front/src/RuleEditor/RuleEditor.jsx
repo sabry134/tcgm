@@ -383,7 +383,6 @@ const saveGameRule = async () => {
           rule: {
             rule_name: editingCustomRuleName,
             value: editingCustomRuleValue,
-            game_rule_id: gameRule.id
           }
         })
       })

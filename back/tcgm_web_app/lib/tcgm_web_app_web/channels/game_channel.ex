@@ -39,7 +39,7 @@ defmodule TcgmWebAppWeb.GameChannel do
 
   def handle_in("start_game", %{"game_id" => game_id}, socket) do
     TcgmWebApp.Game.GameServer.start_game(socket.assigns.room_id, game_id)
-    broadcast!(socket, "game_update", %{state: TcgmWebApp.Game.GameServer.get_state(socket.assigns.room_id)})
+    broadcast!(socket, "game_started", %{state: TcgmWebApp.Game.GameServer.get_state(socket.assigns.room_id)})
     {:noreply, socket}
   end
 

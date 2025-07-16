@@ -256,9 +256,17 @@ const Room = () => {
                 }
                 handleContextMenu={handleContextMenu}
               /> */}
-              {zones.map((zone) => (
-                <div
+              {zones.map((zone) => {
+                return <CardZone
                   key={zone.id}
+                  stackZone={true}
+                  opponent={false}
+                  cards={[]}
+                  boardLocation={`zone_${zone.id}`}
+                  handleCardClick={handleCardClick}
+                  selectedCard={selectedCard}
+                  cssName={`zone-${zone.id}`}
+                  draggable={true}
                   style={{
                     position: "absolute",
                     left: zone.x,
@@ -268,23 +276,11 @@ const Room = () => {
                     borderRadius: zone.borderRadius,
                     backgroundColor: "rgba(0,0,0,0.25)",
                     overflow: "hidden",
-                    pointerEvents: "none",
+                    pointerEvents: "auto"
                   }}
-                >
-                  <CardZone
-                    stackZone={true}
-                    opponent={false}
-                    cards={[]}
-                    boardLocation={`zone_${zone.id}`}
-                    handleCardClick={handleCardClick}
-                    selectedCard={selectedCard}
-                    cssName={`zone-${zone.id}`}
-                    draggable={true}
-                    style={{ pointerEvents: "auto" }}
-                    handleContextMenu={handleContextMenu}
-                  />
-                </div>
-              ))}
+                  handleContextMenu={handleContextMenu}
+                />
+              })}
             </div>
           );
         })}

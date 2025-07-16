@@ -59,73 +59,11 @@ const JoinRoom = () => {
     }
   }, [scenes])
 
-  const joinRoom = async navigate => {
-    try {
-      weakResetConnection()
-      const room_id = localStorage.getItem('room_id') ?? roomId
-      if (!room_id && !roomId.trim()) {
-        throw new Error('Room ID is required')
-      }
-      let username = playerUsername.trim()
-      if (!username) {
-        const counter = parseInt(
-          localStorage.getItem('playerCounter') || '1',
-          10
-        )
-        username = `Player ${counter}`
-        localStorage.setItem('playerUsername', username)
-      }
-
-      const joinRoomFetch = async (username, roomId) => {
-        try {
-          const response = await joinRoomRequest(roomId, {
-            player_id: username,
-            game_id: localStorage.getItem('gameSelected') || ''
-          })
-          setGameState(response)
-          console.log('response to join room:', response)
-          return response
-        } catch (error) {
-          console.error('Error joining room:', error)
-          throw error
-        }
-      }
-
-      try {
-        const data = await joinRoomFetch(username, room_id)
-        localStorage.setItem('room_id', room_id)
-        localStorage.setItem('player_id', username)
-        localStorage.setItem('playerUsername', username)
-        navigate(ROUTES.LOBBY)
-      } catch (error) {
-        console.error('Join room failed with username', username, error)
-        const currentCounter = parseInt(
-          localStorage.getItem('playerCounter') || '1',
-          10
-        )
-        const newCounter = currentCounter + 1
-        const newUsername = localStorage.getItem('userId')
-        localStorage.setItem('playerCounter', newCounter.toString())
-        localStorage.setItem('playerUsername', newUsername)
-        try {
-          const data = await joinRoomFetch(newUsername, room_id)
-          localStorage.setItem('player_id', data.player_id)
-          localStorage.setItem('room_id', roomId)
-          navigate(ROUTES.LOBBY)
-        } catch (err) {
-          console.error(
-            'Retry join room failed with username',
-            newUsername,
-            err
-          )
-          throw err
-        }
-      }
-    } catch (error) {
-      console.error(error)
-      setSnackbarMessage('Room ID not found')
-      setSnackbarOpen(true)
-    }
+  const joinRoom = async (navigate, create = false) => {
+    if (!create) localStorage.setItem('room_id', roomId)
+    localStorage.setItem('player_id', playerUsername ?? 'Player')
+    localStorage.setItem('playerUsername', playerUsername ?? 'Player')
+    navigate(ROUTES.LOBBY)
   }
 
   const createRoom = async navigate => {
@@ -133,7 +71,7 @@ const JoinRoom = () => {
       const response = await createRoomRequest()
       console.log('response to create room:', response)
       localStorage.setItem('room_id', response.room_id)
-      joinRoom(navigate)
+      joinRoom(navigate, true)
     } catch (error) {
       console.error(error)
     }

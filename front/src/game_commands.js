@@ -125,3 +125,18 @@ export const callStartGame = (channel, gameId) => {
   }
   return false;
 }
+
+export const joinRoom = (channel, gameId, playerid) => {
+  if (channel && gameId) {
+    channel.push("join_room", { game_id: gameId, player_id: playerid })
+      .receive("ok", response => {
+        console.log("join_room", response);
+        return true;
+      })
+      .receive("error", response => {
+        console.error("Error starting game:", response);
+        return false;
+      });
+  }
+  return false;
+}

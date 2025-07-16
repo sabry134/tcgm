@@ -138,7 +138,6 @@ const Lobby = () => {
       console.log("channel and socket = ", tmpSocket, tmpChannel)
       tmpChannel.on("game_started", (payload) => {
         console.log("Game started :", payload);
-        navigate(ROUTES.ROOM);
       }
       );
       tmpChannel.on("game_update", (payload) => {

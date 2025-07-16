@@ -178,19 +178,44 @@ const RuleEditor = () => {
     }))
   }
 
-  const saveGameRule = async () => {
-    try {
-      const res = await fetch(`${API_BASE}gameRules/${gameRule.id}`, {
+const saveGameRule = async () => {
+  try {
+    let res;
+    let updatedGameRule = { ...gameRule };
+
+    if (!gameRule.id) {
+      res = await fetch(`${API_BASE}gameRules`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          gameRule: {
+            ...gameRule,
+            game_id: parseInt(gameId)
+          }
+        })
+      });
+
+      if (!res.ok) throw new Error('Failed to create game rule');
+      const newGameRule = await res.json();
+
+      setGameRule(newGameRule);
+      updatedGameRule = newGameRule;
+    } else {
+      res = await fetch(`${API_BASE}gameRules/${gameRule.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ gameRule })
-      })
-      if (!res.ok) throw new Error('Failed to save game rule')
-      showSnackbar('Game Rule saved')
-    } catch (e) {
-      showSnackbar(e.message)
+      });
+
+      if (!res.ok) throw new Error('Failed to update game rule');
     }
+
+    showSnackbar('Game Rule saved');
+  } catch (e) {
+    showSnackbar(e.message);
   }
+};
+
 
   const handleAddPlayerProperty = async () => {
     if (!newPlayerPropName.trim()) {

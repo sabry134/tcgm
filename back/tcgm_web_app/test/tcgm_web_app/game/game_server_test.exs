@@ -104,7 +104,7 @@ defmodule TcgmWebApp.Game.GameServerTest do
     |> Repo.insert!()
 
     card_collection = %CardCollection{}
-    |> CardCollection.changeset(%{ name: "test", quantity: 10, game_id: game.id, user_id: user.id, type: "deck", public_template: true })
+    |> CardCollection.changeset(%{ name: "test", quantity: 10, game_id: game.id, user_id: user.id, type: "deck", public_template: true, valid: true, active: true })
     |> Repo.insert!()
 
     card_collection_card = %CardCollectionCard{}
@@ -120,7 +120,7 @@ defmodule TcgmWebApp.Game.GameServerTest do
     |> Repo.insert!()
 
     card_collection_p2 = %CardCollection{}
-    |> CardCollection.changeset(%{ name: "testp2", quantity: 10, game_id: game.id, user_id: user2.id, type: "deck", public_template: true })
+    |> CardCollection.changeset(%{ name: "testp2", quantity: 10, game_id: game.id, user_id: user2.id, type: "deck", public_template: true, valid: true, active: true })
     |> Repo.insert!()
 
     card_collection_card_p2 = %CardCollectionCard{}

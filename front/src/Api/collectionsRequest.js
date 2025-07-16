@@ -69,3 +69,7 @@ export async function saveCollectionWithCardsRequest(id, cards) {
 export async function getCardsInCardCollection(id) {
     return await baseRequest(`card_collections/${id}/cards`, 'GET');
 }
+
+export async function getActiveCardCollectionRequestForUserAndGame(userId, gameId, type) {
+    return await baseRequest(`card_collections/${userId}/${gameId}/${type}`, 'GET');
+}

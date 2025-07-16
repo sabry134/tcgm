@@ -10,6 +10,16 @@ import { getCardsByGameWithPropertiesRequest } from '../Api/cardsRequest';
 import { saveCollectionWithCardsRequest, getCardsInCollectionRequest } from '../Api/collectionsRequest';
 import { getCardCardType } from '../Api/cardsRequest';
 import { getCardCollectionGroupsForGameWithTypeRequest } from '../Api/cardCollectionGroupRequests';
+import { useNavigate } from 'react-router-dom';
+
+const Popup = ({ message, onClose }) => (
+  <div className="popup-overlay">
+    <div className="popup-content">
+      <p>{message}</p>
+      <button onClick={onClose}>Close</button>
+    </div>
+  </div>
+);
 
 const DeckBuilder = () => {
   const [deck, setDeck] = useState({});
@@ -18,11 +28,15 @@ const DeckBuilder = () => {
   const [filteredCards, setFilteredCards] = useState(mockCards);
   const [hoveredCard, setHoveredCard] = useState(null);
 
+  const navigate = useNavigate();
+
   async function getCardsWithProperties() {
     try {
       const gameId = localStorage.getItem('gameSelected');
       const response = await getCardsByGameWithPropertiesRequest(gameId);
-      setAllCards(response);
+      if (response) {
+        setAllCards(response);
+      }
     } catch (error) {
       console.error('Error fetching cards:', error);
     }
@@ -41,7 +55,11 @@ const DeckBuilder = () => {
           }
         }
       });
-      setDeck(deckData);
+      if (response) {
+        setDeck(deckData);
+      } else {
+        console.log('No cards found in the deck.')
+      }
     } catch (error) {
       console.error('Error fetching deck cards:', error);
     }
@@ -50,22 +68,26 @@ const DeckBuilder = () => {
   useEffect(() => {
     async function initializeDeck() {
       try {
-        // Fetch cards with properties first (independent of deck initialization)
         await getCardsWithProperties();
 
-        // Fetch deck groups and initialize the deck
         const gameId = localStorage.getItem('gameSelected');
         const groupsResponse = await getCardCollectionGroupsForGameWithTypeRequest(gameId, 'deck');
-        setDeckGroups(groupsResponse);
-
-        const initialDeck = {};
-        groupsResponse.forEach((group) => {
-          initialDeck[group.name] = [];
-        });
-        setDeck(initialDeck);
+        if(groupsResponse && groupsResponse.length > 0) {
+          console.log('Deck groups fetched:', groupsResponse);
+          setDeckGroups(groupsResponse);
+          const initialDeck = {};
+          groupsResponse.forEach((group) => {
+            initialDeck[group.name] = [];
+          });
+          setDeck(initialDeck);
+          await getCardsInDeck(initialDeck);
+        } else {
+          console.error('No deck groups found for the selected game.');
+          alert('No deck groups found for the selected game. Please create one before building your deck.');
+          navigate('/card-collection-editor');
+        }
 
         // Fetch cards in the deck using the initialized deck structure
-        await getCardsInDeck(initialDeck);
       } catch (error) {
         console.error('Error during deck initialization:', error);
       }

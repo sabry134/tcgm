@@ -11,9 +11,13 @@ import {
 } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { createRoomRequest, joinRoomRequest } from '../Api/roomRequest'
+import { getGamesRulesByGameIdRequest, getPlayerPropertiesByGameRuleIdRequest } from '../Api/rulesRequest'
+import { getActiveCardCollectionRequestForUserAndGame } from '../Api/collectionsRequest'
+import { getBoardByGameIdRequest } from '../Api/boardRequest'
 import { JoinRoomNavigationBar } from '../NavigationBar/JoinRoomNavigationBar'
 import { useChannel } from '../ChannelContext'
 import { ROUTES } from '../Routes/routes'
+import { get } from 'lodash'
 
 const JoinRoom = () => {
   const navigate = useNavigate()
@@ -27,6 +31,7 @@ const JoinRoom = () => {
   const [playerUsername, setPlayerUsername] = useState('')
   const [snackbarOpen, setSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('')
+  const [ressourcesOk, setRessourcesOk] = useState(false)
   const { setGameState } = useChannel()
 
   useEffect(() => {
@@ -35,6 +40,10 @@ const JoinRoom = () => {
       setScenes(savedScenes)
       setSelectedScene(savedScenes[0])
     }
+  }, [])
+
+  useEffect(() => {
+    checkRessources()
   }, [])
 
   useEffect(() => {
@@ -58,6 +67,49 @@ const JoinRoom = () => {
       localStorage.setItem('scenes', JSON.stringify(scenes))
     }
   }, [scenes])
+
+  const checkRessources = async () => {
+    const user_id = localStorage.getItem('user_id')
+    const game_id = localStorage.getItem('gameSelected')
+
+    try {
+      const gameRulesResponse = await getGamesRulesByGameIdRequest(game_id)
+      console.log('Game rules response:', gameRulesResponse)
+      if (!gameRulesResponse) {
+        console.log('No game rules found for the selected game.')
+        setRessourcesOk(false)
+        return;
+      }
+      const playerProperties = await getPlayerPropertiesByGameRuleIdRequest(gameRulesResponse.id)
+      console.log('Player properties response:', playerProperties)
+      if (!playerProperties) {
+        console.log('No player properties found for the game rules.')
+        setRessourcesOk(false)
+        return;
+      }
+      const boardResponse = await getBoardByGameIdRequest(game_id)
+      console.log('Board response:', boardResponse)
+      if (!boardResponse) {
+        console.log('No board found for the selected game.')
+        setRessourcesOk(false)
+        return;
+      }
+      const activeDeck = await getActiveCardCollectionRequestForUserAndGame(user_id, game_id, 'deck')
+      console.log('Active deck response:', activeDeck)
+      if (!activeDeck) {
+        console.log('No active deck found for the user and game.')
+        setRessourcesOk(false)
+        return;
+      }
+      setRessourcesOk(true)
+    } catch (error) {
+      console.error('Error checking resources:', error)
+      setSnackbarMessage('Error checking resources. Please try again.')
+      setSnackbarOpen(true)
+      setRessourcesOk(false)
+      return;
+    }
+  }
 
   const joinRoom = async (navigate, create = false) => {
     if (!create) localStorage.setItem('room_id', roomId)
@@ -121,6 +173,7 @@ const JoinRoom = () => {
                 variant='contained'
                 sx={styles.button}
                 onClick={() => joinRoom(navigate)}
+                disabled={!ressourcesOk}
               >
                 Join Room
               </Button>
@@ -138,6 +191,7 @@ const JoinRoom = () => {
                 variant='contained'
                 sx={styles.button}
                 onClick={() => createRoom(navigate)}
+                disabled={!ressourcesOk}
               >
                 Create Room
               </Button>

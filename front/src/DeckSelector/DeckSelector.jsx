@@ -31,7 +31,8 @@ const DeckSelector = () => {
         game_id: localStorage.getItem("gameSelected"),
         user_id: localStorage.getItem("userId"),
         type: "deck",
-        active: false
+        active: false,
+        valid: false,
       }
     };
     createCollectionRequest(deckCreationData)

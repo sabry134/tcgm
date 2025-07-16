@@ -105,7 +105,9 @@ const CardCollectionEditor = () => {
       if (!cardTypes.length) {
         const response = await getCardTypesByGameRequest(game_id);
         console.log("Fetched card types:", response);
-        setCardTypes(response);
+        if(response) {
+          setCardTypes(response);
+        }
         return;
       }
     } catch (error) {
@@ -166,6 +168,17 @@ const CardCollectionEditor = () => {
     alert("Item deleted successfully");
     fetchItems();
     closeModal();
+  };
+
+  const isFormValid = () => {
+    return (
+      currentItem.name.trim() !== "" &&
+      currentItem.max_cards !== "" &&
+      currentItem.min_cards !== "" &&
+      currentItem.max_copies !== "" &&
+      currentItem.collection_type !== "" &&
+      currentItem.allowed_card_types.length > 0
+    );
   };
 
   return (
@@ -279,28 +292,39 @@ const CardCollectionEditor = () => {
               </FormControl>
               <Box mt={2}>
                 <Typography variant="subtitle1" gutterBottom>Allowed Card Types:</Typography>
-                {cardTypes.map((type) => (
-                  <FormControlLabel
-                    key={type.id}
-                    control={
-                      <Checkbox
-                        checked={currentItem.allowed_card_types.includes(type.id)}
-                        onChange={(e) => {
-                          const updated = e.target.checked
-                            ? [...currentItem.allowed_card_types, type.id]
-                            : currentItem.allowed_card_types.filter((id) => id !== type.id);
-                          setCurrentItem({ ...currentItem, allowed_card_types: updated });
-                        }}
-                      />
-                    }
-                    label={type.name} // Display the name as the label
-                  />
-                ))}
+                {cardTypes.length === 0 ? (
+                  <Typography variant="body2" color="textSecondary">
+                    No card types available. Please create card types first.
+                  </Typography>
+                ) : (
+                  cardTypes.map((type) => (
+                    <FormControlLabel
+                      key={type.id}
+                      control={
+                        <Checkbox
+                          checked={currentItem.allowed_card_types.includes(type.id)}
+                          onChange={(e) => {
+                            const updated = e.target.checked
+                              ? [...currentItem.allowed_card_types, type.id]
+                              : currentItem.allowed_card_types.filter((id) => id !== type.id);
+                            setCurrentItem({ ...currentItem, allowed_card_types: updated });
+                          }}
+                        />
+                      }
+                      label={type.name} // Display the name as the label
+                    />
+                  ))
+                )}
               </Box>
             </DialogContent>
             <DialogActions>
               <Button onClick={closeModal} color="secondary">Cancel</Button>
-              <Button onClick={handleSubmit} variant="contained" color="primary">
+              <Button
+                onClick={handleSubmit}
+                variant="contained"
+                color="primary"
+                disabled={!isFormValid()} // Disable the button if the form is invalid
+              >
                 {isEditing ? "Save Changes" : "Create"}
               </Button>
             </DialogActions>

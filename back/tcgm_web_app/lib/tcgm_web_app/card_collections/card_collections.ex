@@ -102,4 +102,8 @@ defmodule TcgmWebApp.CardCollections.CardCollections do
   def get_active_card_collection_by_game_id_and_type(game_id, type) do
     Repo.one(from c in CardCollection, where: c.active == true and c.game_id == ^game_id and c.type == ^type)
   end
+
+  def get_active_card_collection_by_user_id_and_game_id_and_type(user_id, game_id, type) do
+    Repo.one(from c in CardCollection, where: c.active == true and c.user_id == ^user_id and c.game_id == ^game_id and c.type == ^type)
+  end
 end

@@ -48,6 +48,10 @@ defmodule TcgmWebApp.Game.GameServer do
     GenServer.call(via_tuple(room_id), {:join, player_id, game_id})
   end
 
+  def start_game(room_id, game_id) do
+    GenServer.call(via_tuple(room_id), {:start_game, game_id})
+  end
+
   def set_deck(room_id, player_id, deck) do
     GenServer.cast(via_tuple(room_id), {:set_deck, player_id, deck})
   end
@@ -74,10 +78,6 @@ defmodule TcgmWebApp.Game.GameServer do
 
   def update_card(room_id, player_id, location, card, key, value) do
     GenServer.cast(via_tuple(room_id), {:update_card, player_id, location, card, key, value})
-  end
-
-  def start_game(room_id, game_id) do
-    GenServer.cast(via_tuple(room_id), {:start_game, game_id})
   end
 
   def set_turn(room_id, player_id) do
@@ -132,6 +132,7 @@ defmodule TcgmWebApp.Game.GameServer do
   end
 
   def handle_call({:join, player_id, game_id}, _from, state) do
+    IO.inspect("Joining player #{player_id} to game #{game_id}")
     case GameRules.get_game_rule_by_game_id(game_id) do
       nil ->
         {:reply, {:error, :game_not_found}, state}
@@ -145,6 +146,7 @@ defmodule TcgmWebApp.Game.GameServer do
         new_players = Map.put(state.players, player_id, player_data)
         new_state = %{state | players: new_players, turn: player_id}
 
+        IO.inspect("Player #{player_id} joined game #{game_id} with properties: #{inspect(player_data)}")
         {:reply, {:ok, new_state}, new_state}
     end
   end
@@ -160,6 +162,21 @@ defmodule TcgmWebApp.Game.GameServer do
       {:reply, {:ok, new_state}, new_state}
     else
       {:reply, {:error, :not_found}, state}
+    end
+  end
+
+  def handle_call({:start_game, game_id}, state) do
+    case GameRules.get_game_rule_by_game_id(game_id) do
+      nil ->
+        {:noreply, state}
+
+      game_rules ->
+        new_state = Enum.reduce(state.players, state, fn {player_id, _player_data}, acc_state ->
+          update_state = GameConfig.load_deck_config(acc_state, game_id, player_id)
+          GameLogic.draw_card(update_state, player_id, %{"amount" => game_rules.starting_hand_size})
+        end)
+
+        {:noreply, new_state}
     end
   end
 
@@ -277,21 +294,6 @@ defmodule TcgmWebApp.Game.GameServer do
   def handle_cast({:shuffle_card, player_id, location}, state) do
     new_state = GameLogic.shuffle_card_location(state, player_id, %{"location" => location})
     {:noreply, new_state}
-  end
-
-  def handle_cast({:start_game, game_id}, state) do
-    case GameRules.get_game_rule_by_game_id(game_id) do
-      nil ->
-        {:noreply, state}
-
-      game_rules ->
-        new_state = Enum.reduce(state.players, state, fn {player_id, _player_data}, acc_state ->
-          update_state = GameConfig.load_deck_config(acc_state, game_id, player_id)
-          GameLogic.draw_card(update_state, player_id, %{"amount" => game_rules.starting_hand_size})
-        end)
-
-        {:noreply, new_state}
-    end
   end
 
 end

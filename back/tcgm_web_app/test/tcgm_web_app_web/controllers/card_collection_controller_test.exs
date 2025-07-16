@@ -240,7 +240,7 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
   end
 
   test "GET /api/card_collections/active/:user_id/:game_id/:type returns the active card collection for a user for a game", %{conn: conn, game: game, user: user} do
-    conn = get(conn, "/api/card_collections/active/#{user.id}/#{game.id}/Test_type")
+    conn = get(conn, "/api/card_collections/active/user/#{user.id}/game/#{game.id}/type/Test_type")
     response = json_response(conn, 200)
 
     assert is_map(response)

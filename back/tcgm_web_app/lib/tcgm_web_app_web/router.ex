@@ -69,7 +69,7 @@ defmodule TcgmWebAppWeb.Router do
     put "/card_collections/:card_collection_id/cards", CardCollectionController, :update_card_collection
     get "/card_collections/user/:user_id", CardCollectionController, :get_card_collections_by_user_id
     get "/card_collections/user/:user_id/game/:game_id", CardCollectionController, :get_card_collections_by_user_id_and_game_id
-    get "/card_collections/active/:user_id/:game_id/:type", CardCollectionController, :get_active_card_collection_by_user_id_and_game_id_and_type
+    get "/card_collections/active/user/:user_id/game/:game_id/type/:type", CardCollectionController, :get_active_card_collection_by_user_id_and_game_id_and_type
 
     get "/card_collection_groups/card_collection_types", CardCollectionGroupController, :get_card_collection_types
     resources "/card_collection_groups", CardCollectionGroupController, only: [:index, :show, :create, :update]

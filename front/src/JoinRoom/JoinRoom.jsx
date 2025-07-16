@@ -69,7 +69,7 @@ const JoinRoom = () => {
   }, [scenes])
 
   const checkRessources = async () => {
-    const user_id = localStorage.getItem('user_id')
+    const user_id = localStorage.getItem('userId')
     const game_id = localStorage.getItem('gameSelected')
 
     try {
@@ -80,7 +80,7 @@ const JoinRoom = () => {
         setRessourcesOk(false)
         return;
       }
-      const playerProperties = await getPlayerPropertiesByGameRuleIdRequest(gameRulesResponse.id)
+      const playerProperties = await getPlayerPropertiesByGameRuleIdRequest(gameRulesResponse[0].id)
       console.log('Player properties response:', playerProperties)
       if (!playerProperties) {
         console.log('No player properties found for the game rules.')

@@ -71,5 +71,5 @@ export async function getCardsInCardCollection(id) {
 }
 
 export async function getActiveCardCollectionRequestForUserAndGame(userId, gameId, type) {
-    return await baseRequest(`card_collections/${userId}/${gameId}/${type}`, 'GET');
+    return await baseRequest(`card_collections/active/user/${userId}/game/${gameId}/type/${type}`, 'GET');
 }

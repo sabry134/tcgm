@@ -256,7 +256,7 @@ defmodule TcgmWebAppWeb.CardCollectionController do
   end
 
   swagger_path :get_active_card_collection_by_game_id_and_type do
-    get("/card_collections/active/{user_id}/{game_id}/{type}")
+    get("/card_collections/active/user/{user_id}/game/{game_id}/type{type}")
     description("Get the active card collection for game ID and type")
     parameter("game_id", :path, :integer, "Game ID", required: true)
     parameter("type", :path, :string, "Collection type", required: true)

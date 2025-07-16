@@ -97,7 +97,7 @@ defmodule TcgmWebAppWeb.RoomControllerTest do
     |> Repo.insert!()
 
     card_collection = %CardCollection{}
-    |> CardCollection.changeset(%{ name: "test", quantity: 10, game_id: game.id, user_id: user.id, type: "deck", public_template: true })
+    |> CardCollection.changeset(%{ name: "test", quantity: 10, game_id: game.id, user_id: user.id, type: "deck", public_template: true, valid: true, active: true })
     |> Repo.insert!()
 
     card_collection_card = %CardCollectionCard{}

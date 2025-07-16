@@ -47,7 +47,12 @@ defmodule TcgmWebAppWeb.CardCollectionController do
     card_collection_params =
       case CardCollections.get_card_collections_by_game_id_and_type(card_collection_params["game_id"], card_collection_params["type"]) do
         [] ->
-          Map.put(card_collection_params, "active", true)
+          case card_collection_params["valid"] do
+            true ->
+              Map.put(card_collection_params, "active", true)
+            _ ->
+              card_collection_params
+          end
         _ ->
           case card_collection_params["active"] do
             true ->

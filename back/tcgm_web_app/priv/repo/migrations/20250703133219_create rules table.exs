@@ -9,6 +9,6 @@ defmodule :"Elixir.TcgmWebApp.Repo.Migrations.Create rules table" do
       timestamps()
     end
 
-    create unique_index(:rules, [:game_rule_id])
+    create unique_index(:rules, [:rule_name, :game_rule_id])
   end
 end

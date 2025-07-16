@@ -702,10 +702,10 @@ const BoardEditor = () => {
               tableBackground,
               board
             })
-            navigate(ROUTES.HOME)
+            navigate(ROUTES.GAME_MAIN_PAGE)
           }}
         >
-          Close
+          Back
         </Button>
         <Typography sx={styles.navText}>Board Editor</Typography>
         <Button sx={styles.navButton} onClick={addZonePair}>

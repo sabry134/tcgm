@@ -136,7 +136,10 @@ const Lobby = () => {
         });
       joinRoom(tmpChannel, localStorage.getItem("gameSelected"), localStorage.getItem("playerUsername"));
       console.log("channel and socket = ", tmpSocket, tmpChannel)
-
+      tmpChannel.on("game_started", (payload) => {
+        console.log("Game started :", payload);
+      }
+      );
       tmpChannel.on("game_update", (payload) => {
         console.log("Received game update:", payload);
         setGameState(payload.state);

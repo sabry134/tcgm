@@ -37,6 +37,12 @@ defmodule TcgmWebAppWeb.GameChannel do
     end
   end
 
+  def handle_in("start_game", %{"game_id" => game_id}, socket) do
+    TcgmWebApp.Game.GameServer.start_game(socket.assigns.room_id, game_id)
+    broadcast!(socket, "game_update", %{state: TcgmWebApp.Game.GameServer.get_state(socket.assigns.room_id)})
+    {:noreply, socket}
+  end
+
   def handle_in("leave_room", %{"player_id" => player_id}, socket) do
     TcgmWebApp.Game.GameServer.leave_room(socket.assigns.room_id, player_id)
     broadcast!(socket, "game_update", %{state: TcgmWebApp.Game.GameServer.get_state(socket.assigns.room_id)})
@@ -110,7 +116,7 @@ defmodule TcgmWebAppWeb.GameChannel do
     {:noreply, socket}
   end
 
-  def terminate(reason, socket) do
+  def terminate(_reason, socket) do
     room_id = socket.assigns[:room_id]
     player_id = socket.assigns[:player_id]
     if player_id && room_id do

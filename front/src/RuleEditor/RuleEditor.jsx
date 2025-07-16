@@ -35,7 +35,7 @@ const styles = {
 }
 
 const RuleEditor = () => {
-  const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:4000/api/'
+  const API_BASE = process.env.REACT_APP_API_URL || 'http://79.137.11.227:4000/api/'
   const brown = '#5d3a00'
   const brownLight = '#7a541c'
   const whiteText = '#fff'
@@ -452,29 +452,33 @@ const RuleEditor = () => {
               <Stack spacing={2}>
                 <TextField
                   label="Starting Hand Size"
-                  type="number"
+                  type="text"
                   fullWidth
                   value={gameRule.starting_hand_size}
                   onChange={e => handleGameRuleChange('starting_hand_size', e.target.value)}
+                  inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                 />
                 <TextField
                   label="Max Hand Size"
-                  type="number"
+                  type="text"
                   fullWidth
                   value={gameRule.max_hand_size}
                   onChange={e => handleGameRuleChange('max_hand_size', e.target.value)}
+                  inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                 />
                 <TextField
                   label="Draw Per Turn"
-                  type="number"
+                  type="text"
                   fullWidth
                   value={gameRule.draw_per_turn}
                   onChange={e => handleGameRuleChange('draw_per_turn', e.target.value)}
+                  inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                 />
                 <Button variant="contained" sx={{ bgcolor: brownLight }} onClick={saveGameRule}>
                   Save Game Rule
                 </Button>
               </Stack>
+
             </Card>
           </Grid>
 
@@ -492,11 +496,13 @@ const RuleEditor = () => {
                 />
                 <TextField
                   label="Value"
-                  type="number"
+                  type="text"
                   value={newPlayerPropValue}
-                  onChange={e => setNewPlayerPropValue(Number(e.target.value))}
+                  onChange={e => setNewPlayerPropValue(e.target.value)}
+                  inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                   fullWidth
                 />
+
                 <Button
                   variant="contained"
                   fullWidth
@@ -521,12 +527,14 @@ const RuleEditor = () => {
                       />
                       <TextField
                         label="Value"
-                        type="number"
+                        type="text"
                         value={editingPlayerPropValue}
-                        onChange={e => setEditingPlayerPropValue(Number(e.target.value))}
+                        onChange={e => setEditingPlayerPropValue(e.target.value)}
+                        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
                         sx={{ mr: 2, bgcolor: 'white', borderRadius: 1, width: 100 }}
                         size="small"
                       />
+
                       <Button
                         variant="contained"
                         onClick={saveEditedPlayerProp}

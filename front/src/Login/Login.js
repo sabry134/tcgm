@@ -24,7 +24,7 @@ const Login = () => {
   const [error, setError] = useState("");
 
   let API_BASE = process.env.REACT_APP_API_URL;
-  if (!API_BASE) API_BASE = 'http://localhost:4000/api/';
+  if (!API_BASE) API_BASE = 'http://79.137.11.227:4000/api/';
 
   const handleLogin = async () => {
     try {

@@ -43,7 +43,7 @@ const styles = {
 const MAX_NAME_LENGTH = 30
 let API_BASE = process.env.REACT_APP_API_URL
 if (!API_BASE) {
-  API_BASE = 'http://localhost:4000/api/'
+  API_BASE = 'http://79.137.11.227:4000/api/'
 }
 
 const BoardEditor = () => {

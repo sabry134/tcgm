@@ -201,6 +201,10 @@ defmodule TcgmWebAppWeb.CardCollectionController do
       end
     end)
 
+    CardCollections.update_card_collection(card_collection, %{
+      valid: true
+    })
+
     updated_cards = CardCollectionCards.get_card_collection_cards_by_card_collection_id(card_collection.id)
 
     json(conn, %{card_collection: card_collection, cards: updated_cards})

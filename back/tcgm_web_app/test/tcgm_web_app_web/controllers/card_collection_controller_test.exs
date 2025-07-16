@@ -239,8 +239,8 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
     assert Enum.all?(response, fn template -> Map.has_key?(template, "id") end)
   end
 
-  test "GET /api/card_collections/active/:game_id/:type returns the active card collection for a game", %{conn: conn, game: game} do
-    conn = get(conn, "/api/card_collections/active/#{game.id}/Test_type")
+  test "GET /api/card_collections/active/:user_id/:game_id/:type returns the active card collection for a user for a game", %{conn: conn, game: game, user: user} do
+    conn = get(conn, "/api/card_collections/active/#{user.id}/#{game.id}/Test_type")
     response = json_response(conn, 200)
 
     assert is_map(response)

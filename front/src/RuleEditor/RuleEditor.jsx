@@ -51,6 +51,8 @@ const RuleEditor = () => {
   const [editingPlayerPropId, setEditingPlayerPropId] = useState(null)
   const [editingPlayerPropName, setEditingPlayerPropName] = useState('')
   const [editingPlayerPropValue, setEditingPlayerPropValue] = useState(0)
+  const [customRuleIds, setCustomRuleIds] = useState({})
+
 
   const [customRules, setCustomRules] = useState([])
 
@@ -105,48 +107,48 @@ const RuleEditor = () => {
     }
   }
 
-useEffect(() => {
-  if (!gameId) return;
+  useEffect(() => {
+    if (!gameId) return;
 
-  const loadGameRule = async () => {
-    try {
-      const res = await fetch(`${API_BASE}gameRules/gameRule/${gameId}`);
-      const gameRulesData = await res.json();
-      if (gameRulesData.length > 0) {
-        const gr = gameRulesData[0];
-        setGameRule(gr);
+    const loadGameRule = async () => {
+      try {
+        const res = await fetch(`${API_BASE}gameRules/gameRule/${gameId}`);
+        const gameRulesData = await res.json();
+        if (gameRulesData.length > 0) {
+          const gr = gameRulesData[0];
+          setGameRule(gr);
+        }
+      } catch (e) {
+        console.error(e);
       }
-    } catch (e) {
-      console.error(e);
-    }
-  };
+    };
 
-  loadGameRule();
-}, [gameId]);
+    loadGameRule();
+  }, [gameId]);
 
-useEffect(() => {
-  if (!gameRule.id) return;
+  useEffect(() => {
+    if (!gameRule.id) return;
 
-  const fetchData = async () => {
-    try {
-      const propsRes = await fetch(`${API_BASE}playerProperties`);
-      const propsData = await propsRes.json();
-      const filteredProps = propsData.filter(p => p.game_rule_id === gameRule.id);
-      setPlayerProps(filteredProps);
+    const fetchData = async () => {
+      try {
+        const propsRes = await fetch(`${API_BASE}playerProperties`);
+        const propsData = await propsRes.json();
+        const filteredProps = propsData.filter(p => p.game_rule_id === gameRule.id);
+        setPlayerProps(filteredProps);
 
-      const rulesRes = await fetch(`${API_BASE}rules`);
-      const rulesData = await rulesRes.json();
-      const filteredRules = rulesData.filter(r => r.game_rule_id !== gameRule.id && r.game_rule_id !== null);
-      setCustomRules(filteredRules);
-    } catch (e) {
-      console.error(e);
-      setPlayerProps([]);
-      setCustomRules([]);
-    }
-  };
+        const rulesRes = await fetch(`${API_BASE}rules`);
+        const rulesData = await rulesRes.json();
+        const filteredRules = rulesData.filter(r => r.game_rule_id !== gameRule.id && r.game_rule_id !== null);
+        setCustomRules(filteredRules);
+      } catch (e) {
+        console.error(e);
+        setPlayerProps([]);
+        setCustomRules([]);
+      }
+    };
 
-  fetchData();
-}, [gameRule.id]);
+    fetchData();
+  }, [gameRule.id]);
 
 
   const showSnackbar = (message) => {
@@ -177,10 +179,6 @@ useEffect(() => {
   }
 
   const saveGameRule = async () => {
-    if (!gameRule.id) {
-      showSnackbar('Game Rule ID missing')
-      return
-    }
     try {
       const res = await fetch(`${API_BASE}gameRules/${gameRule.id}`, {
         method: 'PUT',
@@ -282,9 +280,10 @@ useEffect(() => {
 
   const handleCreateCustomRule = async () => {
     if (!newRuleName.trim()) {
-      showSnackbar('Enter a custom rule name')
-      return
+      showSnackbar('Enter a custom rule name');
+      return;
     }
+
     try {
       const gameRuleRes = await fetch(`${API_BASE}gameRules`, {
         method: 'POST',
@@ -297,9 +296,10 @@ useEffect(() => {
             game_id: parseInt(gameId)
           }
         })
-      })
-      const gameRuleData = await gameRuleRes.json()
-      if (!gameRuleRes.ok) throw new Error('Failed to create game rule')
+      });
+
+      const gameRuleData = await gameRuleRes.json();
+      if (!gameRuleRes.ok) throw new Error('Failed to create game rule');
 
       const ruleRes = await fetch(`${API_BASE}rules`, {
         method: 'POST',
@@ -311,17 +311,23 @@ useEffect(() => {
             game_rule_id: gameRuleData.id
           }
         })
-      })
-      if (!ruleRes.ok) throw new Error('Failed to create custom rule')
+      });
 
-      setNewRuleName('')
-      setNewRuleValue(0)
-      showSnackbar('Custom rule added')
-      fetchCustomRules(gameRule.id)
+      const ruleData = await ruleRes.json();
+      if (!ruleRes.ok) throw new Error('Failed to create custom rule');
+
+      setCustomRuleIds(prev => ({ ...prev, [ruleData.rule_name]: ruleData.id }));
+
+      setNewRuleName('');
+      setNewRuleValue(0);
+      showSnackbar('Custom rule added');
+      fetchCustomRules(gameRule.id);
     } catch (e) {
-      showSnackbar(e.message)
+      showSnackbar(e.message);
     }
-  }
+  };
+
+
 
   const startEditCustomRule = rule => {
     setEditingCustomRuleId(rule.id)
@@ -341,7 +347,11 @@ useEffect(() => {
       return
     }
     try {
-      const res = await fetch(`${API_BASE}rules/${editingCustomRuleId}`, {
+      console.log(gameRule.id)
+      const ruleId = customRuleIds[editingCustomRuleName] || editingCustomRuleId;
+
+      const res = await fetch(`${API_BASE}rules/${ruleId}`, {
+
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

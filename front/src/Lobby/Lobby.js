@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./Lobby.css"
 import { Socket } from "phoenix";
-import { callSetDeck, callStartGame } from "../game_commands";
+import { callSetDeck, callStartGame, joinRoom } from "../game_commands";
 import { useNavigate } from "react-router-dom";
 import { useChannel } from "../ChannelContext"; // Import the context hook
 import { RoomNavigationBar } from "../NavigationBar/RoomNavigationBar";
@@ -134,7 +134,7 @@ const Lobby = () => {
         .receive("error", (resp) => {
           console.error("WebSocket connection failed", resp);
         });
-
+      joinRoom(tmpChannel, localStorage.getItem("gameSelected"), localStorage.getItem("playerUsername"));
       console.log("channel and socket = ", tmpSocket, tmpChannel)
 
       tmpChannel.on("game_update", (payload) => {

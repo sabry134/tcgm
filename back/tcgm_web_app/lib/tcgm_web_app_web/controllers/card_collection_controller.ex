@@ -47,7 +47,12 @@ defmodule TcgmWebAppWeb.CardCollectionController do
     card_collection_params =
       case CardCollections.get_card_collections_by_game_id_and_type(card_collection_params["game_id"], card_collection_params["type"]) do
         [] ->
-          Map.put(card_collection_params, "active", true)
+          case card_collection_params["valid"] do
+            true ->
+              Map.put(card_collection_params, "active", true)
+            _ ->
+              card_collection_params
+          end
         _ ->
           case card_collection_params["active"] do
             true ->
@@ -196,6 +201,10 @@ defmodule TcgmWebAppWeb.CardCollectionController do
       end
     end)
 
+    CardCollections.update_card_collection(card_collection, %{
+      valid: true
+    })
+
     updated_cards = CardCollectionCards.get_card_collection_cards_by_card_collection_id(card_collection.id)
 
     json(conn, %{card_collection: card_collection, cards: updated_cards})
@@ -247,15 +256,17 @@ defmodule TcgmWebAppWeb.CardCollectionController do
   end
 
   swagger_path :get_active_card_collection_by_game_id_and_type do
-    get("/card_collections/active/{game_id}/{type}")
+    get("/card_collections/active/{user_id}/{game_id}/{type}")
     description("Get the active card collection for game ID and type")
     parameter("game_id", :path, :integer, "Game ID", required: true)
+    parameter("type", :path, :string, "Collection type", required: true)
+    parameter("user_id", :path, :integer, "User ID", required: true)
     response(code(:ok), "Success")
     response(code(:not_found), "No active card collection found")
   end
 
-  def get_active_card_collection_by_game_id_and_type(conn, %{"game_id" => game_id, "type" => type}) do
-    case CardCollections.get_active_card_collection_by_game_id_and_type(game_id, type) do
+  def get_active_card_collection_by_user_id_and_game_id_and_type(conn, %{"user_id" => user_id, "game_id" => game_id, "type" => type}) do
+    case CardCollections.get_active_card_collection_by_user_id_and_game_id_and_type(user_id, game_id, type) do
       nil ->
         conn
         |> put_status(:not_found)

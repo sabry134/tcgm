@@ -133,13 +133,26 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
     end)
   end
 
-  test "POST /api/card_collection sets collection to active if no other collections exist", %{conn: conn, game2: game2, user: user} do
-    attrs = %{ name: "Test card collection", quantity: 1, game_id: game2.id, user_id: user.id, type: "Test_type", active: false }
+  test "POST /api/card_collection sets collection to active if no other collections exist and valid is true", %{conn: conn, game2: game2, user: user} do
+    attrs = %{ name: "Test card collection", quantity: 1, game_id: game2.id, user_id: user.id, type: "Test_type", active: false, valid: true }
     conn = post(conn, "/api/card_collections", card_collection: attrs)
     response = json_response(conn, 201)
 
     assert response["id"]
     assert response["active"] == true
+
+    # Check if no other collections exist
+    all_collections = CardCollections.get_card_collections_by_user_id_and_game_id_and_type(user.id, game2.id, "Test_type")
+    assert length(all_collections) == 1
+  end
+
+  test "POST /api/card_collection will not set collection to active if valid is false", %{conn: conn, game2: game2, user: user} do
+    attrs = %{ name: "Test card collection", quantity: 1, game_id: game2.id, user_id: user.id, type: "Test_type", active: false, valid: false }
+    conn = post(conn, "/api/card_collections", card_collection: attrs)
+    response = json_response(conn, 201)
+
+    assert response["id"]
+    assert response["active"] == false
 
     # Check if no other collections exist
     all_collections = CardCollections.get_card_collections_by_user_id_and_game_id_and_type(user.id, game2.id, "Test_type")
@@ -226,8 +239,8 @@ defmodule TcgmWebAppWeb.CardCollectionControllerTest do
     assert Enum.all?(response, fn template -> Map.has_key?(template, "id") end)
   end
 
-  test "GET /api/card_collections/active/:game_id/:type returns the active card collection for a game", %{conn: conn, game: game} do
-    conn = get(conn, "/api/card_collections/active/#{game.id}/Test_type")
+  test "GET /api/card_collections/active/:user_id/:game_id/:type returns the active card collection for a user for a game", %{conn: conn, game: game, user: user} do
+    conn = get(conn, "/api/card_collections/active/#{user.id}/#{game.id}/Test_type")
     response = json_response(conn, 200)
 
     assert is_map(response)

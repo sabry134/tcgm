@@ -43,6 +43,27 @@ defmodule TcgmWebAppWeb.CardCollectionController do
   end
 
   def create(conn, %{"card_collection" => card_collection_params}) do
+
+    card_collection_params =
+      case CardCollections.get_card_collections_by_game_id_and_type(card_collection_params["game_id"], card_collection_params["type"]) do
+        [] ->
+          case card_collection_params["valid"] do
+            true ->
+              Map.put(card_collection_params, "active", true)
+            _ ->
+              card_collection_params
+          end
+        _ ->
+          case card_collection_params["active"] do
+            true ->
+              active_card_collection = CardCollections.get_active_card_collection_by_game_id_and_type(card_collection_params["game_id"], card_collection_params["type"])
+              CardCollections.update_card_collection(active_card_collection, %{active: false})
+              card_collection_params
+            _ ->
+              card_collection_params
+          end
+      end
+
     case CardCollections.create_card_collection(card_collection_params) do
       {:ok, card_collection} ->
         conn
@@ -67,6 +88,19 @@ defmodule TcgmWebAppWeb.CardCollectionController do
 
   def update(conn, %{"id" => id, "card_collection" => card_collection_params}) do
     card_collection = CardCollections.get_card_collection!(id)
+
+    case card_collection.active do
+      true ->
+        case CardCollections.get_active_card_collection_by_game_id_and_type(card_collection_params["game_id"], card_collection_params["type"]) do
+          nil ->
+            :ok
+          active_card_collection ->
+            # Deactivate the currently active card collection
+            CardCollections.update_card_collection(active_card_collection, %{active: false})
+        end
+      _ ->
+        :ok
+    end
 
     case CardCollections.update_card_collection(card_collection, card_collection_params) do
       {:ok, card_collection} ->
@@ -106,18 +140,24 @@ defmodule TcgmWebAppWeb.CardCollectionController do
     card_collection = CardCollections.get_card_collection!(id)
     card_collection_cards = CardCollectionCards.get_card_collection_cards_by_card_collection_id(card_collection.id)
 
-    card_quantities = Enum.reduce(card_collection_cards, %{}, fn card, acc ->
-      Map.put(acc, card.card_id, card.quantity)
+    card_data = Enum.reduce(card_collection_cards, %{}, fn card, acc ->
+      Map.put(acc, card.card_id, %{quantity: card.quantity, group: card.group})
     end)
 
-    card_ids = Map.keys(card_quantities)
+    card_ids = Map.keys(card_data)
     cards = Cards.get_cards_by_ids(card_ids)
 
-    cards_with_quantities = Enum.map(cards, fn card ->
-      Map.put(card, :quantity, card_quantities[card.id])
+    cards_with_details = Enum.map(cards, fn card ->
+      card_info = card_data[card.id]
+
+      card
+      |> Map.from_struct()
+      |> Map.drop([:__meta__, :inserted_at, :updated_at])
+      |> Map.put(:quantity, card_info.quantity)
+      |> Map.put(:group, card_info.group)
     end)
 
-    json(conn, cards_with_quantities)
+    json(conn, cards_with_details)
   end
 
   swagger_path :update_card_collection do
@@ -161,6 +201,10 @@ defmodule TcgmWebAppWeb.CardCollectionController do
       end
     end)
 
+    CardCollections.update_card_collection(card_collection, %{
+      valid: true
+    })
+
     updated_cards = CardCollectionCards.get_card_collection_cards_by_card_collection_id(card_collection.id)
 
     json(conn, %{card_collection: card_collection, cards: updated_cards})
@@ -191,5 +235,44 @@ defmodule TcgmWebAppWeb.CardCollectionController do
   def get_card_collections_by_user_id_and_game_id(conn, %{"user_id" => user_id, "game_id" => game_id}) do
     card_collections = CardCollections.get_card_collections_by_user_id_and_game_id(user_id, game_id)
     json(conn, card_collections)
+  end
+
+  swagger_path :get_card_collection_templates do
+    get("/card_collections/templates")
+    description("Get all public card collections")
+    response(code(:ok), "Success")
+    response(code(:not_found), "No public card collections found")
+  end
+
+  def get_card_collection_templates(conn, _params) do
+    case CardCollections.get_card_collection_templates() do
+      [] ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "No public card collections found"})
+      card_collections ->
+        json(conn, card_collections)
+    end
+  end
+
+  swagger_path :get_active_card_collection_by_game_id_and_type do
+    get("/card_collections/active/user/{user_id}/game/{game_id}/type{type}")
+    description("Get the active card collection for game ID and type")
+    parameter("game_id", :path, :integer, "Game ID", required: true)
+    parameter("type", :path, :string, "Collection type", required: true)
+    parameter("user_id", :path, :integer, "User ID", required: true)
+    response(code(:ok), "Success")
+    response(code(:not_found), "No active card collection found")
+  end
+
+  def get_active_card_collection_by_user_id_and_game_id_and_type(conn, %{"user_id" => user_id, "game_id" => game_id, "type" => type}) do
+    case CardCollections.get_active_card_collection_by_user_id_and_game_id_and_type(user_id, game_id, type) do
+      nil ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "No active card collection found"})
+      card_collection ->
+        json(conn, card_collection)
+    end
   end
 end

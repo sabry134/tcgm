@@ -1,7 +1,7 @@
-import React, { Component } from 'react'
+import React, { Component, useEffect } from 'react'
 import { Grid2, Box } from '@mui/material'
 import { DeckBox } from './DeckBox'
-import { getCollectionsByUserAndGameRequest, getGamesRequest } from '../../Api/collectionsRequest'
+import { getCollectionsByUserAndGameRequest } from '../../Api/collectionsRequest'
 
 export class DeckPicker extends Component {
   constructor (props) {
@@ -13,6 +13,13 @@ export class DeckPicker extends Component {
 
   componentDidMount () {
     if (this.state.deckList.length === 0) this.getDecks()
+    window.addEventListener('refreshDecks', () => {
+      this.getDecks()
+    })
+  }
+
+  componentWillUnmount () {
+    window.removeEventListener('refreshDecks', this.getDecks)
   }
 
   async getDecks () {

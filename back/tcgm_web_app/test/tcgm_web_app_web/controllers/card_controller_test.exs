@@ -47,7 +47,7 @@ defmodule TcgmWebAppWeb.CardControllerTest do
     |> CardProperty.changeset(%{ value_number: 43, cardtype_property_id: cardTypeProperty2.id, card_id: card.id })
     |> Repo.insert!()
 
-    {:ok, card: card, game: game, cardType: cardType, action: action, effect: effect, cardTypeProperty: cardTypeProperty, cardTypeProperty2: cardTypeProperty2}
+    {:ok, card: card, game: game, cardType: cardType, action: action, effect: effect, cardTypeProperty: cardTypeProperty, cardTypeProperty2: cardTypeProperty2, cardProperty: cardProperty}
   end
 
   test "GET /api/cards returns a list of cards", %{conn: conn, card: card} do
@@ -84,6 +84,13 @@ defmodule TcgmWebAppWeb.CardControllerTest do
     assert Enum.any?(response, fn c -> c["game_id"] == card.game_id end)
     assert Enum.any?(response, fn c -> c["card_type_id"] == card.card_type_id end)
     assert Enum.any?(response, fn c -> c["effect_ids"] == card.effect_ids end)
+  end
+
+  test "GET /api/cards/:card_id/cardtype returns the card's cardtype", %{conn: conn, card: card} do
+    conn = get(conn, "/api/cards/#{card.id}/cardtype")
+    response = json_response(conn, 200)
+
+    assert response["id"] == card.card_type_id
   end
 
   test "POST /api/cards creates a new card", %{conn: conn, game: game, cardType: cardType, effect: effect} do
@@ -135,11 +142,10 @@ defmodule TcgmWebAppWeb.CardControllerTest do
     assert response["properties"] |> Enum.any?(fn p -> p["cardtype_property_id"] == cardTypeProperty2.id and p["value_number"] == 42 end)
   end
 
-  test "GET /api/cards/game/:game_id/with_properties returns a list of cards with properties by game_id", %{conn: conn, card: card, game: game} do
+  test "GET /api/cards/game/:game_id/with_properties returns a list of cards with properties by game_id", %{conn: conn, card: card, game: game, cardProperty: cardProperty} do
     conn = get(conn, "/api/cards/game/#{game.id}/with_properties")
     response = json_response(conn, 200)
 
-    IO.inspect(response, label: "Response")
     assert length(response) > 0
     assert Enum.any?(response, fn c -> c["name"] == card.name end)
     assert Enum.any?(response, fn c -> c["text"] == card.text end)
@@ -147,7 +153,7 @@ defmodule TcgmWebAppWeb.CardControllerTest do
     assert Enum.any?(response, fn c -> c["card_type_id"] == card.card_type_id end)
     assert Enum.any?(response, fn c -> c["effect_ids"] == card.effect_ids end)
 
-    assert Enum.any?(response, fn c -> c["properties"] |> Enum.any?(fn p -> p["name"] == "property1" and p["value"] == "value1" end) end)
+    assert Enum.any?(response, fn c -> c["properties"] |> Enum.any?(fn p -> p["name"] == "property1" and p["value"] == "value1" and p["data_type"] == "text" and p["id"] == cardProperty.id end) end)
   end
 
 end

@@ -1,9 +1,17 @@
-import { Button, Paper, TextField } from '@mui/material'
+import { Button, Paper, TextField, Typography } from '@mui/material'
+import CheckIcon from '@mui/icons-material/Check'
 import React, { Component } from 'react'
 import { CardPicker } from './CardPicker'
 import { createCardTypeRequest } from '../../Api/cardTypesRequest'
-import { saveCardRequest, getCardsByGameRequest } from '../../Api/cardsRequest'
-import { loginUserRequest, createUserRequest } from '../../Api/usersRequest'
+import {
+  saveCardRequest,
+  getCardsByGameRequest,
+  getCardsByGameWithPropertiesRequest
+} from '../../Api/cardsRequest'
+import defaultData from '../Data/TestBack.json'
+
+// TODO(): add new create card button
+// TODO(): change right pannel to only accept mutable properties change and name of card
 
 export class LeftPanel extends Component {
   constructor (props) {
@@ -18,16 +26,26 @@ export class LeftPanel extends Component {
         name: '',
         description: ''
       },
-      cardList: []
+      cardList: [],
+      selectedCard: 0 // Track the selected card
     }
   }
 
   componentDidMount () {
     this.getCard()
+
+    // Add storage event listener
+    this.storageListener = () => {
+      this.getCard(false) // Reload cards when storage changes
+    }
+    window.addEventListener('newCardCreated', this.storageListener)
   }
 
   componentWillUnmount () {
     localStorage.removeItem('editIdPick')
+
+    // Remove storage event listener
+    window.removeEventListener('newCardCreated', this.storageListener)
   }
 
   createCardType () {
@@ -52,51 +70,37 @@ export class LeftPanel extends Component {
     const card = localStorage.getItem('currentEditedCard')
     const storedId = localStorage.getItem('editIdPick')
     const gameId = localStorage.getItem('gameSelected')
-
     try {
-      saveCardRequest(storedId, gameId, JSON.parse(card), ).then(data => {
-        console.log(data)
+      saveCardRequest(storedId, gameId, JSON.parse(card)).then(data => {
+        this.getCard()
       })
-      this.getCard()
     } catch (error) {
       console.log(error)
     }
   }
 
-  getCard () {
+  getCard (reloadPickedCard = true) {
     const gameSelected = localStorage.getItem('gameSelected')
 
     try {
-      getCardsByGameRequest(gameSelected).then(data => {
+      getCardsByGameWithPropertiesRequest(gameSelected).then(data => {
         if (!data) {
           return []
         }
-        this.setState({ cardList: data })
+
+        if (data.length > 0 && reloadPickedCard) {
+          this.setState({ cardList: data })
+          this.loadCard(data[0])
+        }
+        if (!reloadPickedCard) {
+          this.setState({
+            cardList: data,
+            selectedCard: data.findIndex(
+              card => JSON.parse(localStorage.getItem('editIdPick')) === card.id
+            )
+          })
+        }
         return data
-      })
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  login (json) {
-    try {
-      loginUserRequest({
-        user: { username: 'zac' }
-      }).then(data => {
-        console.log(data)
-      })
-    } catch (error) {
-      console.log(error)
-    }
-  }
-
-  register (json) {
-    try {
-      createUserRequest({
-        user: { username: 'zac' }
-      }).then(data => {
-        console.log(data)
       })
     } catch (error) {
       console.log(error)
@@ -115,8 +119,22 @@ export class LeftPanel extends Component {
   }
 
   loadCard (card) {
-    localStorage.setItem('currentEditedCard', JSON.stringify({ card: card }))
+    localStorage.setItem('currentEditedCard', JSON.stringify(card))
     window.dispatchEvent(new Event('storage'))
+  }
+
+  selectCard (index) {
+    if (index === -1) {
+      this.setState({ selectedCard: -1 })
+      localStorage.removeItem('editIdPick')
+      localStorage.setItem('currentEditedCard', JSON.stringify(defaultData))
+      window.dispatchEvent(new Event('storage'))
+      return
+    }
+    const selectedCard = this.state.cardList[index]
+    localStorage.setItem('editIdPick', selectedCard.id)
+    this.setState({ selectedCard: index })
+    this.loadCard(selectedCard)
   }
 
   render () {
@@ -131,30 +149,47 @@ export class LeftPanel extends Component {
           borderRadius: 0
         }}
       >
-        <CardPicker />
-        <Button
-          onClick={event => this.saveCard()}
-          sx={{ color: 'white', paddingBottom: 5 }}
-        >
-          Save Card
-        </Button>
-
         <div style={{ marginTop: 20 }}>
-          <h3>Cards List:</h3>
-          {this.state.cardList.length > 0 ? (
-            this.state.cardList.map((card, index) => (
-              <Button
-                key={index}
-                variant='contained'
-                onClick={event => this.loadCard(card)}
-                sx={{ bgcolor: 'white', color: '#5d3a00', margin: '5px 0' }}
+          <div className='titleList'> Card List </div>{' '}
+          {/* Add title for Card List */}
+          <ul className='typeList'>
+            {this.state.cardList.map((card, index) => (
+              <div key={index} className='itemList'>
+                <div
+                  className={'selector'}
+                  onClick={event => this.selectCard(index)}
+                >
+                  <Typography
+                    color={
+                      this.state.selectedCard === index ? '#FFF600' : 'white'
+                    }
+                  >
+                    {card.name}
+                  </Typography>
+                  {this.state.selectedCard === index && (
+                    <CheckIcon htmlColor='#FFF600' />
+                  )}
+                </div>
+                <div className='separator'></div>
+              </div>
+            ))}
+            <div className='itemList'>
+              <div
+                className={'selector'}
+                onClick={event => this.selectCard(-1)}
               >
-                {card.name}
-              </Button>
-            ))
-          ) : (
-            <p>No cards available.</p>
-          )}
+                <Typography
+                  color={this.state.selectedCard === -1 ? '#FFF600' : 'white'}
+                >
+                  + Create New Card
+                </Typography>
+                {this.state.selectedCard === -1 && (
+                  <CheckIcon htmlColor='#FFF600' />
+                )}
+              </div>
+              <div className='separator'></div>
+            </div>
+          </ul>
         </div>
       </Paper>
     )

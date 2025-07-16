@@ -1,4 +1,4 @@
-import { baseRequest  } from "./baseRequest";
+import { baseRequest } from "./baseRequest";
 
 // Create a new user
 export async function createUserRequest(data) {

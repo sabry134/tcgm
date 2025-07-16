@@ -8,6 +8,10 @@ defmodule TcgmWebApp.Game.GameServer do
   alias TcgmWebApp.CardTypeProperties.CardTypeProperties
   alias TcgmWebApp.CardProperties.CardProperties
   alias TcgmWebApp.Cards.Cards
+  alias TcgmWebApp.BoardZones.BoardZones
+  alias TcgmWebApp.Boards.Boards
+  alias TcgmWebApp.GameRules.GameRules
+  alias TcgmWebApp.PlayerProperties.PlayerProperties
 
   @moduledoc """
     This module is responsible for handling game servers.
@@ -28,7 +32,8 @@ defmodule TcgmWebApp.Game.GameServer do
       players: %{},
       turn: "",
       turnCount: 0,
-      phase: :waiting
+      phase: :waiting,
+      chat: [],
     }
     {:ok, state}
   end
@@ -39,8 +44,8 @@ defmodule TcgmWebApp.Game.GameServer do
     GenServer.call(via_tuple(room_id), :get_state)
   end
 
-  def join_room(room_id, player_id) do
-    GenServer.call(via_tuple(room_id), {:join, player_id})
+  def join_room(room_id, player_id, game_id) do
+    GenServer.call(via_tuple(room_id), {:join, player_id, game_id})
   end
 
   def set_deck(room_id, player_id, deck) do
@@ -71,8 +76,8 @@ defmodule TcgmWebApp.Game.GameServer do
     GenServer.cast(via_tuple(room_id), {:update_card, player_id, location, card, key, value})
   end
 
-  def start_game(room_id) do
-    GenServer.cast(via_tuple(room_id), {:start_game})
+  def start_game(room_id, game_id) do
+    GenServer.cast(via_tuple(room_id), {:start_game, game_id})
   end
 
   def set_turn(room_id, player_id) do
@@ -82,30 +87,35 @@ defmodule TcgmWebApp.Game.GameServer do
   def pass_turn(room_id, player_id) do
     GenServer.cast(via_tuple(room_id), {:pass_turn, player_id})
   end
-  # Server interaction functions
 
-  defp load_game_config(game_id) do
-    config_path = "assets/game_config/#{game_id}.json"
-
-    case File.read(config_path) do
-      {:ok, content} ->
-        case Jason.decode(content) do
-          {:ok, config} -> {:ok, config}
-          {:error, reason} -> {:error, {:invalid_json, reason}}
-        end
-
-      {:error, reason} -> {:error, {:file_not_found, reason}}
-    end
+  def shuffle_card(room_id, player_id, location) do
+    GenServer.cast(via_tuple(room_id), {:shuffle_card, player_id, location})
   end
 
-  defp create_player(config) do
-    containers =
-      config["card_containers"]
-      |> Map.keys()
-      |> Enum.map(fn container -> {container, %{}} end)
-      |> Enum.into(%{})
+  # server chat functions
 
-    Map.merge(containers, config["player_properties"])
+  def get_chat(room_id) do
+    GenServer.call(via_tuple(room_id), :get_chat)
+  end
+
+  def add_chat_message(room_id, player_id, message) do
+    GenServer.cast(via_tuple(room_id), {:add_chat_message, player_id, message})
+  end
+
+  # Server interaction functions
+
+  def leave_room(room_id, player_id) do
+    GenServer.call(via_tuple(room_id), {:leave, player_id})
+  end
+
+  defp create_player(game_id, player_properties) do
+    board = Boards.get_board_by_game_id(game_id)
+    zones = BoardZones.get_board_zones_by_board_id(board.id)
+    containers = Enum.reduce(zones, %{}, fn zone, acc ->
+      Map.put(acc, zone.name, [])
+    end)
+
+    Map.merge(containers, player_properties)
   end
 
   # GenServer callbacks
@@ -121,17 +131,35 @@ defmodule TcgmWebApp.Game.GameServer do
     {:reply, state, state}
   end
 
-  def handle_call({:join, player_id}, _from, state) do
-    game_id = 1
+  def handle_call({:join, player_id, game_id}, _from, state) do
+    case GameRules.get_game_rule_by_game_id(game_id) do
+      nil ->
+        {:reply, {:error, :game_not_found}, state}
 
-    case load_game_config(game_id) do
-      {:ok, config} ->
-        player_data = create_player(config)
-        new_state = %{state | players: Map.put(state.players, player_id, player_data)}
-        {:reply, :ok, new_state}
+      game_rules ->
+        player_properties = PlayerProperties.get_player_properties_by_game_rule_id(game_rules.id)
+        player_data = Enum.reduce(player_properties, %{"id" => player_id}, fn property, acc ->
+          Map.put(acc, property.property_name, property.value)
+        end)
+        player_data = create_player(game_id, player_data)
+        new_players = Map.put(state.players, player_id, player_data)
+        new_state = %{state | players: new_players, turn: player_id}
 
-      {:error, reason} ->
-        {:reply, {:error, reason}, state}
+        {:reply, {:ok, new_state}, new_state}
+    end
+  end
+
+  def handle_call(:get_chat, _from, state) do
+    {:reply, state.chat, state}
+  end
+
+  def handle_call({:leave, player_id}, _from, state) do
+    if Map.has_key?(state.players, player_id) do
+      new_players = Map.delete(state.players, player_id)
+      new_state = %{state | players: new_players}
+      {:reply, {:ok, new_state}, new_state}
+    else
+      {:reply, {:error, :not_found}, state}
     end
   end
 
@@ -157,13 +185,21 @@ defmodule TcgmWebApp.Game.GameServer do
   end
 
   def handle_cast({:set_deck, player_id, deck}, state) do
+
     new_state = %{state | players: Map.update!(state.players, player_id, fn player -> %{player | "deck" => deck} end)}
+    {:noreply, new_state}
+  end
+
+  def handle_cast({:add_chat_message, player_id, message}, state) do
+    timestamp = DateTime.utc_now() |> DateTime.to_iso8601()
+    message = %{timestamp: timestamp, player_id: player_id, message: message}
+    new_chat = [message | state.chat]
+    new_state = %{state | chat: new_chat}
     {:noreply, new_state}
   end
 
   def handle_cast({:set_deck_by_id, player_id, deck_id}, state) do
     card_collection_cards = CardCollectionCards.get_card_collection_cards_by_card_collection_id(deck_id)
-
     grouped_cards = Enum.group_by(card_collection_cards, & &1.group, fn card ->
       %{
         id: card.card_id,
@@ -172,7 +208,7 @@ defmodule TcgmWebApp.Game.GameServer do
     end)
 
     enriched_groups = Enum.map(grouped_cards, fn {group, cards} ->
-      enriched_cards = Enum.reduce(cards, %{}, fn card, acc ->
+      enriched_cards = Enum.map(cards, fn card ->
         base_card = Cards.get_card!(card.id)
         card_properties = CardProperties.get_card_properties_by_card_id(card.id)
 
@@ -187,8 +223,8 @@ defmodule TcgmWebApp.Game.GameServer do
           "image" => base_card.image,
           "properties" => enriched_properties
         }
-
-        Map.put(acc, "#{card.id}", enriched_card)
+        c = %{"#{card.id}" => enriched_card}
+        c
       end)
 
       {group, enriched_cards}
@@ -238,22 +274,24 @@ defmodule TcgmWebApp.Game.GameServer do
     {:noreply, new_state}
   end
 
-  def handle_cast({:start_game}, state) do
-    game_id = 1
+  def handle_cast({:shuffle_card, player_id, location}, state) do
+    new_state = GameLogic.shuffle_card_location(state, player_id, %{"location" => location})
+    {:noreply, new_state}
+  end
 
-    case load_game_config(game_id) do
-      {:ok, config} ->
-        starting_hand_size = config["starting_hand_size"]
+  def handle_cast({:start_game, game_id}, state) do
+    case GameRules.get_game_rule_by_game_id(game_id) do
+      nil ->
+        {:noreply, state}
 
+      game_rules ->
         new_state = Enum.reduce(state.players, state, fn {player_id, _player_data}, acc_state ->
           update_state = GameConfig.load_deck_config(acc_state, game_id, player_id)
-          GameLogic.draw_card(update_state, player_id, %{"amount" => starting_hand_size})
+          GameLogic.draw_card(update_state, player_id, %{"amount" => game_rules.starting_hand_size})
         end)
 
         {:noreply, new_state}
-
-      {:error, reason} ->
-        {:reply, {:error, reason}, state}
     end
   end
+
 end

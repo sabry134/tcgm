@@ -6,6 +6,9 @@ defmodule TcgmWebApp.Accounts.User do
 
   schema "users" do
     field :username, :string
+    field :password, :string, virtual: true
+    field :password_hash, :string
+    field :email, :string
 
     timestamps()
   end
@@ -13,17 +16,23 @@ defmodule TcgmWebApp.Accounts.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:username])
-    |> validate_required([:username])
+    |> cast(attrs, [:username, :password, :email])
+    |> validate_required([:username, :password, :email])
+    |> validate_format(:email, ~r/^[\w.!#$%&'*+\/=?`{|}^~\-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
     |> unique_constraint(:username)
-  #  |> put_pass_hash() will uncomment when passwords are added
+    |> unique_constraint(:email)
+    |> put_pass_hash()
   end
 
-  #defp put_pass_hash(changeset) do
-  #  case get_change(changeset, :password) do
-  #    nil -> changeset
-  #    password ->
-  #      put_change(changeset, :password_hash, Comeonin.Bcrypt.hashpwsalt(password))
-  #  end
-  #end
+  defp put_pass_hash(changeset) do
+    case get_change(changeset, :password) do
+      nil -> changeset
+      password ->
+        put_change(changeset, :password_hash, Pbkdf2.hash_pwd_salt(password))
+    end
+  end
+
+  def verify_password(user, password) do
+    Pbkdf2.verify_pass(password, user.password_hash)
+  end
 end

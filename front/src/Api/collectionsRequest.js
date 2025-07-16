@@ -36,7 +36,7 @@ export async function getCardsInCollectionRequest(id) {
 // }
 
 export async function updateCollectionRequest(id, data) {
-    return await baseRequest(`card_collections/${id}/cards`, 'PUT', data, {
+    return await baseRequest(`card_collections/${id}`, 'PUT', data, {
         'Content-Type': 'application/json'
     });
 }
@@ -51,4 +51,25 @@ export async function getCollectionsByUserRequest(userId) {
 
 export async function getCollectionsByUserAndGameRequest(userId, gameId) {
     return await baseRequest(`card_collections/user/${userId}/game/${gameId}`, 'GET');
+}
+
+// Save collection with cards
+// data: {
+//   "cards": cards,
+// }
+
+export async function saveCollectionWithCardsRequest(id, cards) {
+    return await baseRequest(`card_collections/${id}/cards`, 'PUT', cards, {
+        'Content-Type': 'application/json'
+    });
+}
+
+// Get list of cards in a card collection
+
+export async function getCardsInCardCollection(id) {
+    return await baseRequest(`card_collections/${id}/cards`, 'GET');
+}
+
+export async function getActiveCardCollectionRequestForUserAndGame(userId, gameId, type) {
+    return await baseRequest(`card_collections/active/user/${userId}/game/${gameId}/type/${type}`, 'GET');
 }

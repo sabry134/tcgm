@@ -6,69 +6,29 @@ import './Editor.css'
 import { TCGMBox } from './Properties/TCGMBox'
 import { CardTypeDisplay } from './CardTypeDisplay'
 
-// TODO(): when back is done changing properties put back those default properties
-// const defaultProperties = {
-//   property_name: 'Property',
-//   cardtype_id: '',
-//   type: 'text',
-//   value: 'Text',
-//   variant: [],
-//   mutable: true,
-//   width: 50,
-//   height: 50,
-//   font: 'Arial',
-//   font_size: 12,
-//   font_color: [0, 0, 0, 0],
-//   background_color: [25, 25, 25, 1],
-//   position_x: 50,
-//   position_y: 50,
-//   rotation: 0,
-//   border_width: 0,
-//   border_color: [0, 0, 0, 0],
-//   border_radius: 0,
-//   scale_x: 1,
-//   scale_y: 1,
-//   opacity: 1,
-//   image: '',
-//   image_width: 0,
-//   image_heigth: 0,
-//   image_position_x: 0,
-//   image_position_y: 0,
-//   image_rotation: 0,
-//   image_scale_x: 0,
-//   image_scale_y: 0,
-//   image_opacity: 0,
-//   z_axis: 0
-// }
-
 const defaultProperties = {
-  property_name: 'property2',
-  cardtype_id: 0,
+  property_name: 'Property',
+  cardtype_id: '',
   type: 'text',
-  value: 'test',
-  variant: 'test',
+  value: 'Text',
+  variant: [],
   mutable: true,
+  width: 50,
+  height: 50,
   font: 'Arial',
   font_size: 12,
-  font_color: [25, 25, 25, 1],
-  position_x: 0,
-  position_y: 0,
+  font_color: [0, 0, 0, 1],
+  background_color: [25, 25, 25, 1],
+  position_x: 50,
+  position_y: 50,
   rotation: 0,
+  border_width: 0,
+  border_color: [0, 0, 0, 0],
+  border_radius: 0,
   scale_x: 1,
   scale_y: 1,
-  border_width: 1,
-  border_color: [0, 0, 0, 0],
-  border_radius: '130',
-  opacity: 2,
-  image: 'image',
-  image_width: 100,
-  image_height: 100,
-  image_position_x: 0,
-  image_position_y: 0,
-  image_rotation: 0,
-  image_scale_x: 1,
-  image_scale_y: 1,
-  image_opacity: 100
+  opacity: 1,
+  z_axis: 0
 }
 
 export class Editor extends Component {
@@ -91,13 +51,27 @@ export class Editor extends Component {
       localStorage.removeItem('propertySelected')
     window.addEventListener('storage', this.handlePropertyChange)
     window.addEventListener('delete', this.handleDelete)
-
     window.addEventListener('storeProperties', this.handlePropertiesSet)
+    window.addEventListener('idSelected', this.handleIdSelected)
   }
   componentWillUnmount () {
-    window.removeEventListener('storage', this.handlePropertiesSet)
-    window.removeEventListener('storeProperties', this.handlePropertyChange)
+    window.removeEventListener('storage', this.handlePropertyChange)
+    window.removeEventListener('storeProperties', this.handlePropertiesSet)
     window.removeEventListener('delete', this.handleDelete)
+    window.removeEventListener('idSelected', this.handleIdSelected)
+  }
+
+  handleIdSelected = () => {
+    const index = JSON.parse(localStorage.getItem('idSelected'))
+    localStorage.setItem(
+      'propertySelected',
+      JSON.stringify(this.state.properties[index])
+    )
+    this.setState({
+      idSelected: index,
+      position_x: this.state.properties[index].position_x,
+      position_y: this.state.properties[index].position_y
+    })
   }
 
   handleDelete = () => {
@@ -106,12 +80,12 @@ export class Editor extends Component {
 
   handlePropertyChange = () => {
     const tmpProperties = this.state.properties
-
     const currentPropertySelected = JSON.parse(
       localStorage.getItem('propertySelected')
     )
+    const index = localStorage.getItem('idSelected')
 
-    tmpProperties[this.state.idSelected] = currentPropertySelected
+    tmpProperties[index] = currentPropertySelected
 
     this.setState({
       properties: tmpProperties,
@@ -126,6 +100,7 @@ export class Editor extends Component {
   }
 
   handleOnDragStart = event => {
+    event.stopPropagation()
     // Calculate offset from mouse to element's top-left corner
     if (this.state.idSelected === -1) return
 
@@ -162,9 +137,26 @@ export class Editor extends Component {
 
   createNewComponnent = type => {
     const typeId = localStorage.getItem('currentTypeSelected')
-    let newProperties = defaultProperties
+    let newProperties = { ...defaultProperties } // Clone defaultProperties
     newProperties.cardtype_id = typeId
     newProperties.type = type
+
+    switch (type) {
+      case 'number':
+        newProperties.value = 0
+        break // Prevent fall-through
+      case 'image':
+        newProperties.value = 'Image URL'
+        break // Prevent fall-through
+      case 'text':
+        newProperties.value = 'Text'
+        break // Prevent fall-through
+      case 'box':
+        newProperties.value = null
+        break // Prevent fall-through
+      default:
+        console.error(`Unknown type: ${type}`)
+    }
 
     this.setState(prevState => {
       const tmpProperties = [...prevState.properties, newProperties]
@@ -172,40 +164,9 @@ export class Editor extends Component {
         'currentTypeProperties',
         JSON.stringify(tmpProperties)
       )
+      window.dispatchEvent(new Event('componnentCreated'))
       return { properties: tmpProperties }
     })
-  }
-
-  switchProperties (value, index, selected) {
-    let data = value
-    if (index === this.state.idSelected) {
-      data = localStorage.getItem('propertySelected')
-    }
-    switch (value.type) {
-      case 'text': {
-        return (
-          <TCGMTextField
-            data={data}
-            selected={selected}
-            positionX={selected ? this.state.position_x : value.position_x}
-            positionY={selected ? this.state.position_y : value.position_y}
-          />
-        )
-      }
-      case 'box': {
-        return (
-          <TCGMBox
-            data={data}
-            selected={selected}
-            positionX={selected ? this.state.position_x : value.position_x}
-            positionY={selected ? this.state.position_y : value.position_y}
-          />
-        )
-      }
-      default: {
-        return <Box />
-      }
-    }
   }
 
   handleSelectedOnClick = (event, index) => {
@@ -215,13 +176,14 @@ export class Editor extends Component {
       JSON.stringify(this.state.properties[index])
     )
 
-    window.dispatchEvent(new Event('ComponnentSelected'))
+    localStorage.setItem('idSelected', index)
 
     this.setState({
       idSelected: index,
       position_x: this.state.properties[index].position_x,
       position_y: this.state.properties[index].position_y
     })
+    window.dispatchEvent(new Event('ComponnentSelected'))
   }
 
   handleDeselectedOnClick = () => {
@@ -238,7 +200,6 @@ export class Editor extends Component {
         onMouseLeave={this.handleOnDragEnd}
         onMouseUp={this.handleOnDragEnd}
         onClick={this.handleDeselectedOnClick}
-        className='editor'
       >
         <StagnantUI createNewComponnent={this.createNewComponnent} />
         <CardTypeDisplay
@@ -252,9 +213,3 @@ export class Editor extends Component {
     )
   }
 }
-// props:
-// position_x
-// position_y
-// id_selected
-// handleSelectedOnClick
-// properties *required

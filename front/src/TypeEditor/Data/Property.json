@@ -1,8 +1,8 @@
 {
   "property_name": "text",
   "cardtype_id": "none",
-  "type": "property_type",
-  "value": "text",
+  "type": "none",
+  "value": "value",
   "variant": "variant",
   "mutable": "boolean",
   "width": "number",

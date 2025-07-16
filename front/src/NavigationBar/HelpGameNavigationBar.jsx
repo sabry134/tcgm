@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { Games } from "@mui/icons-material";
 import { NavbarSmallButton } from "./Components/navbarButton";
 import { Box } from "@mui/material";
+import { ROUTES } from "../Routes/routes";
 
 export const HelpGameNavigationBar = () => {
   const navigate = useNavigate()
 
   const backGame = () => {
-    navigate('/room')
+    navigate(ROUTES.ROOM)
   }
 
   return (
@@ -22,9 +23,9 @@ export const HelpGameNavigationBar = () => {
       }}
     >
       <NavbarSmallButton
-        event={ backGame }
-        altText={ "Back to game" }
-        svgComponent={ Games }
+        event={backGame}
+        altText={"Back to game"}
+        svgComponent={Games}
       />
     </Box>
   )

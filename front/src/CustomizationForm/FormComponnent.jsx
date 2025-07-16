@@ -1,12 +1,29 @@
 import { Component } from 'react'
+import shallowEqual from 'shallowequal'
 
 export class FormComponnent extends Component {
   constructor (props) {
     super(props)
-    this.state = { inputValue: '' }
+    this.state = { inputValue: this.getInitialValue() }
+  }
+
+  getInitialValue () {
+    try {
+      const storedData = localStorage.getItem(
+        this.props.localStorageName ?? 'currentEditedCard'
+      )
+      if (storedData) {
+        const parsedData = JSON.parse(storedData)
+        return this.getValueByPath(parsedData, this.props.name)
+      }
+    } catch (error) {
+      console.error('Error reading from localStorage:', error)
+    }
+    return ''
   }
 
   getValueByPath (obj, path) {
+    if (!path || !obj) return ''
     return path.split('.').reduce((acc, part) => acc && acc[part], obj)
   }
 
@@ -14,19 +31,26 @@ export class FormComponnent extends Component {
     const parts = path.split('.')
     const lastPart = parts.pop()
     const lastObj = parts.reduce((acc, part) => acc[part], obj)
-    lastObj[lastPart] = value // Set the new value
+    lastObj[lastPart] = value
+  }
+
+  componentDidMountHandle () {
+    const currentValue = this.getInitialValue()
+    if (!shallowEqual(this.state.inputValue, currentValue)) {
+      this.setState({ inputValue: currentValue })
+    }
   }
 
   componentDidMount () {
-    this.setState({
-      inputValue: this.getValueByPath(
-        JSON.parse(
-          localStorage.getItem(
-            this.props.localStorageName ?? 'currentEditedCard'
-          )
-        ),
-        this.props.name
-      )
+    this.componentDidMountHandle()
+  }
+  componentDidUpdate () {
+    this.setState(prevState => {
+      const currentValue = this.getInitialValue()
+      if (!shallowEqual(prevState.inputValue, currentValue)) {
+        return { inputValue: currentValue }
+      }
+      return null
     })
   }
 
@@ -34,22 +58,24 @@ export class FormComponnent extends Component {
   handleChange = event => {
     const newValue = event.target.value
     this.setState({ inputValue: newValue })
-
-    // Send update to backend (or localStorage for temporary saving)
     this.updateJsonFile(newValue)
   }
 
   // Simulating JSON file update
   updateJsonFile = newValue => {
-    const storedCard = localStorage.getItem(
-      this.props.localStorageName ?? 'currentEditedCard'
-    )
-    const parsedCard = JSON.parse(storedCard)
-    this.setValueByPath(parsedCard, this.props.name, newValue)
-    localStorage.setItem(
-      this.props.localStorageName ?? 'currentEditedCard',
-      JSON.stringify(parsedCard)
-    )
-    window.dispatchEvent(new Event('storage'))
+    try {
+      const storedCard = localStorage.getItem(
+        this.props.localStorageName ?? 'currentEditedCard'
+      )
+      const parsedCard = JSON.parse(storedCard)
+      this.setValueByPath(parsedCard, this.props.name, newValue)
+      localStorage.setItem(
+        this.props.localStorageName ?? 'currentEditedCard',
+        JSON.stringify(parsedCard)
+      )
+      window.dispatchEvent(new Event('storage'))
+    } catch (error) {
+      console.error('Error updating localStorage:', error)
+    }
   }
 }

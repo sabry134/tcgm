@@ -1,0 +1,30 @@
+.cardEditorStagnantUIContainer {
+  display: flex;
+  width: 100%;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.cardEditorStagnantUI {
+  display: flex;
+  width: 70%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  background-color: #936639;
+
+  border-bottom: 1px solid #ccc;
+  border-radius: 80px;
+}
+
+.cardEditorStagnantUI h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 10px;
+}

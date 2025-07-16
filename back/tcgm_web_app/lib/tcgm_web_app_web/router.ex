@@ -13,16 +13,23 @@ defmodule TcgmWebAppWeb.Router do
     plug :cors_plug
   end
 
+  pipeline :auth do
+    plug TcgmWebAppWeb.AuthPipeline
+  end
+
+
   scope "/api", TcgmWebAppWeb do
     pipe_through :api
 
-    resources "/users", UserController, only: [:index, :show, :create, :update]
-    delete "/users/delete/:user_id", UserController, :delete_user
+    post "/users", UserController, :create
     post "/users/login", UserController, :login
 
     resources "/games", GameController, only: [:index, :show, :create, :update]
     delete "/games/delete/:game_id", GameController, :delete_game
     get "/games/name/:name", GameController, :get_game_by_name
+    get "/games/role/:role_name/user/:user_id", GameController, :get_games_by_role_and_user_id
+    get "/games/:game_id/user/:user_id/roles", GameController, :get_user_roles_for_game
+    post "/games/:game_id/user/:user_id/role", GameController, :grant_role_to_user
 
     resources "/actions", ActionController, only: [:index, :show, :create, :update]
     delete "/actions/delete/:action_id", ActionController, :delete_action
@@ -33,7 +40,9 @@ defmodule TcgmWebAppWeb.Router do
     get "/cards/game/:game_id", CardController, :get_cards_by_game_id
     post "/cards/with_properties", CardController, :create_card_with_properties
     get "/cards/game/:game_id/with_properties", CardController, :get_cards_with_properties_by_game_id
+    get "/cards/:card_id/cardtype", CardController, :get_card_cardtype
 
+    get "/cardTypes/templates", CardTypeController, :get_card_type_templates
     resources "/cardTypes", CardTypeController, only: [:index, :show, :create, :update]
     delete "/cardTypes/delete/:cardType_id", CardTypeController, :delete_cardType
     get "/cardTypes/game/:game_id", CardTypeController, :get_cardTypes_by_game_id
@@ -53,20 +62,59 @@ defmodule TcgmWebAppWeb.Router do
     get "/cardProperties/card/:card_id", CardPropertyController, :get_card_properties_by_card_id
     get "/cardProperties/card/:card_id/property/:cardtype_property_id", CardPropertyController, :get_card_properties_by_card_id_and_cardtype_property_id
 
+    get "/card_collections/templates", CardCollectionController, :get_card_collection_templates
     resources "/card_collections", CardCollectionController, only: [:index, :show, :create, :update]
     delete "/card_collections/delete/:card_collection_id", CardCollectionController, :delete_card_collection
     get "/card_collections/:card_collection_id/cards", CardCollectionController, :get_cards_in_card_collection
     put "/card_collections/:card_collection_id/cards", CardCollectionController, :update_card_collection
     get "/card_collections/user/:user_id", CardCollectionController, :get_card_collections_by_user_id
     get "/card_collections/user/:user_id/game/:game_id", CardCollectionController, :get_card_collections_by_user_id_and_game_id
+    get "/card_collections/active/user/:user_id/game/:game_id/type/:type", CardCollectionController, :get_active_card_collection_by_user_id_and_game_id_and_type
+
+    get "/card_collection_groups/card_collection_types", CardCollectionGroupController, :get_card_collection_types
+    resources "/card_collection_groups", CardCollectionGroupController, only: [:index, :show, :create, :update]
+    delete "/card_collection_groups/delete/:card_collection_group_id", CardCollectionGroupController, :delete_card_collection_group
+    get "/card_collection_groups/game/:game_id", CardCollectionGroupController, :get_card_collection_groups_by_game_id
+    get "/card_collection_groups/game/:game_id/type/:collection_type", CardCollectionGroupController, :get_card_collection_group_by_game_id_and_collection_type
+
+    get "/boards/templates", BoardController, :get_board_templates
+    resources "/boards", BoardController, only: [:index, :show, :create, :update]
+    delete "/boards/delete/:board_id", BoardController, :delete_board
+    get "/boards/game/:game_id", BoardController, :get_board_by_game_id
+    post "/boards/with_zones", BoardController, :create_board_with_zones
+    get "/boards/with_zones/:board_id", BoardController, :get_board_with_zones
+    put "/boards/with_zones/:board_id", BoardController, :update_board_with_zones
+    get "/boards/:board_id/zones", BoardController, :get_board_zones
+    delete "/boards/zones/:zone_id", BoardController, :delete_board_zone
 
     post "/rooms", RoomController, :create
     get "/rooms/:room_id", RoomController, :state
     post "/rooms/:room_id/join", RoomController, :join
+    post "/rooms/leave", RoomController, :leave
+
+    resources "/rules", RuleController, only: [:index, :show, :create, :update]
+    delete "/rules/delete/:rule_id", RuleController, :delete_rule
+    get "/rules/rule/:game_rule_id", RuleController, :get_rules_by_game_rule_id
+
+    resources "/playerProperties", PlayerPropertyController, only: [:index, :show, :create, :update]
+    delete "/playerProperties/delete/:player_property_id", PlayerPropertyController, :delete_player_property
+    get "/playerProperties/playerProperty/:game_rule_id", PlayerPropertyController, :get_player_properties_by_game_rule_id
+    post "/playerProperties/create", PlayerPropertyController, :create_player_properties
+
+    get "/gameRules/templates", GameRuleController, :get_game_rule_templates
+    resources "/gameRules", GameRuleController, only: [:index, :show, :create, :update]
+    delete "/gameRules/delete/:game_rule_id", GameRuleController, :delete_game_rule
+    get "/gameRules/gameRule/:game_id", GameRuleController, :get_game_rules_by_game_id
 
     get "/hello", HelloController, :index
   end
 
+  scope "/api", TcgmWebAppWeb do
+    pipe_through [:api, :auth]
+
+    resources "/users", UserController, only: [:index, :show, :update]
+    delete "/users/delete/:user_id", UserController, :delete_user
+  end
   def swagger_info do
     %{
       schemes: ["http", "https"],

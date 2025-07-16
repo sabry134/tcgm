@@ -1,6 +1,6 @@
 import { React, useRef, useState } from 'react'
 import './StagnantUI.css'
-import shallowEqual from 'shallowequal'
+import shallowEqualObject from 'shallowequal'
 import AddIcon from '@mui/icons-material/Add'
 import DeleteIcon from '@mui/icons-material/Delete'
 import PanToolAltIcon from '@mui/icons-material/PanToolAlt'
@@ -12,6 +12,7 @@ import {
   getCardTypesPropertiesbyTypeRequest,
   editCardTypesPropertyByIdRequest
 } from '../../Api/cardTypesPropertiesRequest'
+
 const StagnantUI = ({ createNewComponnent }) => {
   const [open, setOpen] = useState(false)
   const [tool, setTool] = useState(0)
@@ -27,7 +28,16 @@ const StagnantUI = ({ createNewComponnent }) => {
 
   const addBox = event => {
     setOpen(!open)
-    createNewComponnent('box')
+    createNewComponnent('text')
+  }
+  const addImage = event => {
+    setOpen(!open)
+    createNewComponnent('image')
+  }
+
+  const addNum = event => {
+    setOpen(!open)
+    createNewComponnent('number')
   }
 
   const selectButton = event => {
@@ -56,22 +66,24 @@ const StagnantUI = ({ createNewComponnent }) => {
       getCardTypesPropertiesbyTypeRequest(typeId).then(data => {
         for (let i = 0; i < tmpProperties.length; i++) {
           if (!data || i >= data.length) {
-            const updateProperties = {
-              ...tmpProperties[i],
-              font_color: tmpProperties[i].font_color.toString(),
-              border_color: tmpProperties[i].border_color.toString()
-            }
-            saveNewCardTypesPropertiesRequest({
-              cardTypeProperty: updateProperties
-            })
+            saveNewCardTypesPropertiesRequest(tmpProperties[i])
+            continue
           }
-          if (data && !shallowEqual(tmpProperties[i], data[i])) {
+
+          if (
+            data &&
+            !shallowEqualObject(
+              JSON.stringify(tmpProperties[i]),
+              JSON.stringify(data[i])
+            )
+          ) {
             editCardTypesPropertyByIdRequest(
               tmpProperties[i],
               tmpProperties[i].id
             )
           }
         }
+        window.dispatchEvent(new Event('componnentCreated'))
       })
     } catch (error) {
       console.log(error)
@@ -99,9 +111,10 @@ const StagnantUI = ({ createNewComponnent }) => {
         </div>
         <Popper anchorEl={anchorRef.current} open={open}>
           <div className='subAddMenu'>
-            {/* We need to add icon to menu item */}
             <MenuItem onClick={addText}> Text Field </MenuItem>
             <MenuItem onClick={addBox}> Box </MenuItem>
+            <MenuItem onClick={addNum}> Number </MenuItem>
+            <MenuItem onClick={addImage}> Image </MenuItem>
           </div>
         </Popper>
         <div className='roundButton' onClick={deleteButton}>

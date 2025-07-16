@@ -1,197 +1,162 @@
-import React, { useState, useEffect } from "react";
-import { Button, Typography, Box, Tabs, Tab, TextField } from "@mui/material";
+import React, { useState } from "react";
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Paper,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { ROUTES } from "../Routes/routes";
+import { BaseTopBar } from "../Components/TopBar/BaseTopBar.jsx";
+import { TopBarButton } from "../Components/TopBar/TopBarButton.jsx";
+
 
 const Login = () => {
   const navigate = useNavigate();
 
-  const [scenes, setScenes] = useState([]);
-  const [selectedScene, setSelectedScene] = useState("");
   const [tabIndex, setTabIndex] = useState(0);
-  const [cards, setCards] = useState([]);
-  const [buttons, setButtons] = useState([]);
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [repeatPassword, setRepeatPassword] = useState("");
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    const savedScenes = JSON.parse(localStorage.getItem("scenes")) || [];
-    if (savedScenes.length > 0) {
-      setScenes(savedScenes);
-      setSelectedScene(savedScenes[0]);
+  let API_BASE = process.env.REACT_APP_API_URL;
+  if (!API_BASE) API_BASE = 'http://79.137.11.227:4000/api/';
+
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post(API_BASE + "users/login", {
+        user: { username, password },
+      });
+      console.log("Login success:", response.data);
+      localStorage.setItem("accessToken", response.data.token);
+      localStorage.setItem("userId", response.data.user.id);
+      navigate(ROUTES.COMMUNITY);
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("Invalid username or password");
     }
-  }, []);
+  };
 
-  useEffect(() => {
-    if (selectedScene) {
-      const savedSceneData = JSON.parse(
-        sessionStorage.getItem(selectedScene)
-      ) || { cards: [], buttons: [] };
-      setCards(savedSceneData.cards);
-      setButtons(savedSceneData.buttons);
+  const handleRegister = async () => {
+    if (password !== repeatPassword) {
+      setError("Passwords do not match");
+      return;
     }
-  }, [selectedScene]);
 
-  useEffect(() => {
-    if (selectedScene) {
-      sessionStorage.setItem(selectedScene, JSON.stringify({ cards, buttons }));
+    try {
+      const response = await axios.post(API_BASE + "users", {
+        user: { username, email, password },
+      });
+      console.log("Register success:", response.data);
+      localStorage.setItem("accessToken", response.data.token);
+      localStorage.setItem("userId", response.data.user.id);
+      navigate(ROUTES.COMMUNITY);
+    } catch (err) {
+      console.error("Register error:", err);
+      const message =
+        err.response?.data?.errors?.email?.[0] ||
+        err.response?.data?.errors?.username?.[0] ||
+        "Registration failed";
+      setError(message);
     }
-  }, [cards, buttons, selectedScene]);
+  };
 
-  useEffect(() => {
-    if (scenes.length > 0) {
-      localStorage.setItem("scenes", JSON.stringify(scenes));
-    }
-  }, [scenes]);
-
-  useEffect(() => {
-    document.title = "JCCE";
-  }, []);
+  const submit = () => {
+    setError("");
+    tabIndex === 0 ? handleLogin() : handleRegister();
+  };
 
   return (
-    <Box display="flex" flexDirection="column" height="100vh">
-      <Box sx={styles.navbar}>
-        <Button onClick={() => navigate("/")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🌟 Home
-          </Typography>
-        </Button>
-        <Button
-          onClick={() => navigate("/documentation")}
-          sx={styles.navButton}
-        >
-          <Typography variant="h6" sx={styles.navText}>
-            📜 Documentation
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/forum")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🖼️ Forum
-          </Typography>
-        </Button>
-        <Button onClick={() => navigate("/community")} sx={styles.navButton}>
-          <Typography variant="h6" sx={styles.navText}>
-            🌍 Community
-          </Typography>
-        </Button>
-      </Box>
-      <Box sx={styles.container}>
-        <Box sx={styles.formContainer}>
-          <Tabs
-            value={tabIndex}
-            onChange={(_, newIndex) => setTabIndex(newIndex)}
-            textColor="inherit"
-            indicatorColor="secondary"
-            sx={styles.tabs}
-          >
-            <Tab label="Login" />
-            <Tab label="Register" />
-          </Tabs>
+    <Box sx={{ height: "100vh", bgcolor: "#eee", display: "flex", flexDirection: "column" }}>
+      <BaseTopBar>
+        <TopBarButton
+          text="Login"
+          altText="Login Tab"
+          event={() => {
+            setTabIndex(0);
+            setError("");
+          }}
+        />
+        <TopBarButton
+          text="Register"
+          altText="Register Tab"
+          event={() => {
+            setTabIndex(1);
+            setError("");
+          }}
+        />
+      </BaseTopBar>
 
-          {tabIndex === 0 ? (
-            <Box sx={styles.formBox}>
-              <TextField
-                fullWidth
-                label="Enter username"
-                variant="outlined"
-                sx={styles.input}
-              />
-              <TextField
-                fullWidth
-                label="Enter Password"
-                variant="outlined"
-                sx={styles.input}
-              />
-              <Button
-                fullWidth
-                variant="contained"
-                sx={styles.button}
-                onClick={() => navigate("/editor")}
-              >
-                Login
-              </Button>
-            </Box>
-          ) : (
-            <Box sx={styles.formBox}>
-              <TextField
-                fullWidth
-                label="Enter Username"
-                variant="outlined"
-                sx={styles.input}
-              />
-              <TextField
-                fullWidth
-                label="Enter Password"
-                variant="outlined"
-                sx={styles.input}
-              />
-              <TextField
-                fullWidth
-                label="Repeat Password"
-                variant="outlined"
-                sx={styles.input}
-              />
-              <Button
-                fullWidth
-                variant="contained"
-                sx={styles.button}
-                onClick={() => navigate("/editor")}
-              >
-                Register
-              </Button>
-            </Box>
+      <Box sx={{ flex: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <Paper elevation={6} sx={{ p: 4, bgcolor: "#fff", width: "320px" }}>
+          <Typography variant="h6" align="center" gutterBottom>
+            {tabIndex === 0 ? "Welcome Back" : "Create an Account"}
+          </Typography>
+
+          <TextField
+            fullWidth
+            label="Username"
+            variant="outlined"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            sx={{ mt: 2 }}
+          />
+
+          {tabIndex === 1 && (
+            <TextField
+              fullWidth
+              label="Email"
+              variant="outlined"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              sx={{ mt: 2 }}
+            />
           )}
-        </Box>
+
+          <TextField
+            fullWidth
+            label="Password"
+            type="password"
+            variant="outlined"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            sx={{ mt: 2 }}
+          />
+
+          {tabIndex === 1 && (
+            <TextField
+              fullWidth
+              label="Repeat Password"
+              type="password"
+              variant="outlined"
+              value={repeatPassword}
+              onChange={(e) => setRepeatPassword(e.target.value)}
+              sx={{ mt: 2 }}
+            />
+          )}
+
+          {error && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              {error}
+            </Typography>
+          )}
+
+          <Button
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3 }}
+            onClick={submit}
+          >
+            {tabIndex === 0 ? "Login" : "Register"}
+          </Button>
+        </Paper>
       </Box>
     </Box>
   );
-};
-
-const styles = {
-  navbar: {
-    backgroundColor: "#5d3a00",
-    color: "white",
-    padding: "10px",
-    display: "flex",
-    justifyContent: "space-around",
-  },
-  navButton: {
-    borderRadius: 0,
-  },
-  navText: {
-    color: "white",
-  },
-  container: {
-    height: "100vh",
-    backgroundColor: "#c4c4c4",
-    color: "white",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  formContainer: {
-    backgroundColor: "#5d3a00",
-    padding: 3,
-    borderRadius: 2,
-    boxShadow: 3,
-    textAlign: "center",
-  },
-  tabs: {
-    display: "flex",
-    justifyContent: "center",
-    width: "100%",
-  },
-  formBox: {
-    mt: 3,
-    width: "300px",
-    textAlign: "center",
-  },
-  input: {
-    backgroundColor: "white",
-    borderRadius: 1,
-    marginTop: "5%",
-  },
-  button: {
-    mt: 2,
-  },
 };
 
 export default Login;

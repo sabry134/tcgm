@@ -64,6 +64,11 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
+#Configures Elixir Guardian
+config :tcgm_web_app, TcgmWebApp.Guardian,
+  issuer: "tcgm_web_app",
+  secret_key: "MITyApsYEthEZJCXbuBaswZ8TKC0hk2gfpIo+kjUiEwQGMwEuTJh7C/FqdPyT7Yj"
+
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 

@@ -1,6 +1,7 @@
 import { FormComponnent } from '../FormComponnent'
 import { FormControl, InputLabel, Select, MenuItem } from '@mui/material'
-import { getCardTypesRequest } from '../../Api/cardTypesRequest'
+import { getCardTypesByGameRequest } from '../../Api/cardTypesRequest'
+import shallowEqual from 'shallowequal'
 
 export class CardTypePicker extends FormComponnent {
   constructor (props) {
@@ -15,15 +16,46 @@ export class CardTypePicker extends FormComponnent {
     this.fetchType()
     const currentCard = localStorage.getItem('currentEditedCard')
     if (currentCard) {
-      this.setState({ inputValue: JSON.parse(currentCard).card.card_type_id })
+      this.setState({ inputValue: JSON.parse(currentCard).card_type_id })
     }
   }
 
-  fetchType = () => {
+  componentDidUpdate () {
+    this.setState({
+      inputValue: this.getValueByPath(
+        JSON.parse(
+          localStorage.getItem(
+            this.props.localStorageName ?? 'currentEditedCard'
+          )
+        ),
+        this.props.name
+      )
+    })
+  }
+
+  shouldComponentUpdate (nextProps, nextState) {
+    return (
+      !shallowEqual(
+        this.state.inputValue,
+        this.getValueByPath(
+          JSON.parse(
+            localStorage.getItem(
+              this.props.localStorageName ?? 'currentEditedCard'
+            )
+          ),
+          this.props.name
+        )
+      ) ||
+      (nextState && !shallowEqual(this.state.cardTypes, nextState.cardTypes))
+    )
+  }
+
+  fetchType = async () => {
     try {
-      getCardTypesRequest().then(data => {
-        this.setState({ cardTypes: data })
-      })
+      const data = await getCardTypesByGameRequest(
+        localStorage.getItem('gameSelected')
+      )
+      this.setState({ cardTypes: data })
     } catch (error) {
       console.log(error)
     }
@@ -47,14 +79,15 @@ export class CardTypePicker extends FormComponnent {
           value={this.state.inputValue}
           label='Type'
           onChange={this.handleChange}
-          onOpen={this.fetchType}
         >
           {this.state.cardTypes.length > 0 ? (
-            this.state.cardTypes.map((type, index) => (
-              <MenuItem key={index} value={type.id}>
-                {type.name}
-              </MenuItem>
-            ))
+            this.state.cardTypes.map((type, index) => {
+              return (
+                <MenuItem key={index} value={type.id}>
+                  {type.name}
+                </MenuItem>
+              )
+            })
           ) : (
             <MenuItem disabled>Loading...</MenuItem>
           )}

@@ -4,7 +4,7 @@ import { GameSelectedAddOn } from "./EditorsAddOn/GameSelectedAddOn";
 import { ListEditorsAddOn } from "./EditorsAddOn/ListEditorsAddOn";
 
 export class MainNavigationBar extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
 
     this.state = {
@@ -12,13 +12,14 @@ export class MainNavigationBar extends Component {
       showEditors: false
     }
   }
-  componentDidMount () {
+
+  componentDidMount() {
     this.handleStorageChange({})
 
     window.addEventListener('gameSelected', this.handleStorageChange)
   }
 
-  componentWillUnmount () {
+  componentWillUnmount() {
     window.removeEventListener('gameSelected', this.handleStorageChange)
   }
 
@@ -34,10 +35,10 @@ export class MainNavigationBar extends Component {
     this.setState({ showEditors: !this.state.showEditors })
   }
 
-  render () {
+  render() {
     return (
       <>
-        { this.state.noGameChosen ? (
+        {this.state.noGameChosen ? (
           <Box
             sx={{
               backgroundColor: '#5d3a00',
@@ -61,12 +62,12 @@ export class MainNavigationBar extends Component {
               justifyContent: 'space-around'
             }}
           >
-            { this.state.showEditors ? (
+            {this.state.showEditors ? (
               <>
-                <ListEditorsAddOn toggleDisplay={this.toggleDisplayEditors} />
+                <ListEditorsAddOn toggleDisplay={this.toggleDisplayEditors}/>
               </>
             ) : (
-              <GameSelectedAddOn toggleDisplay={ this.toggleDisplayEditors } />
+              <GameSelectedAddOn toggleDisplay={this.toggleDisplayEditors}/>
             )}
           </Box>
         )}

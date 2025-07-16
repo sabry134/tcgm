@@ -1,0 +1,42 @@
+.customFormItem {
+  display: flex;
+  background-color: #936639;
+  padding-right: 15px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: #b6ad90;
+  justify-content: space-between;
+}
+
+.customFormItem.first {
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+}
+
+.customFormItem.last {
+  border-bottom-right-radius: 15px;
+  border-bottom-left-radius: 15px;
+}
+
+.customFormName {
+  padding-left: 15px;
+  width: 10vw;
+  margin: 0px;
+  padding-bottom: 5px;
+  padding-right: 15px;
+  background-color: #7f4f24;
+}
+
+.customFormName.first {
+  border-top-left-radius: 15px;
+}
+
+.customFormName.last {
+  border-bottom-left-radius: 15px;
+}
+
+.customFormInput {
+  width: 70%;
+  align-items: center;
+  justify-content: center;
+}

@@ -157,4 +157,30 @@ defmodule TcgmWebAppWeb.CardTypeController do
         |> json(%{errors: Helpers.translate_errors(changeset)})
     end
   end
+
+  swagger_path :get_card_type_templates do
+    get("/cardTypes/templates")
+    description("Get all public card type templates")
+    response(code(:ok), "Success")
+    response(code(:not_found), "No public templates found")
+  end
+
+  def get_card_type_templates(conn, _params) do
+    case CardTypes.get_card_type_templates() do
+      [] ->
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "No public templates found"})
+
+      cardTypes when is_list(cardTypes) ->
+        conn
+        |> put_status(:ok)
+        |> json(cardTypes)
+
+      _ ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(%{error: "Could not retrieve public templates"})
+    end
+  end
 end
